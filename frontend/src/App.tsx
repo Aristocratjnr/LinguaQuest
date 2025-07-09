@@ -18,6 +18,7 @@ import AIResponse from './components/AIResponse';
 import NicknamePrompt from './components/NicknamePrompt';
 import AvatarPicker from './components/AvatarPicker';
 import Leaderboard from './components/Leaderboard';
+import Badges from './components/Badges';
 
 const TONES = ['polite', 'passionate', 'formal', 'casual'];
 const LANGUAGES = [
@@ -55,6 +56,10 @@ const App: React.FC = () => {
   const [showNicknamePrompt, setShowNicknamePrompt] = useState(!nickname);
   const [showAvatarPicker, setShowAvatarPicker] = useState(!avatar && !showNicknamePrompt);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [badges, setBadges] = useState<string[]>([]);
+  const [roundWins, setRoundWins] = useState(0);
+  const [allPersuaded, setAllPersuaded] = useState(true);
+  const [uniqueWords, setUniqueWords] = useState<Set<string>>(new Set());
 
   // Timer logic
   useEffect(() => {
@@ -179,6 +184,37 @@ const App: React.FC = () => {
     }
   }, [roundResult, round, TOTAL_ROUNDS]);
 
+  // Track round wins and unique words
+  useEffect(() => {
+    if (roundResult === 'success') {
+      setRoundWins(w => w + 1);
+    }
+    if (userArgument && roundResult === 'playing') {
+      const words = userArgument.toLowerCase().split(/\W+/).filter(Boolean);
+      setUniqueWords(prev => new Set([...prev, ...words]));
+    }
+    if (roundResult === 'fail') {
+      setAllPersuaded(false);
+    }
+    if (roundResult === 'playing' && round === 1) {
+      setRoundWins(0);
+      setAllPersuaded(true);
+      setUniqueWords(new Set());
+    }
+  }, [roundResult, userArgument, round]);
+
+  // Unlock badges on game over
+  useEffect(() => {
+    if (roundResult === 'gameover') {
+      const unlocked: string[] = [];
+      if (roundWins >= 3) unlocked.push('streak');
+      if ((score ?? 0) >= 8) unlocked.push('highscore');
+      if (uniqueWords.size >= 20) unlocked.push('creative');
+      if (allPersuaded && round === TOTAL_ROUNDS + 1) unlocked.push('perfect');
+      setBadges(unlocked);
+    }
+  }, [roundResult, roundWins, score, uniqueWords, allPersuaded, round]);
+
   // Handle nickname confirm
   const handleNicknameConfirm = (name: string) => {
     setNickname(name);
@@ -256,7 +292,10 @@ const App: React.FC = () => {
         </div>
         {roundResult === 'success' && <div className="lq-round-success">🎉 Persuaded! +1</div>}
         {roundResult === 'fail' && <div className="lq-round-fail">⏰ Time's up! Try next round.</div>}
-        {roundResult === 'gameover' && <div className="lq-gameover">🏆 Game Over! Thanks for playing.</div>}
+        {roundResult === 'gameover' && <>
+          <div className="lq-gameover">🏆 Game Over! Thanks for playing.</div>
+          {badges.length > 0 && <Badges badges={badges} />}
+        </>}
         {showGameOverLeaderboard && <button className="lq-btn lq-btn-scenario" onClick={() => setShowLeaderboard(true)}>View Leaderboard</button>}
         {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
         <button className="lq-btn lq-btn-scenario" onClick={fetchScenario} disabled={loading || roundResult !== 'playing'}>New Scenario</button>
