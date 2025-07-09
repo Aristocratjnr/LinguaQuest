@@ -3,3 +3,5 @@ uvicorn
 transformers
 torch
 sentencepiece 
+vaderSentiment
+scikit-learn 

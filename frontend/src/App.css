@@ -1,0 +1,216 @@
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  margin: 0;
+  font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+.lq-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lq-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 600px;
+  margin: 2rem auto 1rem auto;
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 2px 16px #0002;
+  padding: 1rem 2rem;
+}
+
+.lq-logo {
+  height: 48px;
+  margin-right: 1rem;
+}
+
+.lq-avatar {
+  height: 56px;
+  width: 56px;
+  border-radius: 50%;
+  border: 2px solid #764ba2;
+  box-shadow: 0 2px 8px #764ba233;
+}
+
+.lq-card {
+  background: #fff;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 2px 16px #0002;
+  padding: 2rem;
+  max-width: 600px;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.lq-section {
+  margin-bottom: 1.5rem;
+}
+
+.lq-label {
+  font-weight: 500;
+  color: #764ba2;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.lq-lang {
+  color: #667eea;
+  font-weight: bold;
+}
+
+.lq-scenario {
+  font-size: 1.2rem;
+  color: #333;
+  margin: 0.5rem 0 1rem 0;
+  background: #f3f0fa;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.lq-textarea {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #764ba2;
+  padding: 0.75rem;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  resize: vertical;
+  background: #f8f6fc;
+}
+
+.lq-select {
+  margin-left: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #764ba2;
+  padding: 0.3rem 0.7rem;
+  background: #f8f6fc;
+  color: #333;
+}
+
+.lq-btn {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #764ba233;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.lq-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.lq-btn-scenario {
+  background: linear-gradient(90deg, #ffb347 0%, #ffcc33 100%);
+  color: #764ba2;
+}
+.lq-btn-translate {
+  background: linear-gradient(90deg, #4ade80 0%, #22d3ee 100%);
+  color: #333;
+}
+.lq-btn-evaluate {
+  background: linear-gradient(90deg, #f472b6 0%, #a78bfa 100%);
+  color: #fff;
+}
+.lq-btn-dialogue {
+  background: linear-gradient(90deg, #fbbf24 0%, #f59e42 100%);
+  color: #fff;
+}
+
+.lq-translation {
+  margin-top: 0.5rem;
+  color: #22a06b;
+  background: #e6f9f0;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+}
+.lq-feedback {
+  margin-top: 0.5rem;
+  color: #a21caf;
+  background: #f3e8ff;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+}
+.lq-score {
+  color: #667eea;
+  font-weight: bold;
+  margin-top: 0.3rem;
+}
+.lq-ai-response {
+  margin-top: 0.5rem;
+  color: #2563eb;
+  background: #e0e7ff;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+}
+.lq-ai-stance {
+  color: #f59e42;
+  font-weight: bold;
+  margin-top: 0.3rem;
+}
+.lq-loading {
+  color: #888;
+  margin-top: 1rem;
+  text-align: center;
+}
+.lq-footer {
+  text-align: center;
+  color: #fff;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.lq-onboarding {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+.lq-onboarding-card {
+  max-width: 420px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px #0002;
+  padding: 2rem 2.5rem;
+  text-align: center;
+}
+.lq-onboarding-card h2 {
+  color: #764ba2;
+  margin-bottom: 1rem;
+}
+.lq-onboarding-card p {
+  color: #333;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+.lq-onboarding .lq-btn {
+  font-size: 1.1rem;
+  padding: 0.8rem 2rem;
+}
+.lq-shake {
+  animation: lq-shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+}
+@keyframes lq-shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-8px); }
+  40%, 60% { transform: translateX(8px); }
+}
+.lq-root .Confetti {
+  z-index: 1000;
+  pointer-events: none;
+} 
