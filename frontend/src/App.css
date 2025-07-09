@@ -213,4 +213,67 @@ body {
 .lq-root .Confetti {
   z-index: 1000;
   pointer-events: none;
+}
+
+.lq-leaderboard-bg {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(102, 126, 234, 0.85);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lq-leaderboard-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 24px #764ba244;
+  padding: 2rem 2.5rem;
+  min-width: 340px;
+  max-width: 95vw;
+  text-align: center;
+}
+.lq-leaderboard-card h2 {
+  color: #764ba2;
+  margin-bottom: 1.5rem;
+}
+.lq-leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: #f8f6fc;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.lq-leaderboard-table th, .lq-leaderboard-table td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #e0e7ff;
+  color: #333;
+}
+.lq-leaderboard-table th {
+  background: #667eea;
+  color: #fff;
+  font-weight: 600;
+}
+.lq-leaderboard-table tr:last-child td {
+  border-bottom: none;
+}
+.lq-leaderboard-table tr:nth-child(even) td {
+  background: #f3f0fa;
+}
+.lq-leaderboard-table td {
+  font-size: 1.05rem;
+}
+.lq-leaderboard-card .lq-btn {
+  margin-bottom: 1rem;
+}
+
+.lq-avatar-pick {
+  transition: box-shadow 0.2s, border 0.2s;
+  border: 2px solid #e0e7ff;
+  box-shadow: none;
+}
+.lq-avatar-pick-selected {
+  border: 3px solid #764ba2 !important;
+  box-shadow: 0 0 12px #764ba288 !important;
 } 
