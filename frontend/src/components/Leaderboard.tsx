@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import defaultAvatar from './avatar.png';
 
 interface Entry {
   name: string;
   score: number;
   date: string;
+  avatar?: string;
 }
 
 const Leaderboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
@@ -34,12 +36,19 @@ const Leaderboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         {!loading && !error && (
           <table className="lq-leaderboard-table">
             <thead>
-              <tr><th>#</th><th>Name</th><th>Score</th><th>Date</th></tr>
+              <tr><th>#</th><th>Avatar</th><th>Name</th><th>Score</th><th>Date</th></tr>
             </thead>
             <tbody>
               {entries.map((e, i) => (
                 <tr key={i}>
                   <td>{i + 1}</td>
+                  <td>
+                    <img
+                      src={e.avatar || defaultAvatar}
+                      alt="avatar"
+                      style={{ width: 36, height: 36, borderRadius: '50%', border: '2px solid #764ba2', objectFit: 'cover' }}
+                    />
+                  </td>
                   <td>{e.name}</td>
                   <td>{e.score}</td>
                   <td>{new Date(e.date).toLocaleDateString()}</td>

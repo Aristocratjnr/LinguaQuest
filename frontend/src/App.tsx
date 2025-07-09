@@ -15,6 +15,9 @@ import ArgumentInput from './components/ArgumentInput';
 import ToneSelector from './components/ToneSelector';
 import Feedback from './components/Feedback';
 import AIResponse from './components/AIResponse';
+import NicknamePrompt from './components/NicknamePrompt';
+import AvatarPicker from './components/AvatarPicker';
+import Leaderboard from './components/Leaderboard';
 
 const TONES = ['polite', 'passionate', 'formal', 'casual'];
 const LANGUAGES = [
@@ -47,6 +50,11 @@ const App: React.FC = () => {
   const audioSuccess = useRef<HTMLAudioElement|null>(null);
   const audioFail = useRef<HTMLAudioElement|null>(null);
   const audioClick = useRef<HTMLAudioElement|null>(null);
+  const [nickname, setNickname] = useState(() => localStorage.getItem('lq_nickname') || '');
+  const [avatar, setAvatar] = useState(() => localStorage.getItem('lq_avatar') || '');
+  const [showNicknamePrompt, setShowNicknamePrompt] = useState(!nickname);
+  const [showAvatarPicker, setShowAvatarPicker] = useState(!avatar && !showNicknamePrompt);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   // Timer logic
   useEffect(() => {
@@ -171,6 +179,33 @@ const App: React.FC = () => {
     }
   }, [roundResult, round, TOTAL_ROUNDS]);
 
+  // Handle nickname confirm
+  const handleNicknameConfirm = (name: string) => {
+    setNickname(name);
+    localStorage.setItem('lq_nickname', name);
+    setShowNicknamePrompt(false);
+    setShowAvatarPicker(true);
+  };
+
+  // Handle avatar confirm
+  const handleAvatarConfirm = (avatarUrl: string) => {
+    setAvatar(avatarUrl);
+    localStorage.setItem('lq_avatar', avatarUrl);
+    setShowAvatarPicker(false);
+  };
+
+  // Submit score on game over
+  useEffect(() => {
+    if (roundResult === 'gameover' && nickname && score !== null) {
+      axios.post('/score', {
+        name: nickname,
+        score,
+        date: new Date().toISOString(),
+        avatar,
+      });
+    }
+  }, [roundResult, nickname, score, avatar]);
+
   // Play sound effects
   const playSuccess = () => audioSuccess.current && audioSuccess.current.play();
   const playFail = () => audioFail.current && audioFail.current.play();
@@ -187,11 +222,24 @@ const App: React.FC = () => {
   }, [roundResult]);
 
   // Onboarding logic
+  if (showNicknamePrompt) {
+    return <NicknamePrompt onConfirm={handleNicknameConfirm} />;
+  }
+  if (showAvatarPicker) {
+    return <AvatarPicker onConfirm={handleAvatarConfirm} />;
+  }
   if (showOnboarding) {
     return (
-      <Onboarding show={showOnboarding} onStart={() => { setShowOnboarding(false); playClick(); }} playClick={playClick} />
+      <>
+        <Onboarding show={showOnboarding} onStart={() => { setShowOnboarding(false); playClick(); }} playClick={playClick} />
+        <button className="lq-btn lq-btn-scenario" style={{ marginTop: 24 }} onClick={() => setShowLeaderboard(true)}>View Leaderboard</button>
+        {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
+      </>
     );
   }
+
+  // Game over screen leaderboard button
+  const showGameOverLeaderboard = roundResult === 'gameover' && !showLeaderboard;
 
   return (
     <div className={`lq-root${shake ? ' lq-shake' : ''}`}>
@@ -199,7 +247,7 @@ const App: React.FC = () => {
       <header className="lq-header">
         <img src={logo} alt="LinguaQuest Logo" className="lq-logo" />
         <h1>LinguaQuest</h1>
-        <img src={avatar} alt="AI Character" className="lq-avatar" />
+        <img src={avatar || require('./avatar.png')} alt="AI Character" className="lq-avatar" />
       </header>
       <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
       <main className="lq-card">
@@ -209,6 +257,8 @@ const App: React.FC = () => {
         {roundResult === 'success' && <div className="lq-round-success">🎉 Persuaded! +1</div>}
         {roundResult === 'fail' && <div className="lq-round-fail">⏰ Time's up! Try next round.</div>}
         {roundResult === 'gameover' && <div className="lq-gameover">🏆 Game Over! Thanks for playing.</div>}
+        {showGameOverLeaderboard && <button className="lq-btn lq-btn-scenario" onClick={() => setShowLeaderboard(true)}>View Leaderboard</button>}
+        {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
         <button className="lq-btn lq-btn-scenario" onClick={fetchScenario} disabled={loading || roundResult !== 'playing'}>New Scenario</button>
         <Scenario
           scenario={scenario}
