@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
-import logo from './logo.svg';
-import avatar from './avatar.png';
+import logo from './assets';
+import avatar from './assets/images/avatar.png';
 import Confetti from 'react-confetti';
 import successSfx from './assets/sounds/sfx-success.mp3';
 import failSfx from './assets/sounds/sfx-fail.mp3';
@@ -27,24 +27,8 @@ const LANGUAGES = [
   { code: 'gaa', label: 'Ga' },
   { code: 'ewe', label: 'Ewe' },
 ];
-const VOICE_LANGUAGES = [
-  { code: 'en-US', label: 'English (US)' },
-  { code: 'en-GB', label: 'English (UK)' },
-  { code: 'ak-GH', label: 'Akan/Twi (Ghana)' },
-  { code: 'fr-FR', label: 'French' },
-  // Add more as needed
-];
 const TOTAL_ROUNDS = 5;
 const ROUND_TIME = 30; // seconds
-
-const VOICE_COMMANDS = [
-  { phrases: ['next', 'continue', 'proceed', 'suivant', 'weiter'], action: 'next', desc: 'Go to next round' },
-  { phrases: ['repeat', 'again', 'répéter', 'nochmal'], action: 'repeat', desc: 'Repeat AI response' },
-  { phrases: ['leaderboard', 'scores', 'classement', 'rangliste'], action: 'leaderboard', desc: 'Show leaderboard' },
-  { phrases: ['settings', 'options', 'paramètres', 'einstellungen'], action: 'settings', desc: 'Open settings' },
-  { phrases: ['start', 'play', 'begin', 'démarrer', 'commencer', 'starten'], action: 'start', desc: 'Start game' },
-  // Add more as needed
-];
 
 const App: React.FC = () => {
   const [scenario, setScenario] = useState('');
@@ -80,13 +64,6 @@ const App: React.FC = () => {
   const [category, setCategory] = useState('');
   const [difficulty, setDifficulty] = useState('');
   const [showCategorySelector, setShowCategorySelector] = useState(true);
-  const [voiceLang, setVoiceLang] = useState(() => localStorage.getItem('lq_voiceLang') || 'en-US');
-  const [autoPlayVoice, setAutoPlayVoice] = useState(() => localStorage.getItem('lq_autoPlayVoice') === 'true');
-  const [showSettings, setShowSettings] = useState(false);
-  const [listeningCmd, setListeningCmd] = useState(false);
-  const [lastCmd, setLastCmd] = useState('');
-  const [showHelp, setShowHelp] = useState(false);
-  const [cmdError, setCmdError] = useState('');
 
   // Timer logic
   useEffect(() => {
@@ -242,70 +219,6 @@ const App: React.FC = () => {
     }
   }, [roundResult, roundWins, score, uniqueWords, allPersuaded, round]);
 
-  // Save settings to localStorage
-  useEffect(() => {
-    localStorage.setItem('lq_voiceLang', voiceLang);
-    localStorage.setItem('lq_autoPlayVoice', autoPlayVoice ? 'true' : 'false');
-  }, [voiceLang, autoPlayVoice]);
-
-  // Auto-play AI response if enabled
-  useEffect(() => {
-    if (autoPlayVoice && roundResult === 'success' && aiResponse) {
-      if ('speechSynthesis' in window) {
-        const utter = new window.SpeechSynthesisUtterance(aiResponse);
-        utter.lang = voiceLang;
-        window.speechSynthesis.speak(utter);
-      }
-    }
-  }, [aiResponse, autoPlayVoice, roundResult, voiceLang]);
-
-  // Voice command logic
-  const handleVoiceCommand = () => {
-    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      alert('Speech recognition is not supported in this browser.');
-      return;
-    }
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.lang = voiceLang;
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    setListeningCmd(true);
-    setCmdError('');
-    recognition.start();
-    recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript.toLowerCase();
-      setLastCmd(transcript);
-      setListeningCmd(false);
-      // Find matching command (any synonym)
-      let found = false;
-      for (const cmd of VOICE_COMMANDS) {
-        if (cmd.phrases.some(p => transcript.includes(p))) {
-          found = true;
-          if (cmd.action === 'next') {
-            if (roundResult === 'success' || roundResult === 'fail') nextRound();
-          } else if (cmd.action === 'repeat') {
-            if ('speechSynthesis' in window && aiResponse) {
-              const utter = new window.SpeechSynthesisUtterance(aiResponse);
-              utter.lang = voiceLang;
-              window.speechSynthesis.speak(utter);
-            }
-          } else if (cmd.action === 'leaderboard') {
-            setShowLeaderboard(true);
-          } else if (cmd.action === 'settings') {
-            setShowSettings(true);
-          } else if (cmd.action === 'start') {
-            if (showOnboarding) setShowOnboarding(false);
-          }
-          break;
-        }
-      }
-      if (!found) setCmdError('Command not recognized. Try: Next, Repeat, Leaderboard, Settings, Start.');
-    };
-    recognition.onerror = () => setListeningCmd(false);
-    recognition.onend = () => setListeningCmd(false);
-  };
-
   // Handle nickname confirm
   const handleNicknameConfirm = (name: string) => {
     setNickname(name);
@@ -387,41 +300,7 @@ const App: React.FC = () => {
         <img src={logo} alt="LinguaQuest Logo" className="lq-logo" />
         <h1>LinguaQuest</h1>
         <img src={avatar || require('./avatar.png')} alt="AI Character" className="lq-avatar" />
-        <button className="lq-btn lq-btn-translate" style={{ marginLeft: 12 }} onClick={handleVoiceCommand} aria-label="Voice command">{listeningCmd ? '🎤...' : '🎤'}</button>
-        <button className="lq-btn lq-btn-translate" style={{ marginLeft: 12 }} onClick={() => setShowHelp(true)} aria-label="Voice command help">❓</button>
-        <button className="lq-btn lq-btn-translate" style={{ marginLeft: 12 }} onClick={() => setShowSettings(v => !v)} aria-label="Voice settings">⚙️</button>
       </header>
-      {showSettings && (
-        <div className="lq-leaderboard-bg">
-          <div className="lq-leaderboard-card">
-            <h2>Voice Settings</h2>
-            <label style={{ display: 'block', marginBottom: 12 }}>
-              <input type="checkbox" checked={autoPlayVoice} onChange={e => setAutoPlayVoice(e.target.checked)} />
-              Auto-play AI response
-            </label>
-            <label style={{ display: 'block', marginBottom: 12 }}>
-              Recognition/Speech Language:
-              <select value={voiceLang} onChange={e => setVoiceLang(e.target.value)} style={{ marginLeft: 8 }}>
-                {VOICE_LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}
-              </select>
-            </label>
-            <button className="lq-btn lq-btn-scenario" onClick={() => setShowSettings(false)}>Close</button>
-          </div>
-        </div>
-      )}
-      {showHelp && (
-        <div className="lq-leaderboard-bg">
-          <div className="lq-leaderboard-card">
-            <h2>Voice Commands</h2>
-            <ul style={{ textAlign: 'left', margin: '1rem 0' }}>
-              {VOICE_COMMANDS.map(cmd => (
-                <li key={cmd.action}><strong>{cmd.phrases[0]}</strong> <span style={{ color: '#888' }}>({cmd.desc})</span><br /><span style={{ fontSize: '0.95em', color: '#aaa' }}>Synonyms: {cmd.phrases.slice(1).join(', ')}</span></li>
-              ))}
-            </ul>
-            <button className="lq-btn lq-btn-scenario" onClick={() => setShowHelp(false)}>Close</button>
-          </div>
-        </div>
-      )}
       <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
       <main className="lq-card">
         <div className="lq-timer-container">
@@ -451,8 +330,6 @@ const App: React.FC = () => {
           onTranslate={handleTranslate}
           translation={translation}
           language={language}
-          enableVoice={autoPlayVoice}
-          voiceLang={voiceLang}
         />
         <ToneSelector
           tone={tone}
@@ -476,17 +353,13 @@ const App: React.FC = () => {
           disabled={roundResult !== 'playing'}
           onDialogue={handleDialogue}
           userArgument={userArgument}
-          enableVoice={autoPlayVoice}
-          voiceLang={voiceLang}
         />
         {loading && <div className="lq-loading">Loading...</div>}
-        {cmdError && <div className="lq-feedback" style={{ textAlign: 'center', margin: '0.5rem 0' }}>{cmdError}</div>}
       </main>
       <footer className="lq-footer">&copy; {new Date().getFullYear()} LinguaQuest</footer>
       <audio ref={audioSuccess} src={successSfx} preload="auto" />
       <audio ref={audioFail} src={failSfx} preload="auto" />
       <audio ref={audioClick} src={clickSfx} preload="auto" />
-      {lastCmd && <div className="lq-feedback" style={{ textAlign: 'center', margin: '0.5rem 0' }}>Heard: "{lastCmd}"</div>}
     </div>
   );
 };
