@@ -67,7 +67,7 @@ const App: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState(ROUND_TIME);
   const [timerActive, setTimerActive] = useState(true);
   const [roundResult, setRoundResult] = useState<'playing'|'success'|'fail'|'gameover'>('playing');
-  const timerRef = useRef<NodeJS.Timeout|null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(true);
   const [shake, setShake] = useState(false);
   const audioSuccess = useRef<HTMLAudioElement|null>(null);
@@ -401,7 +401,7 @@ const App: React.FC = () => {
       <header className="lq-header">
         <img src={logo} alt="LinguaQuest Logo" className="lq-logo" />
         <h1>LinguaQuest</h1>
-        <img src={avatar || require('./avatar.png')} alt="AI Character" className="lq-avatar" />
+        <img src={avatar || avatar} alt="AI Character" className="lq-avatar" />
       </header>
       <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
       <main className="lq-card">
