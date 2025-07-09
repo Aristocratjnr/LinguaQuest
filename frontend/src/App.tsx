@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
+import logo from './assets/images/logo.png'
 import avatar from './assets/images/avatar.png';
 import Confetti from 'react-confetti';
 import successSfx from './assets/sounds/sfx-success.mp3';
