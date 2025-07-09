@@ -9,6 +9,9 @@ import os
 import threading
 from datetime import datetime
 from fastapi import Request
+from backend.integrations.translation.marianmt import MarianMTTranslator
+from backend.integrations.nlp.sentiment import SentimentAnalyzer
+from backend.integrations.nlp.argument_eval import ArgumentEvaluator
 
 app = FastAPI()
 
@@ -21,46 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load MarianMT for English <-> Twi, Ga, Ewe
-MODEL_NAMES = {
-    ("en", "twi"): "Helsinki-NLP/opus-mt-en-tw",
-    ("twi", "en"): "Helsinki-NLP/opus-mt-tw-en",
-    ("en", "gaa"): "Helsinki-NLP/opus-mt-en-gaa",
-    ("gaa", "en"): "Helsinki-NLP/opus-mt-gaa-en",
-    ("en", "ewe"): "Helsinki-NLP/opus-mt-en-ewe",
-    ("ewe", "en"): "Helsinki-NLP/opus-mt-ewe-en",
-}
-
-# Cache models and tokenizers
-MODEL_CACHE = {}
-
-LEADERBOARD_FILE = 'leaderboard.json'
-LEADERBOARD_LOCK = threading.Lock()
-
-class ScoreEntry(BaseModel):
-    name: str
-    score: int
-    date: str
-
-class LeaderboardResponse(BaseModel):
-    leaderboard: list
-
-def get_model_and_tokenizer(src_lang, tgt_lang):
-    key = (src_lang.lower(), tgt_lang.lower())
-    model_name = MODEL_NAMES.get(key)
-    if not model_name:
-        raise ValueError(f"Translation for {src_lang} -> {tgt_lang} not supported.")
-    if key not in MODEL_CACHE:
-        tokenizer = MarianTokenizer.from_pretrained(model_name)
-        model = MarianMTModel.from_pretrained(model_name)
-        MODEL_CACHE[key] = (tokenizer, model)
-    return MODEL_CACHE[key]
-
-def translate(text, src_lang, tgt_lang):
-    tokenizer, model = get_model_and_tokenizer(src_lang, tgt_lang)
-    batch = tokenizer([text], return_tensors="pt", padding=True)
-    gen = model.generate(**batch)
-    return tokenizer.decode(gen[0], skip_special_tokens=True)
+# Remove MODEL_NAMES, MODEL_CACHE, get_model_and_tokenizer, translate, analyzer, analyze_sentiment
 
 # --- Scenario Endpoint ---
 class ScenarioResponse(BaseModel):
@@ -90,10 +54,12 @@ class TranslationRequest(BaseModel):
 class TranslationResponse(BaseModel):
     translated_text: str
 
+translation_service = MarianMTTranslator()
+
 @app.post("/translate", response_model=TranslationResponse)
 def translate_text(req: TranslationRequest):
     try:
-        translated = translate(req.text, req.src_lang, req.tgt_lang)
+        translated = translation_service.translate(req.text, req.src_lang, req.tgt_lang)
         return TranslationResponse(translated_text=translated)
     except Exception as e:
         return TranslationResponse(translated_text="Translation error.")
@@ -108,19 +74,19 @@ class EvaluateResponse(BaseModel):
     feedback: str
     score: int
 
-analyzer = SentimentIntensityAnalyzer()
-
-def analyze_sentiment(text):
-    scores = analyzer.polarity_scores(text)
-    return scores['compound']
+sentiment_service = SentimentAnalyzer()
+argument_evaluator = ArgumentEvaluator()
 
 @app.post("/evaluate", response_model=EvaluateResponse)
 def evaluate_argument(req: EvaluateRequest):
     try:
-        score = 0
-        feedback = []
-        # Sentiment analysis
-        sentiment = analyze_sentiment(req.argument)
+        # Use argument_evaluator and sentiment_service
+        sentiment = sentiment_service.analyze(req.argument)
+        eval_result = argument_evaluator.evaluate(req.argument, req.tone)
+        score = eval_result.get('score', 0)
+        feedback = eval_result.get('feedback', [])
+        persuaded = eval_result.get('persuaded', False)
+        # Add sentiment-based feedback
         if sentiment > 0.3:
             score += 2
             feedback.append("Your argument has a positive, persuasive tone.")
@@ -129,23 +95,6 @@ def evaluate_argument(req: EvaluateRequest):
             feedback.append("Your argument sounds negative or confrontational.")
         else:
             feedback.append("Your argument is neutral in sentiment.")
-        # Tone detection (placeholder)
-        if req.tone.lower() in req.argument.lower():
-            score += 1
-            feedback.append(f"Detected use of the selected tone: {req.tone}.")
-        else:
-            feedback.append(f"Try to use more {req.tone} language.")
-        # Argument quality (placeholder: length-based)
-        if len(req.argument.split()) > 7:
-            score += 2
-            feedback.append("Argument is well developed.")
-        else:
-            feedback.append("Try to elaborate more for a stronger argument.")
-        persuaded = score >= 3
-        if persuaded:
-            feedback.append("The AI is persuaded!")
-        else:
-            feedback.append("The AI is not convinced yet.")
         return EvaluateResponse(persuaded=persuaded, feedback=" ".join(feedback), score=score)
     except Exception as e:
         return EvaluateResponse(persuaded=False, feedback="Evaluation error.", score=0)
@@ -163,10 +112,8 @@ class DialogueResponse(BaseModel):
 
 @app.post("/dialogue", response_model=DialogueResponse)
 def dialogue(req: DialogueRequest):
-    # Placeholder: simple rule-based stance shift
     stance = req.ai_stance
     response = ""
-    # If user argument is long and positive, AI is more likely to be persuaded
     if len(req.user_argument.split()) > 7:
         if stance == 'disagree':
             new_stance = 'neutral'
@@ -187,10 +134,9 @@ def dialogue(req: DialogueRequest):
         else:
             new_stance = 'neutral'
             response = "I'm not fully convinced anymore."
-    # Optionally, translate response to target language (if not English)
     if req.language != 'en':
         try:
-            response = translate(response, 'en', req.language)
+            response = translation_service.translate(response, 'en', req.language)
         except Exception:
             pass
     return DialogueResponse(ai_response=response, new_stance=new_stance)
