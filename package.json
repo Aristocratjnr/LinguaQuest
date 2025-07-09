@@ -5,6 +5,8 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@types/axios": "^0.9.36"
+    "@types/axios": "^0.9.36",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6"
   }
 }
