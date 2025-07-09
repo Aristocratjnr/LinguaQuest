@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import avatar1 from './avatar.png';
-import avatar2 from './avatar2.png';
-import avatar3 from './avatar3.png';
-import avatar4 from './avatar4.png';
+import avatar1 from '../assets/images/boy.png';
+import avatar2 from '../assets/images/woman.png';
+import avatar3 from '../assets/images/programmer.png';
+import avatar4 from '../assets/images/avatar.png';
 
 const AVATARS = [avatar1, avatar2, avatar3, avatar4];
 

@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
-import logo from './assets';
 import avatar from './assets/images/avatar.png';
 import Confetti from 'react-confetti';
 import successSfx from './assets/sounds/sfx-success.mp3';
@@ -29,6 +28,27 @@ const LANGUAGES = [
 ];
 const TOTAL_ROUNDS = 5;
 const ROUND_TIME = 30; // seconds
+
+const VOICE_COMMANDS = [
+  { phrases: ['next', 'continue', 'proceed', 'suivant', 'weiter', 'siguiente', 'ɛdi so'], action: 'next', desc: 'Go to next round', icon: '⏭️' },
+  { phrases: ['repeat', 'again', 'répéter', 'nochmal', 'otra vez', 'san ka bio'], action: 'repeat', desc: 'Repeat AI response', icon: '🔁' },
+  { phrases: ['leaderboard', 'scores', 'classement', 'rangliste', 'tabla', 'mpuntuo'], action: 'leaderboard', desc: 'Show leaderboard', icon: '🏆' },
+  { phrases: ['settings', 'options', 'paramètres', 'einstellungen', 'ajustes', 'nhyehyɛe'], action: 'settings', desc: 'Open settings', icon: '⚙️' },
+  { phrases: ['start', 'play', 'begin', 'démarrer', 'commencer', 'starten', 'empezar', 'fi'], action: 'start', desc: 'Start game', icon: '▶️' },
+  { phrases: ['profile', 'account', 'profil', 'konto', 'perfil', 'me ho nsɛm'], action: 'profile', desc: 'Open profile', icon: '👤' },
+  { phrases: ['help', 'ayuda', 'aide', 'hilfe', 'boa me'], action: 'help', desc: 'Show help', icon: '❓' },
+  { phrases: ['back', 'return', 'volver', 'retour', 'zurück', 'san kɔ'], action: 'back', desc: 'Go back', icon: '🔙' },
+  { phrases: ['home', 'main', 'inicio', 'accueil', 'heim', 'fie'], action: 'home', desc: 'Go to home', icon: '🏠' },
+  { phrases: ['exit', 'quit', 'salir', 'quitter', 'beenden', 'pue'], action: 'exit', desc: 'Exit game', icon: '🚪' },
+  // Add more as needed
+];
+
+// Define response types
+interface ScenarioResponse { scenario: string; language: string; }
+interface TranslationResponse { translated_text: string; }
+interface EvaluateResponse { persuaded: boolean; feedback: string; score: number; }
+interface DialogueResponse { ai_response: string; new_stance: string; }
+interface LeaderboardResponse { leaderboard: any[]; }
 
 const App: React.FC = () => {
   const [scenario, setScenario] = useState('');
@@ -64,6 +84,12 @@ const App: React.FC = () => {
   const [category, setCategory] = useState('');
   const [difficulty, setDifficulty] = useState('');
   const [showCategorySelector, setShowCategorySelector] = useState(true);
+  const [listeningCmd, setListeningCmd] = useState(false);
+  const [lastCmd, setLastCmd] = useState('');
+  const [cmdError, setCmdError] = useState('');
+  const [showSettings, setShowSettings] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  const [voiceLang, setVoiceLang] = useState('twi'); // Default to Twi for voice commands
 
   // Timer logic
   useEffect(() => {
@@ -81,7 +107,7 @@ const App: React.FC = () => {
   const fetchScenario = async () => {
     setLoading(true);
     try {
-      const res = await axios.post('/scenario', { category, difficulty });
+      const res = await axios.post<ScenarioResponse>('/scenario', { category, difficulty });
       setScenario(res.data.scenario);
       setLanguage(res.data.language || 'twi');
       setAiStance('disagree');
@@ -116,7 +142,7 @@ const App: React.FC = () => {
     if (!userArgument) return;
     setLoading(true);
     try {
-      const res = await axios.post('/translate', {
+      const res = await axios.post<TranslationResponse>('/translate', {
         text: userArgument,
         src_lang: 'en',
         tgt_lang: language,
@@ -133,7 +159,7 @@ const App: React.FC = () => {
     if (!userArgument) return;
     setLoading(true);
     try {
-      const res = await axios.post('/evaluate', {
+      const res = await axios.post<EvaluateResponse>('/evaluate', {
         argument: userArgument,
         tone,
       });
@@ -154,7 +180,7 @@ const App: React.FC = () => {
   const handleDialogue = async () => {
     setLoading(true);
     try {
-      const res = await axios.post('/dialogue', {
+      const res = await axios.post<DialogueResponse>('/dialogue', {
         scenario,
         user_argument: userArgument,
         ai_stance: aiStance,
@@ -168,6 +194,77 @@ const App: React.FC = () => {
       setNewStance(aiStance);
     }
     setLoading(false);
+  };
+
+  // Voice command logic (update):
+  const handleVoiceCommand = () => {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      alert('Speech recognition is not supported in this browser.');
+      return;
+    }
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = voiceLang;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    setListeningCmd(true);
+    setCmdError('');
+    recognition.start();
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript.toLowerCase();
+      setLastCmd(transcript);
+      setListeningCmd(false);
+      // Find matching command (any synonym)
+      let found = false;
+      for (const cmd of VOICE_COMMANDS) {
+        if (cmd.phrases.some(p => transcript.includes(p))) {
+          found = true;
+          // Spoken feedback for recognized command
+          if ('speechSynthesis' in window) {
+            const utter = new window.SpeechSynthesisUtterance(`${cmd.desc}`);
+            utter.lang = voiceLang;
+            window.speechSynthesis.speak(utter);
+          }
+          if (cmd.action === 'next') {
+            if (roundResult === 'success' || roundResult === 'fail') nextRound();
+          } else if (cmd.action === 'repeat') {
+            if ('speechSynthesis' in window && aiResponse) {
+              const utter = new window.SpeechSynthesisUtterance(aiResponse);
+              utter.lang = voiceLang;
+              window.speechSynthesis.speak(utter);
+            }
+          } else if (cmd.action === 'leaderboard') {
+            setShowLeaderboard(true);
+          } else if (cmd.action === 'settings') {
+            setShowSettings(true);
+          } else if (cmd.action === 'start') {
+            if (showOnboarding) setShowOnboarding(false);
+          } else if (cmd.action === 'profile') {
+            // Implement profile logic
+          } else if (cmd.action === 'help') {
+            setShowHelp(true);
+          } else if (cmd.action === 'back') {
+            // Implement back logic
+          } else if (cmd.action === 'home') {
+            // Implement home logic
+          } else if (cmd.action === 'exit') {
+            // Implement exit logic
+          }
+          break;
+        }
+      }
+      if (!found) {
+        setCmdError('Command not recognized. Try: Next, Repeat, Leaderboard, Settings, Start, Profile, Help, Back, Home, Exit.');
+        // Spoken feedback for unrecognized command
+        if ('speechSynthesis' in window) {
+          const utter = new window.SpeechSynthesisUtterance('Command not recognized. Try Next, Repeat, Leaderboard, Settings, Start, Profile, Help, Back, Home, or Exit.');
+          utter.lang = voiceLang;
+          window.speechSynthesis.speak(utter);
+        }
+      }
+    };
+    recognition.onerror = () => setListeningCmd(false);
+    recognition.onend = () => setListeningCmd(false);
   };
 
   // Initial scenario load
@@ -360,6 +457,26 @@ const App: React.FC = () => {
       <audio ref={audioSuccess} src={successSfx} preload="auto" />
       <audio ref={audioFail} src={failSfx} preload="auto" />
       <audio ref={audioClick} src={clickSfx} preload="auto" />
+      {/* Style the help modal for clarity */}
+      {showHelp && (
+        <div className="lq-leaderboard-bg">
+          <div className="lq-leaderboard-card" style={{ maxWidth: 420, textAlign: 'left' }}>
+            <h2 style={{ textAlign: 'center', marginBottom: 16 }}>Voice Commands</h2>
+            <ul style={{ margin: '1rem 0', padding: 0, listStyle: 'none' }}>
+              {VOICE_COMMANDS.map(cmd => (
+                <li key={cmd.action} style={{ marginBottom: 18, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <span style={{ fontSize: 22, marginRight: 8 }}>{cmd.icon}</span>
+                  <div>
+                    <strong>{cmd.phrases[0]}</strong> <span style={{ color: '#888' }}>({cmd.desc})</span><br />
+                    <span style={{ fontSize: '0.95em', color: '#aaa' }}>Synonyms: {cmd.phrases.slice(1).join(', ')}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <button className="lq-btn lq-btn-scenario" style={{ display: 'block', margin: '0 auto' }} onClick={() => setShowHelp(false)}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
