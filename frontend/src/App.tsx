@@ -19,6 +19,7 @@ import NicknamePrompt from './components/NicknamePrompt';
 import AvatarPicker from './components/AvatarPicker';
 import Leaderboard from './components/Leaderboard';
 import Badges from './components/Badges';
+import CategorySelector from './components/CategorySelector';
 
 const TONES = ['polite', 'passionate', 'formal', 'casual'];
 const LANGUAGES = [
@@ -60,6 +61,9 @@ const App: React.FC = () => {
   const [roundWins, setRoundWins] = useState(0);
   const [allPersuaded, setAllPersuaded] = useState(true);
   const [uniqueWords, setUniqueWords] = useState<Set<string>>(new Set());
+  const [category, setCategory] = useState('');
+  const [difficulty, setDifficulty] = useState('');
+  const [showCategorySelector, setShowCategorySelector] = useState(true);
 
   // Timer logic
   useEffect(() => {
@@ -77,7 +81,7 @@ const App: React.FC = () => {
   const fetchScenario = async () => {
     setLoading(true);
     try {
-      const res = await axios.post('/scenario');
+      const res = await axios.post('/scenario', { category, difficulty });
       setScenario(res.data.scenario);
       setLanguage(res.data.language || 'twi');
       setAiStance('disagree');
@@ -228,6 +232,15 @@ const App: React.FC = () => {
     setAvatar(avatarUrl);
     localStorage.setItem('lq_avatar', avatarUrl);
     setShowAvatarPicker(false);
+    setShowCategorySelector(true);
+  };
+
+  // Handle category confirm
+  const handleCategoryConfirm = (cat: string, diff: string) => {
+    setCategory(cat);
+    setDifficulty(diff);
+    setShowCategorySelector(false);
+    setShowOnboarding(false);
   };
 
   // Submit score on game over
@@ -263,6 +276,9 @@ const App: React.FC = () => {
   }
   if (showAvatarPicker) {
     return <AvatarPicker onConfirm={handleAvatarConfirm} />;
+  }
+  if (showCategorySelector) {
+    return <CategorySelector onConfirm={handleCategoryConfirm} />;
   }
   if (showOnboarding) {
     return (

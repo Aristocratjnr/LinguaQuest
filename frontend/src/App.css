@@ -276,4 +276,51 @@ body {
 .lq-avatar-pick-selected {
   border: 3px solid #764ba2 !important;
   box-shadow: 0 0 12px #764ba288 !important;
+}
+
+@media (max-width: 600px) {
+  .lq-header, .lq-card, .lq-leaderboard-card {
+    max-width: 98vw;
+    padding: 1rem 0.5rem;
+    border-radius: 10px;
+  }
+  .lq-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .lq-logo {
+    height: 36px;
+  }
+  .lq-avatar {
+    height: 40px;
+    width: 40px;
+  }
+  .lq-card {
+    padding: 1rem 0.5rem;
+  }
+  .lq-section {
+    margin-bottom: 1rem;
+  }
+  .lq-btn {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+  }
+  .lq-textarea {
+    font-size: 1rem;
+    padding: 0.5rem;
+  }
+  .lq-leaderboard-table th, .lq-leaderboard-table td {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.95rem;
+  }
+  .lq-badge {
+    min-width: 90px;
+    max-width: 120px;
+    font-size: 0.9rem;
+  }
+  .lq-badge-icon {
+    width: 36px;
+    height: 36px;
+  }
 } 
