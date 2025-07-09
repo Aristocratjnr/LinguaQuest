@@ -141,6 +141,17 @@ def dialogue(req: DialogueRequest):
             pass
     return DialogueResponse(ai_response=response, new_stance=new_stance)
 
+LEADERBOARD_FILE = 'leaderboard.json'
+LEADERBOARD_LOCK = threading.Lock()
+
+class LeaderboardResponse(BaseModel):
+    leaderboard: list
+
+class ScoreEntry(BaseModel):
+    name: str
+    score: int
+    date: str
+
 @app.post('/score')
 def submit_score(entry: ScoreEntry):
     with LEADERBOARD_LOCK:
