@@ -32,5 +32,10 @@ class MarianMTTranslator:
     def translate(cls, text: str, src_lang: str, tgt_lang: str) -> str:
         tokenizer, model = cls.get_model_and_tokenizer(src_lang, tgt_lang)
         batch = tokenizer([text], return_tensors="pt", padding=True)
-        gen = model.generate(**batch)
+        input_ids = batch["input_ids"]
+        attention_mask = batch.get("attention_mask", None)
+        if attention_mask is not None:
+            gen = model.generate(input_ids=input_ids, attention_mask=attention_mask)
+        else:
+            gen = model.generate(input_ids=input_ids)
         return tokenizer.decode(gen[0], skip_special_tokens=True) 
