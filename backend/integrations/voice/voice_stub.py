@@ -4,8 +4,8 @@ class VoiceIntegration:
     """
     def speech_to_text(self, audio_bytes: bytes, language: str) -> str:
         """Convert audio to text (to be implemented)."""
-        pass
+        return ""
 
     def text_to_speech(self, text: str, language: str) -> bytes:
         """Convert text to audio (to be implemented)."""
-        pass 
+        return b"" 
