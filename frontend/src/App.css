@@ -322,6 +322,23 @@ p {
   box-shadow: 0 0 12px #764ba288 !important;
 }
 
+body.dark, .dark, body.dark .lq-bg, .dark .lq-bg {
+  background: linear-gradient(135deg, #232946 0%, #181c2a 100%) !important;
+  background-attachment: fixed !important;
+  background-size: cover !important;
+  color: #e0e7ff !important;
+}
+
+body.dark .lq-header, .dark .lq-header {
+  background: #232946 !important;
+  color: #e0e7ff !important;
+}
+
+body.dark .lq-card, .dark .lq-card {
+  background: #232946 !important;
+  color: #e0e7ff !important;
+}
+
 @media (max-width: 600px) {
   .lq-header, .lq-card, .lq-leaderboard-card {
     max-width: 98vw;

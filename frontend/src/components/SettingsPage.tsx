@@ -38,30 +38,44 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     setSound(!sound);
   };
 
+  // Theme-aware styles
+  const isDark = theme === 'dark';
+  const bgGradient = isDark
+    ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
+    : 'linear-gradient(135deg, #f5f7fa 0%, #e4e9f3 100%)';
+  const cardBg = isDark ? '#232946' : '#fff';
+  const cardHeaderBg = isDark ? 'rgba(79, 70, 229, 0.10)' : 'rgba(79, 70, 229, 0.05)';
+  const cardFooterBg = cardHeaderBg;
+  const textColor = isDark ? '#e0e7ff' : '#4f46e5';
+  const labelColor = isDark ? '#a5b4fc' : '#4f46e5';
+  const borderColor = isDark ? '#444c6e' : '#e0e7ef';
+  const inputBg = isDark ? '#181c2a' : '#fff';
+  const inputText = isDark ? '#e0e7ff' : '#22223b';
+
   return (
-    <div className="container-fluid d-flex align-items-center justify-content-center min-vh-100 px-2 px-sm-3 px-md-4"
-         style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e9f3 100%)' }}>
+    <div className={`container-fluid d-flex align-items-center justify-content-center min-vh-100 px-2 px-sm-3 px-md-4${isDark ? ' dark' : ''}`}
+         style={{ background: bgGradient }}>
       <motion.div
         className="card shadow-lg w-100"
-        style={{ maxWidth: 420, borderRadius: '1rem', fontFamily: "'JetBrains Mono', monospace", minHeight: 420 }}
+        style={{ maxWidth: 420, borderRadius: '1rem', fontFamily: "'JetBrains Mono', monospace", minHeight: 420, background: cardBg, color: inputText }}
         initial={{ opacity: 0, y: 32 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
         <div className="card-header d-flex justify-content-between align-items-center border-bottom py-3"
-             style={{ background: 'rgba(79, 70, 229, 0.05)' }}>
-          <h2 className="fw-bold mb-0" style={{ color: '#4f46e5', fontSize: '1.1rem' }}>
+             style={{ background: cardHeaderBg }}>
+          <h2 className="fw-bold mb-0" style={{ color: textColor, fontSize: '1.1rem' }}>
             <i className="material-icons align-middle me-2">settings</i>
             Settings
           </h2>
-          <button className="btn btn-sm btn-outline-secondary" onClick={onClose}>
+          <button className={`btn btn-sm btn-outline-secondary${isDark ? ' border-light text-light' : ''}`} onClick={onClose}>
             <i className="material-icons align-middle">close</i>
           </button>
         </div>
         <div className="card-body p-3 p-sm-4">
           {/* Profile Section */}
           <div className="mb-4">
-            <div className="mb-2 fw-bold text-primary" style={{ fontSize: '1rem' }}>Profile</div>
+            <div className="mb-2 fw-bold" style={{ fontSize: '1rem', color: labelColor }}>Profile</div>
             <div className="row g-3 align-items-center flex-column flex-sm-row">
               <div className="col-12 col-sm-4 text-center mb-2 mb-sm-0">
                 <div className="d-flex justify-content-center flex-wrap gap-2">
@@ -82,14 +96,14 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 </div>
               </div>
               <div className="col-12 col-sm-8">
-                <label className="form-label mb-1">Nickname</label>
+                <label className="form-label mb-1" style={{ color: labelColor }}>Nickname</label>
                 <input
                   type="text"
                   className="form-control"
                   value={nickname}
                   onChange={handleNicknameChange}
                   maxLength={16}
-                  style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '1rem' }}
+                  style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '1rem', background: inputBg, color: inputText, borderColor }}
                 />
               </div>
             </div>
@@ -97,19 +111,19 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
           {/* Preferences Section */}
           <div className="mb-4">
-            <div className="mb-2 fw-bold text-primary" style={{ fontSize: '1rem' }}>Preferences</div>
+            <div className="mb-2 fw-bold" style={{ fontSize: '1rem', color: labelColor }}>Preferences</div>
             <div className="row g-3 align-items-center">
               <div className="col-12 col-sm-6 mb-2 mb-sm-0">
-                <label className="form-label mb-1">Language</label>
-                <select className="form-select" value={language} onChange={handleLanguageChange} style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                <label className="form-label mb-1" style={{ color: labelColor }}>Language</label>
+                <select className="form-select" value={language} onChange={handleLanguageChange} style={{ fontFamily: "'JetBrains Mono', monospace", background: inputBg, color: inputText, borderColor }}>
                   {LANGUAGES.map(l => (
                     <option key={l.code} value={l.code}>{l.label}</option>
                   ))}
                 </select>
               </div>
               <div className="col-12 col-sm-6">
-                <label className="form-label mb-1">Theme</label>
-                <select className="form-select" value={theme} onChange={handleThemeChange} style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                <label className="form-label mb-1" style={{ color: labelColor }}>Theme</label>
+                <select className="form-select" value={theme} onChange={handleThemeChange} style={{ fontFamily: "'JetBrains Mono', monospace", background: inputBg, color: inputText, borderColor }}>
                   {THEMES.map(t => (
                     <option key={t.code} value={t.code}>{t.label}</option>
                   ))}
@@ -120,11 +134,11 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
           {/* Real-Time Toggles */}
           <div className="mb-4">
-            <div className="mb-2 fw-bold text-primary" style={{ fontSize: '1rem' }}>Real-Time Controls</div>
+            <div className="mb-2 fw-bold" style={{ fontSize: '1rem', color: labelColor }}>Real-Time Controls</div>
             <div className="d-flex align-items-center gap-3 flex-wrap">
               <div className="form-check form-switch">
                 <input className="form-check-input" type="checkbox" id="soundSwitch" checked={sound} onChange={handleSoundToggle} />
-                <label className="form-check-label" htmlFor="soundSwitch" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                <label className="form-check-label" htmlFor="soundSwitch" style={{ fontFamily: "'JetBrains Mono', monospace", color: labelColor }}>
                   Sound {sound ? 'On' : 'Off'}
                 </label>
               </div>
@@ -133,7 +147,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
           {/* Live Preview */}
           <div className="mb-2">
-            <div className="mb-2 fw-bold text-primary" style={{ fontSize: '1rem' }}>Live Preview</div>
+            <div className="mb-2 fw-bold" style={{ fontSize: '1rem', color: labelColor }}>Live Preview</div>
             <div className="d-flex align-items-center gap-3 flex-wrap">
               <div className="d-flex flex-column align-items-center">
                 <img src={avatar} alt="Preview Avatar" className="rounded-circle mb-2" style={{ width: 44, height: 44, border: '2px solid #4f46e5' }} />
@@ -147,8 +161,8 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </div>
           </div>
         </div>
-        <div className="card-footer py-3 text-center border-top" style={{ background: 'rgba(79, 70, 229, 0.05)', fontSize: '0.9rem' }}>
-          <button className="btn btn-outline-primary px-4 w-100 w-sm-auto" onClick={onClose}>
+        <div className="card-footer py-3 text-center border-top" style={{ background: cardFooterBg, fontSize: '0.9rem' }}>
+          <button className={`btn btn-outline-primary px-4 w-100 w-sm-auto${isDark ? ' border-light text-light' : ''}`} onClick={onClose}>
             <i className="material-icons align-middle me-2">arrow_back</i>
             Back
           </button>

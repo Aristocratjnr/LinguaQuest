@@ -22,6 +22,7 @@ import CategorySelector from './components/CategorySelector';
 import Engagement from './components/Engagement';
 import WelcomePage from './components/WelcomePage'; // Import the new WelcomePage component
 import SettingsPage from './components/SettingsPage';
+import { useSettings } from './context/SettingsContext';
 
 
 const TONES = ['polite', 'passionate', 'formal', 'casual'];
@@ -96,6 +97,27 @@ function App() {
   const [showHelp, setShowHelp] = useState(false);
   const [voiceLang, setVoiceLang] = useState('twi'); // Default to Twi for voice commands
   const [showEngagement, setShowEngagement] = useState(false);
+  const { theme } = useSettings();
+  // Theme-aware header background and avatar glow
+  const headerBg = theme === 'dark' ? 'rgba(35, 41, 70, 0.98)' : 'rgba(255,255,255,0.95)';
+  const headerColor = theme === 'dark' ? '#e0e7ff' : '#4f46e5';
+  const avatarGlow = theme === 'dark'
+    ? '0 0 0 4px #6366f1, 0 0 16px 4px #23294699'
+    : '0 0 0 4px #6366f1, 0 0 16px 4px #e0e7ff99';
+  // Theme-aware footer background
+  const footerBg = theme === 'dark' ? 'rgba(35, 41, 70, 0.98)' : 'rgba(255,255,255,0.95)';
+  const footerColor = theme === 'dark' ? '#e0e7ff' : '#6c6f7d';
+
+  // Apply theme class to body
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.body.classList.add('dark');
+      document.body.classList.remove('light');
+    } else {
+      document.body.classList.add('light');
+      document.body.classList.remove('dark');
+    }
+  }, [theme]);
 
   // Timer logic
   useEffect(() => {
@@ -431,18 +453,15 @@ function App() {
 
   // Main game layout
   return (
-    <div className="min-vh-100 d-flex flex-column" style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e9f3 100%)', fontFamily: "'JetBrains Mono', monospace" }}>
+    <div className="lq-bg" style={{ minHeight: '100vh', minWidth: '100vw' }}>
       {/* Header */}
-      <header className="container-fluid py-3 px-2 px-md-4 mb-3" style={{ background: 'rgba(255,255,255,0.95)', boxShadow: '0 2px 8px #0001' }}>
-        <div className="d-flex justify-content-between align-items-center" style={{ maxWidth: 900, margin: '0 auto' }}>
+      <header className="container-fluid py-3 px-2 px-md-4 mb-3" style={{ background: headerBg, boxShadow: '0 2px 8px #0001', color: headerColor }}>
+        <div className="d-flex align-items-center justify-content-between" style={{ minHeight: 48 }}>
           <div className="d-flex align-items-center gap-2">
-            <img src={logo} alt="LinguaQuest Logo" style={{ height: 40, marginRight: 10 }} />
-            <span className="fw-bold" style={{ color: '#764ba2', fontSize: '1.3rem', letterSpacing: '-0.01em' }}>LinguaQuest</span>
+            <img src={logo} alt="LinguaQuest Logo" style={{ height: 36, width: 36 }} />
+            <h1 className="fw-bold mb-0" style={{ fontSize: '1.3rem', color: headerColor, letterSpacing: '.01em' }}>LinguaQuest</h1>
           </div>
-          <div className="d-flex align-items-center gap-2">
-            <span className="badge bg-primary px-3 py-2" style={{ fontSize: '1rem' }}>{nickname || 'Player'}</span>
-            <img src={avatar} alt="User Avatar" className="rounded-circle" style={{ height: 40, width: 40, objectFit: 'cover', border: '2px solid #764ba2' }} />
-          </div>
+          <img src={avatar} alt="User Avatar" className="rounded-circle" style={{ height: 40, width: 40, objectFit: 'cover', border: '2px solid #764ba2', boxShadow: avatarGlow, background: '#fff' }} />
         </div>
       </header>
 
@@ -648,7 +667,7 @@ function App() {
       <audio ref={audioClick} src={clickSfx} preload="auto" />
 
       {/* Footer */}
-      <footer className="text-center text-muted mt-auto py-3 small" style={{ background: 'rgba(255,255,255,0.95)', boxShadow: '0 -2px 8px #0001' }}>
+      <footer className="text-center text-muted mt-auto py-3 small" style={{ background: footerBg, color: footerColor, boxShadow: '0 -2px 8px #0001' }}>
         <div className="d-flex justify-content-center gap-3 mb-2">
           <button className="btn btn-sm btn-link text-muted" onClick={() => setShowHelp(true)}>
             <i className="material-icons align-middle me-1" style={{ fontSize: '.9rem' }}>help_outline</i>

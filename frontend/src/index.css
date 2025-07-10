@@ -131,3 +131,124 @@ button {
     font-size: 14px;
   }
 }
+
+body.dark, .dark {
+  --primary: #6366f1;
+  --primary-dark: #a5b4fc;
+  --secondary: #a855f7;
+  --gradient: linear-gradient(135deg, #232946 0%, #181c2a 100%);
+  --text-dark: #e0e7ff;
+  --text-light: #a5b4fc;
+  --bg-light: #181c2a;
+  --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.25);
+  --shadow: 0 4px 12px -1px rgba(0,0,0,0.45), 0 2px 4px -1px rgba(0,0,0,0.25);
+  --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.35), 0 4px 6px -2px rgba(0,0,0,0.18);
+  --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.45), 0 10px 10px -5px rgba(0,0,0,0.18);
+  --radius-sm: 0.25rem;
+  --radius: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --transition: all 0.2s ease-in-out;
+  background: var(--gradient) !important;
+  color: var(--text-dark) !important;
+}
+
+body.dark, .dark, body.dark .lq-bg, .dark .lq-bg {
+  background: var(--gradient) !important;
+  color: var(--text-dark) !important;
+}
+
+body.dark h1, body.dark h2, body.dark h3, body.dark h4, body.dark h5, body.dark h6,
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  color: #e0e7ff;
+}
+
+body.dark .card, .dark .card {
+  background: #232946 !important;
+  color: #e0e7ff !important;
+  box-shadow: 0 4px 24px #0008;
+}
+
+body.dark .form-control, .dark .form-control,
+body.dark .form-select, .dark .form-select {
+  background: #181c2a !important;
+  color: #e0e7ff !important;
+  border-color: #444c6e !important;
+}
+
+body.dark .form-label, .dark .form-label,
+body.dark .form-check-label, .dark .form-check-label {
+  color: #a5b4fc !important;
+}
+
+body.dark .btn, .dark .btn {
+  background: #232946;
+  color: #e0e7ff;
+  border-color: #444c6e;
+}
+body.dark .btn-primary, .dark .btn-primary {
+  background: #6366f1 !important;
+  color: #fff !important;
+  border-color: #6366f1 !important;
+}
+body.dark .btn-outline-primary, .dark .btn-outline-primary {
+  background: transparent !important;
+  color: #a5b4fc !important;
+  border-color: #6366f1 !important;
+}
+body.dark .badge.bg-primary, .dark .badge.bg-primary {
+  background: #6366f1 !important;
+  color: #fff !important;
+}
+body.dark .input-group-text, .dark .input-group-text {
+  background: #232946 !important;
+  color: #a5b4fc !important;
+  border-color: #444c6e !important;
+}
+body.dark .bg-light, .dark .bg-light {
+  background: #232946 !important;
+  color: #e0e7ff !important;
+}
+body.dark .border-primary, .dark .border-primary {
+  border-color: #6366f1 !important;
+}
+body.dark .text-primary, .dark .text-primary {
+  color: #a5b4fc !important;
+}
+body.dark .text-muted, .dark .text-muted {
+  color: #a5b4fc !important;
+}
+
+/* Utility: dark mode for custom classes */
+body.dark .lq-card, .dark .lq-card {
+  background: #232946 !important;
+  color: #e0e7ff !important;
+}
+body.dark .lq-header, .dark .lq-header {
+  background: #181c2a !important;
+  color: #e0e7ff !important;
+}
+body.dark .lq-section, .dark .lq-section {
+  background: #232946 !important;
+  color: #e0e7ff !important;
+}
+body.dark .lq-btn, .dark .lq-btn {
+  background: linear-gradient(90deg, #6366f1 0%, #232946 100%) !important;
+  color: #fff !important;
+}
+body.dark .lq-btn-scenario, .dark .lq-btn-scenario {
+  background: linear-gradient(90deg, #ffb347 0%, #232946 100%) !important;
+  color: #fff !important;
+}
+body.dark .lq-btn-translate, .dark .lq-btn-translate {
+  background: linear-gradient(90deg, #4ade80 0%, #232946 100%) !important;
+  color: #fff !important;
+}
+body.dark .lq-btn-evaluate, .dark .lq-btn-evaluate {
+  background: linear-gradient(90deg, #f472b6 0%, #232946 100%) !important;
+  color: #fff !important;
+}
+body.dark .lq-btn-dialogue, .dark .lq-btn-dialogue {
+  background: linear-gradient(90deg, #fbbf24 0%, #232946 100%) !important;
+  color: #fff !important;
+}
