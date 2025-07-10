@@ -2,6 +2,7 @@ fastapi
 uvicorn
 transformers
 torch
-sentencepiece 
+sentencepiece
 vaderSentiment
-scikit-learn 
+scikit-learn
+protobuf 

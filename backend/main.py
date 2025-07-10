@@ -9,7 +9,7 @@ import os
 import threading
 from datetime import datetime
 from fastapi import Request
-from backend.integrations.translation.marianmt import MarianMTTranslator
+from backend.integrations.translation.simple_translator import SimpleTranslator
 from backend.integrations.nlp.sentiment import SentimentAnalyzer
 from backend.integrations.nlp.argument_eval import ArgumentEvaluator
 
@@ -52,7 +52,7 @@ class TranslationRequest(BaseModel):
 class TranslationResponse(BaseModel):
     translated_text: str
 
-translation_service = MarianMTTranslator()
+translation_service = SimpleTranslator()
 
 @app.post("/translate", response_model=TranslationResponse)
 def translate_text(req: TranslationRequest):
@@ -60,7 +60,10 @@ def translate_text(req: TranslationRequest):
         translated = translation_service.translate(req.text, req.src_lang, req.tgt_lang)
         return TranslationResponse(translated_text=translated)
     except Exception as e:
-        return TranslationResponse(translated_text="Translation error.")
+        # Provide more specific error message
+        error_msg = f"Translation error: {str(e)}"
+        print(f"Translation failed: {error_msg}")  # Log for debugging
+        return TranslationResponse(translated_text=error_msg)
 
 # --- Evaluation Endpoint ---
 class EvaluateRequest(BaseModel):

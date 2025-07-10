@@ -19,6 +19,7 @@ import NicknamePrompt from './components/NicknamePrompt';
 import AvatarPicker from './components/AvatarPicker';
 import Leaderboard from './components/Leaderboard';
 import CategorySelector from './components/CategorySelector';
+import Engagement from './components/Engagement';
 
 
 const TONES = ['polite', 'passionate', 'formal', 'casual'];
@@ -91,6 +92,7 @@ function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [voiceLang, setVoiceLang] = useState('twi'); // Default to Twi for voice commands
+  const [showEngagement, setShowEngagement] = useState(false);
 
   // Timer logic
   useEffect(() => {
@@ -331,9 +333,17 @@ function App() {
 
   // Handle avatar confirm
   const handleAvatarConfirm = (avatarUrl: string) => {
+    console.log('Avatar confirmed:', avatarUrl);
     setAvatar(avatarUrl);
     localStorage.setItem('lq_avatar', avatarUrl);
     setShowAvatarPicker(false);
+    setShowEngagement(true);
+    console.log('showEngagement set to true');
+  };
+
+  // Handle engagement start
+  const handleEngagementStart = () => {
+    setShowEngagement(false);
     setShowCategorySelector(true);
   };
 
@@ -378,6 +388,10 @@ function App() {
   }
   if (showAvatarPicker) {
     return <AvatarPicker onConfirm={handleAvatarConfirm} />;
+  }
+  if (showEngagement) {
+    console.log('Rendering Engagement screen with nickname:', nickname);
+    return <Engagement nickname={nickname} onStart={handleEngagementStart} />;
   }
   if (showCategorySelector) {
     return <CategorySelector onConfirm={handleCategoryConfirm} />;
