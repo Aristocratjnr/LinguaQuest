@@ -13,7 +13,16 @@ type ArgumentInputProps = {
   enableVoice?: boolean;
 };
 
-const ArgumentInput: React.FC<ArgumentInputProps> = ({ userArgument, onChange, loading, disabled, onTranslate, translation, language, enableVoice }) => {
+const ArgumentInput: React.FC<ArgumentInputProps> = ({ 
+  userArgument, 
+  onChange, 
+  loading, 
+  disabled, 
+  onTranslate, 
+  translation, 
+  language, 
+  enableVoice 
+}) => {
   const [listening, setListening] = useState(false);
   let recognition: any = null;
   const { addActivity } = useActivityFeed();
@@ -45,58 +54,123 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({ userArgument, onChange, l
   };
 
   return (
-    <section className="lq-section">
-      <motion.div
-        className="lq-card"
-        style={{ padding: '1.5rem 2rem', boxShadow: '0 4px 24px #764ba233', border: '1px solid #e0e7ff', margin: 0 }}
-        initial={{ opacity: 0, y: 32 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-      >
-        <label className="lq-label text-lg font-semibold mb-2" style={{ color: '#764ba2' }}>
-          Your Argument (in English):
-        </label>
-        <div className="flex items-start gap-4 mb-4">
-          <textarea
-            value={userArgument}
-            onChange={e => onChange(e.target.value)}
-            rows={3}
-            className="lq-textarea flex-1 text-base"
-            disabled={loading || disabled}
-            style={{ minHeight: 80, fontSize: '1.05rem', border: '1.5px solid #764ba2', background: '#f8f6fc', borderRadius: 10, boxShadow: '0 2px 8px #764ba233' }}
-            placeholder="Type your argument here..."
-          />
+    <motion.div
+      className="card shadow-sm mb-4"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+    >
+      <div className="card-header d-flex justify-content-between align-items-center py-3" 
+           style={{ background: 'rgba(118, 75, 162, 0.05)' }}>
+        <h5 className="mb-0 d-flex align-items-center" style={{ color: '#764ba2' }}>
+          <i className="material-icons me-2">edit</i>
+          Your Argument
+        </h5>
+        <span className="badge bg-primary px-2 py-1">
+          English
+        </span>
+      </div>
+      
+      <div className="card-body p-4">
+        <div className="d-flex mb-3">
+          <div className="flex-grow-1 position-relative">
+            <textarea
+              value={userArgument}
+              onChange={e => onChange(e.target.value)}
+              rows={3}
+              className="form-control"
+              disabled={loading || disabled}
+              style={{ 
+                minHeight: 100, 
+                resize: 'vertical',
+                backgroundColor: '#f8f6fc',
+                borderColor: '#d6d3e8',
+                borderRadius: '0.5rem',
+                padding: '0.75rem',
+                fontSize: '1.05rem',
+                lineHeight: 1.5
+              }}
+              placeholder="Type your argument here..."
+            />
+            <div className="form-text text-end mt-1">
+              {userArgument.length} characters
+            </div>
+          </div>
+          
           {enableVoice && (
             <motion.button
               type="button"
-              className={`lq-btn lq-btn-translate flex items-center justify-center ml-2${listening ? ' lq-btn-selected' : ''}`}
-              style={{ minWidth: 48, minHeight: 48, borderRadius: '50%', fontSize: 24, boxShadow: '0 2px 8px #22d3ee33', border: listening ? '2px solid #22d3ee' : '2px solid transparent', transition: 'border 0.2s' }}
+              className={`btn ${listening ? 'btn-info' : 'btn-outline-info'} ms-2 d-flex align-items-center justify-content-center`}
+              style={{ 
+                width: 48, 
+                height: 48, 
+                borderRadius: '50%', 
+                alignSelf: 'flex-start'
+              }}
               onClick={handleVoiceInput}
               disabled={loading || disabled || listening}
               title="Speak your argument"
               whileTap={{ scale: 0.85 }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             >
-              {listening ? '🎤...' : '🎤'}
+              <i className="material-icons">
+                {listening ? 'mic' : 'mic_none'}
+              </i>
             </motion.button>
           )}
         </div>
-        <button
-          className="lq-btn lq-btn-translate w-full mb-3"
+        
+        <motion.button
+          className="btn btn-primary w-100 mb-3 py-3"
           onClick={handleTranslate}
           disabled={loading || !userArgument || disabled}
-          style={{ fontSize: '1.1rem', padding: '0.75rem 0', borderRadius: 12 }}
+          style={{ 
+            background: loading ? '#ccc' : 'linear-gradient(to right, #667eea, #764ba2)',
+            border: 'none',
+            borderRadius: '0.75rem',
+            boxShadow: '0 4px 10px rgba(118, 75, 162, 0.3)'
+          }}
+          whileHover={{ boxShadow: '0 6px 15px rgba(118, 75, 162, 0.4)' }}
+          whileTap={{ scale: 0.98 }}
         >
-          Translate to {language.toUpperCase()}
-        </button>
+          {loading ? (
+            <>
+              <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              Translating...
+            </>
+          ) : (
+            <>
+              <i className="material-icons align-middle me-2">translate</i>
+              Translate to {language.toUpperCase()}
+            </>
+          )}
+        </motion.button>
+        
         {translation && (
-          <div className="lq-translation mt-2 text-green-700 bg-green-50 border border-green-200 rounded-lg p-3">
-            <span className="font-semibold">Translation:</span> <span className="text-gray-800">{translation}</span>
-          </div>
+          <motion.div 
+            className="alert alert-success d-flex"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            transition={{ duration: 0.3 }}
+          >
+            <div>
+              <i className="material-icons fs-5 me-2 align-middle">check_circle</i>
+            </div>
+            <div>
+              <div className="fw-bold mb-1">Translation:</div>
+              <p className="mb-0" style={{ lineHeight: 1.5 }}>{translation}</p>
+            </div>
+          </motion.div>
         )}
-      </motion.div>
-    </section>
+      </div>
+      
+      <div className="card-footer py-2 text-center text-muted small" 
+           style={{ background: 'rgba(118, 75, 162, 0.05)' }}>
+        <i className="material-icons align-middle me-1" style={{ fontSize: '.9rem' }}>info</i>
+        Enter your argument in English, then translate it
+      </div>
+    </motion.div>
   );
 };
 
-export default ArgumentInput; 
+export default ArgumentInput;

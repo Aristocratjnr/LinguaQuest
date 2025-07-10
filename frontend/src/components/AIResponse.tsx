@@ -11,7 +11,15 @@ type AIResponseProps = {
   enableVoice?: boolean;
 };
 
-const AIResponse: React.FC<AIResponseProps> = ({ aiResponse, newStance, loading, disabled, onDialogue, userArgument, enableVoice }) => {
+const AIResponse: React.FC<AIResponseProps> = ({ 
+  aiResponse, 
+  newStance, 
+  loading, 
+  disabled, 
+  onDialogue, 
+  userArgument, 
+  enableVoice 
+}) => {
   const [speaking, setSpeaking] = useState(false);
 
   const handleSpeak = () => {
@@ -28,52 +36,116 @@ const AIResponse: React.FC<AIResponseProps> = ({ aiResponse, newStance, loading,
   };
 
   return (
-    <section className="lq-section">
-      <motion.div
-        className="lq-card"
-        style={{ padding: '1.5rem 2rem', boxShadow: '0 4px 24px #764ba233', border: '1px solid #e0e7ff', margin: 0 }}
-        initial={{ opacity: 0, y: 32 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-      >
-        <button
-          className="lq-btn lq-btn-dialogue w-full mb-4"
+    <motion.div 
+      className="card shadow-sm mb-4"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+    >
+      <div className="card-header d-flex justify-content-between align-items-center py-3" 
+           style={{ background: 'rgba(118, 75, 162, 0.05)' }}>
+        <h5 className="mb-0 d-flex align-items-center" style={{ color: '#764ba2' }}>
+          <i className="material-icons me-2">smart_toy</i>
+          AI Response
+        </h5>
+        <span className="badge bg-info px-2 py-1">
+          <i className="material-icons me-1" style={{ fontSize: '0.75rem' }}>psychology</i>
+          Language Partner
+        </span>
+      </div>
+      
+      <div className="card-body p-4">
+        <motion.button
+          className="btn btn-primary btn-lg w-100 mb-4"
           onClick={onDialogue}
           disabled={loading || !userArgument || disabled}
-          style={{ fontSize: '1.1rem', padding: '0.75rem 0', borderRadius: 12 }}
+          style={{ 
+            background: loading ? '#ccc' : 'linear-gradient(to right, #4f46e5, #6366f1)',
+            border: 'none',
+            borderRadius: '0.75rem',
+            padding: '0.75rem 0',
+            boxShadow: '0 4px 10px rgba(99, 102, 241, 0.3)'
+          }}
+          whileHover={{ boxShadow: '0 6px 15px rgba(99, 102, 241, 0.4)' }}
+          whileTap={{ scale: 0.98 }}
         >
-          {loading ? 'Loading...' : 'Get AI Response'}
-        </button>
+          {loading ? (
+            <>
+              <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              Processing...
+            </>
+          ) : (
+            <>
+              <i className="material-icons align-middle me-2">chat</i>
+              Get AI Response
+            </>
+          )}
+        </motion.button>
+        
         {aiResponse && (
-          <div className="lq-ai-response flex items-start gap-4 mt-4" style={{ fontSize: '1.1rem', border: '1px solid #667eea22', boxShadow: '0 2px 8px #667eea22', borderRadius: 10, background: '#f5f8ff' }}>
-            <div className="flex-1">
-              <div className="font-semibold text-blue-700 mb-1">AI Response</div>
-              <div className="text-gray-800 leading-relaxed">{aiResponse}</div>
+          <motion.div 
+            className="p-4 rounded-3 position-relative mb-3"
+            style={{ 
+              background: 'rgba(99, 102, 241, 0.05)', 
+              border: '1px solid rgba(99, 102, 241, 0.2)',
+              boxShadow: '0 2px 8px rgba(99, 102, 241, 0.1)'
+            }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="ribbon position-absolute px-3 py-1 bg-primary text-white"
+                 style={{ 
+                   top: -10, 
+                   left: 20, 
+                   borderRadius: '.5rem',
+                   boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                 }}>
+              <i className="material-icons align-text-bottom me-1" style={{ fontSize: '1rem' }}>smart_toy</i>
+              AI Response
             </div>
+            
+            <p className="mb-0 mt-3 lh-lg" style={{ fontSize: '1.05rem' }}>{aiResponse}</p>
+            
             {enableVoice && (
               <motion.button
                 type="button"
-                className={`lq-btn lq-btn-translate flex items-center justify-center ml-2${speaking ? ' lq-btn-selected' : ''}`}
-                style={{ minWidth: 48, minHeight: 48, borderRadius: '50%', fontSize: 24, boxShadow: '0 2px 8px #22d3ee33', border: speaking ? '2px solid #22d3ee' : '2px solid transparent', transition: 'border 0.2s' }}
+                className={`btn ${speaking ? 'btn-info' : 'btn-outline-info'} rounded-circle position-absolute top-0 end-0 m-3`}
+                style={{ width: 42, height: 42 }}
                 onClick={handleSpeak}
                 disabled={speaking}
                 title="Hear AI response"
                 whileTap={{ scale: 0.85 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
               >
-                {speaking ? '🔊...' : '🔊'}
+                <i className="material-icons">{speaking ? 'volume_up' : 'volume_up'}</i>
               </motion.button>
             )}
-          </div>
+          </motion.div>
         )}
+        
         {newStance && (
-          <div className="lq-ai-stance mt-4 text-orange-500 font-bold text-lg flex items-center gap-2">
-            <span>AI Stance:</span> <span className="text-gray-800 font-semibold">{newStance}</span>
-          </div>
+          <motion.div 
+            className="alert alert-warning d-flex align-items-center"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+          >
+            <i className="material-icons me-3 fs-4">psychology</i>
+            <div>
+              <div className="fw-bold">AI Stance:</div>
+              <div>{newStance}</div>
+            </div>
+          </motion.div>
         )}
-      </motion.div>
-    </section>
+      </div>
+      
+      <div className="card-footer py-2 text-center text-muted small" 
+           style={{ background: 'rgba(118, 75, 162, 0.05)' }}>
+        <i className="material-icons align-middle me-1" style={{ fontSize: '.9rem' }}>info</i>
+        The AI will respond to your argument and may change its stance
+      </div>
+    </motion.div>
   );
 };
 
-export default AIResponse; 
+export default AIResponse;
