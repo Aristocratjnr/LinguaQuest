@@ -178,6 +178,10 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string) => void }> = ({ o
         </div>
       </motion.div>
       
+      {/* Font import for JetBrains Mono */}
+      <style>
+        {`@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');`}
+      </style>
     </div>
   );
 };

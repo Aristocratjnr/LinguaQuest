@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 type ProgressBarProps = {
@@ -6,25 +6,44 @@ type ProgressBarProps = {
   totalRounds: number;
 };
 
-// Define keyframes animation in a separate style element
-const keyframesStyle = `
-  @keyframes progress-bar-stripes {
-    from { background-position: 1rem 0; }
-    to { background-position: 0 0; }
-  }
-`;
-
 const ProgressBar: React.FC<ProgressBarProps> = ({ round, totalRounds }) => {
-  const progressPercent = ((round - 1) / totalRounds) * 100;
+  // Track the previous round for smoother animations
+  const [prevRound, setPrevRound] = useState(round);
+  const progressPercent = Math.max(0, ((round - 1) / totalRounds) * 100);
+  
+  // Update prevRound when round changes
+  useEffect(() => {
+    setPrevRound(round);
+  }, [round]);
+  
+  // Define a unique ID for the style element to avoid conflicts
+  const styleId = 'progress-bar-animation-style';
   
   // Add the keyframes style to the document head once
   useEffect(() => {
-    const styleElement = document.createElement('style');
-    styleElement.innerHTML = keyframesStyle;
-    document.head.appendChild(styleElement);
+    // Check if the style already exists to avoid duplicates
+    if (!document.getElementById(styleId)) {
+      const styleElement = document.createElement('style');
+      styleElement.id = styleId;
+      styleElement.innerHTML = `
+        @keyframes progress-bar-stripes {
+          from { background-position: 1rem 0; }
+          to { background-position: 0 0; }
+        }
+      `;
+      document.head.appendChild(styleElement);
+    }
     
+    // No need to remove the style on unmount as it's shared
+    // But we'll clean up if necessary
     return () => {
-      document.head.removeChild(styleElement);
+      // Only remove if component is being fully unmounted from the app
+      if (document.getElementById(styleId) && document.querySelectorAll('.progress-bar').length <= 1) {
+        const styleElement = document.getElementById(styleId);
+        if (styleElement) {
+          document.head.removeChild(styleElement);
+        }
+      }
     };
   }, []);
   
@@ -47,6 +66,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ round, totalRounds }) => {
           </div>
         </div>
         
+        {/* Main progress bar */}
         <div className="progress" style={{ height: '12px', borderRadius: '6px', overflow: 'hidden' }}>
           <motion.div 
             className="progress-bar"
@@ -57,9 +77,13 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ round, totalRounds }) => {
               backgroundImage: 'linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent)',
               animation: 'progress-bar-stripes 1s linear infinite'
             }}
-            initial={{ width: `${Math.max(0, ((round - 2) / totalRounds) * 100)}%` }}
+            initial={false} // Don't animate on first render
             animate={{ width: `${progressPercent}%` }}
-            transition={{ duration: 0.5 }}
+            transition={{ 
+              duration: 0.8, 
+              ease: "easeOut",
+              type: "tween" 
+            }}
             role="progressbar"
             aria-valuenow={progressPercent}
             aria-valuemin={0}
@@ -78,19 +102,28 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ round, totalRounds }) => {
           </div>
         </div>
         
+        {/* Round indicators */}
         <div className="progress mt-1" style={{ height: '4px', borderRadius: '2px' }}>
           {Array.from({ length: totalRounds }).map((_, i) => (
-            <div 
+            <motion.div 
               key={i}
-              className={`progress-bar ${i < round - 1 ? 'bg-success' : 'bg-light'}`}
-              role="progressbar"
+              className="progress-segment"
               style={{ 
                 width: `${100 / totalRounds}%`,
+                height: '100%',
+                display: 'inline-block',
                 borderRight: i < totalRounds - 1 ? '2px solid white' : 'none',
+                background: i < round - 1 ? '#28a745' : '#e9ecef',
+                transition: 'background-color 0.5s ease'
               }}
-              aria-valuenow={100 / totalRounds}
-              aria-valuemin={0}
-              aria-valuemax={100}
+              initial={false}
+              animate={{ 
+                backgroundColor: i < round - 1 ? '#28a745' : '#e9ecef'
+              }}
+              transition={{ 
+                duration: 0.5,
+                delay: i * 0.1  // Stagger the animations
+              }}
             />
           ))}
         </div>

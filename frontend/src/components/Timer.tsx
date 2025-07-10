@@ -22,6 +22,16 @@ const Timer: React.FC<TimerProps> = ({ seconds, timeLeft, isActive }) => {
     return '#dc3545'; // Red
   };
   
+  // Format time as mm:ss or ss
+  const formatTime = (t: number) => {
+    if (t >= 60) {
+      const m = Math.floor(t / 60);
+      const s = t % 60;
+      return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+    return `${t}s`;
+  };
+  
   return (
     <div className="d-flex flex-column align-items-center justify-content-center my-4">
       <motion.div
@@ -80,7 +90,7 @@ const Timer: React.FC<TimerProps> = ({ seconds, timeLeft, isActive }) => {
             fontWeight="bold" 
             dy=".3em"
           >
-            {timeLeft}s
+            {formatTime(timeLeft)}
           </text>
         </svg>
         

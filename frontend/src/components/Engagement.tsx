@@ -25,15 +25,18 @@ const Engagement: React.FC<{ nickname: string; onStart: () => void }> = ({ nickn
   const streak = 3;
 
   return (
-    <div className="container-fluid d-flex align-items-center justify-content-center min-vh-100 px-3" 
+    <div className="container-fluid d-flex align-items-center justify-content-center min-vh-100 px-2 px-sm-3 px-md-4" 
          style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
       <motion.div 
-        className="card shadow-lg w-100" 
+        className="card shadow-lg w-100"
         style={{ 
           maxWidth: 500, 
+          width: '100%',
           borderRadius: '1rem', 
           overflow: 'hidden',
-          fontFamily: "'JetBrains Mono', monospace"
+          fontFamily: "'JetBrains Mono', monospace",
+          minHeight: 420,
+          boxSizing: 'border-box',
         }}
         initial={{ opacity: 0, y: 32 }}
         animate={{ opacity: 1, y: 0 }}
@@ -50,59 +53,59 @@ const Engagement: React.FC<{ nickname: string; onStart: () => void }> = ({ nickn
           >
             <i className="material-icons" 
                style={{ 
-                 fontSize: '2.5rem', 
+                 fontSize: '2.2rem', 
                  color: '#4f46e5',
                  background: 'rgba(79, 70, 229, 0.1)',
-                 padding: '0.75rem',
+                 padding: '0.6rem',
                  borderRadius: '50%'
                }}>
               travel_explore
             </i>
           </motion.div>
-          <h2 className="fw-bold mb-1" style={{ color: '#4f46e5' }}>
+          <h2 className="fw-bold mb-1" style={{ color: '#4f46e5', fontSize: '1.3rem' }}>
             Welcome, {nickname}!
           </h2>
-          <div className="text-muted" style={{ letterSpacing: '0.01em' }}>
+          <div className="text-muted" style={{ letterSpacing: '0.01em', fontSize: '1rem' }}>
             Ready to start your language quest?
           </div>
         </div>
 
         {/* Daily Streak / Progress */}
-        <div className="d-flex align-items-center justify-content-center gap-3 py-3" 
+        <div className="d-flex flex-column flex-md-row align-items-center justify-content-center gap-2 gap-md-3 py-3 px-2 px-sm-3" 
              style={{ background: 'rgba(243, 244, 246, 0.7)' }}>
-          <div className="d-flex align-items-center">
-            <div className="d-flex flex-column align-items-center">
-              <div className="d-flex align-items-center mb-1 px-2 py-1 rounded"
+          <div className="d-flex align-items-center w-100 justify-content-center mb-2 mb-md-0">
+            <div className="d-flex flex-column align-items-center w-100">
+              <div className="d-flex align-items-center mb-1 px-2 py-1 rounded w-100 justify-content-center"
                    style={{ 
                      background: 'rgba(253, 224, 71, 0.2)', 
-                     border: '1px solid rgba(253, 224, 71, 0.4)'
+                     border: '1px solid rgba(253, 224, 71, 0.4)',
+                     maxWidth: 180
                    }}>
                 <i className="material-icons align-middle me-1" 
                    style={{ fontSize: '1.1rem', color: '#d97706' }}>
                   local_fire_department
                 </i>
-                <span style={{ fontWeight: 600, color: '#b45309' }}>
+                <span style={{ fontWeight: 600, color: '#b45309', fontSize: '1rem' }}>
                   {streak} day streak
                 </span>
               </div>
               <small className="text-muted" style={{ fontSize: '0.7rem' }}>Keep it up!</small>
             </div>
           </div>
-          
-          <div className="vr mx-2" style={{ height: 32, opacity: 0.2 }}></div>
-          
-          <div className="d-flex align-items-center">
-            <div className="d-flex flex-column align-items-center">
-              <div className="d-flex align-items-center mb-1 px-2 py-1 rounded"
+          <div className="d-none d-md-block vr mx-2" style={{ height: 32, opacity: 0.2 }}></div>
+          <div className="d-flex align-items-center w-100 justify-content-center">
+            <div className="d-flex flex-column align-items-center w-100">
+              <div className="d-flex align-items-center mb-1 px-2 py-1 rounded w-100 justify-content-center"
                    style={{ 
                      background: 'rgba(125, 211, 252, 0.2)', 
-                     border: '1px solid rgba(125, 211, 252, 0.4)'
+                     border: '1px solid rgba(125, 211, 252, 0.4)',
+                     maxWidth: 180
                    }}>
                 <i className="material-icons align-middle me-1" 
                    style={{ fontSize: '1.1rem', color: '#0284c7' }}>
                   emoji_events
                 </i>
-                <span style={{ fontWeight: 600, color: '#0369a1' }}>
+                <span style={{ fontWeight: 600, color: '#0369a1', fontSize: '1rem' }}>
                   Level 2
                 </span>
               </div>
@@ -112,7 +115,7 @@ const Engagement: React.FC<{ nickname: string; onStart: () => void }> = ({ nickn
         </div>
 
         {/* Motivational Quote */}
-        <div className="px-4 py-4 text-center border-bottom" 
+        <div className="px-2 px-sm-4 py-4 text-center border-bottom" 
              style={{ background: 'rgba(255, 255, 255, 0.98)' }}>
           <div className="mb-2" style={{ 
             fontSize: '0.7rem', 
@@ -136,10 +139,16 @@ const Engagement: React.FC<{ nickname: string; onStart: () => void }> = ({ nickn
                 color: '#4b5563',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                fontSize: '1rem',
+                lineHeight: 1.3,
+                textAlign: 'center',
+                width: '100%',
+                maxWidth: 400,
+                margin: '0 auto',
               }}
             >
-              <div style={{ maxWidth: '90%' }}>{quotes[quoteIndex]}</div>
+              <div style={{ maxWidth: '95%' }}>{quotes[quoteIndex]}</div>
             </motion.div>
           </AnimatePresence>
           <div className="d-flex justify-content-center mt-2">
@@ -156,7 +165,7 @@ const Engagement: React.FC<{ nickname: string; onStart: () => void }> = ({ nickn
         </div>
 
         {/* Quick Tips Carousel */}
-        <div className="px-4 py-4" style={{ background: 'rgba(243, 244, 246, 0.7)' }}>
+        <div className="px-2 px-sm-4 py-4" style={{ background: 'rgba(243, 244, 246, 0.7)' }}>
           <div className="d-flex align-items-center justify-content-between mb-2">
             <span style={{ 
               fontSize: '0.7rem', 
@@ -191,7 +200,11 @@ const Engagement: React.FC<{ nickname: string; onStart: () => void }> = ({ nickn
                 minHeight: 32, 
                 color: '#4b5563',
                 display: 'flex',
-                alignItems: 'center' 
+                alignItems: 'center',
+                fontSize: '1rem',
+                width: '100%',
+                maxWidth: 400,
+                margin: '0 auto',
               }}
             >
               <div className="p-2 rounded" style={{ 
@@ -225,7 +238,7 @@ const Engagement: React.FC<{ nickname: string; onStart: () => void }> = ({ nickn
         {/* Start Button */}
         <div className="card-footer py-4 text-center" style={{ background: 'rgba(255, 255, 255, 0.98)' }}>
           <motion.button
-            className="btn btn-primary px-5 py-3 fw-bold"
+            className="btn btn-primary px-4 px-sm-5 py-3 fw-bold w-100 w-sm-auto"
             style={{ 
               borderRadius: '0.5rem', 
               fontSize: '1rem', 
@@ -233,7 +246,10 @@ const Engagement: React.FC<{ nickname: string; onStart: () => void }> = ({ nickn
               border: 'none',
               boxShadow: '0 4px 6px -1px rgba(79, 70, 229, 0.2), 0 2px 4px -1px rgba(79, 70, 229, 0.1)',
               fontFamily: "'JetBrains Mono', monospace",
-              letterSpacing: '0.01em'
+              letterSpacing: '0.01em',
+              maxWidth: 320,
+              margin: '0 auto',
+              display: 'block',
             }}
             whileHover={{ 
               scale: 1.03, 
@@ -247,7 +263,6 @@ const Engagement: React.FC<{ nickname: string; onStart: () => void }> = ({ nickn
           </motion.button>
         </div>
       </motion.div>
-      
     </div>
   );
 };

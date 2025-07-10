@@ -20,6 +20,8 @@ import AvatarPicker from './components/AvatarPicker';
 import Leaderboard from './components/Leaderboard';
 import CategorySelector from './components/CategorySelector';
 import Engagement from './components/Engagement';
+import WelcomePage from './components/WelcomePage'; // Import the new WelcomePage component
+import SettingsPage from './components/SettingsPage';
 
 
 const TONES = ['polite', 'passionate', 'formal', 'casual'];
@@ -76,7 +78,8 @@ function App() {
   const audioClick = useRef<HTMLAudioElement|null>(null);
   const [nickname, setNickname] = useState(() => localStorage.getItem('lq_nickname') || '');
   const [avatar, setAvatar] = useState(() => localStorage.getItem('lq_avatar') || '');
-  const [showNicknamePrompt, setShowNicknamePrompt] = useState(!nickname);
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [showNicknamePrompt, setShowNicknamePrompt] = useState(false);
   const [showAvatarPicker, setShowAvatarPicker] = useState(!avatar && !showNicknamePrompt);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [badges, setBadges] = useState<string[]>([]);
@@ -89,7 +92,7 @@ function App() {
   const [listeningCmd, setListeningCmd] = useState(false);
   const [lastCmd, setLastCmd] = useState('');
   const [cmdError, setCmdError] = useState('');
-  const [showSettings, setShowSettings] = useState(false);
+  const [showSettingsPage, setShowSettingsPage] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [voiceLang, setVoiceLang] = useState('twi'); // Default to Twi for voice commands
   const [showEngagement, setShowEngagement] = useState(false);
@@ -243,7 +246,7 @@ function App() {
           } else if (cmd.action === 'leaderboard') {
             setShowLeaderboard(true);
           } else if (cmd.action === 'settings') {
-            setShowSettings(true);
+            setShowSettingsPage(true);
           } else if (cmd.action === 'start') {
             if (showOnboarding) setShowOnboarding(false);
           } else if (cmd.action === 'profile') {
@@ -383,9 +386,17 @@ function App() {
   }, [roundResult]);
 
   // Onboarding screens
+  if (showWelcome) {
+    return <WelcomePage onGetStarted={() => {
+      setShowWelcome(false);
+      setShowNicknamePrompt(true);
+    }} />;
+  }
+
   if (showNicknamePrompt) {
     return <NicknamePrompt onConfirm={handleNicknameConfirm} />;
   }
+
   if (showAvatarPicker) {
     return <AvatarPicker onConfirm={handleAvatarConfirm} />;
   }
@@ -395,6 +406,9 @@ function App() {
   }
   if (showCategorySelector) {
     return <CategorySelector onConfirm={handleCategoryConfirm} />;
+  }
+  if (showSettingsPage) {
+    return <SettingsPage onClose={() => setShowSettingsPage(false)} />;
   }
   if (showOnboarding) {
     return (
@@ -415,121 +429,122 @@ function App() {
 
   const showGameOverLeaderboard = roundResult === 'gameover' && !showLeaderboard;
 
+  // Main game layout
   return (
-    <div className="min-vh-100 d-flex flex-column" 
-         style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e9f3 100%)' }}>
-      <div className={`container ${shake ? 'animate__animated animate__shakeX' : ''}`}
-           style={{ maxWidth: '1140px', padding: '1.5rem' }}>
-        {roundResult === 'success' && <Confetti width={window.innerWidth} height={window.innerHeight} numberOfPieces={200} recycle={false} />}
-        
-        {/* Header Section */}
-        <header className="d-flex justify-content-between align-items-center mb-4 p-3 bg-white rounded-3 shadow-sm">
-          <div className="d-flex align-items-center">
-            <img src={logo} alt="LinguaQuest Logo" style={{ height: 40, marginRight: 12 }} className="d-none d-sm-block" />
-            <h1 className="m-0 fw-bold" style={{ color: '#764ba2', fontSize: '1.5rem' }}>LinguaQuest</h1>
+    <div className="min-vh-100 d-flex flex-column" style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e9f3 100%)', fontFamily: "'JetBrains Mono', monospace" }}>
+      {/* Header */}
+      <header className="container-fluid py-3 px-2 px-md-4 mb-3" style={{ background: 'rgba(255,255,255,0.95)', boxShadow: '0 2px 8px #0001' }}>
+        <div className="d-flex justify-content-between align-items-center" style={{ maxWidth: 900, margin: '0 auto' }}>
+          <div className="d-flex align-items-center gap-2">
+            <img src={logo} alt="LinguaQuest Logo" style={{ height: 40, marginRight: 10 }} />
+            <span className="fw-bold" style={{ color: '#764ba2', fontSize: '1.3rem', letterSpacing: '-0.01em' }}>LinguaQuest</span>
           </div>
-          <div className="d-flex align-items-center">
-            <span className="badge bg-primary me-2 px-3 py-2">
-              {nickname || 'Player'}
-            </span>
-            <img src={avatar} alt="User Avatar" className="rounded-circle" style={{ height: 40, width: 40, objectFit: 'cover' }} />
+          <div className="d-flex align-items-center gap-2">
+            <span className="badge bg-primary px-3 py-2" style={{ fontSize: '1rem' }}>{nickname || 'Player'}</span>
+            <img src={avatar} alt="User Avatar" className="rounded-circle" style={{ height: 40, width: 40, objectFit: 'cover', border: '2px solid #764ba2' }} />
           </div>
-        </header>
-        
-        {/* Progress and Timer Section */}
-        <div className="row g-3 mb-4">
-          <div className="col-md-8">
+        </div>
+      </header>
+
+      {/* Progress and Timer */}
+      <div className="container mb-3 px-2 px-sm-3" style={{ maxWidth: 900 }}>
+        <div className="row g-3 align-items-center">
+          <div className="col-12 col-md-8">
             <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
           </div>
-          <div className="col-md-4">
+          <div className="col-12 col-md-4">
             <div className="d-flex justify-content-center">
               <Timer seconds={ROUND_TIME} timeLeft={timeLeft} isActive={timerActive && roundResult === 'playing'} />
             </div>
           </div>
         </div>
-        
-        {/* Game Status Messages */}
-        {(roundResult === 'success' || roundResult === 'fail' || roundResult === 'gameover') && (
-          <div className={`alert ${roundResult === 'success' ? 'alert-success' : roundResult === 'fail' ? 'alert-danger' : 'alert-info'} mb-4 text-center`}>
+      </div>
+
+      {/* Game Status Messages */}
+      {(roundResult === 'success' || roundResult === 'fail' || roundResult === 'gameover') && (
+        <div className={`container mb-3 px-2 px-sm-3`} style={{ maxWidth: 600 }}>
+          <div className={`alert ${roundResult === 'success' ? 'alert-success' : roundResult === 'fail' ? 'alert-danger' : 'alert-info'} text-center shadow-sm mb-0`}>
             {roundResult === 'success' && (
-              <div className="d-flex align-items-center justify-content-center">
+              <div className="d-flex align-items-center justify-content-center gap-2">
                 <i className="material-icons me-2" style={{ fontSize: '1.5rem' }}>celebration</i>
                 <span className="fw-bold">Persuaded! +1 Point</span>
               </div>
             )}
             {roundResult === 'fail' && (
-              <div className="d-flex align-items-center justify-content-center">
+              <div className="d-flex align-items-center justify-content-center gap-2">
                 <i className="material-icons me-2" style={{ fontSize: '1.5rem' }}>timer_off</i>
                 <span className="fw-bold">Time's up! Try next round.</span>
               </div>
             )}
             {roundResult === 'gameover' && (
-              <div className="d-flex align-items-center justify-content-center">
+              <div className="d-flex align-items-center justify-content-center gap-2">
                 <i className="material-icons me-2" style={{ fontSize: '1.5rem' }}>emoji_events</i>
                 <span className="fw-bold">Game Over! Thanks for playing.</span>
               </div>
             )}
           </div>
-        )}
-        
-        {/* Main Game Content */}
-        <div className="row g-4">
+        </div>
+      )}
+
+      {/* Main Game Content */}
+      <main className="container flex-grow-1 d-flex flex-column px-2 px-sm-3" style={{ maxWidth: 900 }}>
+        <div className="row g-4 flex-grow-1">
           {/* Left Column - Scenario and User Input */}
-          <div className="col-lg-6">
-            <div className="d-grid gap-4">
-              <Scenario
-                scenario={scenario}
-                language={language}
-                loading={loading || roundResult !== 'playing'}
-                onLanguageChange={setLanguage}
-                languages={LANGUAGES}
-              />
-              
-              <ArgumentInput
-                userArgument={userArgument}
-                onChange={setUserArgument}
-                loading={loading}
-                disabled={roundResult !== 'playing'}
-                onTranslate={handleTranslate}
-                translation={translation}
-                language={language}
-              />
-              
-              <ToneSelector
-                tone={tone}
-                onChange={setTone}
-                loading={loading}
-                disabled={roundResult !== 'playing'}
-                tones={TONES}
-              />
+          <div className="col-12 col-lg-6 d-flex flex-column">
+            <div className="card shadow-sm mb-4 flex-grow-1" style={{ borderRadius: '1rem', background: 'rgba(255,255,255,0.98)' }}>
+              <div className="card-body d-grid gap-4">
+                <Scenario
+                  scenario={scenario}
+                  language={language}
+                  loading={loading || roundResult !== 'playing'}
+                  onLanguageChange={setLanguage}
+                  languages={LANGUAGES}
+                />
+                <ArgumentInput
+                  userArgument={userArgument}
+                  onChange={setUserArgument}
+                  loading={loading}
+                  disabled={roundResult !== 'playing'}
+                  onTranslate={handleTranslate}
+                  translation={translation}
+                  language={language}
+                />
+                <ToneSelector
+                  tone={tone}
+                  onChange={setTone}
+                  loading={loading}
+                  disabled={roundResult !== 'playing'}
+                  tones={TONES}
+                />
+              </div>
             </div>
           </div>
-          
           {/* Right Column - AI Responses and Feedback */}
-          <div className="col-lg-6">
-            <div className="d-grid gap-4">
-              <Feedback
-                feedback={feedback}
-                score={score}
-                loading={loading}
-                disabled={roundResult !== 'playing'}
-                onEvaluate={handleEvaluate}
-                userArgument={userArgument}
-              />
-              
-              <AIResponse
-                aiResponse={aiResponse}
-                newStance={newStance}
-                loading={loading}
-                disabled={roundResult !== 'playing'}
-                onDialogue={handleDialogue}
-                userArgument={userArgument}
-                enableVoice={true}
-              />
+          <div className="col-12 col-lg-6 d-flex flex-column">
+            <div className="card shadow-sm mb-4 flex-grow-1" style={{ borderRadius: '1rem', background: 'rgba(255,255,255,0.98)' }}>
+              <div className="card-body d-grid gap-4">
+                <Feedback
+                  feedback={feedback}
+                  score={score}
+                  loading={loading}
+                  disabled={roundResult !== 'playing'}
+                  onEvaluate={handleEvaluate}
+                  userArgument={userArgument}
+                />
+                <AIResponse
+                  aiResponse={aiResponse}
+                  newStance={newStance}
+                  loading={loading}
+                  disabled={roundResult !== 'playing'}
+                  onDialogue={handleDialogue}
+                  userArgument={userArgument}
+                  enableVoice={true}
+                />
+              </div>
             </div>
           </div>
         </div>
-        
+
         {/* Game Controls */}
         <div className="row mt-4 mb-4">
           <div className="col-12 d-flex flex-wrap justify-content-center gap-2 gap-sm-3">
@@ -548,7 +563,6 @@ function App() {
                 <span className="d-inline d-sm-none">Leaderboard</span>
               </button>
             )}
-            
             <button 
               className="btn btn-outline-primary px-3 px-md-4 py-2"
               style={{ borderRadius: '.75rem' }} 
@@ -559,7 +573,6 @@ function App() {
               <span className="d-none d-sm-inline">New Scenario</span>
               <span className="d-inline d-sm-none">New</span>
             </button>
-            
             <button 
               className="btn btn-outline-info px-3 px-md-4 py-2"
               style={{ borderRadius: '.75rem' }} 
@@ -572,16 +585,18 @@ function App() {
             </button>
           </div>
         </div>
-        
-        {/* Last Command Display */}
-        {lastCmd && (
-          <div className="alert alert-light text-center mb-4">
+      </main>
+
+      {/* Last Command Display */}
+      {lastCmd && (
+        <div className="container mb-3 px-2 px-sm-3" style={{ maxWidth: 600 }}>
+          <div className="alert alert-light text-center shadow-sm mb-0">
             <small className="text-muted">Last voice command: "{lastCmd}"</small>
             {cmdError && <div className="text-danger small mt-1">{cmdError}</div>}
           </div>
-        )}
-      </div>
-      
+        </div>
+      )}
+
       {/* Loading Overlay */}
       {loading && (
         <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ background: 'rgba(255,255,255,0.7)', zIndex: 1000 }}>
@@ -590,10 +605,9 @@ function App() {
           </div>
         </div>
       )}
-      
+
       {/* Modals */}
       {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
-      
       {/* Help Modal */}
       {showHelp && (
         <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ background: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
@@ -627,20 +641,20 @@ function App() {
           </div>
         </div>
       )}
-      
+
       {/* Audio elements */}
       <audio ref={audioSuccess} src={successSfx} preload="auto" />
       <audio ref={audioFail} src={failSfx} preload="auto" />
       <audio ref={audioClick} src={clickSfx} preload="auto" />
-      
+
       {/* Footer */}
-      <footer className="text-center text-muted mt-auto py-3 small">
+      <footer className="text-center text-muted mt-auto py-3 small" style={{ background: 'rgba(255,255,255,0.95)', boxShadow: '0 -2px 8px #0001' }}>
         <div className="d-flex justify-content-center gap-3 mb-2">
           <button className="btn btn-sm btn-link text-muted" onClick={() => setShowHelp(true)}>
             <i className="material-icons align-middle me-1" style={{ fontSize: '.9rem' }}>help_outline</i>
             Help
           </button>
-          <button className="btn btn-sm btn-link text-muted" onClick={() => setShowSettings(true)}>
+          <button className="btn btn-sm btn-link text-muted" onClick={() => setShowSettingsPage(true)}>
             <i className="material-icons align-middle me-1" style={{ fontSize: '.9rem' }}>settings</i>
             Settings
           </button>
