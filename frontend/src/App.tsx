@@ -5,8 +5,8 @@ import logo from './assets/images/logo.png'
 import avatar from './assets/images/avatar.png';
 import Confetti from 'react-confetti';
 import successSfx from './assets/sounds/sfx-success.mp3';
-import failSfx from './assets/sounds/sfx-fail.mp3';
-import clickSfx from './assets/music/sfx-buttonclick.mp3';
+import failSfx from './assets/sounds/sfx-failed.mp3';
+import clickSfx from './assets/sounds/sfx-button-click.mp3';
 import Onboarding from './components/Onboarding';
 import Timer from './components/Timer';
 import ProgressBar from './components/ProgressBar';
@@ -18,8 +18,8 @@ import AIResponse from './components/AIResponse';
 import NicknamePrompt from './components/NicknamePrompt';
 import AvatarPicker from './components/AvatarPicker';
 import Leaderboard from './components/Leaderboard';
-import Badges from './components/Badges';
 import CategorySelector from './components/CategorySelector';
+
 
 const TONES = ['polite', 'passionate', 'formal', 'casual'];
 const LANGUAGES = [
@@ -51,7 +51,7 @@ interface EvaluateResponse { persuaded: boolean; feedback: string; score: number
 interface DialogueResponse { ai_response: string; new_stance: string; }
 interface LeaderboardResponse { leaderboard: any[]; }
 
-const App: React.FC = () => {
+function App() {
   const [scenario, setScenario] = useState('');
   const [language, setLanguage] = useState('twi');
   const [aiStance, setAiStance] = useState('disagree');
@@ -397,93 +397,93 @@ const App: React.FC = () => {
 
   return (
     <div className={`lq-root${shake ? ' lq-shake' : ''}`}>
-      {roundResult === 'success' && <Confetti width={window.innerWidth} height={window.innerHeight} numberOfPieces={200} recycle={false} />}
-      <header className="lq-header">
-        <img src={logo} alt="LinguaQuest Logo" className="lq-logo" />
-        <h1>LinguaQuest</h1>
-        <img src={avatar || avatar} alt="AI Character" className="lq-avatar" />
-      </header>
-      <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
-      <main className="lq-card">
-        <div className="lq-timer-container">
-          <Timer seconds={ROUND_TIME} timeLeft={timeLeft} isActive={timerActive && roundResult === 'playing'} />
-        </div>
-        {roundResult === 'success' && <div className="lq-round-success">🎉 Persuaded! +1</div>}
-        {roundResult === 'fail' && <div className="lq-round-fail">⏰ Time's up! Try next round.</div>}
-        {roundResult === 'gameover' && <>
-          <div className="lq-gameover">🏆 Game Over! Thanks for playing.</div>
-          {badges.length > 0 && <Badges badges={badges} />}
-        </>}
-        {showGameOverLeaderboard && <button className="lq-btn lq-btn-scenario" onClick={() => setShowLeaderboard(true)}>View Leaderboard</button>}
-        {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
-        <button className="lq-btn lq-btn-scenario" onClick={fetchScenario} disabled={loading || roundResult !== 'playing'}>New Scenario</button>
-        <Scenario
-          scenario={scenario}
-          language={language}
-          loading={loading || roundResult !== 'playing'}
-          onLanguageChange={setLanguage}
-          languages={LANGUAGES}
-        />
-        <ArgumentInput
-          userArgument={userArgument}
-          onChange={setUserArgument}
-          loading={loading}
-          disabled={roundResult !== 'playing'}
-          onTranslate={handleTranslate}
-          translation={translation}
-          language={language}
-        />
-        <ToneSelector
-          tone={tone}
-          onChange={setTone}
-          loading={loading}
-          disabled={roundResult !== 'playing'}
-          tones={TONES}
-        />
-        <Feedback
-          feedback={feedback}
-          score={score}
-          loading={loading}
-          disabled={roundResult !== 'playing'}
-          onEvaluate={handleEvaluate}
-          userArgument={userArgument}
-        />
-        <AIResponse
-          aiResponse={aiResponse}
-          newStance={newStance}
-          loading={loading}
-          disabled={roundResult !== 'playing'}
-          onDialogue={handleDialogue}
-          userArgument={userArgument}
-        />
-        {loading && <div className="lq-loading">Loading...</div>}
-      </main>
-      <footer className="lq-footer">&copy; {new Date().getFullYear()} LinguaQuest</footer>
-      <audio ref={audioSuccess} src={successSfx} preload="auto" />
-      <audio ref={audioFail} src={failSfx} preload="auto" />
-      <audio ref={audioClick} src={clickSfx} preload="auto" />
-      {/* Style the help modal for clarity */}
-      {showHelp && (
-        <div className="lq-leaderboard-bg">
-          <div className="lq-leaderboard-card" style={{ maxWidth: 420, textAlign: 'left' }}>
-            <h2 style={{ textAlign: 'center', marginBottom: 16 }}>Voice Commands</h2>
-            <ul style={{ margin: '1rem 0', padding: 0, listStyle: 'none' }}>
-              {VOICE_COMMANDS.map(cmd => (
-                <li key={cmd.action} style={{ marginBottom: 18, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                  <span style={{ fontSize: 22, marginRight: 8 }}>{cmd.icon}</span>
-                  <div>
-                    <strong>{cmd.phrases[0]}</strong> <span style={{ color: '#888' }}>({cmd.desc})</span><br />
-                    <span style={{ fontSize: '0.95em', color: '#aaa' }}>Synonyms: {cmd.phrases.slice(1).join(', ')}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <button className="lq-btn lq-btn-scenario" style={{ display: 'block', margin: '0 auto' }} onClick={() => setShowHelp(false)}>Close</button>
+        {roundResult === 'success' && <Confetti width={window.innerWidth} height={window.innerHeight} numberOfPieces={200} recycle={false} />}
+        <header className="lq-header">
+          <img src={logo} alt="LinguaQuest Logo" className="lq-logo" />
+          <h1>LinguaQuest</h1>
+          <img src={avatar || avatar} alt="AI Character" className="lq-avatar" />
+        </header>
+        <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
+        <main className="lq-card">
+          <div className="lq-timer-container">
+            <Timer seconds={ROUND_TIME} timeLeft={timeLeft} isActive={timerActive && roundResult === 'playing'} />
           </div>
-        </div>
-      )}
-    </div>
+          {roundResult === 'success' && <div className="lq-round-success">🎉 Persuaded! +1</div>}
+          {roundResult === 'fail' && <div className="lq-round-fail">⏰ Time's up! Try next round.</div>}
+          {roundResult === 'gameover' && <>
+            <div className="lq-gameover">🏆 Game Over! Thanks for playing.</div>
+           
+          </>}
+          {showGameOverLeaderboard && <button className="lq-btn lq-btn-scenario" onClick={() => setShowLeaderboard(true)}>View Leaderboard</button>}
+          {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
+          <button className="lq-btn lq-btn-scenario" onClick={fetchScenario} disabled={loading || roundResult !== 'playing'}>New Scenario</button>
+          <Scenario
+            scenario={scenario}
+            language={language}
+            loading={loading || roundResult !== 'playing'}
+            onLanguageChange={setLanguage}
+            languages={LANGUAGES}
+          />
+          <ArgumentInput
+            userArgument={userArgument}
+            onChange={setUserArgument}
+            loading={loading}
+            disabled={roundResult !== 'playing'}
+            onTranslate={handleTranslate}
+            translation={translation}
+            language={language}
+          />
+          <ToneSelector
+            tone={tone}
+            onChange={setTone}
+            loading={loading}
+            disabled={roundResult !== 'playing'}
+            tones={TONES}
+          />
+          <Feedback
+            feedback={feedback}
+            score={score}
+            loading={loading}
+            disabled={roundResult !== 'playing'}
+            onEvaluate={handleEvaluate}
+            userArgument={userArgument}
+          />
+          <AIResponse
+            aiResponse={aiResponse}
+            newStance={newStance}
+            loading={loading}
+            disabled={roundResult !== 'playing'}
+            onDialogue={handleDialogue}
+            userArgument={userArgument}
+          />
+          {loading && <div className="lq-loading">Loading...</div>}
+        </main>
+        <footer className="lq-footer">&copy; {new Date().getFullYear()} LinguaQuest</footer>
+        <audio ref={audioSuccess} src={successSfx} preload="auto" />
+        <audio ref={audioFail} src={failSfx} preload="auto" />
+        <audio ref={audioClick} src={clickSfx} preload="auto" />
+        {/* Style the help modal for clarity */}
+        {showHelp && (
+          <div className="lq-leaderboard-bg">
+            <div className="lq-leaderboard-card" style={{ maxWidth: 420, textAlign: 'left' }}>
+              <h2 style={{ textAlign: 'center', marginBottom: 16 }}>Voice Commands</h2>
+              <ul style={{ margin: '1rem 0', padding: 0, listStyle: 'none' }}>
+                {VOICE_COMMANDS.map(cmd => (
+                  <li key={cmd.action} style={{ marginBottom: 18, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                    <span style={{ fontSize: 22, marginRight: 8 }}>{cmd.icon}</span>
+                    <div>
+                      <strong>{cmd.phrases[0]}</strong> <span style={{ color: '#888' }}>({cmd.desc})</span><br />
+                      <span style={{ fontSize: '0.95em', color: '#aaa' }}>Synonyms: {cmd.phrases.slice(1).join(', ')}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <button className="lq-btn lq-btn-scenario" style={{ display: 'block', margin: '0 auto' }} onClick={() => setShowHelp(false)}>Close</button>
+            </div>
+          </div>
+        )}
+      </div>
   );
 };
 
-export default App; 
+export default App;
