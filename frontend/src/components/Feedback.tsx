@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useActivityFeed } from './ActivityFeedContext';
 
 type FeedbackProps = {
@@ -10,41 +11,104 @@ type FeedbackProps = {
   userArgument: string;
 };
 
-const Feedback: React.FC<FeedbackProps> = ({ feedback, score, loading, disabled, onEvaluate, userArgument }) => {
+const Feedback: React.FC<FeedbackProps> = ({ 
+  feedback, 
+  score, 
+  loading, 
+  disabled, 
+  onEvaluate, 
+  userArgument 
+}) => {
   const { addActivity } = useActivityFeed();
 
   useEffect(() => {
     if (score !== null) {
       addActivity({ type: 'system', message: `Argument evaluated. Score: ${score}.` });
     }
-    // Only run when score changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [score]);
 
   return (
-    <section className="lq-section">
-      <div className="lq-card" style={{ padding: '1.5rem 2rem', boxShadow: '0 4px 24px #a78bfa33', border: '1px solid #f3e8ff', margin: 0 }}>
+    <motion.div 
+      className="card shadow-sm mb-4"
+      initial={{ opacity: 0, y: 32 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+    >
+      <div className="card-body p-4">
         <button
-          className="lq-btn lq-btn-evaluate w-full mb-4"
+          className="btn btn-success btn-lg w-100 mb-4"
           onClick={onEvaluate}
           disabled={loading || !userArgument || disabled}
-          style={{ fontSize: '1.1rem', padding: '0.75rem 0', borderRadius: 12 }}
+          style={{ 
+            background: loading ? '#ccc' : 'linear-gradient(to right, #10b981, #059669)',
+            border: 'none',
+            borderRadius: '.75rem',
+            padding: '0.75rem 0'
+          }}
         >
-          {loading ? 'Evaluating...' : 'Evaluate Persuasiveness'}
+          {loading ? (
+            <>
+              <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              Evaluating...
+            </>
+          ) : (
+            <>
+              <i className="material-icons align-middle me-2">analytics</i>
+              Evaluate Persuasiveness
+            </>
+          )}
         </button>
+        
         {feedback && (
-          <div className="lq-feedback mt-2 text-purple-800 bg-purple-50 border border-purple-200 rounded-lg p-3 text-base">
-            <span className="font-semibold">Feedback:</span> <span className="text-gray-800">{feedback}</span>
+          <div className="alert alert-primary" role="alert">
+            <div className="d-flex">
+              <div>
+                <i className="material-icons me-3" style={{ fontSize: '2rem' }}>feedback</i>
+              </div>
+              <div>
+                <h5 className="alert-heading">Feedback</h5>
+                <p className="mb-0">{feedback}</p>
+              </div>
+            </div>
           </div>
         )}
+        
         {score !== null && (
-          <div className="lq-score mt-2 text-indigo-600 font-bold text-lg flex items-center gap-2">
-            <span>Score:</span> <span className="text-gray-800 font-semibold">{score}</span>
+          <div className="bg-light p-3 rounded-3 d-flex align-items-center">
+            <div className="me-3">
+              <i className="material-icons" style={{ fontSize: '2.5rem', color: getScoreColor(score) }}>equalizer</i>
+            </div>
+            <div>
+              <h6 className="mb-1">Your persuasiveness score</h6>
+              <div className="progress" style={{ height: '20px', width: '200px' }}>
+                <div 
+                  className="progress-bar progress-bar-striped" 
+                  role="progressbar" 
+                  style={{ 
+                    width: `${score*10}%`, 
+                    backgroundColor: getScoreColor(score) 
+                  }} 
+                  aria-valuenow={score} 
+                  aria-valuemin={0} 
+                  aria-valuemax={10}
+                >
+                  {score}/10
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
-    </section>
+    </motion.div>
   );
 };
 
-export default Feedback; 
+// Helper function for score colors
+const getScoreColor = (score: number): string => {
+  if (score >= 8) return '#10b981'; // Green for high scores
+  if (score >= 5) return '#f59e0b'; // Orange for medium scores
+  return '#ef4444'; // Red for low scores
+};
+
+export default Feedback;
