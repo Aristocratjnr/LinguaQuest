@@ -372,7 +372,7 @@ function App() {
     }
   }, [roundResult]);
 
-  // Onboarding logic
+  // Onboarding screens
   if (showNicknamePrompt) {
     return <NicknamePrompt onConfirm={handleNicknameConfirm} />;
   }
@@ -386,104 +386,255 @@ function App() {
     return (
       <>
         <Onboarding show={showOnboarding} onStart={() => { setShowOnboarding(false); playClick(); }} playClick={playClick} />
-        <button className="lq-btn lq-btn-scenario" style={{ marginTop: 24 }} onClick={() => setShowLeaderboard(true)}>View Leaderboard</button>
+        <button 
+          className="btn btn-outline-primary position-absolute" 
+          style={{ bottom: '2rem', left: '50%', transform: 'translateX(-50%)', borderRadius: '.75rem' }} 
+          onClick={() => setShowLeaderboard(true)}
+        >
+          <i className="material-icons align-middle me-2">leaderboard</i>
+          View Leaderboard
+        </button>
         {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
       </>
     );
   }
 
-  // Game over screen leaderboard button
   const showGameOverLeaderboard = roundResult === 'gameover' && !showLeaderboard;
 
   return (
-    <div className={`lq-root${shake ? ' lq-shake' : ''}`}>
+    <div className="min-vh-100 d-flex flex-column" 
+         style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e9f3 100%)' }}>
+      <div className={`container ${shake ? 'animate__animated animate__shakeX' : ''}`}
+           style={{ maxWidth: '1140px', padding: '1.5rem' }}>
         {roundResult === 'success' && <Confetti width={window.innerWidth} height={window.innerHeight} numberOfPieces={200} recycle={false} />}
-        <header className="lq-header">
-          <img src={logo} alt="LinguaQuest Logo" className="lq-logo" />
-          <h1>LinguaQuest</h1>
-          <img src={avatar || avatar} alt="AI Character" className="lq-avatar" />
-        </header>
-        <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
-        <main className="lq-card">
-          <div className="lq-timer-container">
-            <Timer seconds={ROUND_TIME} timeLeft={timeLeft} isActive={timerActive && roundResult === 'playing'} />
+        
+        {/* Header Section */}
+        <header className="d-flex justify-content-between align-items-center mb-4 p-3 bg-white rounded-3 shadow-sm">
+          <div className="d-flex align-items-center">
+            <img src={logo} alt="LinguaQuest Logo" style={{ height: 40, marginRight: 12 }} className="d-none d-sm-block" />
+            <h1 className="m-0 fw-bold" style={{ color: '#764ba2', fontSize: '1.5rem' }}>LinguaQuest</h1>
           </div>
-          {roundResult === 'success' && <div className="lq-round-success">🎉 Persuaded! +1</div>}
-          {roundResult === 'fail' && <div className="lq-round-fail">⏰ Time's up! Try next round.</div>}
-          {roundResult === 'gameover' && <>
-            <div className="lq-gameover">🏆 Game Over! Thanks for playing.</div>
-           
-          </>}
-          {showGameOverLeaderboard && <button className="lq-btn lq-btn-scenario" onClick={() => setShowLeaderboard(true)}>View Leaderboard</button>}
-          {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
-          <button className="lq-btn lq-btn-scenario" onClick={fetchScenario} disabled={loading || roundResult !== 'playing'}>New Scenario</button>
-          <Scenario
-            scenario={scenario}
-            language={language}
-            loading={loading || roundResult !== 'playing'}
-            onLanguageChange={setLanguage}
-            languages={LANGUAGES}
-          />
-          <ArgumentInput
-            userArgument={userArgument}
-            onChange={setUserArgument}
-            loading={loading}
-            disabled={roundResult !== 'playing'}
-            onTranslate={handleTranslate}
-            translation={translation}
-            language={language}
-          />
-          <ToneSelector
-            tone={tone}
-            onChange={setTone}
-            loading={loading}
-            disabled={roundResult !== 'playing'}
-            tones={TONES}
-          />
-          <Feedback
-            feedback={feedback}
-            score={score}
-            loading={loading}
-            disabled={roundResult !== 'playing'}
-            onEvaluate={handleEvaluate}
-            userArgument={userArgument}
-          />
-          <AIResponse
-            aiResponse={aiResponse}
-            newStance={newStance}
-            loading={loading}
-            disabled={roundResult !== 'playing'}
-            onDialogue={handleDialogue}
-            userArgument={userArgument}
-          />
-          {loading && <div className="lq-loading">Loading...</div>}
-        </main>
-        <footer className="lq-footer">&copy; {new Date().getFullYear()} LinguaQuest</footer>
-        <audio ref={audioSuccess} src={successSfx} preload="auto" />
-        <audio ref={audioFail} src={failSfx} preload="auto" />
-        <audio ref={audioClick} src={clickSfx} preload="auto" />
-        {/* Style the help modal for clarity */}
-        {showHelp && (
-          <div className="lq-leaderboard-bg">
-            <div className="lq-leaderboard-card" style={{ maxWidth: 420, textAlign: 'left' }}>
-              <h2 style={{ textAlign: 'center', marginBottom: 16 }}>Voice Commands</h2>
-              <ul style={{ margin: '1rem 0', padding: 0, listStyle: 'none' }}>
+          <div className="d-flex align-items-center">
+            <span className="badge bg-primary me-2 px-3 py-2">
+              {nickname || 'Player'}
+            </span>
+            <img src={avatar} alt="User Avatar" className="rounded-circle" style={{ height: 40, width: 40, objectFit: 'cover' }} />
+          </div>
+        </header>
+        
+        {/* Progress and Timer Section */}
+        <div className="row g-3 mb-4">
+          <div className="col-md-8">
+            <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
+          </div>
+          <div className="col-md-4">
+            <div className="d-flex justify-content-center">
+              <Timer seconds={ROUND_TIME} timeLeft={timeLeft} isActive={timerActive && roundResult === 'playing'} />
+            </div>
+          </div>
+        </div>
+        
+        {/* Game Status Messages */}
+        {(roundResult === 'success' || roundResult === 'fail' || roundResult === 'gameover') && (
+          <div className={`alert ${roundResult === 'success' ? 'alert-success' : roundResult === 'fail' ? 'alert-danger' : 'alert-info'} mb-4 text-center`}>
+            {roundResult === 'success' && (
+              <div className="d-flex align-items-center justify-content-center">
+                <i className="material-icons me-2" style={{ fontSize: '1.5rem' }}>celebration</i>
+                <span className="fw-bold">Persuaded! +1 Point</span>
+              </div>
+            )}
+            {roundResult === 'fail' && (
+              <div className="d-flex align-items-center justify-content-center">
+                <i className="material-icons me-2" style={{ fontSize: '1.5rem' }}>timer_off</i>
+                <span className="fw-bold">Time's up! Try next round.</span>
+              </div>
+            )}
+            {roundResult === 'gameover' && (
+              <div className="d-flex align-items-center justify-content-center">
+                <i className="material-icons me-2" style={{ fontSize: '1.5rem' }}>emoji_events</i>
+                <span className="fw-bold">Game Over! Thanks for playing.</span>
+              </div>
+            )}
+          </div>
+        )}
+        
+        {/* Main Game Content */}
+        <div className="row g-4">
+          {/* Left Column - Scenario and User Input */}
+          <div className="col-lg-6">
+            <div className="d-grid gap-4">
+              <Scenario
+                scenario={scenario}
+                language={language}
+                loading={loading || roundResult !== 'playing'}
+                onLanguageChange={setLanguage}
+                languages={LANGUAGES}
+              />
+              
+              <ArgumentInput
+                userArgument={userArgument}
+                onChange={setUserArgument}
+                loading={loading}
+                disabled={roundResult !== 'playing'}
+                onTranslate={handleTranslate}
+                translation={translation}
+                language={language}
+              />
+              
+              <ToneSelector
+                tone={tone}
+                onChange={setTone}
+                loading={loading}
+                disabled={roundResult !== 'playing'}
+                tones={TONES}
+              />
+            </div>
+          </div>
+          
+          {/* Right Column - AI Responses and Feedback */}
+          <div className="col-lg-6">
+            <div className="d-grid gap-4">
+              <Feedback
+                feedback={feedback}
+                score={score}
+                loading={loading}
+                disabled={roundResult !== 'playing'}
+                onEvaluate={handleEvaluate}
+                userArgument={userArgument}
+              />
+              
+              <AIResponse
+                aiResponse={aiResponse}
+                newStance={newStance}
+                loading={loading}
+                disabled={roundResult !== 'playing'}
+                onDialogue={handleDialogue}
+                userArgument={userArgument}
+                enableVoice={true}
+              />
+            </div>
+          </div>
+        </div>
+        
+        {/* Game Controls */}
+        <div className="row mt-4 mb-4">
+          <div className="col-12 d-flex flex-wrap justify-content-center gap-2 gap-sm-3">
+            {showGameOverLeaderboard && (
+              <button 
+                className="btn btn-primary px-3 px-md-4 py-2"
+                style={{ 
+                  background: 'linear-gradient(to right, #667eea, #764ba2)',
+                  border: 'none',
+                  borderRadius: '.75rem',
+                }} 
+                onClick={() => setShowLeaderboard(true)}
+              >
+                <i className="material-icons align-middle me-2">leaderboard</i>
+                <span className="d-none d-sm-inline">View Leaderboard</span>
+                <span className="d-inline d-sm-none">Leaderboard</span>
+              </button>
+            )}
+            
+            <button 
+              className="btn btn-outline-primary px-3 px-md-4 py-2"
+              style={{ borderRadius: '.75rem' }} 
+              onClick={fetchScenario} 
+              disabled={loading || roundResult !== 'playing'}
+            >
+              <i className="material-icons align-middle me-2">refresh</i>
+              <span className="d-none d-sm-inline">New Scenario</span>
+              <span className="d-inline d-sm-none">New</span>
+            </button>
+            
+            <button 
+              className="btn btn-outline-info px-3 px-md-4 py-2"
+              style={{ borderRadius: '.75rem' }} 
+              onClick={handleVoiceCommand}
+              disabled={listeningCmd}
+            >
+              <i className="material-icons align-middle me-2">{listeningCmd ? 'mic' : 'mic_none'}</i>
+              <span className="d-none d-sm-inline">{listeningCmd ? 'Listening...' : 'Voice Command'}</span>
+              <span className="d-inline d-sm-none">{listeningCmd ? 'Listening...' : 'Voice'}</span>
+            </button>
+          </div>
+        </div>
+        
+        {/* Last Command Display */}
+        {lastCmd && (
+          <div className="alert alert-light text-center mb-4">
+            <small className="text-muted">Last voice command: "{lastCmd}"</small>
+            {cmdError && <div className="text-danger small mt-1">{cmdError}</div>}
+          </div>
+        )}
+      </div>
+      
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ background: 'rgba(255,255,255,0.7)', zIndex: 1000 }}>
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      )}
+      
+      {/* Modals */}
+      {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
+      
+      {/* Help Modal */}
+      {showHelp && (
+        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ background: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
+          <div className="card shadow mx-3" style={{ maxWidth: 480, maxHeight: '90vh', overflow: 'auto' }}>
+            <div className="card-header bg-primary text-white py-3">
+              <h5 className="mb-0 d-flex align-items-center">
+                <i className="material-icons me-2">help_outline</i>
+                Voice Commands
+              </h5>
+            </div>
+            <div className="card-body p-4">
+              <ul className="list-group list-group-flush">
                 {VOICE_COMMANDS.map(cmd => (
-                  <li key={cmd.action} style={{ marginBottom: 18, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                    <span style={{ fontSize: 22, marginRight: 8 }}>{cmd.icon}</span>
+                  <li key={cmd.action} className="list-group-item border-0 d-flex align-items-start py-3">
+                    <div className="me-3 fs-4">{cmd.icon}</div>
                     <div>
-                      <strong>{cmd.phrases[0]}</strong> <span style={{ color: '#888' }}>({cmd.desc})</span><br />
-                      <span style={{ fontSize: '0.95em', color: '#aaa' }}>Synonyms: {cmd.phrases.slice(1).join(', ')}</span>
+                      <div className="fw-bold">{cmd.phrases[0]}</div>
+                      <div className="text-muted small">{cmd.desc}</div>
+                      <div className="text-muted small mt-1">Synonyms: {cmd.phrases.slice(1).join(', ')}</div>
                     </div>
                   </li>
                 ))}
               </ul>
-              <button className="lq-btn lq-btn-scenario" style={{ display: 'block', margin: '0 auto' }} onClick={() => setShowHelp(false)}>Close</button>
+            </div>
+            <div className="card-footer d-flex justify-content-end p-3">
+              <button className="btn btn-primary px-4" onClick={() => setShowHelp(false)}>
+                <i className="material-icons align-middle me-2">close</i>
+                Close
+              </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+      
+      {/* Audio elements */}
+      <audio ref={audioSuccess} src={successSfx} preload="auto" />
+      <audio ref={audioFail} src={failSfx} preload="auto" />
+      <audio ref={audioClick} src={clickSfx} preload="auto" />
+      
+      {/* Footer */}
+      <footer className="text-center text-muted mt-auto py-3 small">
+        <div className="d-flex justify-content-center gap-3 mb-2">
+          <button className="btn btn-sm btn-link text-muted" onClick={() => setShowHelp(true)}>
+            <i className="material-icons align-middle me-1" style={{ fontSize: '.9rem' }}>help_outline</i>
+            Help
+          </button>
+          <button className="btn btn-sm btn-link text-muted" onClick={() => setShowSettings(true)}>
+            <i className="material-icons align-middle me-1" style={{ fontSize: '.9rem' }}>settings</i>
+            Settings
+          </button>
+        </div>
+        &copy; {new Date().getFullYear()} LinguaQuest
+      </footer>
+    </div>
   );
-};
+}
 
 export default App;
