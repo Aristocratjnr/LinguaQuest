@@ -407,6 +407,25 @@ function App() {
     }
   }, [roundResult]);
 
+  // Translate scenario when language changes
+  const handleScenarioLanguageChange = async (newLang: string) => {
+    setLanguage(newLang);
+    if (scenario && newLang !== 'en') {
+      setLoading(true);
+      try {
+        const res = await axios.post<TranslationResponse>('/translate', {
+          text: scenario,
+          src_lang: 'en', // or track the current scenario language if needed
+          tgt_lang: newLang,
+        });
+        setScenario(res.data.translated_text);
+      } catch (e) {
+        setScenario('Translation error.');
+      }
+      setLoading(false);
+    }
+  };
+
   // Onboarding screens
   if (showWelcome) {
     return <WelcomePage onGetStarted={() => {
@@ -516,7 +535,7 @@ function App() {
                   scenario={scenario}
                   language={language}
                   loading={loading || roundResult !== 'playing'}
-                  onLanguageChange={setLanguage}
+                  onLanguageChange={handleScenarioLanguageChange}
                   languages={LANGUAGES}
                 />
                 <ArgumentInput
