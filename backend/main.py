@@ -18,13 +18,11 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For development, allow all. Restrict in production.
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Remove MODEL_NAMES, MODEL_CACHE, get_model_and_tokenizer, translate, analyzer, analyze_sentiment
 
 # --- Scenario Endpoint ---
 class ScenarioResponse(BaseModel):
