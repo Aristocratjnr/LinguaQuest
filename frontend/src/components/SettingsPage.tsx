@@ -5,6 +5,10 @@ import avatar1 from '../assets/images/boy.png';
 import avatar2 from '../assets/images/woman.png';
 import avatar3 from '../assets/images/programmer.png';
 import avatar4 from '../assets/images/avatar.png';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AVATARS = [avatar1, avatar2, avatar3, avatar4];
 const LANGUAGES = [
@@ -20,6 +24,52 @@ const THEMES = [
 
 const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const { nickname, setNickname, avatar, setAvatar, language, setLanguage, theme, setTheme, sound, setSound } = useSettings();
+  // Engagement state
+  const [streak, setStreak] = useState<number | null>(null);
+  const [level, setLevel] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [resetting, setResetting] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    Promise.all([
+      axios.get(`/streak`, { params: { nickname } }),
+      axios.get(`/level`, { params: { nickname } })
+    ])
+      .then(([streakRes, levelRes]) => {
+        setStreak(streakRes.data.streak);
+        setLevel(levelRes.data.level);
+      })
+      .catch(() => setError('Failed to load engagement stats.'))
+      .finally(() => setLoading(false));
+  }, [nickname]);
+
+  const handleResetStreak = async () => {
+    setResetting(true);
+    try {
+      const res = await axios.patch('/streak', { nickname, streak: 1 });
+      setStreak(res.data.streak);
+      toast.success('Streak reset to 1.');
+    } catch {
+      toast.error('Failed to reset streak.');
+    } finally {
+      setResetting(false);
+    }
+  };
+  const handleResetLevel = async () => {
+    setResetting(true);
+    try {
+      const res = await axios.patch('/level', { nickname, level: 1 });
+      setLevel(res.data.level);
+      toast.success('Level reset to 1.');
+    } catch {
+      toast.error('Failed to reset level.');
+    } finally {
+      setResetting(false);
+    }
+  };
 
   // Real-time update handlers
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,7 +210,27 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               </div>
             </div>
           </div>
+
+          <hr className="my-4" />
+          <h5 className="fw-bold mb-3" style={{ color: labelColor }}>Engagement Stats</h5>
+          {loading ? (
+            <div className="text-center py-3"><span className="spinner-border" /></div>
+          ) : error ? (
+            <div className="alert alert-danger text-center">{error}</div>
+          ) : (
+            <div className="d-flex flex-column gap-3 align-items-center">
+              <div className="d-flex align-items-center gap-2">
+                <span className="badge bg-warning text-dark px-3 py-2" style={{ fontSize: '1rem' }}>Streak: {streak}</span>
+                <button className="btn btn-xs btn-outline-danger ms-2" style={{ fontSize: '0.8rem', padding: '0.1rem 0.6rem' }} onClick={handleResetStreak} disabled={resetting}>Reset</button>
+              </div>
+              <div className="d-flex align-items-center gap-2">
+                <span className="badge bg-info text-dark px-3 py-2" style={{ fontSize: '1rem' }}>Level: {level}</span>
+                <button className="btn btn-xs btn-outline-danger ms-2" style={{ fontSize: '0.8rem', padding: '0.1rem 0.6rem' }} onClick={handleResetLevel} disabled={resetting}>Reset</button>
+              </div>
+            </div>
+          )}
         </div>
+        <ToastContainer position="top-center" autoClose={2500} hideProgressBar newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover aria-label="Notification Toasts" />
         <div className="card-footer py-3 text-center border-top" style={{ background: cardFooterBg, fontSize: '0.9rem' }}>
           <button className={`btn btn-outline-primary px-4 w-100 w-sm-auto${isDark ? ' border-light text-light' : ''}`} onClick={onClose}>
             <i className="material-icons align-middle me-2">arrow_back</i>

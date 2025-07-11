@@ -16,6 +16,6 @@
     "jsx": "react-jsx",
     "types": ["node", "react", "react-dom"]
   },
-  "include": ["src", "tailwind.config.js"],
+  "include": ["src", "tailwind.config.js", "vite.config.js"],
   "exclude": ["node_modules", "build", "dist"]
 } 

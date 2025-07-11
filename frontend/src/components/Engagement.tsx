@@ -1,28 +1,157 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const quotes = [
-  '"Learning another language is like becoming another person." – Haruki Murakami',
-  '"The limits of my language mean the limits of my world." – Ludwig Wittgenstein',
-  '"Practice makes perfect. Keep going!"',
-  '"Every day is a new chance to improve your skills."',
-  '"Mistakes are proof that you are trying."',
-];
-
-const tips = [
-  'Use persuasive arguments to convince the AI! 💡',
-  'Try different tones: polite, passionate, formal, or casual.',
-  'Switch languages to challenge yourself.',
-  'Check the leaderboard to see how you rank!',
-  'Collect badges for creative and high-scoring arguments.',
-];
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Engagement: React.FC<{ nickname: string; onStart: () => void }> = ({ nickname, onStart }) => {
   const [tipIndex, setTipIndex] = useState(0);
-  const [quoteIndex, setQuoteIndex] = useState(() => Math.floor(Math.random() * quotes.length));
+  const [quoteIndex, setQuoteIndex] = useState(0);
+  const [quotes, setQuotes] = useState<string[]>([]);
+  const [tips, setTips] = useState<string[]>([]);
+  const [streak, setStreak] = useState<number | null>(null);
+  const [level, setLevel] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showUsers, setShowUsers] = useState(false);
+  const [users, setUsers] = useState<{nickname: string, streak: number, level: number}[]>([]);
+  const [userActionMsg, setUserActionMsg] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // Simulate a daily streak (could be replaced with real data)
-  const streak = 3;
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    setError(null);
+    Promise.all([
+      axios.get(`/api/engagement/streak`, { params: { nickname } }),
+      axios.get(`/api/engagement/level`, { params: { nickname } }),
+      axios.get<string[]>(`/api/engagement/quotes`),
+      axios.get<string[]>(`/api/engagement/tips`),
+    ])
+      .then(([streakRes, levelRes, quotesRes, tipsRes]) => {
+        if (!isMounted) return;
+        setStreak(streakRes.data.streak);
+        setLevel(levelRes.data.level);
+        setQuotes(quotesRes.data);
+        setTips(tipsRes.data);
+        setQuoteIndex(Math.floor(Math.random() * quotesRes.data.length));
+        setTipIndex(0);
+      })
+      .catch(async (err) => {
+        // If user not found, create user and retry
+        if (err.response && err.response.status === 404) {
+          try {
+            await axios.post('/api/engagement/user', { nickname });
+            // Retry fetching streak and level
+            const [streakRes, levelRes] = await Promise.all([
+              axios.get(`/api/engagement/streak`, { params: { nickname } }),
+              axios.get(`/api/engagement/level`, { params: { nickname } })
+            ]);
+            setStreak(streakRes.data.streak);
+            setLevel(levelRes.data.level);
+            // Quotes and tips may have loaded already
+          } catch (createErr) {
+            setError('Failed to create user.');
+          }
+        } else {
+          setError('Failed to load engagement data.');
+        }
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [nickname]);
+
+  // Demo: Increment streak
+  const handleIncrementStreak = async () => {
+    try {
+      const res = await axios.patch('/api/engagement/streak', { nickname, increment: 1 });
+      setStreak(res.data.streak);
+    } catch (e) {
+      setError('Failed to update streak.');
+    }
+  };
+  // Demo: Increment level
+  const handleIncrementLevel = async () => {
+    try {
+      const res = await axios.patch('/api/engagement/level', { nickname, increment: 1 });
+      setLevel(res.data.level);
+    } catch (e) {
+      setError('Failed to update level.');
+    }
+  };
+
+  // Feedback helpers
+  const showSuccess = (msg: string) => toast.success(msg);
+  const showError = (msg: string) => toast.error(msg);
+
+  // Fetch all users
+  const handleShowUsers = async () => {
+    setShowUsers(true);
+    setUserActionMsg(null);
+    try {
+      const res = await axios.get('/api/engagement/users');
+      setUsers(res.data.users);
+    } catch (e) {
+      showError('Failed to fetch users.');
+    }
+  };
+
+  // Reset streak
+  const handleResetStreak = async () => {
+    try {
+      const res = await axios.patch('/api/engagement/streak', { nickname, streak: 1 });
+      setStreak(res.data.streak);
+      showSuccess('Streak reset to 1.');
+    } catch (e) {
+      showError('Failed to reset streak.');
+    }
+  };
+  // Reset level
+  const handleResetLevel = async () => {
+    try {
+      const res = await axios.patch('/api/engagement/level', { nickname, level: 1 });
+      setLevel(res.data.level);
+      showSuccess('Level reset to 1.');
+    } catch (e) {
+      showError('Failed to reset level.');
+    }
+  };
+  // Delete user
+  const handleDeleteUser = async () => {
+    setShowDeleteModal(false);
+    setDeleting(true);
+    setUserActionMsg(null);
+    try {
+      await axios.delete('/api/engagement/user', { params: { nickname } });
+      showSuccess('User deleted. Please refresh or choose another nickname.');
+      setStreak(null);
+      setLevel(null);
+    } catch (e) {
+      showError('Failed to delete user.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="d-flex align-items-center justify-content-center min-vh-100">
+        <div>Loading engagement...</div>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="d-flex align-items-center justify-content-center min-vh-100 text-danger">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="container-fluid d-flex align-items-center justify-content-center min-vh-100 px-2 px-sm-3 px-md-4" 
@@ -88,6 +217,12 @@ const Engagement: React.FC<{ nickname: string; onStart: () => void }> = ({ nickn
                 <span style={{ fontWeight: 600, color: '#b45309', fontSize: '1rem' }}>
                   {streak} day streak
                 </span>
+                <button className="btn btn-xs btn-outline-secondary ms-2" style={{ fontSize: '0.7rem', padding: '0.1rem 0.4rem' }} onClick={handleIncrementStreak} disabled={deleting}>
+                  +1
+                </button>
+                <button className="btn btn-xs btn-outline-danger ms-1" style={{ fontSize: '0.7rem', padding: '0.1rem 0.4rem' }} onClick={handleResetStreak} disabled={deleting}>
+                  Reset
+                </button>
               </div>
               <small className="text-muted" style={{ fontSize: '0.7rem' }}>Keep it up!</small>
             </div>
@@ -106,13 +241,97 @@ const Engagement: React.FC<{ nickname: string; onStart: () => void }> = ({ nickn
                   emoji_events
                 </i>
                 <span style={{ fontWeight: 600, color: '#0369a1', fontSize: '1rem' }}>
-                  Level 2
+                  Level {level}
                 </span>
+                <button className="btn btn-xs btn-outline-secondary ms-2" style={{ fontSize: '0.7rem', padding: '0.1rem 0.4rem' }} onClick={handleIncrementLevel} disabled={deleting}>
+                  +1
+                </button>
+                <button className="btn btn-xs btn-outline-danger ms-1" style={{ fontSize: '0.7rem', padding: '0.1rem 0.4rem' }} onClick={handleResetLevel} disabled={deleting}>
+                  Reset
+                </button>
               </div>
               <small className="text-muted" style={{ fontSize: '0.7rem' }}>Next badge at 5 days</small>
             </div>
           </div>
         </div>
+        {/* Advanced actions */}
+        <div className="d-flex justify-content-between align-items-center px-3 py-2" style={{ background: 'rgba(243,244,246,0.7)' }}>
+          <button className="btn btn-sm btn-outline-info" onClick={handleShowUsers} disabled={loading}>
+            {loading ? <span className="spinner-border spinner-border-sm" /> : 'Show All Users'}
+          </button>
+          <button className="btn btn-sm btn-outline-danger" onClick={() => setShowDeleteModal(true)} disabled={deleting}>
+            {deleting ? <span className="spinner-border spinner-border-sm" /> : 'Delete User'}
+          </button>
+        </div>
+        {/* Delete confirmation modal */}
+        {showDeleteModal && (
+          <div className="modal d-block" tabIndex={-1} style={{ background: 'rgba(0,0,0,0.3)' }} onClick={() => setShowDeleteModal(false)}>
+            <div className="modal-dialog modal-dialog-centered" onClick={e => e.stopPropagation()}>
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Confirm Delete</h5>
+                  <button type="button" className="btn-close" onClick={() => setShowDeleteModal(false)}></button>
+                </div>
+                <div className="modal-body">
+                  <p>Are you sure you want to delete this user? This cannot be undone.</p>
+                </div>
+                <div className="modal-footer">
+                  <button className="btn btn-secondary" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+                  <button className="btn btn-danger" onClick={handleDeleteUser} disabled={deleting}>
+                    {deleting ? <span className="spinner-border spinner-border-sm" /> : 'Delete'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* Toast container */}
+        <ToastContainer position="top-center" autoClose={2500} hideProgressBar newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover />
+        {userActionMsg && (
+          <div className="alert alert-info m-3 p-2 text-center">{userActionMsg}</div>
+        )}
+        {/* User list modal/simple list */}
+        {showUsers && (
+          <div className="modal d-block" tabIndex={-1} style={{ background: 'rgba(0,0,0,0.3)' }} onClick={() => setShowUsers(false)}>
+            <div className="modal-dialog modal-dialog-centered modal-lg" onClick={e => e.stopPropagation()}>
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">All Users</h5>
+                  <button type="button" className="btn-close" onClick={() => setShowUsers(false)}></button>
+                </div>
+                <div className="modal-body">
+                  {users.length === 0 ? (
+                    <div className="text-center py-3">No users found.</div>
+                  ) : (
+                    <div style={{ overflowX: 'auto' }}>
+                      <table className="table table-sm table-striped">
+                        <thead>
+                          <tr>
+                            <th>Nickname</th>
+                            <th>Streak</th>
+                            <th>Level</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {users.map(u => (
+                            <tr key={u.nickname}>
+                              <td>{u.nickname}</td>
+                              <td>{u.streak}</td>
+                              <td>{u.level}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+                <div className="modal-footer">
+                  <button className="btn btn-secondary" onClick={() => setShowUsers(false)}>Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Motivational Quote */}
         <div className="px-2 px-sm-4 py-4 text-center border-bottom" 
@@ -148,7 +367,7 @@ const Engagement: React.FC<{ nickname: string; onStart: () => void }> = ({ nickn
                 margin: '0 auto',
               }}
             >
-              <div style={{ maxWidth: '95%' }}>{quotes[quoteIndex]}</div>
+              <div style={{ maxWidth: '95%' }}>{Array.isArray(quotes) ? quotes[quoteIndex] : ''}</div>
             </motion.div>
           </AnimatePresence>
           <div className="d-flex justify-content-center mt-2">
@@ -218,7 +437,7 @@ const Engagement: React.FC<{ nickname: string; onStart: () => void }> = ({ nickn
           </AnimatePresence>
           <div className="d-flex justify-content-center mt-2">
             <div className="hstack gap-1">
-              {tips.map((_, i) => (
+              {Array.isArray(tips) && tips.map((_, i) => (
                 <div 
                   key={i}
                   className="rounded-circle"

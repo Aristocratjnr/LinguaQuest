@@ -9,9 +9,10 @@ import os
 import threading
 from datetime import datetime
 from fastapi import Request
-from backend.integrations.translation.simple_translator import SimpleTranslator
-from backend.integrations.nlp.sentiment import SentimentAnalyzer
-from backend.integrations.nlp.argument_eval import ArgumentEvaluator
+from integrations.translation.simple_translator import SimpleTranslator
+from integrations.nlp.sentiment import SentimentAnalyzer
+from integrations.nlp.argument_eval import ArgumentEvaluator
+from integrations.engagement_api import router as engagement_router
 import requests
 from gtts import gTTS
 from fastapi.responses import FileResponse
@@ -264,3 +265,5 @@ def get_leaderboard():
     # Sort by score descending, then date
     data = sorted(data, key=lambda x: (-x['score'], x['date']))[:10]
     return LeaderboardResponse(leaderboard=data) 
+
+app.include_router(engagement_router, prefix="/api/engagement")
