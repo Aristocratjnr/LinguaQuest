@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import defaultAvatar from '../assets/images/avatar.png';
+import defaultAvatar from '../assets/images/avatar.jpg';
 import Loader from './Loader';
 
 interface Entry {

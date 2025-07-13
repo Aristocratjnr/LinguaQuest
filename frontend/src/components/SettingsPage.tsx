@@ -2,9 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useSettings } from '../context/SettingsContext';
 import avatar1 from '../assets/images/boy.png';
-import avatar2 from '../assets/images/woman.png';
-import avatar3 from '../assets/images/programmer.png';
-import avatar4 from '../assets/images/avatar.png';
+import avatar2 from '../assets/images/woman.jpg';
+import avatar3 from '../assets/images/programmer.jpg';
+import avatar4 from '../assets/images/avatar.jpg';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
@@ -103,7 +103,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const inputText = isDark ? '#e0e7ff' : '#22223b';
 
   return (
-    <div className={`container-fluid d-flex align-items-center justify-content-center min-vh-100 px-2 px-sm-3 px-md-4${isDark ? ' dark' : ''}`}
+    <div className={`container-fluid d-flex align-items-center justify-content-center min-vh-100 px-6 px-sm-3 px-md-4${isDark ? ' dark' : ''}`}
          style={{ background: bgGradient }}>
       <motion.div
         className="card shadow-lg w-100"

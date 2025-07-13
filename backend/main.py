@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, UploadFile, File
 from pydantic import BaseModel
 from transformers import MarianMTModel, MarianTokenizer
 import random
@@ -9,10 +9,7 @@ import os
 import threading
 from datetime import datetime
 from fastapi import Request
-from integrations.translation.simple_translator import SimpleTranslator
-from integrations.nlp.sentiment import SentimentAnalyzer
-from integrations.nlp.argument_eval import ArgumentEvaluator
-from integrations.engagement_api import router as engagement_router
+from mock_modules import router as engagement_router
 import requests
 from gtts import gTTS
 from fastapi.responses import FileResponse
@@ -21,6 +18,15 @@ from fastapi import Query
 from urllib.parse import quote
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import torch
+from typing import Dict
+
+# Import enhanced NLP services
+from simple_nlp_services import (
+    SimpleSentimentAnalyzer as EnhancedSentimentAnalyzer,
+    SimpleArgumentEvaluator as ArgumentEvaluator,
+    SimpleConversationalAI as ConversationalAI,
+    SimpleSpeechToText as SpeechToText
+)
 
 app = FastAPI()
 
@@ -32,6 +38,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Initialize enhanced NLP services
+sentiment_analyzer = EnhancedSentimentAnalyzer()
+argument_evaluator = ArgumentEvaluator()
+conversational_ai = ConversationalAI()
+speech_to_text = SpeechToText()
 
 # --- Scenario Endpoint ---
 class ScenarioResponse(BaseModel):
@@ -153,6 +165,45 @@ def tts(text: str = Query(...), lang: str = Query("en")):
     except Exception as e:
         return {"error": str(e)}
 
+# --- Speech-to-Text Endpoint ---
+class TranscriptionResponse(BaseModel):
+    transcription: str
+    confidence: float
+    language: str
+    success: bool
+    error: str = None
+
+@app.post("/stt", response_model=TranscriptionResponse)
+async def speech_to_text_endpoint(
+    audio_file: UploadFile = File(...),
+    language: str = Query("en")
+):
+    """Convert speech to text using Whisper"""
+    try:
+        # Read audio file
+        audio_bytes = await audio_file.read()
+        
+        # Transcribe using enhanced speech-to-text service
+        result = speech_to_text.transcribe_audio_bytes(audio_bytes, language)
+        
+        return TranscriptionResponse(
+            transcription=result.get('transcription', ''),
+            confidence=result.get('confidence', 0.0),
+            language=result.get('language', language),
+            success=result.get('success', False),
+            error=result.get('error')
+        )
+        
+    except Exception as e:
+        print(f"Speech-to-text error: {e}")
+        return TranscriptionResponse(
+            transcription="",
+            confidence=0.0,
+            language=language,
+            success=False,
+            error=str(e)
+        )
+
 # --- Evaluation Endpoint ---
 class EvaluateRequest(BaseModel):
     argument: str
@@ -163,29 +214,55 @@ class EvaluateResponse(BaseModel):
     feedback: str
     score: int
 
-sentiment_service = SentimentAnalyzer()
+sentiment_service = EnhancedSentimentAnalyzer()
 argument_evaluator = ArgumentEvaluator()
 
 @app.post("/evaluate", response_model=EvaluateResponse)
 def evaluate_argument(req: EvaluateRequest):
     try:
-        # Use argument_evaluator and sentiment_service
-        sentiment = sentiment_service.analyze(req.argument)
-        eval_result = argument_evaluator.evaluate(req.argument, req.tone)
+        # Enhanced evaluation using new NLP services
+        sentiment_result = sentiment_analyzer.analyze_sentiment(req.argument)
+        tone_result = sentiment_analyzer.analyze_tone(req.argument)
+        
+        # Evaluate argument with topic context
+        eval_result = argument_evaluator.evaluate_argument(
+            argument=req.argument,
+            topic="persuasive argument",  # Default topic
+            tone=req.tone
+        )
+        
         score = eval_result.get('score', 0)
         feedback = eval_result.get('feedback', [])
         persuaded = eval_result.get('persuaded', False)
+        
         # Add sentiment-based feedback
-        if sentiment > 0.3:
-            score += 2
+        sentiment = sentiment_result['sentiment']
+        sentiment_confidence = sentiment_result['confidence']
+        
+        if sentiment == 'positive' and sentiment_confidence > 0.6:
+            score += 5
             feedback.append("Your argument has a positive, persuasive tone.")
-        elif sentiment < -0.3:
-            score -= 1
+        elif sentiment == 'negative' and sentiment_confidence > 0.6:
+            score -= 3
             feedback.append("Your argument sounds negative or confrontational.")
         else:
             feedback.append("Your argument is neutral in sentiment.")
+        
+        # Add tone feedback
+        dominant_tone = tone_result['dominant_tone']
+        tone_confidence = tone_result['confidence']
+        
+        if tone_confidence > 0.5:
+            if dominant_tone == 'polite':
+                feedback.append("Your polite tone enhances persuasiveness.")
+            elif dominant_tone == 'passionate':
+                feedback.append("Your passionate tone shows conviction.")
+            elif dominant_tone == 'confrontational':
+                feedback.append("Consider a more respectful tone.")
+        
         return EvaluateResponse(persuaded=persuaded, feedback=" ".join(feedback), score=score)
     except Exception as e:
+        print(f"Evaluation error: {e}")
         return EvaluateResponse(persuaded=False, feedback="Evaluation error.", score=0)
 
 # --- Dialogue Endpoint ---
@@ -201,34 +278,67 @@ class DialogueResponse(BaseModel):
 
 @app.post("/dialogue", response_model=DialogueResponse)
 def dialogue(req: DialogueRequest):
-    stance = req.ai_stance
-    response = ""
-    if len(req.user_argument.split()) > 7:
-        if stance == 'disagree':
-            new_stance = 'neutral'
-            response = "You make some good points. Maybe I should reconsider."
-        elif stance == 'neutral':
-            new_stance = 'agree'
-            response = "I am convinced by your argument!"
+    try:
+        # Use enhanced conversational AI
+        context = [f"Scenario: {req.scenario}"]
+        
+        # Generate AI response using conversational model
+        ai_response = conversational_ai.generate_response(
+            user_input=req.user_argument,
+            context=context,
+            personality="neutral",
+            stance=req.ai_stance
+        )
+        
+        # Determine new stance based on argument strength
+        eval_result = argument_evaluator.evaluate_argument(
+            argument=req.user_argument,
+            topic=req.scenario,
+            tone="neutral"
+        )
+        
+        score = eval_result.get('score', 0)
+        current_stance = req.ai_stance
+        
+        # Update stance based on argument strength
+        if score >= 75:
+            if current_stance == 'disagree':
+                new_stance = 'neutral'
+            elif current_stance == 'neutral':
+                new_stance = 'agree'
+            else:
+                new_stance = 'agree'
+        elif score >= 50:
+            if current_stance == 'disagree':
+                new_stance = 'neutral'
+            else:
+                new_stance = current_stance
         else:
-            new_stance = 'agree'
-            response = "I already agree with you!"
-    else:
-        if stance == 'disagree':
-            new_stance = 'disagree'
-            response = "I am not convinced yet. Can you explain more?"
-        elif stance == 'neutral':
-            new_stance = 'disagree'
-            response = "I'm not sure I agree with you."
-        else:
-            new_stance = 'neutral'
-            response = "I'm not fully convinced anymore."
-    if req.language != 'en':
-        try:
-            response = libre_translate(response, 'en', req.language)
-        except Exception:
-            pass
-    return DialogueResponse(ai_response=response, new_stance=new_stance)
+            if current_stance == 'agree':
+                new_stance = 'neutral'
+            else:
+                new_stance = current_stance
+        
+        # Translate response if needed
+        if req.language != 'en':
+            try:
+                ai_response = libre_translate(ai_response, 'en', req.language)
+            except Exception as e:
+                print(f"Translation error: {e}")
+                # Fallback to original response
+        
+        return DialogueResponse(ai_response=ai_response, new_stance=new_stance)
+        
+    except Exception as e:
+        print(f"Dialogue error: {e}")
+        # Fallback to simple response
+        fallback_response = "I understand your point. Can you elaborate?"
+        if req.language != 'en':
+            try:
+                fallback_response = libre_translate(fallback_response, 'en', req.language)
+            except Exception:
+                pass
+        return DialogueResponse(ai_response=fallback_response, new_stance=req.ai_stance)
 
 LEADERBOARD_FILE = 'leaderboard.json'
 LEADERBOARD_LOCK = threading.Lock()
@@ -265,5 +375,47 @@ def get_leaderboard():
     # Sort by score descending, then date
     data = sorted(data, key=lambda x: (-x['score'], x['date']))[:10]
     return LeaderboardResponse(leaderboard=data) 
+
+# --- Enhanced Sentiment and Tone Analysis Endpoint ---
+class SentimentRequest(BaseModel):
+    text: str
+
+class SentimentResponse(BaseModel):
+    sentiment: str
+    confidence: float
+    sentiment_scores: Dict[str, float]
+    dominant_tone: str
+    tone_confidence: float
+    tone_scores: Dict[str, float]
+
+@app.post("/sentiment", response_model=SentimentResponse)
+def analyze_sentiment_and_tone(req: SentimentRequest):
+    """Enhanced sentiment and tone analysis"""
+    try:
+        # Analyze sentiment
+        sentiment_result = sentiment_analyzer.analyze_sentiment(req.text)
+        
+        # Analyze tone
+        tone_result = sentiment_analyzer.analyze_tone(req.text)
+        
+        return SentimentResponse(
+            sentiment=sentiment_result['sentiment'],
+            confidence=sentiment_result['confidence'],
+            sentiment_scores=sentiment_result['scores'],
+            dominant_tone=tone_result['dominant_tone'],
+            tone_confidence=tone_result['confidence'],
+            tone_scores=tone_result['tone_scores']
+        )
+        
+    except Exception as e:
+        print(f"Sentiment analysis error: {e}")
+        return SentimentResponse(
+            sentiment="neutral",
+            confidence=0.0,
+            sentiment_scores={"positive": 0.33, "neutral": 0.34, "negative": 0.33},
+            dominant_tone="neutral",
+            tone_confidence=0.0,
+            tone_scores={"polite": 0.0, "passionate": 0.0, "formal": 0.0, "casual": 0.0, "confrontational": 0.0}
+        )
 
 app.include_router(engagement_router, prefix="/api/engagement")

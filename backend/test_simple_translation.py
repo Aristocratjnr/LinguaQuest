@@ -7,7 +7,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from integrations.translation.simple_translator import SimpleTranslator
+from backend.integrations.translation.simple_translator import SimpleTranslator
 
 def test_simple_translator():
     """Test the simple translator functionality."""

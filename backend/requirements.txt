@@ -6,4 +6,10 @@ torch
 sentencepiece
 vaderSentiment
 scikit-learn
-protobuf 
+protobuf
+sentence-transformers
+torchaudio
+soundfile
+librosa
+numpy
+scipy 

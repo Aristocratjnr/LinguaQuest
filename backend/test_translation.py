@@ -7,7 +7,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from integrations.translation.marianmt import MarianMTTranslator
+from backend.integrations.translation.marianmt import MarianMTTranslator
 
 def test_translation_models():
     """Test which translation models are available and working."""

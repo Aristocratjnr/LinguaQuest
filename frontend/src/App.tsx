@@ -443,7 +443,7 @@ function App() {
   }
   if (showEngagement) {
     console.log('Rendering Engagement screen with nickname:', nickname);
-    return <Engagement nickname={nickname} onStart={handleEngagementStart} />;
+    return <Engagement nickname={nickname} avatar={avatar} onStart={handleEngagementStart} />;
   }
   if (showCategorySelector) {
     return <CategorySelector onConfirm={handleCategoryConfirm} />;

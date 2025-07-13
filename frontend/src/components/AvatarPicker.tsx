@@ -1,101 +1,155 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import avatar1 from '../assets/images/boy.png';
-import avatar2 from '../assets/images/woman.png';
-import avatar3 from '../assets/images/programmer.png';
-import avatar4 from '../assets/images/avatar.png';
+import avatar2 from '../assets/images/woman.jpg';
+import avatar3 from '../assets/images/programmer.jpg';
+import avatar4 from '../assets/images/avatar.jpg';
 
 const AVATARS = [avatar1, avatar2, avatar3, avatar4];
 
 const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onConfirm }) => {
-  const [selected, setSelected] = useState(AVATARS[0]);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleConfirm = () => {
+    if (!selected) return;
+    setIsSubmitting(true);
+    setTimeout(() => {
+      onConfirm(selected);
+      setIsSubmitting(false);
+    }, 500);
+  };
 
   return (
-    <div className="container-fluid d-flex align-items-center justify-content-center min-vh-100 px-2 px-sm-3 px-md-4" 
-         style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+      padding: '1rem',
+      fontFamily: '"JetBrains Mono", monospace'
+    }}>
       <motion.div
-        className="card shadow w-100"
-        style={{ 
-          maxWidth: 450, 
+        style={{
           width: '100%',
-          borderRadius: '1rem',
+          maxWidth: '32rem',
+          background: 'white',
+          borderRadius: '1.25rem',
           overflow: 'hidden',
-          minHeight: 420,
-          boxSizing: 'border-box',
-          fontFamily: "'JetBrains Mono', monospace"
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
         }}
-        initial={{ opacity: 0, y: 32 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
+        transition={{ 
+          type: 'spring',
+          stiffness: 300,
+          damping: 20
+        }}
       >
-        <div className="card-header text-center py-3 border-bottom" 
-             style={{ background: 'rgba(118, 75, 162, 0.05)' }}>
-          <h2 className="card-title fw-bold mb-0" style={{ color: '#764ba2', fontSize: '1.3rem' }}>
-            <i className="material-icons align-middle me-2">face</i>
-            Choose Your Avatar
-          </h2>
+        {/* Header */}
+        <div style={{
+          padding: '1.5rem',
+          background: 'linear-gradient(to right, #4f46e5, #6366f1)',
+          textAlign: 'center',
+          color: 'white'
+        }}>
+          <motion.div
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 400 }}
+          >
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '3rem',
+              height: '3rem',
+              borderRadius: '50%',
+              background: 'rgba(255, 255, 255, 0.2)',
+              marginBottom: '0.75rem'
+            }}>
+              <span className="material-icons" style={{ fontSize: '1.5rem' }}>face</span>
+            </div>
+            <h2 style={{
+              margin: 0,
+              fontSize: '1.5rem',
+              fontWeight: 700,
+              letterSpacing: '-0.025em'
+            }}>
+              Choose Your Avatar
+            </h2>
+            <p style={{
+              margin: '0.5rem 0 0',
+              opacity: 0.9,
+              fontSize: '0.875rem'
+            }}>
+              Select an image that represents you
+            </p>
+          </motion.div>
         </div>
         
-        <div className="card-body p-3 p-sm-4">
-          <p className="text-center text-muted mb-3 mb-md-4" style={{ fontSize: '1rem' }}>
-            Select an avatar that represents you best
-          </p>
-          
-          <div className="d-flex justify-content-center flex-wrap gap-3 gap-md-4 my-3 my-md-4"
-               style={{ rowGap: 18, columnGap: 18 }}>
-            {AVATARS.map((a, i) => (
+        {/* Body */}
+        <div style={{ padding: '1.5rem' }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
+            gap: '1rem',
+            marginBottom: '1.5rem'
+          }}>
+            {AVATARS.map((avatar, index) => (
               <motion.div
-                key={i}
-                className="position-relative"
-                style={{ cursor: 'pointer', minWidth: 64, minHeight: 64 }}
-                onClick={() => setSelected(a)}
+                key={index}
+                onClick={() => setSelected(avatar)}
+                style={{
+                  position: 'relative',
+                  cursor: 'pointer',
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  aspectRatio: '1/1',
+                  border: selected === avatar ? '3px solid #4f46e5' : '3px solid #e2e8f0',
+                  transition: 'all 0.2s',
+                  boxShadow: selected === avatar ? 
+                    '0 10px 15px -3px rgba(79, 70, 229, 0.3), 0 4px 6px -2px rgba(79, 70, 229, 0.1)' : 
+                    '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+                }}
                 whileHover={{ 
-                  scale: selected === a ? 1.12 : 1.06,
-                  boxShadow: '0 8px 20px rgba(0,0,0,0.08)'
+                  scale: 1.05,
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
                 }}
                 whileTap={{ scale: 0.95 }}
-                animate={selected === a ? { scale: 1.12 } : { scale: 1 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
               >
-                <div className="avatar-container" style={{
-                  borderRadius: '50%',
-                  padding: selected === a ? '4px' : '0px',
-                  background: selected === a ? 'linear-gradient(to right, #667eea, #764ba2)' : 'transparent',
-                  transition: 'all 0.3s ease',
-                  width: 'clamp(64px, 18vw, 85px)',
-                  height: 'clamp(64px, 18vw, 85px)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                  <img
-                    src={a}
-                    alt={`Avatar ${i + 1}`}
-                    className={`rounded-circle bg-white`}
-                    style={{ 
-                      width: '100%', 
-                      height: '100%', 
-                      maxWidth: 85, 
-                      maxHeight: 85, 
-                      minWidth: 48, 
-                      minHeight: 48, 
-                      boxShadow: selected === a ? '0 0 16px rgba(118, 75, 162, 0.5)' : '0 4px 8px rgba(0,0,0,0.08)',
-                      opacity: selected === a ? 1 : 0.8,
-                      transition: 'all 0.3s ease',
-                      objectFit: 'cover',
-                      border: '3px solid white',
-                    }}
-                  />
-                </div>
-                {selected === a && (
-                  <motion.div 
+                <img
+                  src={avatar}
+                  alt={`Avatar ${index + 1}`}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
+                />
+                {selected === avatar && (
+                  <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="position-absolute top-0 end-0 translate-middle badge rounded-pill bg-success p-2"
-                    style={{ boxShadow: '0 2px 5px rgba(0,0,0,0.15)', fontSize: '0.85rem' }}
+                    style={{
+                      position: 'absolute',
+                      top: '0.25rem',
+                      right: '0.25rem',
+                      background: '#4f46e5',
+                      color: 'white',
+                      borderRadius: '50%',
+                      width: '1.5rem',
+                      height: '1.5rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)'
+                    }}
                   >
-                    <i className="material-icons" style={{ fontSize: '0.85rem' }}>check</i>
-                    <span className="visually-hidden">Selected</span>
+                    <span className="material-icons" style={{ 
+                      fontSize: '1rem'
+                    }}>check</span>
                   </motion.div>
                 )}
               </motion.div>
@@ -103,32 +157,105 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
           </div>
           
           <motion.button
-            className="btn btn-primary btn-lg w-100 mt-4"
-            style={{ 
-              background: 'linear-gradient(to right, #667eea, #764ba2)',
+            onClick={handleConfirm}
+            disabled={!selected || isSubmitting}
+            whileHover={selected ? { scale: 1.02 } : {}}
+            whileTap={selected ? { scale: 0.98 } : {}}
+            style={{
+              width: '100%',
+              padding: '0.875rem',
+              borderRadius: '0.5rem',
               border: 'none',
-              borderRadius: '0.8rem',
-              padding: '0.75rem',
-              boxShadow: '0 4px 15px rgba(118, 75, 162, 0.4)',
-              fontSize: '1.05rem',
+              background: selected ? 
+                'linear-gradient(to right, #4f46e5, #6366f1)' : 
+                '#e2e8f0',
+              color: selected ? 'white' : '#94a3b8',
+              fontSize: '1rem',
               fontWeight: 600,
-              letterSpacing: '0.01em',
+              cursor: selected ? 'pointer' : 'not-allowed',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: selected ? 
+                '0 4px 6px -1px rgba(79, 70, 229, 0.3), 0 2px 4px -1px rgba(79, 70, 229, 0.1)' : 
+                'none',
+              transition: 'all 0.2s'
             }}
-            onClick={() => onConfirm(selected)}
-            whileHover={{ scale: 1.03, boxShadow: '0 6px 20px rgba(118, 75, 162, 0.6)' }}
-            whileTap={{ scale: 0.97 }}
           >
-            <i className="material-icons align-middle me-2">check_circle</i>
-            Confirm Selection
+            {isSubmitting ? (
+              <>
+                <div style={{
+                  width: '1rem',
+                  height: '1rem',
+                  border: '2px solid rgba(255, 255, 255, 0.3)',
+                  borderTopColor: 'white',
+                  borderRadius: '50%',
+                  marginRight: '0.5rem',
+                  animation: 'spin 1s linear infinite'
+                }} />
+                Saving...
+              </>
+            ) : (
+              <>
+                <span className="material-icons" style={{ 
+                  fontSize: '1.25rem',
+                  marginRight: '0.5rem'
+                }}>check_circle</span>
+                Confirm Selection
+              </>
+            )}
           </motion.button>
         </div>
         
-        <div className="card-footer py-2 text-center text-muted small border-top" 
-             style={{ background: 'rgba(118, 75, 162, 0.05)', fontSize: '0.95rem' }}>
-          <i className="material-icons align-middle me-1" style={{ fontSize: '.9rem' }}>tips_and_updates</i>
-          Your avatar will appear in conversations and on the leaderboard
+        {/* Footer */}
+        <div style={{
+          padding: '1rem',
+          background: '#f8fafc',
+          borderTop: '1px solid #e2e8f0',
+          textAlign: 'center',
+          fontSize: '0.75rem',
+          color: '#64748b'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span className="material-icons" style={{ 
+              fontSize: '1rem',
+              marginRight: '0.25rem',
+              color: '#64748b'
+            }}>info</span>
+            Your avatar will appear on your profile and leaderboard
+          </div>
         </div>
       </motion.div>
+
+      {/* Global styles */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+        
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+        
+        body {
+          margin: 0;
+          font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .material-icons {
+          font-family: 'Material Icons';
+          font-weight: normal;
+          font-style: normal;
+          font-size: 24px;
+          line-height: 1;
+          letter-spacing: normal;
+          text-transform: none;
+          display: inline-block;
+          white-space: nowrap;
+          word-wrap: normal;
+          direction: ltr;
+          -webkit-font-feature-settings: 'liga';
+          -webkit-font-smoothing: antialiased;
+        }
+      `}</style>
     </div>
   );
 };
