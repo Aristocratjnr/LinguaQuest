@@ -566,7 +566,7 @@ function AppContent() {
               <div className="d-flex flex-column">
                 <h1 className="fw-bold mb-0" style={{ 
                   fontSize: '1.5rem', 
-                  color: headerColor, 
+                  color: '#58cc02', 
                   letterSpacing: '1px',
                   fontFamily: '"JetBrains Mono", monospace',
                   textTransform: 'uppercase',
@@ -595,7 +595,7 @@ function AppContent() {
             <div className="d-flex flex-column align-items-end me-2">
               <span className="fw-bold" style={{ 
                 fontSize: '0.9rem', 
-                color: headerColor, 
+                color: '#58cc02', 
                 letterSpacing: '0.5px',
                 fontFamily: '"JetBrains Mono", monospace',
                 textTransform: 'uppercase'
@@ -767,28 +767,48 @@ function AppContent() {
               </motion.button>
             )}
             <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="btn btn-outline-primary px-3 px-md-4 py-2 rounded-pill"
-              style={{ borderRadius: 16, fontWeight: 600, letterSpacing: '.01em' }}
+              whileHover={{ scale: 1.02, boxShadow: '0 6px 0 #3caa3c' }}
+              whileTap={{ scale: 0.98, boxShadow: '0 2px 0 #3caa3c' }}
+              className="btn px-3 px-md-4 py-2 rounded-pill"
+              style={{ 
+                borderRadius: 16, 
+                fontWeight: 'bold', 
+                letterSpacing: '1px',
+                background: '#58cc02',
+                color: 'white',
+                border: 'none',
+                boxShadow: '0 4px 0 #3caa3c',
+                textTransform: 'uppercase',
+                fontFamily: '"JetBrains Mono", monospace'
+              }}
               onClick={fetchScenario}
               disabled={loading || roundResult !== 'playing'}
             >
               <i className="material-icons align-middle me-2">refresh</i>
-              <span className="d-none d-sm-inline">New Scenario</span>
-              <span className="d-inline d-sm-none">New</span>
+              <span className="d-none d-sm-inline">NEW SCENARIO</span>
+              <span className="d-inline d-sm-none">NEW</span>
             </motion.button>
             <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="btn btn-outline-info px-3 px-md-4 py-2 rounded-pill"
-              style={{ borderRadius: 16, fontWeight: 600, letterSpacing: '.01em' }}
+              whileHover={{ scale: 1.02, boxShadow: '0 6px 0 #3caa3c' }}
+              whileTap={{ scale: 0.98, boxShadow: '0 2px 0 #3caa3c' }}
+              className="btn px-3 px-md-4 py-2 rounded-pill"
+              style={{ 
+                borderRadius: 16, 
+                fontWeight: 'bold', 
+                letterSpacing: '1px',
+                background: '#58cc02',
+                color: 'white',
+                border: 'none',
+                boxShadow: '0 4px 0 #3caa3c',
+                textTransform: 'uppercase',
+                fontFamily: '"JetBrains Mono", monospace'
+              }}
               onClick={handleVoiceCommand}
               disabled={listeningCmd}
             >
               <i className="material-icons align-middle me-2">{listeningCmd ? 'mic' : 'mic_none'}</i>
-              <span className="d-none d-sm-inline">{listeningCmd ? 'Listening...' : 'Voice Command'}</span>
-              <span className="d-inline d-sm-none">{listeningCmd ? 'Listening...' : 'Voice'}</span>
+              <span className="d-none d-sm-inline">{listeningCmd ? 'LISTENING...' : 'VOICE COMMAND'}</span>
+              <span className="d-inline d-sm-none">{listeningCmd ? 'LISTENING...' : 'VOICE'}</span>
             </motion.button>
           </div>
         </div>

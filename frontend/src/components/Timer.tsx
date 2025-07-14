@@ -17,9 +17,9 @@ const Timer: React.FC<TimerProps> = ({ seconds, timeLeft, isActive }) => {
   
   // Color changes based on time left
   const getTimeColor = () => {
-    if (timeLeft > seconds * 0.6) return '#28a745'; // Green
-    if (timeLeft > seconds * 0.3) return '#fd7e14'; // Orange
-    return '#dc3545'; // Red
+    if (timeLeft > seconds * 0.6) return '#58cc02'; // Duolingo Green
+    if (timeLeft > seconds * 0.3) return '#ffd700'; // Gold
+    return '#ff6b6b'; // Red
   };
   
   // Format time as mm:ss or ss
@@ -47,7 +47,7 @@ const Timer: React.FC<TimerProps> = ({ seconds, timeLeft, isActive }) => {
         <svg height={radius * 2} width={radius * 2} className="drop-shadow">
           {/* Background circle */}
           <circle
-            stroke="#e0e7ff"
+            stroke="#e8f5e9"
             fill="none"
             strokeWidth={stroke}
             r={normalizedRadius}
@@ -75,8 +75,8 @@ const Timer: React.FC<TimerProps> = ({ seconds, timeLeft, isActive }) => {
           {/* Gradient definition */}
           <defs>
             <linearGradient id="timer-gradient" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#667eea" />
-              <stop offset="100%" stopColor="#764ba2" />
+              <stop offset="0%" stopColor="#58cc02" />
+              <stop offset="100%" stopColor="#3caa3c" />
             </linearGradient>
           </defs>
           
@@ -85,7 +85,7 @@ const Timer: React.FC<TimerProps> = ({ seconds, timeLeft, isActive }) => {
             x="50%" 
             y="54%" 
             textAnchor="middle" 
-            fill={timeLeft <= 5 && isActive ? getTimeColor() : "#764ba2"} 
+            fill={timeLeft <= 5 && isActive ? getTimeColor() : "#58cc02"} 
             fontSize="1.4rem" 
             fontWeight="bold" 
             dy=".3em"
