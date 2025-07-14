@@ -23,6 +23,7 @@ import Engagement from './components/Engagement';
 import WelcomePage from './components/WelcomePage'; // Import the new WelcomePage component
 import SettingsPage from './components/SettingsPage';
 import { useSettings } from './context/SettingsContext';
+import { motion } from 'framer-motion';
 
 
 const TONES = ['polite', 'passionate', 'formal', 'casual'];
@@ -474,13 +475,28 @@ function App() {
   return (
     <div className="lq-bg d-flex flex-column min-vh-100" style={{ minHeight: '100vh', width: '100%' }}>
       {/* Header */}
-      <header className="container-fluid py-3 px-2 px-md-4 mb-3" style={{ background: headerBg, boxShadow: '0 2px 8px #0001', color: headerColor }}>
+      <header className="container-fluid py-3 px-2 px-md-4 mb-3" style={{ background: headerBg, boxShadow: '0 2px 8px #0001', color: headerColor, borderRadius: 0 }}>
         <div className="d-flex align-items-center justify-content-between" style={{ minHeight: 48 }}>
           <div className="d-flex align-items-center gap-2">
-            <img src={logo} alt="LinguaQuest Logo" style={{ height: 36, width: 36 }} />
+            <span className="d-flex align-items-center justify-content-center me-2" style={{
+              width: 40, height: 40, borderRadius: 12,
+              backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9',
+              color: '#58a700', boxShadow: '0 2px 8px rgba(88,167,0,0.07)'
+            }}>
+              <img src={logo} alt="LinguaQuest Logo" style={{ height: 28, width: 28 }} />
+            </span>
             <h1 className="fw-bold mb-0" style={{ fontSize: '1.3rem', color: headerColor, letterSpacing: '.01em' }}>LinguaQuest</h1>
+            <span className="badge px-3 py-1 d-flex align-items-center ms-2" style={{
+              backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9',
+              color: '#58a700', borderRadius: '12px', fontWeight: 600, fontSize: '0.85rem', letterSpacing: '.01em'
+            }}>
+              <i className="material-icons me-1" style={{ fontSize: '1rem' }}>psychology</i>
+              Language Game
+            </span>
           </div>
-          <img src={avatar} alt="User Avatar" className="rounded-circle" style={{ height: 40, width: 40, objectFit: 'cover', border: '2px solid #764ba2', boxShadow: avatarGlow, background: '#fff' }} />
+          <span className="d-flex align-items-center justify-content-center" style={{ width: 44, height: 44, borderRadius: 12, background: theme === 'dark' ? '#232946' : '#e8f5e9', boxShadow: avatarGlow, border: '2px solid #764ba2' }}>
+            <img src={avatar} alt="User Avatar" className="rounded-circle" style={{ height: 36, width: 36, objectFit: 'cover', border: '2px solid #ffd700', background: '#fff' }} />
+          </span>
         </div>
       </header>
 
@@ -531,7 +547,7 @@ function App() {
         <div className="row g-4 flex-grow-1" style={{ minHeight: 0 }}>
           {/* Left Column - Scenario and User Input */}
           <div className="col-12 col-lg-6 d-flex flex-column mb-3 mb-lg-0" style={{ minHeight: 0 }}>
-            <div className="card shadow-sm mb-4 flex-grow-1 d-flex flex-column" style={{ borderRadius: '1rem', background: 'rgba(255,255,255,0.98)', minHeight: 340 }}>
+            <div className="card shadow-lg mb-4 flex-grow-1 d-flex flex-column" style={{ borderRadius: 16, background: theme === 'dark' ? '#232946' : 'rgba(255,255,255,0.98)', minHeight: 340, boxShadow: theme === 'dark' ? '0 10px 30px #181c2a' : '0 10px 30px rgba(0,0,0,0.10)' }}>
               <div className="card-body d-grid gap-4 flex-grow-1">
                 <Scenario
                   scenario={scenario}
@@ -561,7 +577,7 @@ function App() {
           </div>
           {/* Right Column - AI Responses and Feedback */}
           <div className="col-12 col-lg-6 d-flex flex-column" style={{ minHeight: 0 }}>
-            <div className="card shadow-sm mb-4 flex-grow-1 d-flex flex-column" style={{ borderRadius: '1rem', background: 'rgba(255,255,255,0.98)', minHeight: 340 }}>
+            <div className="card shadow-lg mb-4 flex-grow-1 d-flex flex-column" style={{ borderRadius: 16, background: theme === 'dark' ? '#232946' : 'rgba(255,255,255,0.98)', minHeight: 340, boxShadow: theme === 'dark' ? '0 10px 30px #181c2a' : '0 10px 30px rgba(0,0,0,0.10)' }}>
               <div className="card-body d-grid gap-4 flex-grow-1">
                 <Feedback
                   feedback={feedback}
@@ -589,40 +605,42 @@ function App() {
         <div className="row mt-4 mb-4">
           <div className="col-12 d-flex flex-wrap justify-content-center gap-2 gap-sm-3">
             {showGameOverLeaderboard && (
-              <button 
-                className="btn btn-primary px-3 px-md-4 py-2"
-                style={{ 
-                  background: 'linear-gradient(to right, #667eea, #764ba2)',
-                  border: 'none',
-                  borderRadius: '.75rem',
-                }} 
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="btn btn-primary px-3 px-md-4 py-2 rounded-pill"
+                style={{ background: 'linear-gradient(to right, #667eea, #764ba2)', border: 'none', borderRadius: 16, fontWeight: 600, letterSpacing: '.01em' }}
                 onClick={() => setShowLeaderboard(true)}
               >
                 <i className="material-icons align-middle me-2">leaderboard</i>
                 <span className="d-none d-sm-inline">View Leaderboard</span>
                 <span className="d-inline d-sm-none">Leaderboard</span>
-              </button>
+              </motion.button>
             )}
-            <button 
-              className="btn btn-outline-primary px-3 px-md-4 py-2"
-              style={{ borderRadius: '.75rem' }} 
-              onClick={fetchScenario} 
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="btn btn-outline-primary px-3 px-md-4 py-2 rounded-pill"
+              style={{ borderRadius: 16, fontWeight: 600, letterSpacing: '.01em' }}
+              onClick={fetchScenario}
               disabled={loading || roundResult !== 'playing'}
             >
               <i className="material-icons align-middle me-2">refresh</i>
               <span className="d-none d-sm-inline">New Scenario</span>
               <span className="d-inline d-sm-none">New</span>
-            </button>
-            <button 
-              className="btn btn-outline-info px-3 px-md-4 py-2"
-              style={{ borderRadius: '.75rem' }} 
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="btn btn-outline-info px-3 px-md-4 py-2 rounded-pill"
+              style={{ borderRadius: 16, fontWeight: 600, letterSpacing: '.01em' }}
               onClick={handleVoiceCommand}
               disabled={listeningCmd}
             >
               <i className="material-icons align-middle me-2">{listeningCmd ? 'mic' : 'mic_none'}</i>
               <span className="d-none d-sm-inline">{listeningCmd ? 'Listening...' : 'Voice Command'}</span>
               <span className="d-inline d-sm-none">{listeningCmd ? 'Listening...' : 'Voice'}</span>
-            </button>
+            </motion.button>
           </div>
         </div>
       </main>
@@ -630,9 +648,12 @@ function App() {
       {/* Last Command Display */}
       {lastCmd && (
         <div className="container mb-3 px-2 px-sm-3" style={{ maxWidth: 600 }}>
-          <div className="alert alert-light text-center shadow-sm mb-0">
-            <small className="text-muted">Last voice command: "{lastCmd}"</small>
-            {cmdError && <div className="text-danger small mt-1">{cmdError}</div>}
+          <div className="alert alert-light text-center shadow-sm mb-0 d-flex align-items-center justify-content-center gap-2" style={{ borderRadius: 16, fontSize: '0.95rem', color: theme === 'dark' ? '#a5b4fc' : '#6c757d' }}>
+            <span className="d-flex align-items-center justify-content-center" style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700' }}>
+              <i className="material-icons" style={{ fontSize: '1.1rem' }}>info</i>
+            </span>
+            <span>Last voice command: "{lastCmd}"</span>
+            {cmdError && <span className="text-danger small ms-2">{cmdError}</span>}
           </div>
         </div>
       )}
@@ -647,7 +668,57 @@ function App() {
       )}
 
       {/* Modals */}
-      {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
+      {showLeaderboard && (
+        <motion.div
+          className="fixed inset-0 d-flex align-items-center justify-content-center p-4 z-50"
+          style={{ background: theme === 'dark' ? 'rgba(24,28,42,0.85)' : 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="bg-white dark:bg-[#232946] rounded-4 overflow-hidden w-100 position-relative shadow-lg"
+            style={{ maxWidth: 700, width: '100%', borderRadius: 24, boxShadow: theme === 'dark' ? '0 10px 30px #181c2a' : '0 10px 30px rgba(0,0,0,0.10)' }}
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 50, opacity: 0 }}
+            transition={{ type: 'spring', damping: 25 }}
+          >
+            {/* Header */}
+            <div className="d-flex align-items-center justify-content-between px-4 py-3 border-bottom" style={{ background: theme === 'dark' ? '#181c2a' : '#f8f9fa', borderTopLeftRadius: 24, borderTopRightRadius: 24 }}>
+              <div className="d-flex align-items-center gap-2">
+                <span className="d-flex align-items-center justify-content-center" style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700' }}>
+                  <i className="material-icons" style={{ fontSize: '1.5rem' }}>leaderboard</i>
+                </span>
+                <h2 className="fw-bold mb-0" style={{ color: '#58a700', fontSize: '1.15rem', letterSpacing: '.01em' }}>Leaderboard</h2>
+                <span className="badge px-3 py-1 d-flex align-items-center ms-2" style={{ backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700', borderRadius: '12px', fontWeight: 600, fontSize: '0.85rem', letterSpacing: '.01em' }}>
+                  <i className="material-icons me-1" style={{ fontSize: '1rem' }}>emoji_events</i>
+                  Top Players
+                </span>
+              </div>
+              <motion.button whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
+                onClick={() => setShowLeaderboard(false)}
+                className="btn btn-sm btn-outline-secondary rounded-circle ms-2 d-flex align-items-center justify-content-center"
+                style={{ width: 36, height: 36, border: 'none', background: theme === 'dark' ? '#232946' : '#f8f9fa' }}
+                aria-label="Close leaderboard"
+              >
+                <i className="material-icons">close</i>
+              </motion.button>
+            </div>
+            {/* Leaderboard Content */}
+            <div className="p-0 p-md-4" style={{ minHeight: 400 }}>
+              <Leaderboard onClose={() => setShowLeaderboard(false)} />
+            </div>
+            {/* Info/Help Section */}
+            <div className="text-muted small px-4 py-3 d-flex align-items-center gap-2 border-top" style={{ color: theme === 'dark' ? '#a5b4fc' : '#6c757d', fontSize: '0.9rem', background: theme === 'dark' ? '#181c2a' : '#f8f9fa', borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }}>
+              <span className="d-flex align-items-center justify-content-center" style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700' }}>
+                <i className="material-icons" style={{ fontSize: '1.1rem' }}>info</i>
+              </span>
+              Scores update in real time. Click a player for details and badges.
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
       {/* Help Modal */}
       {showHelp && (
         <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ background: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
@@ -688,16 +759,16 @@ function App() {
       <audio ref={audioClick} src={clickSfx} preload="auto" />
 
       {/* Footer */}
-      <footer className="text-center text-muted mt-auto py-3 small" style={{ background: footerBg, color: footerColor, boxShadow: '0 -2px 8px #0001' }}>
+      <footer className="text-center text-muted mt-auto py-3 small" style={{ background: footerBg, color: footerColor, boxShadow: '0 -2px 8px #0001', borderTopLeftRadius: 16, borderTopRightRadius: 16 }}>
         <div className="d-flex justify-content-center gap-3 mb-2">
-          <button className="btn btn-sm btn-link text-muted" onClick={() => setShowHelp(true)}>
+          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="btn btn-sm btn-link text-muted rounded-pill" style={{ fontWeight: 600, letterSpacing: '.01em' }} onClick={() => setShowHelp(true)}>
             <i className="material-icons align-middle me-1" style={{ fontSize: '.9rem' }}>help_outline</i>
             Help
-          </button>
-          <button className="btn btn-sm btn-link text-muted" onClick={() => setShowSettingsPage(true)}>
+          </motion.button>
+          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="btn btn-sm btn-link text-muted rounded-pill" style={{ fontWeight: 600, letterSpacing: '.01em' }} onClick={() => setShowSettingsPage(true)}>
             <i className="material-icons align-middle me-1" style={{ fontSize: '.9rem' }}>settings</i>
             Settings
-          </button>
+          </motion.button>
         </div>
         &copy; {new Date().getFullYear()} LinguaQuest
       </footer>
