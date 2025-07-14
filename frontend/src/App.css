@@ -1,4 +1,5 @@
 body, .lq-bg {
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f3 40%, #d1c4e9 100%);
   background-attachment: fixed;
@@ -31,6 +32,7 @@ body, .lq-bg {
 
 /* Professional Typography */
 h1, h2, h3, h4, h5, h6 {
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   font-weight: 700;
   line-height: 1.2;
   margin: 0 0 1rem 0;
@@ -384,4 +386,341 @@ body.dark .lq-card, .dark .lq-card {
     width: 36px;
     height: 36px;
   }
+} 
+
+/* --- Voice Command UI Enhancements --- */
+.lq-voice-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(90deg, #22d3ee 0%, #6366f1 100%);
+  color: #fff;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.7rem 1.6rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 2px 12px #6366f144;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  cursor: pointer;
+  outline: none;
+}
+
+.lq-voice-btn:active {
+  transform: scale(0.97);
+}
+.lq-voice-btn.listening {
+  background: linear-gradient(90deg, #4ade80 0%, #22d3ee 100%);
+  box-shadow: 0 0 0 4px #22d3ee33, 0 2px 16px #22d3ee44;
+  animation: lq-pulse 1.2s infinite;
+}
+@keyframes lq-pulse {
+  0% { box-shadow: 0 0 0 0 #22d3ee33, 0 2px 16px #22d3ee44; }
+  70% { box-shadow: 0 0 0 12px #22d3ee11, 0 2px 16px #22d3ee44; }
+  100% { box-shadow: 0 0 0 0 #22d3ee33, 0 2px 16px #22d3ee44; }
+}
+.lq-voice-btn .lq-mic-wave {
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  position: relative;
+}
+.lq-voice-btn .lq-mic-wave span {
+  display: block;
+  position: absolute;
+  bottom: 0;
+  width: 0.3em;
+  background: #fff;
+  border-radius: 0.2em;
+  animation: lq-wave 1s infinite linear;
+}
+.lq-voice-btn .lq-mic-wave span:nth-child(1) { left: 0.1em; height: 60%; animation-delay: 0s; }
+.lq-voice-btn .lq-mic-wave span:nth-child(2) { left: 0.6em; height: 80%; animation-delay: 0.2s; }
+.lq-voice-btn .lq-mic-wave span:nth-child(3) { left: 1.1em; height: 50%; animation-delay: 0.4s; }
+@keyframes lq-wave {
+  0%, 100% { height: 60%; }
+  50% { height: 100%; }
+}
+.lq-voice-fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1 0%, #22d3ee 100%);
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 20px #6366f144;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+.lq-voice-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 25px #6366f166;
+}
+.lq-voice-fab.listening {
+  background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
+  animation: lq-fab-pulse 1.5s infinite;
+}
+@keyframes lq-fab-pulse {
+  0% { transform: scale(1); box-shadow: 0 4px 20px #6366f144; }
+  50% { transform: scale(1.05); box-shadow: 0 6px 30px #6366f166; }
+  100% { transform: scale(1); box-shadow: 0 4px 20px #6366f144; }
+}
+
+.lq-voice-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(35, 41, 70, 0.45);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+.lq-voice-modal-inner {
+  background: #fff;
+  color: #232946;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 32px #23294633;
+  padding: 2.5rem 2.5rem 2rem 2.5rem;
+  min-width: 320px;
+  max-width: 90vw;
+  text-align: center;
+  position: relative;
+  animation: fadeIn 0.3s;
+}
+.lq-voice-modal-inner .lq-mic-wave {
+  margin: 0 auto 1.2rem auto;
+  width: 2.5em;
+  height: 2.5em;
+}
+.lq-voice-modal-inner .lq-mic-wave span {
+  width: 0.5em;
+  border-radius: 0.3em;
+  background: #6366f1;
+}
+.lq-voice-modal-inner .lq-mic {
+  font-size: 2.5em;
+  color: #6366f1;
+  margin-bottom: 0.5rem;
+}
+.lq-voice-modal-inner .lq-voice-status {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.lq-voice-modal-inner .lq-voice-tip {
+  font-size: 0.95em;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+.lq-voice-toast {
+  position: fixed;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #232946;
+  color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 16px #23294644;
+  padding: 1rem 2rem;
+  z-index: 2100;
+  min-width: 220px;
+  text-align: center;
+  font-size: 1.05em;
+  animation: fadeIn 0.3s;
+}
+.lq-voice-toast .lq-toast-error {
+  color: #f87171;
+  font-weight: 600;
+  margin-top: 0.3rem;
+} 
+
+.duo-bg {
+  background: linear-gradient(135deg, var(--duo-bg) 0%, #e9fbe5 100%);
+  min-height: 100vh;
+  min-width: 100vw;
+  font-family: 'Readex Pro', 'Nunito', 'Quicksand', 'Segoe UI', 'Arial Rounded MT Bold', 'Arial', sans-serif;
+}
+
+.duo-header {
+  background: var(--duo-card);
+  border-radius: 2rem;
+  box-shadow: var(--duo-shadow);
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.duo-logo {
+  height: 44px;
+  width: 44px;
+}
+
+.duo-avatar {
+  height: 56px;
+  width: 56px;
+  border-radius: 50%;
+  border: 3px solid var(--duo-green);
+  box-shadow: 0 0 0 4px #e9fbe5, 0 2px 8px #58cc0233;
+  background: #fff;
+  object-fit: cover;
+}
+
+.duo-card {
+  background: var(--duo-card);
+  border-radius: 2rem;
+  box-shadow: var(--duo-shadow);
+  padding: 2rem 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.duo-btn {
+  font-family: inherit;
+  font-size: 1.15rem;
+  font-weight: 700;
+  border: none;
+  outline: none;
+  border-radius: 999px;
+  padding: 0.9rem 2.2rem;
+  box-shadow: 0 2px 8px #58cc0233;
+  transition: transform 0.14s cubic-bezier(.4,1.4,.6,1), box-shadow 0.18s, background 0.18s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+}
+.duo-btn:hover {
+  transform: scale(1.045);
+  box-shadow: 0 4px 16px #58cc0255;
+  filter: brightness(1.04);
+}
+.duo-btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 4px #58cc0222;
+  filter: brightness(0.97);
+}
+.duo-btn-primary {
+  background: var(--duo-green);
+  color: #fff;
+}
+.duo-btn-secondary {
+  background: var(--duo-blue);
+  color: #fff;
+}
+.duo-btn-yellow {
+  background: var(--duo-yellow);
+  color: var(--duo-dark);
+}
+.duo-btn-primary:hover {
+  background: #4eb502;
+}
+.duo-btn-secondary:hover {
+  background: #1799d6;
+}
+.duo-btn-yellow:hover {
+  background: #ffe066;
+}
+
+/* Confetti animation utility for gamification */
+@keyframes duo-confetti {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(60px) scale(1.2) rotate(20deg); }
+}
+.duo-confetti-piece {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  opacity: 0.85;
+  animation: duo-confetti 1.2s cubic-bezier(.4,1.4,.6,1) forwards;
+}
+
+.duo-status-alert {
+  border-radius: 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: var(--duo-shadow);
+  padding: 1.2rem 1rem;
+  margin-bottom: 1rem;
+} 
+
+.duo-progress-card {
+  background: var(--duo-card);
+  border-radius: 2rem;
+  box-shadow: var(--duo-shadow);
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.duo-progress-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  margin: 0 2px;
+  transition: background 0.4s, border 0.4s;
+} 
+
+.duo-badges-row {
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+  margin: 1.5rem 0 0.5rem 0;
+}
+
+.duo-badge {
+  background: #fffbe6;
+  border: 2.5px solid var(--duo-yellow);
+  border-radius: 1.5rem;
+  box-shadow: 0 2px 8px #ffd60033;
+  padding: 0.7rem 1.3rem 0.7rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  font-weight: 700;
+  color: #bfa100;
+  font-size: 1.1rem;
+  position: relative;
+  min-width: 90px;
+  transition: transform 0.13s, box-shadow 0.18s;
+}
+.duo-badge:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 4px #ffd60022;
+}
+.duo-badge-icon {
+  font-size: 1.7em;
+  margin-right: 0.4em;
+  color: var(--duo-yellow);
+  filter: drop-shadow(0 2px 4px #ffd60033);
+}
+
+/* Confetti utility for celebratory effects */
+.duo-confetti {
+  pointer-events: none;
+  position: fixed;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  z-index: 9999;
 } 

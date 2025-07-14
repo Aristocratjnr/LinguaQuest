@@ -23,6 +23,8 @@ import Engagement from './components/Engagement';
 import WelcomePage from './components/WelcomePage'; // Import the new WelcomePage component
 import SettingsPage from './components/SettingsPage';
 import { useSettings } from './context/SettingsContext';
+import { UserProvider, useUser } from './context/UserContext';
+import { motion } from 'framer-motion';
 
 
 const TONES = ['polite', 'passionate', 'formal', 'casual'];
@@ -32,7 +34,7 @@ const LANGUAGES = [
   { code: 'ewe', label: 'Ewe' },
 ];
 const TOTAL_ROUNDS = 5;
-const ROUND_TIME = 30; // seconds
+const ROUND_TIME = 50; // seconds (increased from 30 to 50)
 
 const VOICE_COMMANDS = [
   { phrases: ['next', 'continue', 'proceed', 'suivant', 'weiter', 'siguiente', 'ɛdi so'], action: 'next', desc: 'Go to next round', icon: '⏭️' },
@@ -55,7 +57,7 @@ interface EvaluateResponse { persuaded: boolean; feedback: string; score: number
 interface DialogueResponse { ai_response: string; new_stance: string; }
 interface LeaderboardResponse { leaderboard: any[]; }
 
-function App() {
+function AppContent() {
   const [scenario, setScenario] = useState('');
   const [language, setLanguage] = useState('twi');
   const [aiStance, setAiStance] = useState('disagree');
@@ -97,7 +99,10 @@ function App() {
   const [showHelp, setShowHelp] = useState(false);
   const [voiceLang, setVoiceLang] = useState('twi'); // Default to Twi for voice commands
   const [showEngagement, setShowEngagement] = useState(false);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
   const { theme } = useSettings();
+  const { user, submitScore, startGameSession, endGameSession, incrementStreak, awardBadge } = useUser();
   // Theme-aware header background and avatar glow
   const headerBg = theme === 'dark' ? 'rgba(35, 41, 70, 0.98)' : 'rgba(255,255,255,0.95)';
   const headerColor = theme === 'dark' ? '#e0e7ff' : '#4f46e5';
@@ -139,7 +144,7 @@ function App() {
   const fetchScenario = async () => {
     setLoading(true);
     try {
-      const res = await axios.post<ScenarioResponse>('/scenario', { category, difficulty });
+      const res = await axios.post<ScenarioResponse>('http://127.0.0.1:8000/scenario', { category, difficulty });
       setScenario(res.data.scenario);
       setLanguage(res.data.language || 'twi');
       setAiStance('disagree');
@@ -174,7 +179,7 @@ function App() {
     if (!userArgument) return;
     setLoading(true);
     try {
-      const res = await axios.post<TranslationResponse>('/translate', {
+      const res = await axios.post<TranslationResponse>('http://127.0.0.1:8000/translate', {
         text: userArgument,
         src_lang: 'en',
         tgt_lang: language,
@@ -191,7 +196,7 @@ function App() {
     if (!userArgument) return;
     setLoading(true);
     try {
-      const res = await axios.post<EvaluateResponse>('/evaluate', {
+      const res = await axios.post<EvaluateResponse>('http://127.0.0.1:8000/evaluate', {
         argument: userArgument,
         tone,
       });
@@ -212,7 +217,7 @@ function App() {
   const handleDialogue = async () => {
     setLoading(true);
     try {
-      const res = await axios.post<DialogueResponse>('/dialogue', {
+      const res = await axios.post<DialogueResponse>('http://127.0.0.1:8000/dialogue', {
         scenario,
         user_argument: userArgument,
         ai_stance: aiStance,
@@ -321,6 +326,12 @@ function App() {
   useEffect(() => {
     if (roundResult === 'success') {
       setRoundWins(w => w + 1);
+      // Increment streak on success
+      if (user) {
+        incrementStreak().catch(error => {
+          console.error('Failed to increment streak:', error);
+        });
+      }
     }
     if (userArgument && roundResult === 'playing') {
       const words = userArgument.toLowerCase().split(/\W+/).filter(Boolean);
@@ -334,19 +345,40 @@ function App() {
       setAllPersuaded(true);
       setUniqueWords(new Set());
     }
-  }, [roundResult, userArgument, round]);
+  }, [roundResult, userArgument, round, user, incrementStreak]);
 
   // Unlock badges on game over
   useEffect(() => {
-    if (roundResult === 'gameover') {
+    if (roundResult === 'gameover' && user) {
       const unlocked: string[] = [];
       if (roundWins >= 3) unlocked.push('streak');
       if ((score ?? 0) >= 8) unlocked.push('highscore');
       if (uniqueWords.size >= 20) unlocked.push('creative');
       if (allPersuaded && round === TOTAL_ROUNDS + 1) unlocked.push('perfect');
       setBadges(unlocked);
+      
+      // Award badges in database
+      unlocked.forEach(async (badgeType) => {
+        try {
+          const badgeNames = {
+            streak: 'Streak Master',
+            highscore: 'High Scorer',
+            creative: 'Creative Thinker',
+            perfect: 'Perfect Player'
+          };
+          const badgeDescriptions = {
+            streak: 'Won 3 or more rounds in a game',
+            highscore: 'Achieved a high score of 8 or more',
+            creative: 'Used 20 or more unique words',
+            perfect: 'Persuaded AI in all rounds'
+          };
+          await awardBadge(badgeType, badgeNames[badgeType as keyof typeof badgeNames], badgeDescriptions[badgeType as keyof typeof badgeDescriptions]);
+        } catch (error) {
+          console.error(`Failed to award badge ${badgeType}:`, error);
+        }
+      });
     }
-  }, [roundResult, roundWins, score, uniqueWords, allPersuaded, round]);
+  }, [roundResult, roundWins, score, uniqueWords, allPersuaded, round, user, awardBadge]);
 
   // Handle nickname confirm
   const handleNicknameConfirm = (name: string) => {
@@ -373,24 +405,60 @@ function App() {
   };
 
   // Handle category confirm
-  const handleCategoryConfirm = (cat: string, diff: string) => {
+  const handleCategoryConfirm = async (cat: string, diff: string) => {
     setCategory(cat);
     setDifficulty(diff);
     setShowCategorySelector(false);
     setShowOnboarding(false);
+    
+    // Start game session
+    if (user) {
+      try {
+        const sessionId = await startGameSession({
+          category: cat,
+          difficulty: diff
+        });
+        setCurrentSessionId(sessionId);
+      } catch (error) {
+        console.error('Failed to start game session:', error);
+      }
+    }
   };
 
-  // Submit score on game over
+  // Submit score and end session on game over
   useEffect(() => {
-    if (roundResult === 'gameover' && nickname && score !== null) {
-      axios.post('/score', {
-        name: nickname,
-        score,
-        date: new Date().toISOString(),
-        avatar,
-      });
+    if (roundResult === 'gameover' && user && score !== null) {
+      const endGame = async () => {
+        try {
+          // Submit score
+          await submitScore({
+            score,
+            details: {
+              roundWins,
+              uniqueWords: uniqueWords.size,
+              allPersuaded,
+              badges: badges
+            }
+          });
+          
+          // End game session
+          if (currentSessionId) {
+            await endGameSession(currentSessionId, {
+              end_time: new Date().toISOString(),
+              total_score: score,
+              rounds_played: round,
+              status: 'completed'
+            });
+            setCurrentSessionId(null);
+          }
+        } catch (error) {
+          console.error('Failed to end game:', error);
+        }
+      };
+      
+      endGame();
     }
-  }, [roundResult, nickname, score, avatar]);
+  }, [roundResult, user, score, roundWins, uniqueWords, allPersuaded, badges, submitScore, currentSessionId, endGameSession, round]);
 
   // Play sound effects
   const playSuccess = () => audioSuccess.current && audioSuccess.current.play();
@@ -399,7 +467,11 @@ function App() {
 
   // Animate on round result
   useEffect(() => {
-    if (roundResult === 'success') playSuccess();
+    if (roundResult === 'success') {
+      playSuccess();
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3000);
+    }
     if (roundResult === 'fail') {
       playFail();
       setShake(true);
@@ -413,7 +485,7 @@ function App() {
     if (scenario && newLang !== 'en') {
       setLoading(true);
       try {
-        const res = await axios.post<TranslationResponse>('/translate', {
+        const res = await axios.post<TranslationResponse>('http://127.0.0.1:8000/translate', {
           text: scenario,
           src_lang: 'en', // or track the current scenario language if needed
           tgt_lang: newLang,
@@ -443,7 +515,7 @@ function App() {
   }
   if (showEngagement) {
     console.log('Rendering Engagement screen with nickname:', nickname);
-    return <Engagement nickname={nickname} onStart={handleEngagementStart} />;
+    return <Engagement nickname={nickname} avatar={avatar} onStart={handleEngagementStart} />;
   }
   if (showCategorySelector) {
     return <CategorySelector onConfirm={handleCategoryConfirm} />;
@@ -472,15 +544,108 @@ function App() {
 
   // Main game layout
   return (
-    <div className="lq-bg" style={{ minHeight: '100vh', minWidth: '100vw' }}>
+    <div className="lq-bg d-flex flex-column min-vh-100" style={{ minHeight: '100vh', width: '100%' }}>
       {/* Header */}
-      <header className="container-fluid py-3 px-2 px-md-4 mb-3" style={{ background: headerBg, boxShadow: '0 2px 8px #0001', color: headerColor }}>
+      <header className="container-fluid py-3 px-2 px-md-4 mb-3" style={{ background: headerBg, boxShadow: '0 2px 8px #0001', color: headerColor, borderRadius: 0 }}>
         <div className="d-flex align-items-center justify-content-between" style={{ minHeight: 48 }}>
-          <div className="d-flex align-items-center gap-2">
-            <img src={logo} alt="LinguaQuest Logo" style={{ height: 36, width: 36 }} />
-            <h1 className="fw-bold mb-0" style={{ fontSize: '1.3rem', color: headerColor, letterSpacing: '.01em' }}>LinguaQuest</h1>
+          <div className="d-flex align-items-center gap-3">
+            <div className="d-flex align-items-center gap-3">
+              <motion.div 
+                className="d-flex align-items-center justify-content-center" 
+                style={{
+                  width: 48, height: 48, borderRadius: 16,
+                  background: '#58cc02',
+                  boxShadow: '0 4px 12px rgba(88, 204, 2, 0.3)',
+                  border: '2px solid #3caa3c'
+                }}
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: 'spring', stiffness: 400 }}
+              >
+                <img src={logo} alt="LinguaQuest Logo" style={{ height: 32, width: 32 }} />
+              </motion.div>
+              <div className="d-flex flex-column">
+                <h1 className="fw-bold mb-0" style={{ 
+                  fontSize: '1.5rem', 
+                  color: '#58cc02', 
+                  letterSpacing: '1px',
+                  fontFamily: '"JetBrains Mono", monospace',
+                  textTransform: 'uppercase',
+                  lineHeight: '1.2'
+                }}>
+                  LINGUAQUEST
+                </h1>
+                <span className="badge px-3 py-1 d-flex align-items-center" style={{
+                  backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9',
+                  color: '#58cc02', 
+                  borderRadius: '12px', 
+                  fontWeight: 'bold', 
+                  fontSize: '0.75rem', 
+                  letterSpacing: '1px',
+                  fontFamily: '"JetBrains Mono", monospace',
+                  textTransform: 'uppercase',
+                  alignSelf: 'flex-start'
+                }}>
+                  <i className="material-icons me-1" style={{ fontSize: '0.9rem' }}>psychology</i>
+                  Language Game
+                </span>
+              </div>
+            </div>
           </div>
-          <img src={avatar} alt="User Avatar" className="rounded-circle" style={{ height: 40, width: 40, objectFit: 'cover', border: '2px solid #764ba2', boxShadow: avatarGlow, background: '#fff' }} />
+          <div className="d-flex align-items-center gap-2">
+            <div className="d-flex flex-column align-items-end me-2">
+              <span className="fw-bold" style={{ 
+                fontSize: '0.9rem', 
+                color: '#58cc02', 
+                letterSpacing: '0.5px',
+                fontFamily: '"JetBrains Mono", monospace',
+                textTransform: 'uppercase'
+              }}>
+                {user?.nickname || nickname || 'Player'}
+              </span>
+              <span className="text-muted small" style={{ 
+                fontSize: '0.75rem',
+                letterSpacing: '0.5px',
+                fontFamily: '"JetBrains Mono", monospace'
+              }}>
+                Welcome Back!
+              </span>
+            </div>
+            <motion.div 
+              className="d-flex align-items-center justify-content-center position-relative" 
+              style={{ 
+                width: 48, 
+                height: 48, 
+                borderRadius: 16, 
+                background: theme === 'dark' ? '#232946' : '#e8f5e9', 
+                boxShadow: avatarGlow, 
+                border: '3px solid #58cc02',
+                overflow: 'hidden'
+              }}
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: 'spring', stiffness: 400 }}
+            >
+              <img 
+                src={user?.avatar_url || avatar} 
+                alt="User Avatar" 
+                style={{ 
+                  height: 42, 
+                  width: 42, 
+                  objectFit: 'cover',
+                  borderRadius: '12px'
+                }} 
+              />
+              <div className="position-absolute" style={{
+                bottom: -2,
+                right: -2,
+                width: 12,
+                height: 12,
+                borderRadius: '50%',
+                background: '#58cc02',
+                border: '2px solid white',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+              }} />
+            </motion.div>
+          </div>
         </div>
       </header>
 
@@ -488,7 +653,9 @@ function App() {
       <div className="container mb-3 px-2 px-sm-3" style={{ maxWidth: 900 }}>
         <div className="row g-3 align-items-center">
           <div className="col-12 col-md-8">
-            <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
+            <div className="progress-container">
+              <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
+            </div>
           </div>
           <div className="col-12 col-md-4">
             <div className="d-flex justify-content-center">
@@ -525,16 +692,16 @@ function App() {
       )}
 
       {/* Main Game Content */}
-      <main className="container flex-grow-1 d-flex flex-column px-2 px-sm-3" style={{ maxWidth: 900 }}>
-        <div className="row g-4 flex-grow-1">
+      <main className="container flex-grow-1 d-flex flex-column px-2 px-sm-3" style={{ maxWidth: 900, flex: 1, minHeight: 0 }}>
+        <div className="row g-4 flex-grow-1" style={{ minHeight: 0 }}>
           {/* Left Column - Scenario and User Input */}
-          <div className="col-12 col-lg-6 d-flex flex-column">
-            <div className="card shadow-sm mb-4 flex-grow-1" style={{ borderRadius: '1rem', background: 'rgba(255,255,255,0.98)' }}>
-              <div className="card-body d-grid gap-4">
+          <div className="col-12 col-lg-6 d-flex flex-column mb-3 mb-lg-0" style={{ minHeight: 0 }}>
+            <div className="card shadow-lg mb-4 flex-grow-1 d-flex flex-column" style={{ borderRadius: 16, background: theme === 'dark' ? '#232946' : 'rgba(255,255,255,0.98)', minHeight: 340, boxShadow: theme === 'dark' ? '0 10px 30px #181c2a' : '0 10px 30px rgba(0,0,0,0.10)' }}>
+              <div className="card-body d-grid gap-4 flex-grow-1">
                 <Scenario
                   scenario={scenario}
                   language={language}
-                  loading={loading || roundResult !== 'playing'}
+                  loading={loading}
                   onLanguageChange={handleScenarioLanguageChange}
                   languages={LANGUAGES}
                 />
@@ -542,7 +709,7 @@ function App() {
                   userArgument={userArgument}
                   onChange={setUserArgument}
                   loading={loading}
-                  disabled={roundResult !== 'playing'}
+                  disabled={loading}
                   onTranslate={handleTranslate}
                   translation={translation}
                   language={language}
@@ -551,16 +718,16 @@ function App() {
                   tone={tone}
                   onChange={setTone}
                   loading={loading}
-                  disabled={roundResult !== 'playing'}
+                  disabled={loading}
                   tones={TONES}
                 />
               </div>
             </div>
           </div>
           {/* Right Column - AI Responses and Feedback */}
-          <div className="col-12 col-lg-6 d-flex flex-column">
-            <div className="card shadow-sm mb-4 flex-grow-1" style={{ borderRadius: '1rem', background: 'rgba(255,255,255,0.98)' }}>
-              <div className="card-body d-grid gap-4">
+          <div className="col-12 col-lg-6 d-flex flex-column" style={{ minHeight: 0 }}>
+            <div className="card shadow-lg mb-4 flex-grow-1 d-flex flex-column" style={{ borderRadius: 16, background: theme === 'dark' ? '#232946' : 'rgba(255,255,255,0.98)', minHeight: 340, boxShadow: theme === 'dark' ? '0 10px 30px #181c2a' : '0 10px 30px rgba(0,0,0,0.10)' }}>
+              <div className="card-body d-grid gap-4 flex-grow-1">
                 <Feedback
                   feedback={feedback}
                   score={score}
@@ -587,40 +754,62 @@ function App() {
         <div className="row mt-4 mb-4">
           <div className="col-12 d-flex flex-wrap justify-content-center gap-2 gap-sm-3">
             {showGameOverLeaderboard && (
-              <button 
-                className="btn btn-primary px-3 px-md-4 py-2"
-                style={{ 
-                  background: 'linear-gradient(to right, #667eea, #764ba2)',
-                  border: 'none',
-                  borderRadius: '.75rem',
-                }} 
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="btn btn-primary px-3 px-md-4 py-2 rounded-pill"
+                style={{ background: 'linear-gradient(to right, #667eea, #764ba2)', border: 'none', borderRadius: 16, fontWeight: 600, letterSpacing: '.01em' }}
                 onClick={() => setShowLeaderboard(true)}
               >
                 <i className="material-icons align-middle me-2">leaderboard</i>
                 <span className="d-none d-sm-inline">View Leaderboard</span>
                 <span className="d-inline d-sm-none">Leaderboard</span>
-              </button>
+              </motion.button>
             )}
-            <button 
-              className="btn btn-outline-primary px-3 px-md-4 py-2"
-              style={{ borderRadius: '.75rem' }} 
-              onClick={fetchScenario} 
+            <motion.button
+              whileHover={{ scale: 1.02, boxShadow: '0 6px 0 #3caa3c' }}
+              whileTap={{ scale: 0.98, boxShadow: '0 2px 0 #3caa3c' }}
+              className="btn px-3 px-md-4 py-2 rounded-pill"
+              style={{ 
+                borderRadius: 16, 
+                fontWeight: 'bold', 
+                letterSpacing: '1px',
+                background: '#58cc02',
+                color: 'white',
+                border: 'none',
+                boxShadow: '0 4px 0 #3caa3c',
+                textTransform: 'uppercase',
+                fontFamily: '"JetBrains Mono", monospace'
+              }}
+              onClick={fetchScenario}
               disabled={loading || roundResult !== 'playing'}
             >
               <i className="material-icons align-middle me-2">refresh</i>
-              <span className="d-none d-sm-inline">New Scenario</span>
-              <span className="d-inline d-sm-none">New</span>
-            </button>
-            <button 
-              className="btn btn-outline-info px-3 px-md-4 py-2"
-              style={{ borderRadius: '.75rem' }} 
+              <span className="d-none d-sm-inline">NEW SCENARIO</span>
+              <span className="d-inline d-sm-none">NEW</span>
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02, boxShadow: '0 6px 0 #3caa3c' }}
+              whileTap={{ scale: 0.98, boxShadow: '0 2px 0 #3caa3c' }}
+              className="btn px-3 px-md-4 py-2 rounded-pill"
+              style={{ 
+                borderRadius: 16, 
+                fontWeight: 'bold', 
+                letterSpacing: '1px',
+                background: '#58cc02',
+                color: 'white',
+                border: 'none',
+                boxShadow: '0 4px 0 #3caa3c',
+                textTransform: 'uppercase',
+                fontFamily: '"JetBrains Mono", monospace'
+              }}
               onClick={handleVoiceCommand}
               disabled={listeningCmd}
             >
               <i className="material-icons align-middle me-2">{listeningCmd ? 'mic' : 'mic_none'}</i>
-              <span className="d-none d-sm-inline">{listeningCmd ? 'Listening...' : 'Voice Command'}</span>
-              <span className="d-inline d-sm-none">{listeningCmd ? 'Listening...' : 'Voice'}</span>
-            </button>
+              <span className="d-none d-sm-inline">{listeningCmd ? 'LISTENING...' : 'VOICE COMMAND'}</span>
+              <span className="d-inline d-sm-none">{listeningCmd ? 'LISTENING...' : 'VOICE'}</span>
+            </motion.button>
           </div>
         </div>
       </main>
@@ -628,9 +817,12 @@ function App() {
       {/* Last Command Display */}
       {lastCmd && (
         <div className="container mb-3 px-2 px-sm-3" style={{ maxWidth: 600 }}>
-          <div className="alert alert-light text-center shadow-sm mb-0">
-            <small className="text-muted">Last voice command: "{lastCmd}"</small>
-            {cmdError && <div className="text-danger small mt-1">{cmdError}</div>}
+          <div className="alert alert-light text-center shadow-sm mb-0 d-flex align-items-center justify-content-center gap-2" style={{ borderRadius: 16, fontSize: '0.95rem', color: theme === 'dark' ? '#a5b4fc' : '#6c757d' }}>
+            <span className="d-flex align-items-center justify-content-center" style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700' }}>
+              <i className="material-icons" style={{ fontSize: '1.1rem' }}>info</i>
+            </span>
+            <span>Last voice command: "{lastCmd}"</span>
+            {cmdError && <span className="text-danger small ms-2">{cmdError}</span>}
           </div>
         </div>
       )}
@@ -645,17 +837,96 @@ function App() {
       )}
 
       {/* Modals */}
-      {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
+      {showLeaderboard && (
+        <motion.div
+          className="fixed inset-0 d-flex align-items-center justify-content-center p-4 z-50"
+          style={{ background: theme === 'dark' ? 'rgba(24,28,42,0.85)' : 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="bg-white dark:bg-[#232946] rounded-4 overflow-hidden w-100 position-relative shadow-lg"
+            style={{ maxWidth: 700, width: '100%', borderRadius: 24, boxShadow: theme === 'dark' ? '0 10px 30px #181c2a' : '0 10px 30px rgba(0,0,0,0.10)' }}
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 50, opacity: 0 }}
+            transition={{ type: 'spring', damping: 25 }}
+          >
+            {/* Header */}
+            <div className="d-flex align-items-center justify-content-between px-4 py-3 border-bottom" style={{ background: theme === 'dark' ? '#181c2a' : '#f8f9fa', borderTopLeftRadius: 24, borderTopRightRadius: 24 }}>
+              <div className="d-flex align-items-center gap-2">
+                <span className="d-flex align-items-center justify-content-center" style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700' }}>
+                  <i className="material-icons" style={{ fontSize: '1.5rem' }}>leaderboard</i>
+                </span>
+                <h2 className="fw-bold mb-0" style={{ color: '#58a700', fontSize: '1.15rem', letterSpacing: '.01em' }}>Leaderboard</h2>
+                <span className="badge px-3 py-1 d-flex align-items-center ms-2" style={{ backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700', borderRadius: '12px', fontWeight: 600, fontSize: '0.85rem', letterSpacing: '.01em' }}>
+                  <i className="material-icons me-1" style={{ fontSize: '1rem' }}>emoji_events</i>
+                  Top Players
+                </span>
+              </div>
+              <motion.button whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
+                onClick={() => setShowLeaderboard(false)}
+                className="btn btn-sm btn-outline-secondary rounded-circle ms-2 d-flex align-items-center justify-content-center"
+                style={{ width: 36, height: 36, border: 'none', background: theme === 'dark' ? '#232946' : '#f8f9fa' }}
+                aria-label="Close leaderboard"
+              >
+                <i className="material-icons">close</i>
+              </motion.button>
+            </div>
+            {/* Leaderboard Content */}
+            <div className="p-0 p-md-4" style={{ minHeight: 400 }}>
+              <Leaderboard onClose={() => setShowLeaderboard(false)} />
+            </div>
+            {/* Info/Help Section */}
+            <div className="text-muted small px-4 py-3 d-flex align-items-center gap-2 border-top" style={{ color: theme === 'dark' ? '#a5b4fc' : '#6c757d', fontSize: '0.9rem', background: theme === 'dark' ? '#181c2a' : '#f8f9fa', borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }}>
+              <span className="d-flex align-items-center justify-content-center" style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700' }}>
+                <i className="material-icons" style={{ fontSize: '1.1rem' }}>info</i>
+              </span>
+              Scores update in real time. Click a player for details and badges.
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
       {/* Help Modal */}
       {showHelp && (
-        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ background: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
-          <div className="card shadow mx-3" style={{ maxWidth: 480, maxHeight: '90vh', overflow: 'auto' }}>
-            <div className="card-header bg-primary text-white py-3">
-              <h5 className="mb-0 d-flex align-items-center">
-                <i className="material-icons me-2">help_outline</i>
-                Voice Commands
-              </h5>
+        <motion.div
+          className="fixed inset-0 d-flex align-items-center justify-content-center p-4 z-50"
+          style={{ background: theme === 'dark' ? 'rgba(24,28,42,0.85)' : 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="bg-white dark:bg-[#232946] rounded-4 overflow-hidden w-100 position-relative shadow-lg"
+            style={{ maxWidth: 480, width: '100%', borderRadius: 24, boxShadow: theme === 'dark' ? '0 10px 30px #181c2a' : '0 10px 30px rgba(0,0,0,0.10)' }}
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: 'spring', damping: 25 }}
+          >
+            {/* Header */}
+            <div className="d-flex align-items-center justify-content-between px-4 py-3 border-bottom" style={{ background: theme === 'dark' ? '#181c2a' : '#f8f9fa', borderTopLeftRadius: 24, borderTopRightRadius: 24 }}>
+              <div className="d-flex align-items-center gap-2">
+                <span className="d-flex align-items-center justify-content-center" style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700' }}>
+                  <i className="material-icons" style={{ fontSize: '1.5rem' }}>help_outline</i>
+                </span>
+                <h2 className="fw-bold mb-0" style={{ color: '#58a700', fontSize: '1.15rem', letterSpacing: '.01em' }}>Voice Commands</h2>
+                <span className="badge px-3 py-1 d-flex align-items-center ms-2" style={{ backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700', borderRadius: '12px', fontWeight: 600, fontSize: '0.85rem', letterSpacing: '.01em' }}>
+                  <i className="material-icons me-1" style={{ fontSize: '1rem' }}>mic</i>
+                  Assistant
+                </span>
+              </div>
+              <motion.button whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
+                onClick={() => setShowHelp(false)}
+                className="btn btn-sm btn-outline-secondary rounded-circle ms-2 d-flex align-items-center justify-content-center"
+                style={{ width: 36, height: 36, border: 'none', background: theme === 'dark' ? '#232946' : '#f8f9fa' }}
+                aria-label="Close help"
+              >
+                <i className="material-icons">close</i>
+              </motion.button>
             </div>
+            {/* Body */}
             <div className="card-body p-4">
               <ul className="list-group list-group-flush">
                 {VOICE_COMMANDS.map(cmd => (
@@ -670,14 +941,26 @@ function App() {
                 ))}
               </ul>
             </div>
-            <div className="card-footer d-flex justify-content-end p-3">
-              <button className="btn btn-primary px-4" onClick={() => setShowHelp(false)}>
-                <i className="material-icons align-middle me-2">close</i>
-                Close
-              </button>
+            {/* Info/Help Section */}
+            <div className="text-muted small px-4 py-3 d-flex align-items-center gap-2 border-top" style={{ color: theme === 'dark' ? '#a5b4fc' : '#6c757d', fontSize: '0.9rem', background: theme === 'dark' ? '#181c2a' : '#f8f9fa', borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }}>
+              <span className="d-flex align-items-center justify-content-center" style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700' }}>
+                <i className="material-icons" style={{ fontSize: '1.1rem' }}>info</i>
+              </span>
+              Try saying a command or tap the mic button. Voice commands work best in supported browsers.
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* Confetti */}
+      {showConfetti && (
+        <Confetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+          numberOfPieces={200}
+          colors={['#58cc02', '#ffd700', '#1cb0f6', '#ff6b6b', '#4ecdc4']}
+        />
       )}
 
       {/* Audio elements */}
@@ -686,20 +969,28 @@ function App() {
       <audio ref={audioClick} src={clickSfx} preload="auto" />
 
       {/* Footer */}
-      <footer className="text-center text-muted mt-auto py-3 small" style={{ background: footerBg, color: footerColor, boxShadow: '0 -2px 8px #0001' }}>
+      <footer className="text-center text-muted mt-auto py-3 small" style={{ background: footerBg, color: footerColor, boxShadow: '0 -2px 8px #0001', borderTopLeftRadius: 16, borderTopRightRadius: 16 }}>
         <div className="d-flex justify-content-center gap-3 mb-2">
-          <button className="btn btn-sm btn-link text-muted" onClick={() => setShowHelp(true)}>
+          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="btn btn-sm btn-link text-muted rounded-pill" style={{ fontWeight: 600, letterSpacing: '.01em' }} onClick={() => setShowHelp(true)}>
             <i className="material-icons align-middle me-1" style={{ fontSize: '.9rem' }}>help_outline</i>
             Help
-          </button>
-          <button className="btn btn-sm btn-link text-muted" onClick={() => setShowSettingsPage(true)}>
+          </motion.button>
+          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="btn btn-sm btn-link text-muted rounded-pill" style={{ fontWeight: 600, letterSpacing: '.01em' }} onClick={() => setShowSettingsPage(true)}>
             <i className="material-icons align-middle me-1" style={{ fontSize: '.9rem' }}>settings</i>
             Settings
-          </button>
+          </motion.button>
         </div>
-        &copy; {new Date().getFullYear()} LinguaQuest
+        &copy; {new Date().getFullYear()} LinguaQuest. Developed by: Opuku Boakye Michael
       </footer>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <UserProvider>
+      <AppContent />
+    </UserProvider>
   );
 }
 

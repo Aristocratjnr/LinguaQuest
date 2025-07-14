@@ -1,0 +1,19 @@
+{
+  "name": "linguaquest-backend",
+  "version": "1.0.0",
+  "description": "Backend for LinguaQuest application",
+  "main": "server.js",
+  "scripts": {
+    "start-express": "node server.js",
+    "start-python": "uvicorn main:app --reload --host 0.0.0.0 --port 8001",
+    "start": "concurrently \"npm run start-express\" \"npm run start-python\""
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

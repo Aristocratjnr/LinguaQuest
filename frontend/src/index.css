@@ -15,18 +15,34 @@
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --transition: all 0.2s ease-in-out;
+  --duo-green: #58cc02;
+  --duo-blue: #1cb0f6;
+  --duo-yellow: #ffd600;
+  --duo-dark: #222;
+  --duo-bg: #f7fcf3;
+  --duo-card: #fff;
+  --duo-accent: #ffb800;
+  --duo-error: #ff4b4b;
+  --duo-success: #58cc02;
+  --duo-shadow: 0 4px 24px 0 rgba(88,204,2,0.08);
+}
+
+html, body {
+  height: 100%;
+  overflow-y: scroll;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, 
-               Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-family: 'Readex Pro', 'Nunito', 'Quicksand', 'Segoe UI', 'Arial Rounded MT Bold', 'Arial', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: var(--gradient);
+  background: linear-gradient(135deg, #f7fcf3 0%, #e9fbe5 100%);
   background-attachment: fixed;
   min-height: 100vh;
-  color: var(--text-dark);
+  color: var(--duo-dark);
   line-height: 1.5;
 }
 
