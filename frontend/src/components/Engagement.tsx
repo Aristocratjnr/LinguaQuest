@@ -92,7 +92,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #58cc02 0%, #1cb0f6 100%)',
+      background: 'linear-gradient(135deg, #58cc02 0%, #4CAF50 100%)',
       padding: getSpacing(16, 20, 24),
       display: 'flex',
       justifyContent: 'center',

@@ -28,6 +28,12 @@ from simple_nlp_services import (
     SimpleSpeechToText as SpeechToText
 )
 
+# Import database components
+from database import init_db
+from user_api import router as user_router
+from game_api import router as game_router
+from engagement_api_v2 import router as engagement_v2_router
+
 app = FastAPI()
 
 # Add CORS middleware
@@ -38,6 +44,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Initialize database on startup
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database on application startup"""
+    init_db()
+    print("Database initialized successfully!")
+
+# Include new database routers
+app.include_router(user_router, prefix="/api/v1", tags=["users"])
+app.include_router(game_router, prefix="/api/v1", tags=["game"])
+app.include_router(engagement_v2_router, prefix="/api/v1", tags=["engagement"])
+
+# Keep the old engagement router for backward compatibility
+app.include_router(engagement_router, tags=["engagement-legacy"])
 
 # Initialize enhanced NLP services
 sentiment_analyzer = EnhancedSentimentAnalyzer()

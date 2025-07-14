@@ -131,7 +131,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           <motion.div 
             className="mb-2 mb-sm-3 p-2 rounded-circle d-flex align-items-center justify-content-center mx-auto" 
             style={{ 
-              background: 'linear-gradient(135deg, #58CC02, #1CB0F6)', 
+              background: '#58cc02', 
               width: 'clamp(60px, 15vw, 80px)', 
               height: 'clamp(60px, 15vw, 80px)',
               boxShadow: '0 4px 20px rgba(88, 204, 2, 0.4)'
@@ -276,23 +276,25 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
               <motion.button
                 className="btn btn-primary btn-lg w-100 text-center d-flex align-items-center justify-content-center"
                 style={{ 
-                  background: slides[currentSlide].color,
+                  background: '#58cc02',
                   border: 'none',
-                  borderRadius: '14px',
+                  borderRadius: '16px',
                   padding: 'clamp(0.75rem, 3vw, 1rem)',
                   fontSize: 'clamp(1rem, 3vw, 1.1rem)',
-                  fontFamily: "'Inter', sans-serif",
-                  fontWeight: 600,
-                  letterSpacing: '0.01em',
-                  boxShadow: `0 4px 14px ${slides[currentSlide].color}50`,
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontWeight: 'bold',
+                  letterSpacing: '1px',
+                  boxShadow: '0 4px 0 #3caa3c',
                   position: 'relative',
                   overflow: 'hidden',
-                  color: 'white'
+                  color: 'white',
+                  textTransform: 'uppercase'
                 }}
                 onClick={onGetStarted}
                 whileHover={{ 
                   scale: 1.02, 
-                  boxShadow: `0 6px 20px ${slides[currentSlide].color}80`,
+                  boxShadow: '0 6px 0 #3caa3c',
+                  transition: { type: 'spring', stiffness: 400 }
                 }}
                 whileTap={{ scale: 0.98 }}
                 initial={{ opacity: 0, y: 20 }}
@@ -303,7 +305,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
                   <i className="material-icons align-middle me-2" style={{ fontSize: 'clamp(1rem, 3vw, 1.2rem)' }}>
                     arrow_forward
                   </i>
-                  Get Started
+                  GET STARTED
                 </span>
                 <motion.span 
                   className="position-absolute top-0 left-0 w-100 h-100"
@@ -354,17 +356,18 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
               className="btn btn-outline-secondary btn-sm w-100 w-sm-auto d-flex align-items-center justify-content-center"
               style={{ 
                 borderRadius: '12px',
-                fontFamily: "'Inter', sans-serif",
-                letterSpacing: '0.01em',
+                fontFamily: "'JetBrains Mono', monospace",
+                letterSpacing: '1px',
                 opacity: currentSlide === 0 ? 0 : 1,
                 pointerEvents: currentSlide === 0 ? 'none' : 'auto',
                 minWidth: 'clamp(90px, 25vw, 100px)',
                 borderColor: '#d1d5db',
                 color: '#4b5563',
                 gap: '4px',
-                fontWeight: 600,
+                fontWeight: 'bold',
                 backgroundColor: 'rgba(255,255,255,0.7)',
-                padding: '0.375rem 0.75rem'
+                padding: '0.375rem 0.75rem',
+                textTransform: 'uppercase'
               }}
               onClick={() => paginate(-1)}
               disabled={currentSlide === 0}
@@ -373,7 +376,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
               transition={{ type: 'spring', stiffness: 300 }}
             >
               <i className="material-icons" style={{ fontSize: 'clamp(0.9rem, 3vw, 1rem)' }}>arrow_back</i>
-              <span>Previous</span>
+              <span>PREVIOUS</span>
             </motion.button>
             
             {currentSlide < slides.length - 1 ? (
@@ -381,26 +384,28 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
                 className="btn btn-primary btn-sm w-100 w-sm-auto d-flex align-items-center justify-content-center"
                 style={{ 
                   borderRadius: '12px',
-                  fontFamily: "'Inter', sans-serif",
-                  letterSpacing: '0.01em',
-                  background: slides[currentSlide + 1].color,
+                  fontFamily: "'JetBrains Mono', monospace",
+                  letterSpacing: '1px',
+                  background: '#58cc02',
                   border: 'none',
                   minWidth: 'clamp(90px, 25vw, 100px)',
                   gap: '4px',
-                  boxShadow: `0 2px 8px ${slides[currentSlide + 1].color}80`,
+                  boxShadow: '0 4px 0 #3caa3c',
                   color: 'white',
-                  fontWeight: 600,
-                  padding: '0.375rem 0.75rem'
+                  fontWeight: 'bold',
+                  padding: '0.375rem 0.75rem',
+                  textTransform: 'uppercase'
                 }}
                 onClick={() => paginate(1)}
                 whileHover={{ 
                   scale: 1.02, 
-                  boxShadow: `0 4px 12px ${slides[currentSlide + 1].color}` 
+                  boxShadow: '0 6px 0 #3caa3c',
+                  transition: { type: 'spring', stiffness: 400 }
                 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ type: 'spring', stiffness: 300 }}
               >
-                <span>Next</span>
+                                  <span>NEXT</span>
                 <i className="material-icons" style={{ fontSize: 'clamp(0.9rem, 3vw, 1rem)' }}>arrow_forward</i>
               </motion.button>
             ) : (
@@ -431,19 +436,20 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
               fontSize: 'clamp(0.75rem, 3vw, 0.8rem)',
               background: 'transparent',
               border: 'none',
-              letterSpacing: '0.01em',
+              letterSpacing: '1px',
               minWidth: 90,
-              fontWeight: 600
+              fontWeight: 'bold',
+              textTransform: 'uppercase'
             }}
             onClick={() => {
               setDirection(1);
               setCurrentSlide(slides.length - 1);
             }}
-            whileHover={{ color: slides[slides.length - 1].color }}
+            whileHover={{ color: '#58cc02' }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300 }}
           >
-            Skip Tour
+            SKIP TOUR
           </motion.button>
         </div>
       </motion.div>

@@ -26,7 +26,7 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+      background: 'linear-gradient(135deg, #58cc02 0%, #4CAF50 100%)',
       padding: '1rem',
       fontFamily: '"JetBrains Mono", monospace'
     }}>
@@ -50,7 +50,7 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
         {/* Header */}
         <div style={{
           padding: '1.5rem',
-          background: 'linear-gradient(to right, #4f46e5, #6366f1)',
+          background: '#58cc02',
           textAlign: 'center',
           color: 'white'
         }}>
@@ -107,10 +107,10 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
                   borderRadius: '50%',
                   overflow: 'hidden',
                   aspectRatio: '1/1',
-                  border: selected === avatar ? '3px solid #4f46e5' : '3px solid #e2e8f0',
+                  border: selected === avatar ? '3px solid #58cc02' : '3px solid #e2e8f0',
                   transition: 'all 0.2s',
                   boxShadow: selected === avatar ? 
-                    '0 10px 15px -3px rgba(79, 70, 229, 0.3), 0 4px 6px -2px rgba(79, 70, 229, 0.1)' : 
+                    '0 10px 15px -3px rgba(88, 204, 2, 0.3), 0 4px 6px -2px rgba(88, 204, 2, 0.1)' : 
                     '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
                 }}
                 whileHover={{ 
@@ -136,7 +136,7 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
                       position: 'absolute',
                       top: '0.25rem',
                       right: '0.25rem',
-                      background: '#4f46e5',
+                      background: '#58cc02',
                       color: 'white',
                       borderRadius: '50%',
                       width: '1.5rem',
@@ -167,7 +167,7 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
               borderRadius: '0.5rem',
               border: 'none',
               background: selected ? 
-                'linear-gradient(to right, #4f46e5, #6366f1)' : 
+                '#58cc02' : 
                 '#e2e8f0',
               color: selected ? 'white' : '#94a3b8',
               fontSize: '1rem',
@@ -177,7 +177,7 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
               alignItems: 'center',
               justifyContent: 'center',
               boxShadow: selected ? 
-                '0 4px 6px -1px rgba(79, 70, 229, 0.3), 0 2px 4px -1px rgba(79, 70, 229, 0.1)' : 
+                '0 4px 0 #3caa3c' : 
                 'none',
               transition: 'all 0.2s'
             }}

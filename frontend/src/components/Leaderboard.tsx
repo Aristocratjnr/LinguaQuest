@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import defaultAvatar from '../assets/images/avatar.jpg';
 import Loader from './Loader';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSettings } from '../context/SettingsContext';
+import { gameApi, LeaderboardEntry } from '../services/api';
 
-interface Entry {
-  name: string;
-  score: number;
-  date: string;
-  avatar?: string;
-  streak?: number;
+interface Entry extends LeaderboardEntry {
+  date?: string;
   level?: number;
 }
 
@@ -30,16 +26,17 @@ const Leaderboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       try {
         setLoading(true);
         setError('');
-        const [leaderboardRes, usersRes] = await Promise.all([
-          axios.get('/leaderboard'),
-          axios.get('/users')
-        ]);
-
-        setEntries(leaderboardRes.data.leaderboard);
+        const leaderboardRes = await gameApi.getLeaderboard(100);
         
+        setEntries(leaderboardRes.leaderboard);
+        
+        // Create engagement map from leaderboard data
         const map: Record<string, {streak: number, level: number}> = {};
-        usersRes.data.users.forEach((u: any) => {
-          map[u.nickname] = { streak: u.streak, level: u.level };
+        leaderboardRes.leaderboard.forEach((entry) => {
+          map[entry.nickname] = { 
+            streak: entry.current_streak, 
+            level: Math.min(10, Math.max(1, Math.floor(entry.current_streak / 3) + 1)) // Calculate level from streak
+          };
         });
         setEngagementMap(map);
       } catch (err) {

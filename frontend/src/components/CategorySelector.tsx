@@ -68,8 +68,8 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
       
       try {
         const [catRes, diffRes] = await Promise.all([
-          axios.get('http://localhost:8000/api/engagement/categories'),
-          axios.get('http://localhost:8000/api/engagement/difficulties')
+          axios.get('http://127.0.0.1:8000/api/engagement/categories'),
+          axios.get('http://127.0.0.1:8000/api/engagement/difficulties')
         ]);
         
         if (catRes.data && catRes.data.length > 0) {

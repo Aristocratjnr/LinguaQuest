@@ -7,14 +7,14 @@ type ProgressBarProps = {
 };
 
 const ProgressBar: React.FC<ProgressBarProps> = ({ round, totalRounds }) => {
-  const progressPercent = Math.max(0, ((round - 1) / totalRounds) * 100);
+  const progressPercent = Math.min(100, (round / totalRounds) * 100);
   
   return (
     <div className="progress-container">
       {/* Round number indicator */}
       <div className="d-flex justify-content-between align-items-center mb-2">
         <span className="text-muted small fw-bold" style={{ color: '#58a700' }}>
-          Round {round} of {totalRounds}
+          Round {Math.min(round, totalRounds)} of {totalRounds}
         </span>
         <div className="round-indicator" style={{
           width: '24px',
@@ -64,9 +64,9 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ round, totalRounds }) => {
       {/* Round indicators with animation */}
       <div className="d-flex justify-content-between mt-3" style={{ position: 'relative', height: 40 }}>
         {Array.from({ length: totalRounds }).map((_, i) => {
-          const isCompleted = i < round - 1;
+          const isCompleted = i < round;
           const isCurrent = i === round - 1;
-          const isUpcoming = i > round - 1;
+          const isUpcoming = i >= round;
           return (
             <React.Fragment key={i}>
               {/* Animated Progress Dots */}

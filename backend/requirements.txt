@@ -12,4 +12,7 @@ torchaudio
 soundfile
 librosa
 numpy
-scipy 
+scipy
+sqlalchemy
+alembic
+python-multipart 

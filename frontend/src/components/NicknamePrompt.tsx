@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useActivityFeed } from './ActivityFeedContext';
-import axios from 'axios';
+import { useUser } from '../context/UserContext';
+import { userApi } from '../services/api';
 
 const MAX_LENGTH = 16;
 const MIN_LENGTH = 3;
@@ -18,6 +19,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
   const [feedback, setFeedback] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const { addActivity } = useActivityFeed();
+  const { createUser } = useUser();
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -32,18 +34,16 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
   // Validate nickname with backend
   const validateNickname = useCallback(async (name: string) => {
     try {
-      const res = await axios.get('http://localhost:8000/api/engagement/validate_username', { 
-        params: { nickname: name } 
-      });
+      const res = await userApi.validateUsername(name);
       
-      if (res.data.valid) {
+      if (res.valid) {
         setValid(true);
-        setFeedback(res.data.reason || 'Available!');
+        setFeedback(res.reason || 'Available!');
         setError('');
       } else {
         setValid(false);
         setFeedback('');
-        setError(res.data.reason || 'Nickname not available');
+        setError(res.reason || 'Nickname not available');
       }
     } catch {
       setValid(false);
@@ -129,30 +129,23 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
 
     setSubmitting(true);
     try {
-      // In a real app, you would upload the avatar file here
-      // const formData = new FormData();
-      // formData.append('nickname', trimmedNickname);
-      // if (avatarPreview) {
-      //   formData.append('avatar', /* your file data */);
-      // }
-      // const res = await axios.post('/api/user', formData);
+      // Create user in database
+      await createUser({
+        nickname: trimmedNickname,
+        avatar_url: avatarPreview || undefined
+      });
 
-      // For demo purposes, we'll just pass the preview URL
       addActivity({ 
         type: 'action', 
         message: `Profile created: ${trimmedNickname}` 
       });
       onConfirm(trimmedNickname, avatarPreview || '');
-    } catch (err) {
-      if (err && typeof err === 'object' && 'response' in err && (err as any).response?.data?.error) {
-        setError((err as any).response.data.error);
-      } else {
-        setError('Failed to create profile');
-      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to create profile');
     } finally {
       setSubmitting(false);
     }
-  }, [nickname, valid, avatarPreview, addActivity, onConfirm]);
+  }, [nickname, valid, avatarPreview, addActivity, onConfirm, createUser]);
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.slice(0, MAX_LENGTH);
@@ -179,7 +172,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+      background: 'linear-gradient(135deg, #58cc02 0%, #4CAF50 100%)',
       padding: '1rem',
       fontFamily: '"JetBrains Mono", monospace'
     }}>
@@ -204,7 +197,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         {/* Header */}
         <div style={{
           padding: '1.5rem',
-          background: 'linear-gradient(to right, #4f46e5, #6366f1)',
+          background: '#58cc02',
           textAlign: 'center',
           color: 'white'
         }}>
@@ -301,8 +294,8 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
               transition: 'all 0.2s',
               boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
               ...(valid && nickname.trim() ? {
-                borderColor: '#10b981',
-                boxShadow: '0 0 0 3px rgba(16, 185, 129, 0.1)'
+                borderColor: '#58cc02',
+                boxShadow: '0 0 0 3px rgba(88, 204, 2, 0.1)'
               } : {}),
               ...(error ? {
                 borderColor: '#ef4444',
@@ -382,7 +375,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      color: '#10b981'
+                      color: '#58cc02'
                     }}
                   >
                     <span className="material-icons" style={{ 
@@ -439,7 +432,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
               borderRadius: '0.5rem',
               border: 'none',
               background: valid ? 
-                'linear-gradient(to right, #4f46e5, #6366f1)' : 
+                '#58cc02' : 
                 '#e2e8f0',
               color: valid ? 'white' : '#94a3b8',
               fontSize: '1rem',
@@ -449,7 +442,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
               alignItems: 'center',
               justifyContent: 'center',
               boxShadow: valid ? 
-                '0 4px 6px -1px rgba(79, 70, 229, 0.3), 0 2px 4px -1px rgba(79, 70, 229, 0.1)' : 
+                '0 4px 0 #3caa3c' : 
                 'none',
               transition: 'all 0.2s'
             }}

@@ -23,6 +23,7 @@ import Engagement from './components/Engagement';
 import WelcomePage from './components/WelcomePage'; // Import the new WelcomePage component
 import SettingsPage from './components/SettingsPage';
 import { useSettings } from './context/SettingsContext';
+import { UserProvider, useUser } from './context/UserContext';
 import { motion } from 'framer-motion';
 
 
@@ -33,7 +34,7 @@ const LANGUAGES = [
   { code: 'ewe', label: 'Ewe' },
 ];
 const TOTAL_ROUNDS = 5;
-const ROUND_TIME = 30; // seconds
+const ROUND_TIME = 50; // seconds (increased from 30 to 50)
 
 const VOICE_COMMANDS = [
   { phrases: ['next', 'continue', 'proceed', 'suivant', 'weiter', 'siguiente', 'ɛdi so'], action: 'next', desc: 'Go to next round', icon: '⏭️' },
@@ -56,7 +57,7 @@ interface EvaluateResponse { persuaded: boolean; feedback: string; score: number
 interface DialogueResponse { ai_response: string; new_stance: string; }
 interface LeaderboardResponse { leaderboard: any[]; }
 
-function App() {
+function AppContent() {
   const [scenario, setScenario] = useState('');
   const [language, setLanguage] = useState('twi');
   const [aiStance, setAiStance] = useState('disagree');
@@ -98,7 +99,10 @@ function App() {
   const [showHelp, setShowHelp] = useState(false);
   const [voiceLang, setVoiceLang] = useState('twi'); // Default to Twi for voice commands
   const [showEngagement, setShowEngagement] = useState(false);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
   const { theme } = useSettings();
+  const { user, submitScore, startGameSession, endGameSession, incrementStreak, awardBadge } = useUser();
   // Theme-aware header background and avatar glow
   const headerBg = theme === 'dark' ? 'rgba(35, 41, 70, 0.98)' : 'rgba(255,255,255,0.95)';
   const headerColor = theme === 'dark' ? '#e0e7ff' : '#4f46e5';
@@ -140,7 +144,7 @@ function App() {
   const fetchScenario = async () => {
     setLoading(true);
     try {
-      const res = await axios.post<ScenarioResponse>('/scenario', { category, difficulty });
+      const res = await axios.post<ScenarioResponse>('http://127.0.0.1:8000/scenario', { category, difficulty });
       setScenario(res.data.scenario);
       setLanguage(res.data.language || 'twi');
       setAiStance('disagree');
@@ -175,7 +179,7 @@ function App() {
     if (!userArgument) return;
     setLoading(true);
     try {
-      const res = await axios.post<TranslationResponse>('/translate', {
+      const res = await axios.post<TranslationResponse>('http://127.0.0.1:8000/translate', {
         text: userArgument,
         src_lang: 'en',
         tgt_lang: language,
@@ -192,7 +196,7 @@ function App() {
     if (!userArgument) return;
     setLoading(true);
     try {
-      const res = await axios.post<EvaluateResponse>('/evaluate', {
+      const res = await axios.post<EvaluateResponse>('http://127.0.0.1:8000/evaluate', {
         argument: userArgument,
         tone,
       });
@@ -213,7 +217,7 @@ function App() {
   const handleDialogue = async () => {
     setLoading(true);
     try {
-      const res = await axios.post<DialogueResponse>('/dialogue', {
+      const res = await axios.post<DialogueResponse>('http://127.0.0.1:8000/dialogue', {
         scenario,
         user_argument: userArgument,
         ai_stance: aiStance,
@@ -322,6 +326,12 @@ function App() {
   useEffect(() => {
     if (roundResult === 'success') {
       setRoundWins(w => w + 1);
+      // Increment streak on success
+      if (user) {
+        incrementStreak().catch(error => {
+          console.error('Failed to increment streak:', error);
+        });
+      }
     }
     if (userArgument && roundResult === 'playing') {
       const words = userArgument.toLowerCase().split(/\W+/).filter(Boolean);
@@ -335,19 +345,40 @@ function App() {
       setAllPersuaded(true);
       setUniqueWords(new Set());
     }
-  }, [roundResult, userArgument, round]);
+  }, [roundResult, userArgument, round, user, incrementStreak]);
 
   // Unlock badges on game over
   useEffect(() => {
-    if (roundResult === 'gameover') {
+    if (roundResult === 'gameover' && user) {
       const unlocked: string[] = [];
       if (roundWins >= 3) unlocked.push('streak');
       if ((score ?? 0) >= 8) unlocked.push('highscore');
       if (uniqueWords.size >= 20) unlocked.push('creative');
       if (allPersuaded && round === TOTAL_ROUNDS + 1) unlocked.push('perfect');
       setBadges(unlocked);
+      
+      // Award badges in database
+      unlocked.forEach(async (badgeType) => {
+        try {
+          const badgeNames = {
+            streak: 'Streak Master',
+            highscore: 'High Scorer',
+            creative: 'Creative Thinker',
+            perfect: 'Perfect Player'
+          };
+          const badgeDescriptions = {
+            streak: 'Won 3 or more rounds in a game',
+            highscore: 'Achieved a high score of 8 or more',
+            creative: 'Used 20 or more unique words',
+            perfect: 'Persuaded AI in all rounds'
+          };
+          await awardBadge(badgeType, badgeNames[badgeType as keyof typeof badgeNames], badgeDescriptions[badgeType as keyof typeof badgeDescriptions]);
+        } catch (error) {
+          console.error(`Failed to award badge ${badgeType}:`, error);
+        }
+      });
     }
-  }, [roundResult, roundWins, score, uniqueWords, allPersuaded, round]);
+  }, [roundResult, roundWins, score, uniqueWords, allPersuaded, round, user, awardBadge]);
 
   // Handle nickname confirm
   const handleNicknameConfirm = (name: string) => {
@@ -374,24 +405,60 @@ function App() {
   };
 
   // Handle category confirm
-  const handleCategoryConfirm = (cat: string, diff: string) => {
+  const handleCategoryConfirm = async (cat: string, diff: string) => {
     setCategory(cat);
     setDifficulty(diff);
     setShowCategorySelector(false);
     setShowOnboarding(false);
+    
+    // Start game session
+    if (user) {
+      try {
+        const sessionId = await startGameSession({
+          category: cat,
+          difficulty: diff
+        });
+        setCurrentSessionId(sessionId);
+      } catch (error) {
+        console.error('Failed to start game session:', error);
+      }
+    }
   };
 
-  // Submit score on game over
+  // Submit score and end session on game over
   useEffect(() => {
-    if (roundResult === 'gameover' && nickname && score !== null) {
-      axios.post('/score', {
-        name: nickname,
-        score,
-        date: new Date().toISOString(),
-        avatar,
-      });
+    if (roundResult === 'gameover' && user && score !== null) {
+      const endGame = async () => {
+        try {
+          // Submit score
+          await submitScore({
+            score,
+            details: {
+              roundWins,
+              uniqueWords: uniqueWords.size,
+              allPersuaded,
+              badges: badges
+            }
+          });
+          
+          // End game session
+          if (currentSessionId) {
+            await endGameSession(currentSessionId, {
+              end_time: new Date().toISOString(),
+              total_score: score,
+              rounds_played: round,
+              status: 'completed'
+            });
+            setCurrentSessionId(null);
+          }
+        } catch (error) {
+          console.error('Failed to end game:', error);
+        }
+      };
+      
+      endGame();
     }
-  }, [roundResult, nickname, score, avatar]);
+  }, [roundResult, user, score, roundWins, uniqueWords, allPersuaded, badges, submitScore, currentSessionId, endGameSession, round]);
 
   // Play sound effects
   const playSuccess = () => audioSuccess.current && audioSuccess.current.play();
@@ -400,7 +467,11 @@ function App() {
 
   // Animate on round result
   useEffect(() => {
-    if (roundResult === 'success') playSuccess();
+    if (roundResult === 'success') {
+      playSuccess();
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3000);
+    }
     if (roundResult === 'fail') {
       playFail();
       setShake(true);
@@ -414,7 +485,7 @@ function App() {
     if (scenario && newLang !== 'en') {
       setLoading(true);
       try {
-        const res = await axios.post<TranslationResponse>('/translate', {
+        const res = await axios.post<TranslationResponse>('http://127.0.0.1:8000/translate', {
           text: scenario,
           src_lang: 'en', // or track the current scenario language if needed
           tgt_lang: newLang,
@@ -477,26 +548,104 @@ function App() {
       {/* Header */}
       <header className="container-fluid py-3 px-2 px-md-4 mb-3" style={{ background: headerBg, boxShadow: '0 2px 8px #0001', color: headerColor, borderRadius: 0 }}>
         <div className="d-flex align-items-center justify-content-between" style={{ minHeight: 48 }}>
-          <div className="d-flex align-items-center gap-2">
-            <span className="d-flex align-items-center justify-content-center me-2" style={{
-              width: 40, height: 40, borderRadius: 12,
-              backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9',
-              color: '#58a700', boxShadow: '0 2px 8px rgba(88,167,0,0.07)'
-            }}>
-              <img src={logo} alt="LinguaQuest Logo" style={{ height: 28, width: 28 }} />
-            </span>
-            <h1 className="fw-bold mb-0" style={{ fontSize: '1.3rem', color: headerColor, letterSpacing: '.01em' }}>LinguaQuest</h1>
-            <span className="badge px-3 py-1 d-flex align-items-center ms-2" style={{
-              backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9',
-              color: '#58a700', borderRadius: '12px', fontWeight: 600, fontSize: '0.85rem', letterSpacing: '.01em'
-            }}>
-              <i className="material-icons me-1" style={{ fontSize: '1rem' }}>psychology</i>
-              Language Game
-            </span>
+          <div className="d-flex align-items-center gap-3">
+            <div className="d-flex align-items-center gap-3">
+              <motion.div 
+                className="d-flex align-items-center justify-content-center" 
+                style={{
+                  width: 48, height: 48, borderRadius: 16,
+                  background: '#58cc02',
+                  boxShadow: '0 4px 12px rgba(88, 204, 2, 0.3)',
+                  border: '2px solid #3caa3c'
+                }}
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: 'spring', stiffness: 400 }}
+              >
+                <img src={logo} alt="LinguaQuest Logo" style={{ height: 32, width: 32 }} />
+              </motion.div>
+              <div className="d-flex flex-column">
+                <h1 className="fw-bold mb-0" style={{ 
+                  fontSize: '1.5rem', 
+                  color: headerColor, 
+                  letterSpacing: '1px',
+                  fontFamily: '"JetBrains Mono", monospace',
+                  textTransform: 'uppercase',
+                  lineHeight: '1.2'
+                }}>
+                  LINGUAQUEST
+                </h1>
+                <span className="badge px-3 py-1 d-flex align-items-center" style={{
+                  backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9',
+                  color: '#58cc02', 
+                  borderRadius: '12px', 
+                  fontWeight: 'bold', 
+                  fontSize: '0.75rem', 
+                  letterSpacing: '1px',
+                  fontFamily: '"JetBrains Mono", monospace',
+                  textTransform: 'uppercase',
+                  alignSelf: 'flex-start'
+                }}>
+                  <i className="material-icons me-1" style={{ fontSize: '0.9rem' }}>psychology</i>
+                  Language Game
+                </span>
+              </div>
+            </div>
           </div>
-          <span className="d-flex align-items-center justify-content-center" style={{ width: 44, height: 44, borderRadius: 12, background: theme === 'dark' ? '#232946' : '#e8f5e9', boxShadow: avatarGlow, border: '2px solid #764ba2' }}>
-            <img src={avatar} alt="User Avatar" className="rounded-circle" style={{ height: 36, width: 36, objectFit: 'cover', border: '2px solid #ffd700', background: '#fff' }} />
-          </span>
+          <div className="d-flex align-items-center gap-2">
+            <div className="d-flex flex-column align-items-end me-2">
+              <span className="fw-bold" style={{ 
+                fontSize: '0.9rem', 
+                color: headerColor, 
+                letterSpacing: '0.5px',
+                fontFamily: '"JetBrains Mono", monospace',
+                textTransform: 'uppercase'
+              }}>
+                {user?.nickname || nickname || 'Player'}
+              </span>
+              <span className="text-muted small" style={{ 
+                fontSize: '0.75rem',
+                letterSpacing: '0.5px',
+                fontFamily: '"JetBrains Mono", monospace'
+              }}>
+                Welcome Back!
+              </span>
+            </div>
+            <motion.div 
+              className="d-flex align-items-center justify-content-center position-relative" 
+              style={{ 
+                width: 48, 
+                height: 48, 
+                borderRadius: 16, 
+                background: theme === 'dark' ? '#232946' : '#e8f5e9', 
+                boxShadow: avatarGlow, 
+                border: '3px solid #58cc02',
+                overflow: 'hidden'
+              }}
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: 'spring', stiffness: 400 }}
+            >
+              <img 
+                src={user?.avatar_url || avatar} 
+                alt="User Avatar" 
+                style={{ 
+                  height: 42, 
+                  width: 42, 
+                  objectFit: 'cover',
+                  borderRadius: '12px'
+                }} 
+              />
+              <div className="position-absolute" style={{
+                bottom: -2,
+                right: -2,
+                width: 12,
+                height: 12,
+                borderRadius: '50%',
+                background: '#58cc02',
+                border: '2px solid white',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+              }} />
+            </motion.div>
+          </div>
         </div>
       </header>
 
@@ -783,6 +932,17 @@ function App() {
         </motion.div>
       )}
 
+      {/* Confetti */}
+      {showConfetti && (
+        <Confetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+          numberOfPieces={200}
+          colors={['#58cc02', '#ffd700', '#1cb0f6', '#ff6b6b', '#4ecdc4']}
+        />
+      )}
+
       {/* Audio elements */}
       <audio ref={audioSuccess} src={successSfx} preload="auto" />
       <audio ref={audioFail} src={failSfx} preload="auto" />
@@ -803,6 +963,14 @@ function App() {
         &copy; {new Date().getFullYear()} LinguaQuest. Developed by: Opuku Boakye Michael
       </footer>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <UserProvider>
+      <AppContent />
+    </UserProvider>
   );
 }
 
