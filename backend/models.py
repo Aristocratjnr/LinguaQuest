@@ -130,6 +130,8 @@ class GameSessionResponse(BaseModel):
 
 # Leaderboard Models
 class LeaderboardEntry(BaseModel):
+    """Leaderboard entry for a user, including stats, badges, favorite language, and rank."""
+    rank: int
     nickname: str
     avatar: Optional[str] = None
     total_score: int
@@ -139,6 +141,8 @@ class LeaderboardEntry(BaseModel):
     longest_streak: int
     badges_count: int
     last_activity: datetime
+    favorite_language: str
+    level: int
 
 # User Stats Models
 class UserStats(BaseModel):

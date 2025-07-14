@@ -72,13 +72,14 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
   };
 
   return (
-    <div className="container-fluid d-flex align-items-center justify-content-center min-vh-100 px-2 px-sm-3 px-md-4" 
-         style={{ 
-           background: 'linear-gradient(135deg, #58cc02 0%, #4CAF50 100%)',
+    <div className="welcome-container container-fluid d-flex align-items-center justify-content-center min-vh-100 px-2 px-sm-3 px-md-4"
+         style={{
+           background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))',
            backgroundAttachment: 'fixed',
            overflow: 'hidden',
            margin: 0,
            width: 'auto',
+           color: 'var(--text-dark, #222)'
          }}>
       {/* Animated background elements */}
       <motion.div 
@@ -100,10 +101,10 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
       />
       
       <motion.div 
-        className="card shadow-lg mx-3 my-4 position-relative"
+        className="welcome-card shadow-lg mx-3 my-4 position-relative"
         style={{ 
           maxWidth: 500, 
-         width: '95%',
+          width: '95%',
           minWidth: 600, 
           borderRadius: '24px',
           overflow: 'hidden',
@@ -113,7 +114,9 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           backdropFilter: 'blur(4px)',
           marginRight: '0.9rem',
           marginLeft: '0.9rem',
-          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)' 
+          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+          background: 'var(--duo-card, #fff)',
+          color: 'inherit'
         }}
         initial={{ opacity: 0, y: 32 }}
         animate={{ opacity: 1, y: 0 }}
@@ -166,7 +169,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
             style={{ 
               letterSpacing: '-0.02em',
               fontSize: 'clamp(1.5rem, 5vw, 1.75rem)',
-              color: '#1f2937',
+              color: 'var(--text-dark, #222)',
               textShadow: '0 1px 2px rgba(0,0,0,0.05)'
             }}
             initial={{ opacity: 0, y: -10 }}
@@ -181,7 +184,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
               fontSize: 'clamp(0.9rem, 3vw, 1rem)', 
               letterSpacing: '0.01em',
               fontWeight: 500,
-              color: '#6b7280'
+              color: 'var(--text-dark, #6b7280)'
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -236,7 +239,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
                   style={{ 
                     fontSize: 'clamp(1.25rem, 5vw, 1.5rem)', 
                     fontWeight: 700, 
-                    color: '#1f2937',
+                    color: 'var(--text-dark, #222)',
                     marginBottom: 'clamp(0.75rem, 2vw, 1rem)',
                     letterSpacing: '-0.01em',
                     lineHeight: 1.3,
@@ -252,7 +255,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
                 <motion.p 
                   style={{ 
                     fontSize: 'clamp(0.95rem, 3vw, 1.1rem)', 
-                    color: '#4b5563',
+                    color: 'var(--text-dark, #4b5563)',
                     lineHeight: 1.6,
                     maxWidth: '90%',
                     letterSpacing: '0.01em',
@@ -362,7 +365,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
                 pointerEvents: currentSlide === 0 ? 'none' : 'auto',
                 minWidth: 'clamp(90px, 25vw, 100px)',
                 borderColor: '#d1d5db',
-                color: '#4b5563',
+                color: 'var(--text-dark, #4b5563)',
                 gap: '4px',
                 fontWeight: 'bold',
                 backgroundColor: 'rgba(255,255,255,0.7)',
@@ -391,7 +394,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
                   minWidth: 'clamp(90px, 25vw, 100px)',
                   gap: '4px',
                   boxShadow: '0 4px 0 #3caa3c',
-                  color: 'white',
+                  color: 'var(--text-light, #e0e7ff)',
                   fontWeight: 'bold',
                   padding: '0.375rem 0.75rem',
                   textTransform: 'uppercase'
@@ -419,7 +422,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
              style={{ 
                background: 'transparent',
                fontSize: 'clamp(0.75rem, 3vw, 0.8rem)',
-               color: '#6b7280',
+               color: 'var(--text-dark, #6b7280)',
                borderTop: '1px solid rgba(0, 0, 0, 0.05)'
              }}>
           <motion.span 
@@ -453,6 +456,27 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           </motion.button>
         </div>
       </motion.div>
+      <style>{`
+        .dark .welcome-container, body.dark .welcome-container {
+          color: var(--text-light, #e0e7ff) !important;
+        }
+        .dark .welcome-card, body.dark .welcome-card {
+          color: var(--text-light, #e0e7ff) !important;
+          background: var(--duo-card, #232946) !important;
+        }
+        .dark .welcome-card h1, .dark .welcome-card h2, .dark .welcome-card p, .dark .welcome-card .btn, .dark .welcome-card .card-footer, body.dark .welcome-card h1, body.dark .welcome-card h2, body.dark .welcome-card p, body.dark .welcome-card .btn, body.dark .welcome-card .card-footer {
+          color: var(--text-light, #e0e7ff) !important;
+        }
+        .dark .welcome-card .btn-primary, body.dark .welcome-card .btn-primary {
+          background: var(--duo-green, #58cc02) !important;
+          color: var(--text-light, #e0e7ff) !important;
+        }
+        .dark .welcome-card .btn-outline-secondary, body.dark .welcome-card .btn-outline-secondary {
+          color: var(--text-light, #e0e7ff) !important;
+          border-color: #a5b4fc !important;
+          background: rgba(35,41,70,0.7) !important;
+        }
+      `}</style>
     </div>
   );
 };

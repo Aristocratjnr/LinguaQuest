@@ -178,7 +178,9 @@ const AIResponse: React.FC<AIResponseProps> = ({
           transition={{ duration: 0.3, delay: 0.1 }}
           style={{ 
             backgroundColor: '#e8f5e9',
-            borderLeft: '4px solid #58a700'
+            borderRadius: '16px',
+            // Removed borderLeft
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
           }}
         >
           <div className="d-flex align-items-center justify-content-center mt-1" style={{
@@ -193,7 +195,7 @@ const AIResponse: React.FC<AIResponseProps> = ({
           </div>
           <div>
             <div className="fw-bold mb-1" style={{ color: '#58a700' }}>Current Stance:</div>
-            <div style={{ color: '#333' }}>{newStance}</div>
+            <div style={{ color: '#6c757d', fontSize: '0.92rem', fontWeight: 400 }}>{newStance}</div>
           </div>
         </motion.div>
       )}

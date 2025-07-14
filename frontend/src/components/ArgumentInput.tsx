@@ -195,7 +195,9 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
           transition={{ duration: 0.3 }}
           style={{ 
             backgroundColor: '#e8f5e9',
-            borderLeft: '4px solid #58a700'
+            borderRadius: '16px',
+            // Removed borderLeft
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
           }}
         >
           <div className="d-flex align-items-start gap-2">
@@ -211,7 +213,7 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
             </div>
             <div>
               <div className="fw-bold mb-1" style={{ color: '#58a700' }}>Translation:</div>
-              <p className="mb-0" style={{ lineHeight: 1.5, color: '#333' }}>{translation}</p>
+              <p className="mb-0" style={{ lineHeight: 1.5, color: '#6c757d', fontSize: '0.92rem', fontWeight: 400 }}>{translation}</p>
             </div>
           </div>
         </motion.div>

@@ -57,7 +57,6 @@ const Scenario: React.FC<ScenarioProps> = ({
     {/* Scenario content box */}
     <div className="p-4 mb-4 rounded-3" style={{ 
       backgroundColor: '#f8f9fa',
-      borderLeft: '4px solid #58a700',
       boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
     }}>
       {loading ? (
@@ -135,7 +134,11 @@ const Scenario: React.FC<ScenarioProps> = ({
     {/* Help text */}
     <div className="text-muted small mt-3 d-flex align-items-center" style={{ 
       color: '#6c757d',
-      fontSize: '0.8rem'
+      fontSize: '0.8rem',
+      background: '#f8f9fa',
+      borderRadius: '16px',
+      padding: '10px 16px',
+      marginTop: '12px'
     }}>
       <span className="d-flex align-items-center justify-content-center me-2" style={{
         width: '20px',
@@ -146,7 +149,7 @@ const Scenario: React.FC<ScenarioProps> = ({
       }}>
         <i className="material-icons" style={{ fontSize: '0.9rem' }}>info</i>
       </span>
-      Switch languages to practice different linguistic contexts
+      <span style={{ color: '#6c757d', fontSize: '0.92rem', fontWeight: 400 }}>Switch languages to practice different linguistic contexts</span>
     </div>
   </motion.div>
 );

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from database import get_db
-from models import ScoreCreate, ScoreResponse, GameSessionCreate, GameSessionUpdate, GameSessionResponse
+from models import ScoreCreate, ScoreResponse, GameSessionCreate, GameSessionUpdate, GameSessionResponse, LeaderboardEntry
 from crud import (
     create_score, get_user_scores, get_user_highest_score, get_leaderboard,
     create_game_session, update_game_session, get_game_session,
@@ -46,11 +46,23 @@ def get_user_best_score(nickname: str, db: Session = Depends(get_db)):
     
     return score
 
-@router.get("/leaderboard")
-def get_leaderboard_data(limit: int = Query(100, ge=1, le=500), db: Session = Depends(get_db)):
-    """Get leaderboard data"""
-    leaderboard = get_leaderboard(db, limit)
-    return {"leaderboard": leaderboard}
+@router.get("/leaderboard", response_model=List[LeaderboardEntry])
+def get_leaderboard_data(
+    limit: int = Query(100, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+    sort_by: str = Query('score', regex='^(score|streak|level)$'),
+    sort_dir: str = Query('desc', regex='^(asc|desc)$'),
+    db: Session = Depends(get_db)
+):
+    """
+    Get leaderboard data.
+    - limit: max number of entries to return
+    - offset: number of entries to skip (for pagination)
+    - sort_by: field to sort by ('score', 'streak', 'level')
+    - sort_dir: sort direction ('asc' or 'desc')
+    """
+    leaderboard = get_leaderboard(db, limit=limit, offset=offset, sort_by=sort_by, sort_dir=sort_dir)
+    return leaderboard
 
 @router.post("/sessions", response_model=GameSessionResponse)
 def start_game_session(session: GameSessionCreate, nickname: str = Query(...), db: Session = Depends(get_db)):

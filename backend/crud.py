@@ -91,16 +91,18 @@ def get_user_highest_score(db: Session, user_id: int) -> Optional[UserScore]:
         UserScore.user_id == user_id
     ).order_by(desc(UserScore.score)).first()
 
-def get_leaderboard(db: Session, limit: int = 100) -> List[Dict[str, Any]]:
-    """Get leaderboard with user stats"""
+def get_leaderboard(db: Session, limit: int = 100, offset: int = 0, sort_by: str = 'score', sort_dir: str = 'desc') -> List[Dict[str, Any]]:
+    """Get leaderboard with user stats, badges, favorite language, and support for sorting/pagination"""
     subquery = db.query(
         UserScore.user_id,
         func.sum(UserScore.score).label('total_score'),
         func.max(UserScore.score).label('highest_score'),
         func.count(UserScore.id).label('games_played')
     ).group_by(UserScore.user_id).subquery()
-    
-    result = db.query(
+
+    # Join user, streak, and aggregate score
+    query = db.query(
+        User.id,
         User.nickname,
         User.avatar,
         subquery.c.total_score,
@@ -111,10 +113,41 @@ def get_leaderboard(db: Session, limit: int = 100) -> List[Dict[str, Any]]:
         User.last_login.label('last_activity')
     ).join(subquery, User.id == subquery.c.user_id).join(
         UserStreak, User.id == UserStreak.user_id
-    ).order_by(desc(subquery.c.total_score)).limit(limit).all()
-    
-    return [
-        {
+    )
+
+    # Sorting
+    if sort_by == 'score':
+        order = subquery.c.total_score
+    elif sort_by == 'streak':
+        order = UserStreak.current_streak
+    elif sort_by == 'level':
+        # Level is derived from streak
+        order = func.min(10, func.max(1, (UserStreak.current_streak // 3) + 1))
+    else:
+        order = subquery.c.total_score
+    if sort_dir == 'asc':
+        query = query.order_by(order.asc())
+    else:
+        query = query.order_by(order.desc())
+
+    # Pagination
+    query = query.offset(offset).limit(limit)
+    result = query.all()
+
+    leaderboard = []
+    for idx, row in enumerate(result):
+        # Get badges_count and favorite_language
+        badges_count = len(get_user_badges(db, row.id))
+        # Favorite language: get all scores for user
+        scores = get_user_scores(db, row.id, limit=1000)
+        language_counts = {}
+        for score in scores:
+            language_counts[score.language] = language_counts.get(score.language, 0) + 1
+        favorite_language = max(language_counts.items(), key=lambda x: x[1])[0] if language_counts else "twi"
+        # Level from streak
+        level = min(10, max(1, (row.current_streak // 3) + 1))
+        leaderboard.append({
+            "rank": offset + idx + 1,
             "nickname": row.nickname,
             "avatar": row.avatar,
             "total_score": row.total_score,
@@ -122,10 +155,12 @@ def get_leaderboard(db: Session, limit: int = 100) -> List[Dict[str, Any]]:
             "games_played": row.games_played,
             "current_streak": row.current_streak,
             "longest_streak": row.longest_streak,
-            "last_activity": row.last_activity
-        }
-        for row in result
-    ]
+            "last_activity": row.last_activity,
+            "badges_count": badges_count,
+            "favorite_language": favorite_language,
+            "level": level
+        })
+    return leaderboard
 
 # Streak CRUD operations
 def get_user_streak(db: Session, user_id: int) -> Optional[UserStreak]:

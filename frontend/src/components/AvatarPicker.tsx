@@ -4,6 +4,7 @@ import avatar1 from '../assets/images/boy.png';
 import avatar2 from '../assets/images/woman.jpg';
 import avatar3 from '../assets/images/programmer.jpg';
 import avatar4 from '../assets/images/avatar.jpg';
+import LogicFlowStepper from './LogicFlowStepper';
 
 const AVATARS = [avatar1, avatar2, avatar3, avatar4];
 
@@ -21,23 +22,26 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
   };
 
   return (
-    <div style={{
+    <div className="avatar-picker-container" style={{
       minHeight: '100vh',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'linear-gradient(135deg, #58cc02 0%, #4CAF50 100%)',
+      background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))',
       padding: '1rem',
-      fontFamily: '"JetBrains Mono", monospace'
+      fontFamily: '"JetBrains Mono", monospace',
+      color: 'var(--text-dark, #222)'
     }}>
-      <motion.div
+      <motion.div 
+        className="avatar-picker-card"
         style={{
           width: '100%',
           maxWidth: '32rem',
-          background: 'white',
+          background: 'var(--duo-card, #fff)',
           borderRadius: '1.25rem',
           overflow: 'hidden',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          color: 'inherit'
         }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -47,12 +51,20 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
           damping: 20
         }}
       >
+        {/* Stepper */}
+        <div style={{ marginTop: '1.2rem', marginBottom: '1.2rem' }}>
+          <LogicFlowStepper steps={[
+            { label: 'Nickname', icon: 'person' },
+            { label: 'Avatar', icon: 'face' },
+            { label: 'Login', icon: 'login' }
+          ]} currentStep={1} />
+        </div>
         {/* Header */}
         <div style={{
           padding: '1.5rem',
-          background: '#58cc02',
+          background: ' #ffffff',
           textAlign: 'center',
-          color: 'white'
+          color: 'var(--text-light, #e0e7ff)'
         }}>
           <motion.div
             initial={{ scale: 0.9 }}
@@ -75,14 +87,16 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
               margin: 0,
               fontSize: '1.5rem',
               fontWeight: 700,
-              letterSpacing: '-0.025em'
+              letterSpacing: '-0.025em',
+              color: 'var(--text-light, #e0e7ff)'
             }}>
               Choose Your Avatar
             </h2>
             <p style={{
               margin: '0.5rem 0 0',
               opacity: 0.9,
-              fontSize: '0.875rem'
+              fontSize: '0.875rem',
+              color: 'var(--text-dark, #222)'
             }}>
               Select an image that represents you
             </p>
@@ -167,9 +181,9 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
               borderRadius: '0.5rem',
               border: 'none',
               background: selected ? 
-                '#58cc02' : 
+                'var(--duo-green, #58cc02)' : 
                 '#e2e8f0',
-              color: selected ? 'white' : '#94a3b8',
+              color: selected ? 'var(--text-light, #e0e7ff)' : '#94a3b8',
               fontSize: '1rem',
               fontWeight: 600,
               cursor: selected ? 'pointer' : 'not-allowed',
@@ -214,7 +228,7 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
           borderTop: '1px solid #e2e8f0',
           textAlign: 'center',
           fontSize: '0.75rem',
-          color: '#64748b'
+          color: 'var(--text-dark, #64748b)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span className="material-icons" style={{ 
@@ -254,6 +268,17 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
           direction: ltr;
           -webkit-font-feature-settings: 'liga';
           -webkit-font-smoothing: antialiased;
+        }
+      `}</style>
+      <style>{`
+        .dark .avatar-picker-container, body.dark .avatar-picker-container {
+          color: var(--text-light, #e0e7ff) !important;
+        }
+        .dark .avatar-picker-card, body.dark .avatar-picker-card {
+          color: var(--text-light, #e0e7ff) !important;
+        }
+        .dark .avatar-picker-card p, body.dark .avatar-picker-card p {
+          color: var(--text-light, #e0e7ff) !important;
         }
       `}</style>
     </div>

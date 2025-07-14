@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useActivityFeed } from './ActivityFeedContext';
 import { useUser } from '../context/UserContext';
 import { userApi } from '../services/api';
+import LogicFlowStepper from './LogicFlowStepper';
 
 const MAX_LENGTH = 16;
 const MIN_LENGTH = 3;
@@ -172,19 +173,21 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'linear-gradient(135deg, #58cc02 0%, #4CAF50 100%)',
+      background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))',
       padding: '1rem',
-      fontFamily: '"JetBrains Mono", monospace'
+      fontFamily: '"JetBrains Mono", monospace',
+      color: 'var(--text-dark, #222)'
     }}>
       <motion.div 
         className="nickname-card"
         style={{
           width: '100%',
           maxWidth: '28rem',
-          background: 'white',
+          background: 'var(--duo-card, #fff)',
           borderRadius: '1rem',
           overflow: 'hidden',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          color: 'inherit'
         }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -194,12 +197,18 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           damping: 20
         }}
       >
+        {/* Stepper */}
+        <LogicFlowStepper steps={[
+          { label: 'Nickname', icon: 'person' },
+          { label: 'Avatar', icon: 'face' },
+          { label: 'Login', icon: 'login' }
+        ]} currentStep={0} />
         {/* Header */}
         <div style={{
           padding: '1.5rem',
-          background: '#58cc02',
+          background: '#ffffff',
           textAlign: 'center',
-          color: 'white'
+          color: 'var(--text-light, #e0e7ff)'
         }}>
           <motion.div
             initial={{ scale: 0.9 }}
@@ -267,14 +276,16 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
               margin: 0,
               fontSize: '1.5rem',
               fontWeight: 700,
-              letterSpacing: '-0.025em'
+              letterSpacing: '-0.025em',
+              color: 'var(--text-light, #e0e7ff'
             }}>
               Create Your Profile
             </h2>
             <p style={{
               margin: '0.5rem 0 0',
               opacity: 0.9,
-              fontSize: '0.875rem'
+              fontSize: '0.875rem',
+              color: 'var(--text-dark, #222)'
             }}>
               Choose a nickname and profile picture
             </p>
@@ -330,7 +341,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                   outline: 'none',
                   fontSize: '1rem',
                   fontFamily: '"JetBrains Mono", monospace',
-                  color: '#1e293b'
+                  color: 'var(--text-dark, #222)'
                 }}
               />
             </div>
@@ -432,9 +443,9 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
               borderRadius: '0.5rem',
               border: 'none',
               background: valid ? 
-                '#58cc02' : 
+                'var(--duo-green, #58cc02)' : 
                 '#e2e8f0',
-              color: valid ? 'white' : '#94a3b8',
+              color: valid ? 'var(--text-light, #e0e7ff)' : '#94a3b8',
               fontSize: '1rem',
               fontWeight: 600,
               cursor: valid ? 'pointer' : 'not-allowed',
@@ -479,7 +490,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           borderTop: '1px solid #e2e8f0',
           textAlign: 'center',
           fontSize: '0.75rem',
-          color: '#64748b'
+          color: 'var(--text-dark, #64748b)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span className="material-icons" style={{ 
@@ -519,6 +530,19 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           direction: ltr;
           -webkit-font-feature-settings: 'liga';
           -webkit-font-smoothing: antialiased;
+        }
+        .dark .nickname-prompt-container, body.dark .nickname-prompt-container {
+          color: var(--text-light, #e0e7ff) !important;
+        }
+        .dark .nickname-card, body.dark .nickname-card {
+          color: var(--text-light, #e0e7ff) !important;
+        }
+        .dark .nickname-card input, body.dark .nickname-card input {
+          color: var(--text-light, #e0e7ff) !important;
+          background: transparent !important;
+        }
+        .dark .nickname-card p, body.dark .nickname-card p {
+          color: var(--text-light, #e0e7ff) !important;
         }
       `}</style>
     </div>

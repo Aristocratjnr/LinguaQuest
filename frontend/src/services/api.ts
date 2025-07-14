@@ -128,12 +128,18 @@ export interface UserStats {
 }
 
 export interface LeaderboardEntry {
+  rank: number;
   nickname: string;
-  avatar_url?: string;
+  avatar?: string;
   total_score: number;
+  highest_score: number;
   games_played: number;
   current_streak: number;
-  highest_score: number;
+  longest_streak: number;
+  badges_count: number;
+  last_activity: string;
+  favorite_language: string;
+  level: number;
 }
 
 // User API
@@ -196,8 +202,15 @@ export const gameApi = {
   },
 
   // Get leaderboard
-  getLeaderboard: async (limit: number = 100): Promise<{ leaderboard: LeaderboardEntry[] }> => {
-    const response = await api.get(`/leaderboard?limit=${limit}`);
+  getLeaderboard: async (
+    limit: number = 100,
+    offset: number = 0,
+    sortBy: 'score' | 'streak' | 'level' = 'score',
+    sortDir: 'asc' | 'desc' = 'desc'
+  ): Promise<LeaderboardEntry[]> => {
+    const response = await api.get(
+      `/leaderboard?limit=${limit}&offset=${offset}&sort_by=${sortBy}&sort_dir=${sortDir}`
+    );
     return response.data;
   },
 

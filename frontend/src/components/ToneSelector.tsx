@@ -119,8 +119,12 @@ const ToneSelector: React.FC<ToneSelectorProps> = ({ tone, onChange, loading, di
 
       {/* Tip Box */}
       <div className="p-3 rounded-3 d-flex align-items-start gap-3" style={{ 
-        backgroundColor: '#e8f5e9',
-        borderLeft: '4px solid #58a700'
+        backgroundColor: '#f8f9fa',
+        borderRadius: '16px',
+        // Removed borderLeft
+        // Add subtle box shadow for separation
+        boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+        marginTop: '12px'
       }}>
         <div className="d-flex align-items-center justify-content-center mt-1" style={{
           width: '24px',
@@ -134,7 +138,7 @@ const ToneSelector: React.FC<ToneSelectorProps> = ({ tone, onChange, loading, di
         </div>
         <div>
           <div className="fw-bold mb-1" style={{ color: '#58a700' }}>Pro Tip:</div>
-          <p className="mb-0 small" style={{ color: '#333' }}>
+          <p className="mb-0" style={{ color: '#6c757d', fontSize: '0.92rem', fontWeight: 400 }}>
             Your communication style affects how your argument is perceived. 
             Choose one that best fits your persuasive strategy.
           </p>

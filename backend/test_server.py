@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import re
+from ai_service import ai_service
 
 app = FastAPI()
 
@@ -102,50 +103,222 @@ def get_leaderboard_legacy():
 
 @app.post("/scenario")
 def get_scenario(request: dict | None = None):
-    """Get a scenario based on category and difficulty"""
-    # Generate different scenarios based on category and difficulty
+    """Get a random scenario based on category and difficulty"""
+    import random
     category = request.get("category", "daily") if request else "daily"
     difficulty = request.get("difficulty", "beginner") if request else "beginner"
-    
+
     scenarios = {
         "daily": {
-            "beginner": "Convince your friend to join you for morning exercise.",
-            "intermediate": "Persuade your colleague to try a new healthy lunch spot.",
-            "advanced": "Convince your family to adopt a more sustainable lifestyle."
+            "beginner": [
+                "Convince your friend to join you for morning exercise.",
+                "Persuade your sibling to help with household chores.",
+                "Encourage your neighbor to recycle more often."
+            ],
+            "intermediate": [
+                "Persuade your colleague to try a new healthy lunch spot.",
+                "Convince your roommate to start a weekly cleaning schedule.",
+                "Encourage your friend to take up a new hobby with you."
+            ],
+            "advanced": [
+                "Convince your family to adopt a more sustainable lifestyle.",
+                "Persuade your community group to organize a charity event.",
+                "Encourage your friends to participate in a local marathon."
+            ]
         },
         "business": {
-            "beginner": "Convince your manager to approve a team building activity.",
-            "intermediate": "Persuade stakeholders to invest in a new project idea.",
-            "advanced": "Convince the board to implement a major company restructuring."
+            "beginner": [
+                "Convince your manager to approve a team building activity.",
+                "Persuade a coworker to swap shifts with you.",
+                "Encourage your team to use a new productivity tool."
+            ],
+            "intermediate": [
+                "Persuade stakeholders to invest in a new project idea.",
+                "Convince your boss to let you lead a meeting.",
+                "Encourage your department to adopt flexible work hours."
+            ],
+            "advanced": [
+                "Convince the board to implement a major company restructuring.",
+                "Persuade your company to expand into a new market.",
+                "Encourage executives to invest in employee wellness programs."
+            ]
         },
         "social": {
-            "beginner": "Convince your friend to try a new restaurant.",
-            "intermediate": "Persuade your group to watch a movie you recommend.",
-            "advanced": "Convince your community to support a local initiative."
+            "beginner": [
+                "Convince your friend to try a new restaurant.",
+                "Persuade your group to play a board game.",
+                "Encourage your friends to go on a weekend trip."
+            ],
+            "intermediate": [
+                "Persuade your group to watch a movie you recommend.",
+                "Convince your friends to volunteer at a local shelter.",
+                "Encourage your club to host a themed party."
+            ],
+            "advanced": [
+                "Convince your community to support a local initiative.",
+                "Persuade your friends to start a book club.",
+                "Encourage your neighborhood to organize a clean-up day."
+            ]
         },
         "academic": {
-            "beginner": "Convince your classmate to join a study group.",
-            "intermediate": "Persuade your professor to extend a deadline.",
-            "advanced": "Convince the school administration to implement a new program."
+            "beginner": [
+                "Convince your classmate to join a study group.",
+                "Persuade your friend to attend a workshop with you.",
+                "Encourage your peer to participate in a school competition."
+            ],
+            "intermediate": [
+                "Persuade your professor to extend a deadline.",
+                "Convince your classmates to collaborate on a project.",
+                "Encourage your study group to try a new learning method."
+            ],
+            "advanced": [
+                "Convince the school administration to implement a new program.",
+                "Persuade your department to fund a research trip.",
+                "Encourage your university to host an international conference."
+            ]
         }
     }
-    
-    # Get scenario based on category and difficulty, with fallbacks
-    scenario = scenarios.get(category, scenarios["daily"]).get(difficulty, scenarios["daily"]["beginner"])
-    
+
+    # Get a random scenario for the selected category and difficulty
+    category_dict = scenarios.get(category, scenarios["daily"])
+    scenario_list = category_dict.get(difficulty, category_dict["beginner"])
+    scenario = random.choice(scenario_list)
+
     return {"scenario": scenario, "language": "twi"}
 
 @app.post("/translate")
 def translate_text(request: dict):
-    return {"translated_text": request.get("text", "")}
+    """Translate text to the target language (simplified)"""
+    text = request.get("text", "")
+    src_lang = request.get("src_lang", "en")
+    tgt_lang = request.get("tgt_lang", "twi")
+    
+    # Simple translation mapping for demonstration
+    # In a real implementation, this would use a proper translation service
+    translations = {
+        "hello": "ɛte sɛn",
+        "good": "yɛ",
+        "bad": "bone",
+        "yes": "aane",
+        "no": "daabi",
+        "please": "yɛ ma wo",
+        "thank you": "meda wo ase",
+        "sorry": "kafra",
+        "help": "boa",
+        "work": "adwuma",
+        "friend": "adamfo",
+        "family": "abusua",
+        "time": "bere",
+        "money": "sika",
+        "food": "aaduan",
+        "water": "nsu",
+        "house": "fie",
+        "car": "kaa",
+        "book": "nhoma",
+        "school": "sukuu",
+        "teacher": "kyerɛkyerɛfo",
+        "student": "sukuufo",
+        "study": "sua",
+        "learn": "sua",
+        "understand": "te ase",
+        "think": "dwen",
+        "know": "nim",
+        "want": "pɛ",
+        "need": "hia",
+        "can": "tumi",
+        "will": "bɛ",
+        "should": "ɛsɛ",
+        "must": "ɛsɛ",
+        "because": "ɛfiri sɛ",
+        "therefore": "ɛno nti",
+        "however": "nanso",
+        "although": "ɛwom sɛ",
+        "but": "nanso",
+        "and": "ne",
+        "or": "anaa",
+        "if": "sɛ",
+        "when": "bere a",
+        "where": "bea a",
+        "why": "ɛden nti",
+        "how": "sɛnea",
+        "what": "deɛn",
+        "who": "hwan",
+        "which": "deɛn",
+        "exercise": "adwuma",
+        "health": "yare",
+        "healthy": "yare",
+        "benefit": "mfaso",
+        "advantage": "mfaso",
+        "improve": "yɛ yie",
+        "support": "boa",
+        "evidence": "adanse",
+        "research": "hwɛ",
+        "study": "sua",
+        "experience": "nyansahu",
+        "together": "ka ho",
+        "community": "kurom",
+        "future": "daakye",
+        "growth": "kɔ so",
+        "success": "yɛ yie",
+        "positive": "yɛ",
+        "impact": "nsɛm"
+    }
+    
+    # Simple word-by-word translation
+    words = text.lower().split()
+    translated_words = []
+    
+    for word in words:
+        # Clean the word (remove punctuation)
+        clean_word = ''.join(c for c in word if c.isalnum())
+        if clean_word in translations:
+            translated_words.append(translations[clean_word])
+        else:
+            # For unknown words, keep the original or add a placeholder
+            translated_words.append(f"[{clean_word}]")
+    
+    translated_text = " ".join(translated_words)
+    
+    # If no translations found, return a placeholder
+    if translated_text == text or not translated_words:
+        translated_text = f"[Translated to {tgt_lang.upper()}: {text}]"
+    
+    return {"translated_text": translated_text}
 
 @app.post("/evaluate")
 def evaluate_argument(request: dict):
-    return {"persuaded": True, "feedback": "Good argument!", "score": 8}
+    """Evaluate the persuasiveness of an argument using AI"""
+    argument = request.get("argument", "")
+    tone = request.get("tone", "polite")
+    scenario = request.get("scenario", "General persuasion scenario")
+    
+    # Use AI service for evaluation
+    result = ai_service.evaluate_argument(argument, tone, scenario)
+    
+    return {
+        "persuaded": result["persuaded"],
+        "feedback": result["feedback"],
+        "score": result["score"],
+        "strengths": result.get("strengths", []),
+        "suggestions": result.get("suggestions", [])
+    }
 
 @app.post("/dialogue")
 def dialogue(request: dict):
-    return {"ai_response": "I agree with you!", "new_stance": "agree"}
+    """Generate AI dialogue response based on scenario and user argument"""
+    scenario = request.get("scenario", "")
+    user_argument = request.get("user_argument", "")
+    ai_stance = request.get("ai_stance", "disagree")
+    language = request.get("language", "twi")
+    
+    # Use AI service for dialogue generation
+    result = ai_service.generate_dialogue_response(scenario, user_argument, ai_stance, language)
+    
+    return {
+        "ai_response": result["ai_response"],
+        "new_stance": result["new_stance"],
+        "reasoning": result.get("reasoning", "")
+    }
 
 # Game options and categories endpoints
 @app.get("/api/v1/game/categories")

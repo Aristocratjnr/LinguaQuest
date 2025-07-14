@@ -90,22 +90,25 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
   };
 
   return (
-    <div style={{
+    <div className="engagement-container" style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #58cc02 0%, #4CAF50 100%)',
+      background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))',
       padding: getSpacing(16, 20, 24),
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
       fontFamily: '"JetBrains Mono", "Courier New", monospace',
+      color: 'var(--text-dark, #222)'
     }}>
       <motion.div 
+        className="engagement-card"
         style={{
           width: `${cardWidth}px`,
-          background: 'white',
+          background: 'var(--duo-card, #fff)',
           borderRadius: '16px',
           overflow: 'hidden',
           boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+          color: 'inherit'
         }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -113,7 +116,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
       >
        {/* Header with mascot - Updated Avatar Section */}
 <div style={{
-  background: '#58cc02',
+  background: 'var(--duo-green, #58cc02)',
   padding: getSpacing(12, 16, 24),
   display: 'flex',
   flexDirection: 'column',
@@ -129,7 +132,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
     style={{
       width: isSmallMobile ? '80px' : '100px',
       height: isSmallMobile ? '80px' : '100px',
-      background: 'white',
+      background: 'var(--duo-card, #fff)',
       borderRadius: '50%',
       display: 'flex',
       justifyContent: 'center',
@@ -177,17 +180,19 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
     textAlign: 'center'
   }}>
     <h1 style={{
-      color: 'white',
+      color: '#ffff',
+      fontWeight: 900,
       marginBottom: '12px',
       fontSize: getFontSize(18, 22, 26),
-      fontWeight: 'bold',
       letterSpacing: '-0.5px',
-      lineHeight: '1.2'
+      lineHeight: '1.2',
+      textShadow: '0 2px 8px rgba(28,176,246,0.10)'
     }}>
        WELCOME, {nickname.toUpperCase()}!
     </h1>
     <p style={{
-      color: 'rgba(255,255,255,0.9)',
+      color: '#222',
+      fontWeight: 600,
       marginBottom: '0',
       fontSize: getFontSize(12, 14, 16),
       lineHeight: '1.3'
@@ -229,16 +234,17 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
             </motion.div>
             <div style={{
               fontWeight: 'bold',
-              color: '#333',
+              color: '#3caa3c',
               fontSize: getFontSize(14, 16, 18),
               lineHeight: '1.2'
             }}>
               {streak}
             </div>
             <div style={{
-              color: '#666',
+              color: '#222',
               fontSize: getFontSize(10, 11, 12),
-              letterSpacing: '0.5px'
+              letterSpacing: '0.5px',
+              fontWeight: 600
             }}>
               DAY STREAK
             </div>
@@ -267,16 +273,17 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
             </motion.div>
             <div style={{
               fontWeight: 'bold',
-              color: '#333',
+              color: '#3caa3c',
               fontSize: getFontSize(14, 16, 18),
               lineHeight: '1.2'
             }}>
               {xp}
             </div>
             <div style={{
-              color: '#666',
+              color: '#222',
               fontSize: getFontSize(10, 11, 12),
-              letterSpacing: '0.5px'
+              letterSpacing: '0.5px',
+              fontWeight: 600
             }}>
               TOTAL XP
             </div>

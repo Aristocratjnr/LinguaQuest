@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
-import logo from './assets/images/logo.png'
+import logo from './assets/images/logo.png';
 import avatar from './assets/images/avatar.png';
 import Confetti from 'react-confetti';
 import successSfx from './assets/sounds/sfx-success.mp3';
@@ -20,12 +20,28 @@ import AvatarPicker from './components/AvatarPicker';
 import Leaderboard from './components/Leaderboard';
 import CategorySelector from './components/CategorySelector';
 import Engagement from './components/Engagement';
-import WelcomePage from './components/WelcomePage'; // Import the new WelcomePage component
+import WelcomePage from './components/WelcomePage';
 import SettingsPage from './components/SettingsPage';
 import { useSettings } from './context/SettingsContext';
 import { UserProvider, useUser } from './context/UserContext';
 import { motion } from 'framer-motion';
+import Age from './components/Age';
 
+// Duolingo color palette
+const DUOLINGO_COLORS = {
+  green: '#58cc02',
+  darkGreen: '#3caa3c',
+  lightGreen: '#d7f7c8',
+  blue: '#1cb0f6',
+  orange: '#ff9c1a',
+  red: '#ff6b6b',
+  purple: '#9b59b6',
+  white: '#ffffff',
+  lightGray: '#f0f2f5',
+  gray: '#e5e5e5',
+  darkGray: '#6c6f7d',
+  black: '#000000'
+};
 
 const TONES = ['polite', 'passionate', 'formal', 'casual'];
 const LANGUAGES = [
@@ -34,7 +50,7 @@ const LANGUAGES = [
   { code: 'ewe', label: 'Ewe' },
 ];
 const TOTAL_ROUNDS = 5;
-const ROUND_TIME = 50; // seconds (increased from 30 to 50)
+const ROUND_TIME = 50;
 
 const VOICE_COMMANDS = [
   { phrases: ['next', 'continue', 'proceed', 'suivant', 'weiter', 'siguiente', 'ɛdi so'], action: 'next', desc: 'Go to next round', icon: '⏭️' },
@@ -47,10 +63,8 @@ const VOICE_COMMANDS = [
   { phrases: ['back', 'return', 'volver', 'retour', 'zurück', 'san kɔ'], action: 'back', desc: 'Go back', icon: '🔙' },
   { phrases: ['home', 'main', 'inicio', 'accueil', 'heim', 'fie'], action: 'home', desc: 'Go to home', icon: '🏠' },
   { phrases: ['exit', 'quit', 'salir', 'quitter', 'beenden', 'pue'], action: 'exit', desc: 'Exit game', icon: '🚪' },
-  // Add more as needed
 ];
 
-// Define response types
 interface ScenarioResponse { scenario: string; language: string; }
 interface TranslationResponse { translated_text: string; }
 interface EvaluateResponse { persuaded: boolean; feedback: string; score: number; }
@@ -66,6 +80,7 @@ function AppContent() {
   const [translation, setTranslation] = useState('');
   const [feedback, setFeedback] = useState('');
   const [score, setScore] = useState<number|null>(null);
+  const [displayedXp, setDisplayedXp] = useState(0);
   const [aiResponse, setAiResponse] = useState('');
   const [newStance, setNewStance] = useState('');
   const [loading, setLoading] = useState(false);
@@ -97,21 +112,13 @@ function AppContent() {
   const [cmdError, setCmdError] = useState('');
   const [showSettingsPage, setShowSettingsPage] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
-  const [voiceLang, setVoiceLang] = useState('twi'); // Default to Twi for voice commands
+  const [voiceLang, setVoiceLang] = useState('twi');
   const [showEngagement, setShowEngagement] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const { theme } = useSettings();
   const { user, submitScore, startGameSession, endGameSession, incrementStreak, awardBadge } = useUser();
-  // Theme-aware header background and avatar glow
-  const headerBg = theme === 'dark' ? 'rgba(35, 41, 70, 0.98)' : 'rgba(255,255,255,0.95)';
-  const headerColor = theme === 'dark' ? '#e0e7ff' : '#4f46e5';
-  const avatarGlow = theme === 'dark'
-    ? '0 0 0 4px #6366f1, 0 0 16px 4px #23294699'
-    : '0 0 0 4px #6366f1, 0 0 16px 4px #e0e7ff99';
-  // Theme-aware footer background
-  const footerBg = theme === 'dark' ? 'rgba(35, 41, 70, 0.98)' : 'rgba(255,255,255,0.95)';
-  const footerColor = theme === 'dark' ? '#e0e7ff' : '#6c6f7d';
+  const [showLogin, setShowLogin] = useState(false);
 
   // Apply theme class to body
   useEffect(() => {
@@ -233,7 +240,7 @@ function AppContent() {
     setLoading(false);
   };
 
-  // Voice command logic (update):
+  // Voice command logic
   const handleVoiceCommand = () => {
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
       alert('Speech recognition is not supported in this browser.');
@@ -251,7 +258,7 @@ function AppContent() {
       const transcript = event.results[0][0].transcript.toLowerCase();
       setLastCmd(transcript);
       setListeningCmd(false);
-      // Find matching command (any synonym)
+      // Find matching command
       let found = false;
       for (const cmd of VOICE_COMMANDS) {
         if (cmd.phrases.some(p => transcript.includes(p))) {
@@ -390,12 +397,17 @@ function AppContent() {
 
   // Handle avatar confirm
   const handleAvatarConfirm = (avatarUrl: string) => {
-    console.log('Avatar confirmed:', avatarUrl);
     setAvatar(avatarUrl);
     localStorage.setItem('lq_avatar', avatarUrl);
     setShowAvatarPicker(false);
+    setShowLogin(true);
+  };
+
+  // Handle age confirm
+  const handleLogin = (age: number) => {
+    setShowLogin(false);
     setShowEngagement(true);
-    console.log('showEngagement set to true');
+    // You can store the age if needed
   };
 
   // Handle engagement start
@@ -479,6 +491,31 @@ function AppContent() {
     }
   }, [roundResult]);
 
+  // Animate XP badge when score changes
+  useEffect(() => {
+    if (score === null) return;
+    let start = displayedXp;
+    let end = score;
+    if (start === end) return;
+    const duration = 600; // ms
+    const stepTime = 20;
+    const steps = Math.ceil(duration / stepTime);
+    let currentStep = 0;
+    const increment = (end - start) / steps;
+    let current = start;
+    const interval = setInterval(() => {
+      currentStep++;
+      current += increment;
+      if ((increment > 0 && current >= end) || (increment < 0 && current <= end) || currentStep >= steps) {
+        setDisplayedXp(end);
+        clearInterval(interval);
+      } else {
+        setDisplayedXp(Math.round(current));
+      }
+    }, stepTime);
+    return () => clearInterval(interval);
+  }, [score]);
+
   // Translate scenario when language changes
   const handleScenarioLanguageChange = async (newLang: string) => {
     setLanguage(newLang);
@@ -487,7 +524,7 @@ function AppContent() {
       try {
         const res = await axios.post<TranslationResponse>('http://127.0.0.1:8000/translate', {
           text: scenario,
-          src_lang: 'en', // or track the current scenario language if needed
+          src_lang: 'en',
           tgt_lang: newLang,
         });
         setScenario(res.data.translated_text);
@@ -513,16 +550,23 @@ function AppContent() {
   if (showAvatarPicker) {
     return <AvatarPicker onConfirm={handleAvatarConfirm} />;
   }
+
+  if (showLogin) {
+    return <Age onConfirm={handleLogin} />;
+  }
+
   if (showEngagement) {
-    console.log('Rendering Engagement screen with nickname:', nickname);
     return <Engagement nickname={nickname} avatar={avatar} onStart={handleEngagementStart} />;
   }
+
   if (showCategorySelector) {
     return <CategorySelector onConfirm={handleCategoryConfirm} />;
   }
+
   if (showSettingsPage) {
     return <SettingsPage onClose={() => setShowSettingsPage(false)} />;
   }
+
   if (showOnboarding) {
     return (
       <>
@@ -540,180 +584,177 @@ function AppContent() {
     );
   }
 
-  const showGameOverLeaderboard = roundResult === 'gameover' && !showLeaderboard;
-
-  // Main game layout
+  // Main game layout with Duolingo styling
   return (
-    <div className="lq-bg d-flex flex-column min-vh-100" style={{ minHeight: '100vh', width: '100%' }}>
-      {/* Header */}
-      <header className="container-fluid py-3 px-2 px-md-4 mb-3" style={{ background: headerBg, boxShadow: '0 2px 8px #0001', color: headerColor, borderRadius: 0 }}>
-        <div className="d-flex align-items-center justify-content-between" style={{ minHeight: 48 }}>
-          <div className="d-flex align-items-center gap-3">
-            <div className="d-flex align-items-center gap-3">
-              <motion.div 
-                className="d-flex align-items-center justify-content-center" 
-                style={{
-                  width: 48, height: 48, borderRadius: 16,
-                  background: '#58cc02',
-                  boxShadow: '0 4px 12px rgba(88, 204, 2, 0.3)',
-                  border: '2px solid #3caa3c'
-                }}
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: 'spring', stiffness: 400 }}
-              >
-                <img src={logo} alt="LinguaQuest Logo" style={{ height: 32, width: 32 }} />
-              </motion.div>
-              <div className="d-flex flex-column">
-                <h1 className="fw-bold mb-0" style={{ 
-                  fontSize: '1.5rem', 
-                  color: '#58cc02', 
-                  letterSpacing: '1px',
-                  fontFamily: '"JetBrains Mono", monospace',
-                  textTransform: 'uppercase',
-                  lineHeight: '1.2'
-                }}>
-                  LINGUAQUEST
-                </h1>
-                <span className="badge px-3 py-1 d-flex align-items-center" style={{
-                  backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9',
-                  color: '#58cc02', 
-                  borderRadius: '12px', 
-                  fontWeight: 'bold', 
-                  fontSize: '0.75rem', 
-                  letterSpacing: '1px',
-                  fontFamily: '"JetBrains Mono", monospace',
-                  textTransform: 'uppercase',
-                  alignSelf: 'flex-start'
-                }}>
-                  <i className="material-icons me-1" style={{ fontSize: '0.9rem' }}>psychology</i>
-                  Language Game
-                </span>
-              </div>
+    <div className="app-container" style={{ 
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
+      {/* Header - Duolingo style */}
+      <header style={{
+        background: DUOLINGO_COLORS.white,
+        padding: '12px 16px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          maxWidth: '1200px',
+          margin: '0 auto'
+        }}>
+          {/* Logo and title */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '12px',
+              background: DUOLINGO_COLORS.green,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <img src={logo} alt="Logo" style={{ height: '24px' }} />
             </div>
+            <h1 style={{
+              color: DUOLINGO_COLORS.green,
+              fontSize: '20px',
+              fontWeight: 'bold',
+              margin: 0
+            }}>LinguaQuest</h1>
           </div>
-          <div className="d-flex align-items-center gap-2">
-            <div className="d-flex flex-column align-items-end me-2">
-              <span className="fw-bold" style={{ 
-                fontSize: '0.9rem', 
-                color: '#58cc02', 
-                letterSpacing: '0.5px',
-                fontFamily: '"JetBrains Mono", monospace',
-                textTransform: 'uppercase'
-              }}>
-                {user?.nickname || nickname || 'Player'}
-              </span>
-              <span className="text-muted small" style={{ 
-                fontSize: '0.75rem',
-                letterSpacing: '0.5px',
-                fontFamily: '"JetBrains Mono", monospace'
-              }}>
-                Welcome Back!
-              </span>
-            </div>
-            <motion.div 
-              className="d-flex align-items-center justify-content-center position-relative" 
-              style={{ 
-                width: 48, 
-                height: 48, 
-                borderRadius: 16, 
-                background: theme === 'dark' ? '#232946' : '#e8f5e9', 
-                boxShadow: avatarGlow, 
-                border: '3px solid #58cc02',
-                overflow: 'hidden'
-              }}
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: 'spring', stiffness: 400 }}
-            >
+          
+          {/* User profile */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              background: DUOLINGO_COLORS.gray,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
+              border: `2px solid ${DUOLINGO_COLORS.green}`
+            }}>
               <img 
                 src={user?.avatar_url || avatar} 
-                alt="User Avatar" 
-                style={{ 
-                  height: 42, 
-                  width: 42, 
-                  objectFit: 'cover',
-                  borderRadius: '12px'
-                }} 
+                alt="User" 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
               />
-              <div className="position-absolute" style={{
-                bottom: -2,
-                right: -2,
-                width: 12,
-                height: 12,
-                borderRadius: '50%',
-                background: '#58cc02',
-                border: '2px solid white',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-              }} />
-            </motion.div>
+            </div>
+            {/* Display nickname */}
+            <span style={{
+              fontWeight: 'bold',
+              color: DUOLINGO_COLORS.darkGray,
+              fontSize: '14px'
+            }}>
+              {nickname}
+            </span>
           </div>
         </div>
       </header>
 
-      {/* Progress and Timer */}
-      <div className="container mb-3 px-2 px-sm-3" style={{ maxWidth: 900 }}>
-        <div className="row g-3 align-items-center">
-          <div className="col-12 col-md-8">
-            <div className="progress-container">
-              <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
-            </div>
+      {/* Main content area */}
+      <main style={{
+        flex: 1,
+        padding: '0 16px 16px',
+        maxWidth: '640px',
+        width: '100%',
+        margin: '0 auto'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'var(--duo-card, #fff)',
+          borderRadius: '24px',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
+          padding: '24px 20px',
+          marginBottom: '28px',
+          gap: '24px',
+          flexWrap: 'wrap',
+        }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
           </div>
-          <div className="col-12 col-md-4">
-            <div className="d-flex justify-content-center">
-              <Timer seconds={ROUND_TIME} timeLeft={timeLeft} isActive={timerActive && roundResult === 'playing'} />
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: '#d7f7c8',
+            padding: '8px 18px',
+            borderRadius: '24px',
+            fontWeight: 'bold',
+            fontSize: '1.1rem',
+            boxShadow: '0 1px 4px #58cc0233',
+            minWidth: '70px',
+            justifyContent: 'center',
+          }}>
+            <span style={{
+              width: '20px',
+              height: '20px',
+              background: '#58cc02',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+              fontSize: '12px',
+              fontWeight: 700,
+            }}>XP</span>
+            <span style={{ color: '#58cc02', fontWeight: 700 }}>{displayedXp}</span>
+          </div>
+        </div>
+        {/* Scenario card - Duolingo style */}
+        <div className="duo-card" style={{
+          borderRadius: '32px',
+          padding: '40px 32px 36px 28px',
+          marginBottom: '32px',
+          display: 'flex',
+          alignItems: 'flex-start',
+          position: 'relative',
+        }}>
+          <div style={{ width: '100%' }}>
+            <div className="card-title">Scenario</div>
+            <div className="card-body">
+              <Scenario
+                scenario={scenario}
+                language={language}
+                loading={loading}
+                onLanguageChange={handleScenarioLanguageChange}
+                languages={LANGUAGES}
+              />
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Game Status Messages */}
-      {(roundResult === 'success' || roundResult === 'fail' || roundResult === 'gameover') && (
-        <div className={`container mb-3 px-2 px-sm-3`} style={{ maxWidth: 600 }}>
-          <div className={`alert ${roundResult === 'success' ? 'alert-success' : roundResult === 'fail' ? 'alert-danger' : 'alert-info'} text-center shadow-sm mb-0`}>
-            {roundResult === 'success' && (
-              <div className="d-flex align-items-center justify-content-center gap-2">
-                <i className="material-icons me-2" style={{ fontSize: '1.5rem' }}>celebration</i>
-                <span className="fw-bold">Persuaded! +1 Point</span>
-              </div>
-            )}
-            {roundResult === 'fail' && (
-              <div className="d-flex align-items-center justify-content-center gap-2">
-                <i className="material-icons me-2" style={{ fontSize: '1.5rem' }}>timer_off</i>
-                <span className="fw-bold">Time's up! Try next round.</span>
-              </div>
-            )}
-            {roundResult === 'gameover' && (
-              <div className="d-flex align-items-center justify-content-center gap-2">
-                <i className="material-icons me-2" style={{ fontSize: '1.5rem' }}>emoji_events</i>
-                <span className="fw-bold">Game Over! Thanks for playing.</span>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Main Game Content */}
-      <main className="container flex-grow-1 d-flex flex-column px-2 px-sm-3" style={{ maxWidth: 900, flex: 1, minHeight: 0 }}>
-        <div className="row g-4 flex-grow-1" style={{ minHeight: 0 }}>
-          {/* Left Column - Scenario and User Input */}
-          <div className="col-12 col-lg-6 d-flex flex-column mb-3 mb-lg-0" style={{ minHeight: 0 }}>
-            <div className="card shadow-lg mb-4 flex-grow-1 d-flex flex-column" style={{ borderRadius: 16, background: theme === 'dark' ? '#232946' : 'rgba(255,255,255,0.98)', minHeight: 340, boxShadow: theme === 'dark' ? '0 10px 30px #181c2a' : '0 10px 30px rgba(0,0,0,0.10)' }}>
-              <div className="card-body d-grid gap-4 flex-grow-1">
-                <Scenario
-                  scenario={scenario}
-                  language={language}
-                  loading={loading}
-                  onLanguageChange={handleScenarioLanguageChange}
-                  languages={LANGUAGES}
-                />
-                <ArgumentInput
-                  userArgument={userArgument}
-                  onChange={setUserArgument}
-                  loading={loading}
-                  disabled={loading}
-                  onTranslate={handleTranslate}
-                  translation={translation}
-                  language={language}
-                />
+        
+        {/* Input area - Duolingo style */}
+        <div className="duo-card" style={{
+          borderRadius: '32px',
+          padding: '40px 32px 36px 28px',
+          marginBottom: '32px',
+          display: 'flex',
+          alignItems: 'flex-start',
+          position: 'relative',
+        }}>
+          <div style={{ width: '100%' }}>
+            <div className="card-title">Your Argument</div>
+            <div className="card-body">
+              <ArgumentInput
+                userArgument={userArgument}
+                onChange={setUserArgument}
+                loading={loading}
+                disabled={loading}
+                onTranslate={handleTranslate}
+                translation={translation}
+                language={language}
+              />
+              <div style={{ marginTop: '24px' }}>
                 <ToneSelector
                   tone={tone}
                   onChange={setTone}
@@ -724,232 +765,399 @@ function AppContent() {
               </div>
             </div>
           </div>
-          {/* Right Column - AI Responses and Feedback */}
-          <div className="col-12 col-lg-6 d-flex flex-column" style={{ minHeight: 0 }}>
-            <div className="card shadow-lg mb-4 flex-grow-1 d-flex flex-column" style={{ borderRadius: 16, background: theme === 'dark' ? '#232946' : 'rgba(255,255,255,0.98)', minHeight: 340, boxShadow: theme === 'dark' ? '0 10px 30px #181c2a' : '0 10px 30px rgba(0,0,0,0.10)' }}>
-              <div className="card-body d-grid gap-4 flex-grow-1">
-                <Feedback
-                  feedback={feedback}
-                  score={score}
-                  loading={loading}
-                  disabled={roundResult !== 'playing'}
-                  onEvaluate={handleEvaluate}
-                  userArgument={userArgument}
-                />
-                <AIResponse
-                  aiResponse={aiResponse}
-                  newStance={newStance}
-                  loading={loading}
-                  disabled={roundResult !== 'playing'}
-                  onDialogue={handleDialogue}
-                  userArgument={userArgument}
-                  enableVoice={true}
-                />
-              </div>
+        </div>
+        
+        {/* AI Response area - Duolingo style */}
+        <div className="duo-card" style={{
+          borderRadius: '32px',
+          padding: '40px 32px 36px 28px',
+          marginBottom: '32px',
+          display: 'flex',
+          alignItems: 'flex-start',
+          position: 'relative',
+        }}>
+          <div style={{ width: '100%' }}>
+            <div className="card-title">AI Response</div>
+            <div className="card-body">
+              <AIResponse
+                aiResponse={aiResponse}
+                newStance={newStance}
+                loading={loading}
+                disabled={roundResult !== 'playing'}
+                onDialogue={handleDialogue}
+                userArgument={userArgument}
+                enableVoice={true}
+              />
             </div>
           </div>
         </div>
-
-        {/* Game Controls */}
-        <div className="row mt-4 mb-4">
-          <div className="col-12 d-flex flex-wrap justify-content-center gap-2 gap-sm-3">
-            {showGameOverLeaderboard && (
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                className="btn btn-primary px-3 px-md-4 py-2 rounded-pill"
-                style={{ background: 'linear-gradient(to right, #667eea, #764ba2)', border: 'none', borderRadius: 16, fontWeight: 600, letterSpacing: '.01em' }}
-                onClick={() => setShowLeaderboard(true)}
-              >
-                <i className="material-icons align-middle me-2">leaderboard</i>
-                <span className="d-none d-sm-inline">View Leaderboard</span>
-                <span className="d-inline d-sm-none">Leaderboard</span>
-              </motion.button>
-            )}
-            <motion.button
-              whileHover={{ scale: 1.02, boxShadow: '0 6px 0 #3caa3c' }}
-              whileTap={{ scale: 0.98, boxShadow: '0 2px 0 #3caa3c' }}
-              className="btn px-3 px-md-4 py-2 rounded-pill"
-              style={{ 
-                borderRadius: 16, 
-                fontWeight: 'bold', 
-                letterSpacing: '1px',
-                background: '#58cc02',
-                color: 'white',
-                border: 'none',
-                boxShadow: '0 4px 0 #3caa3c',
-                textTransform: 'uppercase',
-                fontFamily: '"JetBrains Mono", monospace'
-              }}
-              onClick={fetchScenario}
-              disabled={loading || roundResult !== 'playing'}
-            >
-              <i className="material-icons align-middle me-2">refresh</i>
-              <span className="d-none d-sm-inline">NEW SCENARIO</span>
-              <span className="d-inline d-sm-none">NEW</span>
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.02, boxShadow: '0 6px 0 #3caa3c' }}
-              whileTap={{ scale: 0.98, boxShadow: '0 2px 0 #3caa3c' }}
-              className="btn px-3 px-md-4 py-2 rounded-pill"
-              style={{ 
-                borderRadius: 16, 
-                fontWeight: 'bold', 
-                letterSpacing: '1px',
-                background: '#58cc02',
-                color: 'white',
-                border: 'none',
-                boxShadow: '0 4px 0 #3caa3c',
-                textTransform: 'uppercase',
-                fontFamily: '"JetBrains Mono", monospace'
-              }}
-              onClick={handleVoiceCommand}
-              disabled={listeningCmd}
-            >
-              <i className="material-icons align-middle me-2">{listeningCmd ? 'mic' : 'mic_none'}</i>
-              <span className="d-none d-sm-inline">{listeningCmd ? 'LISTENING...' : 'VOICE COMMAND'}</span>
-              <span className="d-inline d-sm-none">{listeningCmd ? 'LISTENING...' : 'VOICE'}</span>
-            </motion.button>
+        
+        {/* Feedback area - Duolingo style */}
+        <div className="duo-card" style={{
+          borderRadius: '32px',
+          padding: '40px 32px 36px 28px',
+          marginBottom: '32px',
+          display: 'flex',
+          alignItems: 'flex-start',
+          position: 'relative',
+        }}>
+          <div style={{ width: '100%' }}>
+            <div className="card-title">Feedback</div>
+            <div className="card-body">
+              <Feedback
+                feedback={feedback}
+                score={score}
+                loading={loading}
+                disabled={roundResult !== 'playing'}
+                onEvaluate={handleEvaluate}
+                userArgument={userArgument}
+              />
+            </div>
           </div>
         </div>
+        
+        {/* Action buttons - Duolingo style */}
+        <div style={{
+          display: 'flex',
+          gap: '12px',
+          marginTop: '16px'
+        }}>
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            style={{
+              flex: 1,
+              background: DUOLINGO_COLORS.green,
+              color: DUOLINGO_COLORS.white,
+              border: 'none',
+              borderRadius: '12px',
+              padding: '14px',
+              fontWeight: 'bold',
+              fontSize: '16px',
+              cursor: 'pointer',
+              boxShadow: `0 4px 0 ${DUOLINGO_COLORS.darkGreen}`
+            }}
+            onClick={fetchScenario}
+            disabled={loading || roundResult !== 'playing'}
+          >
+            New Scenario
+          </motion.button>
+          
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            style={{
+              width: '56px',
+              background: listeningCmd ? DUOLINGO_COLORS.orange : DUOLINGO_COLORS.blue,
+              color: DUOLINGO_COLORS.white,
+              border: 'none',
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              boxShadow: `0 4px 0 ${listeningCmd ? '#d18616' : '#0d8ecf'}`
+            }}
+            onClick={handleVoiceCommand}
+            disabled={listeningCmd}
+          >
+            <span style={{ fontSize: '20px' }}>{listeningCmd ? '🎤' : '🎤'}</span>
+          </motion.button>
+        </div>
+
+        {/* Show voice command error if any */}
+        {cmdError && (
+          <div style={{
+            marginTop: '8px',
+            color: DUOLINGO_COLORS.red,
+            fontSize: '14px',
+            textAlign: 'center'
+          }}>
+            {cmdError}
+          </div>
+        )}
       </main>
 
-      {/* Last Command Display */}
-      {lastCmd && (
-        <div className="container mb-3 px-2 px-sm-3" style={{ maxWidth: 600 }}>
-          <div className="alert alert-light text-center shadow-sm mb-0 d-flex align-items-center justify-content-center gap-2" style={{ borderRadius: 16, fontSize: '0.95rem', color: theme === 'dark' ? '#a5b4fc' : '#6c757d' }}>
-            <span className="d-flex align-items-center justify-content-center" style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700' }}>
-              <i className="material-icons" style={{ fontSize: '1.1rem' }}>info</i>
-            </span>
-            <span>Last voice command: "{lastCmd}"</span>
-            {cmdError && <span className="text-danger small ms-2">{cmdError}</span>}
-          </div>
+      {/* Status messages - Duolingo style */}
+      {(roundResult === 'success' || roundResult === 'fail' || roundResult === 'gameover') && (
+        <div style={{
+          position: 'fixed',
+          bottom: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: roundResult === 'success' ? DUOLINGO_COLORS.green : 
+                     roundResult === 'fail' ? DUOLINGO_COLORS.red : DUOLINGO_COLORS.blue,
+          color: DUOLINGO_COLORS.white,
+          padding: '12px 24px',
+          borderRadius: '50px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          zIndex: 100,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          {roundResult === 'success' && (
+            <>
+              <span style={{ fontSize: '20px' }}>🎉</span>
+              <span>Great job! +1 Point</span>
+            </>
+          )}
+          {roundResult === 'fail' && (
+            <>
+              <span style={{ fontSize: '20px' }}>⏱️</span>
+              <span>Time's up! Next round</span>
+            </>
+          )}
+          {roundResult === 'gameover' && (
+            <>
+              <span style={{ fontSize: '20px' }}>🏆</span>
+              <span>Game Complete!</span>
+            </>
+          )}
         </div>
       )}
 
-      {/* Loading Overlay */}
-      {loading && (
-        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ background: 'rgba(255,255,255,0.7)', zIndex: 1000 }}>
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
+      {/* Footer - Duolingo style */}
+      <footer style={{
+        padding: '12px 16px',
+        marginTop: 'auto',
+        boxShadow: '0 -2px 4px rgba(0,0,0,0.05)',
+        display: 'flex',
+        justifyContent: 'center'
+      }}>
+        <div style={{
+          display: 'flex',
+          gap: '20px',
+          maxWidth: '800px',
+          width: '100%',
+          justifyContent: 'center'
+        }}>
+          <button 
+            onClick={() => setShowLeaderboard(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '4px',
+              color: DUOLINGO_COLORS.darkGray,
+              cursor: 'pointer'
+            }}
+          >
+            <span style={{ fontSize: '20px' }}>🏆</span>
+            <span style={{ fontSize: '12px' }}>Leaderboard</span>
+          </button>
+          
+          <button 
+            onClick={() => setShowSettingsPage(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '4px',
+              color: DUOLINGO_COLORS.darkGray,
+              cursor: 'pointer'
+            }}
+          >
+            <span style={{ fontSize: '20px' }}>⚙️</span>
+            <span style={{ fontSize: '12px' }}>Settings</span>
+          </button>
+          
+          <button 
+            onClick={() => setShowHelp(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '4px',
+              color: DUOLINGO_COLORS.darkGray,
+              cursor: 'pointer'
+            }}
+          >
+            <span style={{ fontSize: '20px' }}>❓</span>
+            <span style={{ fontSize: '12px' }}>Help</span>
+          </button>
         </div>
-      )}
+      </footer>
 
       {/* Modals */}
       {showLeaderboard && (
-        <motion.div
-          className="fixed inset-0 d-flex align-items-center justify-content-center p-4 z-50"
-          style={{ background: theme === 'dark' ? 'rgba(24,28,42,0.85)' : 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <motion.div
-            className="bg-white dark:bg-[#232946] rounded-4 overflow-hidden w-100 position-relative shadow-lg"
-            style={{ maxWidth: 700, width: '100%', borderRadius: 24, boxShadow: theme === 'dark' ? '0 10px 30px #181c2a' : '0 10px 30px rgba(0,0,0,0.10)' }}
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 50, opacity: 0 }}
-            transition={{ type: 'spring', damping: 25 }}
-          >
-            {/* Header */}
-            <div className="d-flex align-items-center justify-content-between px-4 py-3 border-bottom" style={{ background: theme === 'dark' ? '#181c2a' : '#f8f9fa', borderTopLeftRadius: 24, borderTopRightRadius: 24 }}>
-              <div className="d-flex align-items-center gap-2">
-                <span className="d-flex align-items-center justify-content-center" style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700' }}>
-                  <i className="material-icons" style={{ fontSize: '1.5rem' }}>leaderboard</i>
-                </span>
-                <h2 className="fw-bold mb-0" style={{ color: '#58a700', fontSize: '1.15rem', letterSpacing: '.01em' }}>Leaderboard</h2>
-                <span className="badge px-3 py-1 d-flex align-items-center ms-2" style={{ backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700', borderRadius: '12px', fontWeight: 600, fontSize: '0.85rem', letterSpacing: '.01em' }}>
-                  <i className="material-icons me-1" style={{ fontSize: '1rem' }}>emoji_events</i>
-                  Top Players
-                </span>
-              </div>
-              <motion.button whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            borderRadius: '16px',
+            width: '90%',
+            maxWidth: '500px',
+            maxHeight: '80vh',
+            overflow: 'hidden',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.15)'
+          }}>
+            <div style={{
+              padding: '16px',
+              borderBottom: `1px solid ${DUOLINGO_COLORS.gray}`,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <h2 style={{ margin: 0, color: DUOLINGO_COLORS.green }}>Leaderboard</h2>
+              <button 
                 onClick={() => setShowLeaderboard(false)}
-                className="btn btn-sm btn-outline-secondary rounded-circle ms-2 d-flex align-items-center justify-content-center"
-                style={{ width: 36, height: 36, border: 'none', background: theme === 'dark' ? '#232946' : '#f8f9fa' }}
-                aria-label="Close leaderboard"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: DUOLINGO_COLORS.darkGray
+                }}
               >
-                <i className="material-icons">close</i>
-              </motion.button>
+                ×
+              </button>
             </div>
-            {/* Leaderboard Content */}
-            <div className="p-0 p-md-4" style={{ minHeight: 400 }}>
+            <div style={{ padding: '16px', maxHeight: '60vh', overflowY: 'auto' }}>
               <Leaderboard onClose={() => setShowLeaderboard(false)} />
             </div>
-            {/* Info/Help Section */}
-            <div className="text-muted small px-4 py-3 d-flex align-items-center gap-2 border-top" style={{ color: theme === 'dark' ? '#a5b4fc' : '#6c757d', fontSize: '0.9rem', background: theme === 'dark' ? '#181c2a' : '#f8f9fa', borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }}>
-              <span className="d-flex align-items-center justify-content-center" style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700' }}>
-                <i className="material-icons" style={{ fontSize: '1.1rem' }}>info</i>
-              </span>
-              Scores update in real time. Click a player for details and badges.
-            </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       )}
-      {/* Help Modal */}
+      
       {showHelp && (
-        <motion.div
-          className="fixed inset-0 d-flex align-items-center justify-content-center p-4 z-50"
-          style={{ background: theme === 'dark' ? 'rgba(24,28,42,0.85)' : 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <motion.div
-            className="bg-white dark:bg-[#232946] rounded-4 overflow-hidden w-100 position-relative shadow-lg"
-            style={{ maxWidth: 480, width: '100%', borderRadius: 24, boxShadow: theme === 'dark' ? '0 10px 30px #181c2a' : '0 10px 30px rgba(0,0,0,0.10)' }}
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            transition={{ type: 'spring', damping: 25 }}
-          >
-            {/* Header */}
-            <div className="d-flex align-items-center justify-content-between px-4 py-3 border-bottom" style={{ background: theme === 'dark' ? '#181c2a' : '#f8f9fa', borderTopLeftRadius: 24, borderTopRightRadius: 24 }}>
-              <div className="d-flex align-items-center gap-2">
-                <span className="d-flex align-items-center justify-content-center" style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700' }}>
-                  <i className="material-icons" style={{ fontSize: '1.5rem' }}>help_outline</i>
-                </span>
-                <h2 className="fw-bold mb-0" style={{ color: '#58a700', fontSize: '1.15rem', letterSpacing: '.01em' }}>Voice Commands</h2>
-                <span className="badge px-3 py-1 d-flex align-items-center ms-2" style={{ backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700', borderRadius: '12px', fontWeight: 600, fontSize: '0.85rem', letterSpacing: '.01em' }}>
-                  <i className="material-icons me-1" style={{ fontSize: '1rem' }}>mic</i>
-                  Assistant
-                </span>
-              </div>
-              <motion.button whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            borderRadius: '16px',
+            width: '90%',
+            maxWidth: '500px',
+            maxHeight: '80vh',
+            overflow: 'hidden',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.15)'
+          }}>
+            <div style={{
+              padding: '16px',
+              borderBottom: `1px solid ${DUOLINGO_COLORS.gray}`,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <h2 style={{ margin: 0, color: DUOLINGO_COLORS.green }}>Voice Commands</h2>
+              <button 
                 onClick={() => setShowHelp(false)}
-                className="btn btn-sm btn-outline-secondary rounded-circle ms-2 d-flex align-items-center justify-content-center"
-                style={{ width: 36, height: 36, border: 'none', background: theme === 'dark' ? '#232946' : '#f8f9fa' }}
-                aria-label="Close help"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: DUOLINGO_COLORS.darkGray
+                }}
               >
-                <i className="material-icons">close</i>
-              </motion.button>
+                ×
+              </button>
             </div>
-            {/* Body */}
-            <div className="card-body p-4">
-              <ul className="list-group list-group-flush">
+            <div style={{ padding: '16px', maxHeight: '60vh', overflowY: 'auto' }}>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {VOICE_COMMANDS.map(cmd => (
-                  <li key={cmd.action} className="list-group-item border-0 d-flex align-items-start py-3">
-                    <div className="me-3 fs-4">{cmd.icon}</div>
-                    <div>
-                      <div className="fw-bold">{cmd.phrases[0]}</div>
-                      <div className="text-muted small">{cmd.desc}</div>
-                      <div className="text-muted small mt-1">Synonyms: {cmd.phrases.slice(1).join(', ')}</div>
+                  <li key={cmd.action} style={{ padding: '12px 0', borderBottom: `1px solid ${DUOLINGO_COLORS.lightGray}` }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{
+                        width: '36px',
+                        height: '36px',
+                        background: DUOLINGO_COLORS.lightGreen,
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '18px'
+                      }}>
+                        {cmd.icon}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 'bold', color: DUOLINGO_COLORS.darkGreen }}>
+                          {cmd.phrases[0]}
+                        </div>
+                        <div style={{ fontSize: '14px', color: DUOLINGO_COLORS.darkGray }}>
+                          {cmd.desc}
+                        </div>
+                      </div>
                     </div>
                   </li>
                 ))}
               </ul>
             </div>
-            {/* Info/Help Section */}
-            <div className="text-muted small px-4 py-3 d-flex align-items-center gap-2 border-top" style={{ color: theme === 'dark' ? '#a5b4fc' : '#6c757d', fontSize: '0.9rem', background: theme === 'dark' ? '#181c2a' : '#f8f9fa', borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }}>
-              <span className="d-flex align-items-center justify-content-center" style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700' }}>
-                <i className="material-icons" style={{ fontSize: '1.1rem' }}>info</i>
-              </span>
-              Try saying a command or tap the mic button. Voice commands work best in supported browsers.
+          </div>
+        </div>
+      )}
+      
+      {showSettingsPage && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            borderRadius: '16px',
+            width: '90%',
+            maxWidth: '500px',
+            maxHeight: '80vh',
+            overflow: 'hidden',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.15)'
+          }}>
+            <div style={{
+              padding: '16px',
+              borderBottom: `1px solid ${DUOLINGO_COLORS.gray}`,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <h2 style={{ margin: 0, color: DUOLINGO_COLORS.green }}>Settings</h2>
+              <button 
+                onClick={() => setShowSettingsPage(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: DUOLINGO_COLORS.darkGray
+                }}
+              >
+                ×
+              </button>
             </div>
-          </motion.div>
-        </motion.div>
+            <div style={{ padding: '16px', maxHeight: '60vh', overflowY: 'auto' }}>
+              <SettingsPage onClose={() => setShowSettingsPage(false)} />
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Confetti */}
@@ -959,7 +1167,7 @@ function AppContent() {
           height={window.innerHeight}
           recycle={false}
           numberOfPieces={200}
-          colors={['#58cc02', '#ffd700', '#1cb0f6', '#ff6b6b', '#4ecdc4']}
+          colors={[DUOLINGO_COLORS.green, DUOLINGO_COLORS.blue, DUOLINGO_COLORS.orange, DUOLINGO_COLORS.purple]}
         />
       )}
 
@@ -967,21 +1175,6 @@ function AppContent() {
       <audio ref={audioSuccess} src={successSfx} preload="auto" />
       <audio ref={audioFail} src={failSfx} preload="auto" />
       <audio ref={audioClick} src={clickSfx} preload="auto" />
-
-      {/* Footer */}
-      <footer className="text-center text-muted mt-auto py-3 small" style={{ background: footerBg, color: footerColor, boxShadow: '0 -2px 8px #0001', borderTopLeftRadius: 16, borderTopRightRadius: 16 }}>
-        <div className="d-flex justify-content-center gap-3 mb-2">
-          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="btn btn-sm btn-link text-muted rounded-pill" style={{ fontWeight: 600, letterSpacing: '.01em' }} onClick={() => setShowHelp(true)}>
-            <i className="material-icons align-middle me-1" style={{ fontSize: '.9rem' }}>help_outline</i>
-            Help
-          </motion.button>
-          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="btn btn-sm btn-link text-muted rounded-pill" style={{ fontWeight: 600, letterSpacing: '.01em' }} onClick={() => setShowSettingsPage(true)}>
-            <i className="material-icons align-middle me-1" style={{ fontSize: '.9rem' }}>settings</i>
-            Settings
-          </motion.button>
-        </div>
-        &copy; {new Date().getFullYear()} LinguaQuest. Developed by: Opuku Boakye Michael
-      </footer>
     </div>
   );
 }
