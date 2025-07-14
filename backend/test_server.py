@@ -87,7 +87,7 @@ def increment_streak(nickname: str):
     return {"streak": 2}
 
 @app.post("/api/v1/badges/{nickname}")
-def award_badge(nickname: str, badge_type: str, badge_name: str, badge_description: str = None):
+def award_badge(nickname: str, badge_type: str, badge_name: str, badge_description: str | None = None):
     """Award a badge to user (simplified)"""
     return {"message": "Badge awarded", "badge": {"type": badge_type, "name": badge_name}}
 
@@ -101,8 +101,39 @@ def get_leaderboard_legacy():
     return {"leaderboard": []}
 
 @app.post("/scenario")
-def get_scenario():
-    return {"scenario": "Test scenario", "language": "twi"}
+def get_scenario(request: dict | None = None):
+    """Get a scenario based on category and difficulty"""
+    # Generate different scenarios based on category and difficulty
+    category = request.get("category", "daily") if request else "daily"
+    difficulty = request.get("difficulty", "beginner") if request else "beginner"
+    
+    scenarios = {
+        "daily": {
+            "beginner": "Convince your friend to join you for morning exercise.",
+            "intermediate": "Persuade your colleague to try a new healthy lunch spot.",
+            "advanced": "Convince your family to adopt a more sustainable lifestyle."
+        },
+        "business": {
+            "beginner": "Convince your manager to approve a team building activity.",
+            "intermediate": "Persuade stakeholders to invest in a new project idea.",
+            "advanced": "Convince the board to implement a major company restructuring."
+        },
+        "social": {
+            "beginner": "Convince your friend to try a new restaurant.",
+            "intermediate": "Persuade your group to watch a movie you recommend.",
+            "advanced": "Convince your community to support a local initiative."
+        },
+        "academic": {
+            "beginner": "Convince your classmate to join a study group.",
+            "intermediate": "Persuade your professor to extend a deadline.",
+            "advanced": "Convince the school administration to implement a new program."
+        }
+    }
+    
+    # Get scenario based on category and difficulty, with fallbacks
+    scenario = scenarios.get(category, scenarios["daily"]).get(difficulty, scenarios["daily"]["beginner"])
+    
+    return {"scenario": scenario, "language": "twi"}
 
 @app.post("/translate")
 def translate_text(request: dict):

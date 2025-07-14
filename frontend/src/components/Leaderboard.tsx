@@ -8,6 +8,10 @@ import { gameApi, LeaderboardEntry } from '../services/api';
 interface Entry extends LeaderboardEntry {
   date?: string;
   level?: number;
+  name?: string;
+  avatar?: string;
+  score?: number;
+  streak?: number;
 }
 
 const Leaderboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
@@ -51,11 +55,14 @@ const Leaderboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   // Sorting/filtering logic
   const filteredEntries = entries
-    .filter(e => e.name.toLowerCase().includes(search.toLowerCase()))
+    .filter(e => e.nickname.toLowerCase().includes(search.toLowerCase()))
     .map(e => ({
       ...e,
-      streak: engagementMap[e.name]?.streak,
-      level: engagementMap[e.name]?.level
+      name: e.nickname,
+      avatar: e.avatar_url,
+      score: e.total_score,
+      streak: engagementMap[e.nickname]?.streak,
+      level: engagementMap[e.nickname]?.level
     }));
 
   const sortedEntries = [...filteredEntries].sort((a, b) => {
@@ -276,7 +283,7 @@ const Leaderboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                     style={{ borderColor: getRankColor(sortedEntries.findIndex(e => e.name === profileModal.name)) }}
                   />
                   <h3 className="text-xl font-bold mb-1" style={{ color: '#333' }}>{profileModal.name}</h3>
-                  <div className="text-gray-500 mb-4">{new Date(profileModal.date).toLocaleDateString()}</div>
+                  <div className="text-gray-500 mb-4">{profileModal.date ? new Date(profileModal.date).toLocaleDateString() : 'No date available'}</div>
                   <div className="grid grid-cols-3 gap-4 mb-6">
                     <div className="bg-blue-50 p-3 rounded-xl">
                       <div className="text-sm text-blue-600 mb-1">Score</div>
