@@ -1,91 +1,140 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const Loader: React.FC<{ label?: string; size?: 'sm' | 'md' | 'lg' }> = ({ 
+const Loader: React.FC<{ 
+  label?: string; 
+  size?: 'sm' | 'md' | 'lg';
+  fullScreen?: boolean;
+}> = ({ 
   label = 'Loading...', 
-  size = 'md' 
+  size = 'md',
+  fullScreen = false
 }) => {
   const sizeMap = {
-    sm: { container: 40, circle: 16, stroke: 3 },
-    md: { container: 56, circle: 24, stroke: 4 },
-    lg: { container: 72, circle: 32, stroke: 5 }
+    sm: { 
+      container: 32, 
+      circle: 12, 
+      stroke: 2,
+      textSize: 'text-sm'
+    },
+    md: { 
+      container: 48, 
+      circle: 18, 
+      stroke: 3,
+      textSize: 'text-base'
+    },
+    lg: { 
+      container: 64, 
+      circle: 24, 
+      stroke: 4,
+      textSize: 'text-lg'
+    }
   };
 
-  const { container, circle, stroke } = sizeMap[size];
+  const { container, circle, stroke, textSize } = sizeMap[size];
+  const duration = size === 'sm' ? 0.8 : size === 'md' ? 1.0 : 1.2;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[120px] w-full gap-3">
+    <div className={`flex flex-col items-center justify-center gap-3 ${fullScreen ? 'fixed inset-0 bg-white bg-opacity-90 z-50' : 'min-h-[120px] w-full'}`}>
       <motion.div
-        className="flex items-center justify-center"
-        initial={{ rotate: 0 }}
-        animate={{ rotate: 360 }}
-        transition={{ 
-          repeat: Infinity, 
-          duration: size === 'sm' ? 0.8 : 1.2, 
-          ease: 'linear' 
-        }}
-        style={{ width: container, height: container }}
+        className="relative"
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.3 }}
       >
-        <svg 
-          width={container} 
-          height={container} 
-          viewBox={`0 0 ${container} ${container}`} 
-          fill="none"
+        {/* Main spinner */}
+        <motion.div
+          className="flex items-center justify-center"
+          initial={{ rotate: 0 }}
+          animate={{ rotate: 360 }}
+          transition={{ 
+            repeat: Infinity, 
+            duration, 
+            ease: 'linear' 
+          }}
+          style={{ width: container, height: container }}
         >
-          <circle
-            cx={container / 2}
-            cy={container / 2}
-            r={circle}
-            stroke="currentColor"
-            strokeOpacity={0.2}
-            strokeWidth={stroke}
+          <svg 
+            width={container} 
+            height={container} 
+            viewBox={`0 0 ${container} ${container}`} 
             fill="none"
-          />
-          <motion.circle
-            cx={container / 2}
-            cy={container / 2}
-            r={circle}
-            stroke="url(#loader-gradient)"
-            strokeWidth={stroke}
-            strokeLinecap="round"
-            fill="none"
-            strokeDasharray={circle * 6}
-            strokeDashoffset={circle * 2}
-            initial={{ pathLength: 0.2 }}
-            animate={{ pathLength: 1 }}
-            transition={{ 
-              repeat: Infinity, 
-              duration: size === 'sm' ? 0.8 : 1.2, 
-              ease: 'easeInOut' 
-            }}
-          />
-          <defs>
-            <linearGradient 
-              id="loader-gradient" 
-              x1="0" 
-              y1="0" 
-              x2="1" 
-              y2="1"
-              gradientTransform="rotate(45)"
+          >
+            {/* Background circle */}
+            <circle
+              cx={container / 2}
+              cy={container / 2}
+              r={circle}
+              stroke="#E5E7EB"
+              strokeWidth={stroke}
+              fill="none"
+            />
+            {/* Animated circle */}
+            <motion.circle
+              cx={container / 2}
+              cy={container / 2}
+              r={circle}
+              stroke="url(#loader-gradient)"
+              strokeWidth={stroke}
+              strokeLinecap="round"
+              fill="none"
+              strokeDasharray={circle * 6}
+              initial={{ pathLength: 0.25, rotate: 0 }}
+              animate={{ 
+                pathLength: [0.25, 1, 0.25],
+                rotate: 90
+              }}
+              transition={{ 
+                repeat: Infinity, 
+                duration,
+                ease: 'easeInOut',
+                times: [0, 0.5, 1]
+              }}
+            />
+            <defs>
+              <linearGradient 
+                id="loader-gradient" 
+                x1="0" 
+                y1="0" 
+                x2="1" 
+                y2="1"
+              >
+                <stop offset="0%" stopColor="#58A700" /> {/* Duolingo green */}
+                <stop offset="50%" stopColor="#A5D6A7" /> {/* Light green */}
+                <stop offset="100%" stopColor="#58A700" /> {/* Duolingo green */}
+              </linearGradient>
+            </defs>
+          </svg>
+        </motion.div>
+
+        {/* Optional center icon */}
+        {size !== 'sm' && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <motion.div
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{
+                repeat: Infinity,
+                repeatType: 'reverse',
+                duration: duration * 1.5
+              }}
             >
-              <stop offset="0%" stopColor="#6366F1" />
-              <stop offset="50%" stopColor="#8B5CF6" />
-              <stop offset="100%" stopColor="#EC4899" />
-            </linearGradient>
-          </defs>
-        </svg>
+              <i className="material-icons text-green-600">auto_awesome</i>
+            </motion.div>
+          </div>
+        )}
       </motion.div>
+
+      {/* Label with pulsating animation */}
       {label && (
         <motion.div 
-          className={`text-indigo-600 font-medium ${
-            size === 'sm' ? 'text-sm' : size === 'md' ? 'text-base' : 'text-lg'
-          }`}
-          initial={{ opacity: 0.6 }}
-          animate={{ opacity: 1 }}
+          className={`font-medium text-green-700 ${textSize}`}
+          initial={{ opacity: 0.6, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{
             repeat: Infinity,
             repeatType: 'reverse',
-            duration: 1.5,
+            duration: duration * 1.5,
             ease: 'easeInOut'
           }}
         >

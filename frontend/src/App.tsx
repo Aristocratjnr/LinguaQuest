@@ -472,7 +472,7 @@ function App() {
 
   // Main game layout
   return (
-    <div className="lq-bg" style={{ minHeight: '100vh', minWidth: '100vw' }}>
+    <div className="lq-bg d-flex flex-column min-vh-100" style={{ minHeight: '100vh', width: '100%' }}>
       {/* Header */}
       <header className="container-fluid py-3 px-2 px-md-4 mb-3" style={{ background: headerBg, boxShadow: '0 2px 8px #0001', color: headerColor }}>
         <div className="d-flex align-items-center justify-content-between" style={{ minHeight: 48 }}>
@@ -488,7 +488,9 @@ function App() {
       <div className="container mb-3 px-2 px-sm-3" style={{ maxWidth: 900 }}>
         <div className="row g-3 align-items-center">
           <div className="col-12 col-md-8">
-            <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
+            <div className="progress-container">
+              <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
+            </div>
           </div>
           <div className="col-12 col-md-4">
             <div className="d-flex justify-content-center">
@@ -525,16 +527,16 @@ function App() {
       )}
 
       {/* Main Game Content */}
-      <main className="container flex-grow-1 d-flex flex-column px-2 px-sm-3" style={{ maxWidth: 900 }}>
-        <div className="row g-4 flex-grow-1">
+      <main className="container flex-grow-1 d-flex flex-column px-2 px-sm-3" style={{ maxWidth: 900, flex: 1, minHeight: 0 }}>
+        <div className="row g-4 flex-grow-1" style={{ minHeight: 0 }}>
           {/* Left Column - Scenario and User Input */}
-          <div className="col-12 col-lg-6 d-flex flex-column">
-            <div className="card shadow-sm mb-4 flex-grow-1" style={{ borderRadius: '1rem', background: 'rgba(255,255,255,0.98)' }}>
-              <div className="card-body d-grid gap-4">
+          <div className="col-12 col-lg-6 d-flex flex-column mb-3 mb-lg-0" style={{ minHeight: 0 }}>
+            <div className="card shadow-sm mb-4 flex-grow-1 d-flex flex-column" style={{ borderRadius: '1rem', background: 'rgba(255,255,255,0.98)', minHeight: 340 }}>
+              <div className="card-body d-grid gap-4 flex-grow-1">
                 <Scenario
                   scenario={scenario}
                   language={language}
-                  loading={loading || roundResult !== 'playing'}
+                  loading={loading}
                   onLanguageChange={handleScenarioLanguageChange}
                   languages={LANGUAGES}
                 />
@@ -542,7 +544,7 @@ function App() {
                   userArgument={userArgument}
                   onChange={setUserArgument}
                   loading={loading}
-                  disabled={roundResult !== 'playing'}
+                  disabled={loading}
                   onTranslate={handleTranslate}
                   translation={translation}
                   language={language}
@@ -551,16 +553,16 @@ function App() {
                   tone={tone}
                   onChange={setTone}
                   loading={loading}
-                  disabled={roundResult !== 'playing'}
+                  disabled={loading}
                   tones={TONES}
                 />
               </div>
             </div>
           </div>
           {/* Right Column - AI Responses and Feedback */}
-          <div className="col-12 col-lg-6 d-flex flex-column">
-            <div className="card shadow-sm mb-4 flex-grow-1" style={{ borderRadius: '1rem', background: 'rgba(255,255,255,0.98)' }}>
-              <div className="card-body d-grid gap-4">
+          <div className="col-12 col-lg-6 d-flex flex-column" style={{ minHeight: 0 }}>
+            <div className="card shadow-sm mb-4 flex-grow-1 d-flex flex-column" style={{ borderRadius: '1rem', background: 'rgba(255,255,255,0.98)', minHeight: 340 }}>
+              <div className="card-body d-grid gap-4 flex-grow-1">
                 <Feedback
                   feedback={feedback}
                   score={score}

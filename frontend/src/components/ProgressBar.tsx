@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 
 type ProgressBarProps = {
@@ -7,128 +7,126 @@ type ProgressBarProps = {
 };
 
 const ProgressBar: React.FC<ProgressBarProps> = ({ round, totalRounds }) => {
-  // Track the previous round for smoother animations
-  const [prevRound, setPrevRound] = useState(round);
   const progressPercent = Math.max(0, ((round - 1) / totalRounds) * 100);
   
-  // Update prevRound when round changes
-  useEffect(() => {
-    setPrevRound(round);
-  }, [round]);
-  
-  // Define a unique ID for the style element to avoid conflicts
-  const styleId = 'progress-bar-animation-style';
-  
-  // Add the keyframes style to the document head once
-  useEffect(() => {
-    // Check if the style already exists to avoid duplicates
-    if (!document.getElementById(styleId)) {
-      const styleElement = document.createElement('style');
-      styleElement.id = styleId;
-      styleElement.innerHTML = `
-        @keyframes progress-bar-stripes {
-          from { background-position: 1rem 0; }
-          to { background-position: 0 0; }
-        }
-      `;
-      document.head.appendChild(styleElement);
-    }
-    
-    // No need to remove the style on unmount as it's shared
-    // But we'll clean up if necessary
-    return () => {
-      // Only remove if component is being fully unmounted from the app
-      if (document.getElementById(styleId) && document.querySelectorAll('.progress-bar').length <= 1) {
-        const styleElement = document.getElementById(styleId);
-        if (styleElement) {
-          document.head.removeChild(styleElement);
-        }
-      }
-    };
-  }, []);
-  
   return (
-    <motion.div 
-      className="card shadow-sm mb-4"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-    >
-      <div className="card-body p-3">
-        <div className="d-flex justify-content-between align-items-center mb-2">
-          <div className="d-flex align-items-center text-muted">
-            <i className="material-icons me-2" style={{ fontSize: '1.1rem' }}>flag</i>
-            <span className="small fw-medium">Progress</span>
-          </div>
-          <div className="badge bg-primary px-3 py-2 d-flex align-items-center">
-            <i className="material-icons me-1" style={{ fontSize: '0.9rem' }}>timer</i>
-            <span>Round {round} of {totalRounds}</span>
-          </div>
-        </div>
-        
-        {/* Main progress bar */}
-        <div className="progress" style={{ height: '12px', borderRadius: '6px', overflow: 'hidden' }}>
-          <motion.div 
-            className="progress-bar"
-            style={{ 
-              width: `${progressPercent}%`,
-              background: 'linear-gradient(to right, #667eea, #764ba2)',
-              backgroundSize: '1rem 1rem',
-              backgroundImage: 'linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent)',
-              animation: 'progress-bar-stripes 1s linear infinite'
-            }}
-            initial={false} // Don't animate on first render
-            animate={{ width: `${progressPercent}%` }}
-            transition={{ 
-              duration: 0.8, 
-              ease: "easeOut",
-              type: "tween" 
-            }}
-            role="progressbar"
-            aria-valuenow={progressPercent}
-            aria-valuemin={0}
-            aria-valuemax={100}
-          />
-        </div>
-        
-        <div className="d-flex justify-content-between mt-2">
-          <div className="d-flex align-items-center">
-            <i className="material-icons me-1" style={{ fontSize: '0.8rem', color: '#6c757d' }}>start</i>
-            <span className="text-muted small">Start</span>
-          </div>
-          <div className="d-flex align-items-center">
-            <span className="text-muted small me-1">Finish</span>
-            <i className="material-icons" style={{ fontSize: '0.8rem', color: '#6c757d' }}>flag</i>
-          </div>
-        </div>
-        
-        {/* Round indicators */}
-        <div className="progress mt-1" style={{ height: '4px', borderRadius: '2px' }}>
-          {Array.from({ length: totalRounds }).map((_, i) => (
-            <motion.div 
-              key={i}
-              className="progress-segment"
-              style={{ 
-                width: `${100 / totalRounds}%`,
-                height: '100%',
-                display: 'inline-block',
-                borderRight: i < totalRounds - 1 ? '2px solid white' : 'none',
-                background: i < round - 1 ? '#28a745' : '#e9ecef',
-                transition: 'background-color 0.5s ease'
-              }}
-              initial={false}
-              animate={{ 
-                backgroundColor: i < round - 1 ? '#28a745' : '#e9ecef'
-              }}
-              transition={{ 
-                duration: 0.5,
-                delay: i * 0.1  // Stagger the animations
-              }}
-            />
-          ))}
+    <div className="progress-container">
+      {/* Round number indicator */}
+      <div className="d-flex justify-content-between align-items-center mb-2">
+        <span className="text-muted small fw-bold" style={{ color: '#58a700' }}>
+          Round {round} of {totalRounds}
+        </span>
+        <div className="round-indicator" style={{
+          width: '24px',
+          height: '24px',
+          borderRadius: '50%',
+          backgroundColor: '#58a700',
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontWeight: 'bold',
+          fontSize: '0.8rem'
+        }}>
+          {round}
         </div>
       </div>
-    </motion.div>
+      
+      {/* Start and Finish Flags */}
+      <div className="d-flex justify-content-between align-items-center mb-1" style={{ position: 'relative' }}>
+        <span className="material-icons" style={{ color: '#58a700', fontSize: '1.3rem' }}>flag</span>
+        <span className="material-icons" style={{ color: '#764ba2', fontSize: '1.3rem' }}>outlined_flag</span>
+      </div>
+      {/* Main progress bar */}
+      <div className="progress" style={{ 
+        height: '8px', 
+        borderRadius: '4px', 
+        backgroundColor: '#e5e5e5',
+        overflow: 'visible'
+      }}>
+        <motion.div 
+          className="progress-bar"
+          style={{ 
+            width: `${progressPercent}%`,
+            backgroundColor: '#58a700',
+            borderRadius: '4px',
+            position: 'relative'
+          }}
+          initial={false}
+          animate={{ width: `${progressPercent}%` }}
+          transition={{ 
+            duration: 0.6, 
+            ease: "easeOut"
+          }}
+        />
+      </div>
+      
+      {/* Round indicators with animation */}
+      <div className="d-flex justify-content-between mt-3" style={{ position: 'relative', height: 40 }}>
+        {Array.from({ length: totalRounds }).map((_, i) => {
+          const isCompleted = i < round - 1;
+          const isCurrent = i === round - 1;
+          const isUpcoming = i > round - 1;
+          return (
+            <React.Fragment key={i}>
+              {/* Animated Progress Dots */}
+              <motion.div
+                initial={false}
+                animate={{
+                  scale: isCurrent ? 1.35 : 1,
+                  boxShadow: isCurrent
+                    ? '0 0 0 4px #b4e19755, 0 0 12px 4px #58a70055'
+                    : isCompleted
+                      ? '0 1px 4px #58a70033'
+                      : '0 1px 4px #e5e5e5',
+                  backgroundColor: isCurrent
+                    ? '#fff'
+                    : isCompleted
+                      ? '#58a700'
+                      : '#e5e5e5',
+                  borderColor: isCurrent
+                    ? '#58a700'
+                    : isCompleted
+                      ? '#58a700'
+                      : '#ccc',
+                }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 400,
+                  damping: 24,
+                  duration: 0.4,
+                }}
+                style={{
+                  position: 'absolute',
+                  left: `${(i / (totalRounds - 1)) * 100}%`,
+                  top: 0,
+                  width: isCurrent ? 28 : 20,
+                  height: isCurrent ? 28 : 20,
+                  borderRadius: '50%',
+                  border: '3px solid',
+                  zIndex: isCurrent ? 3 : 2,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transform: 'translateX(-50%)',
+                  boxSizing: 'border-box',
+                  cursor: 'default',
+                  backgroundClip: 'padding-box',
+                  userSelect: 'none',
+                }}
+              >
+                <span style={{
+                  fontWeight: 'bold',
+                  fontSize: isCurrent ? '1.1rem' : '0.85rem',
+                  color: isCurrent ? '#58a700' : isCompleted ? '#fff' : '#999',
+                  transition: 'color 0.3s',
+                }}>{i + 1}</span>
+              </motion.div>
+            </React.Fragment>
+          );
+        })}
+      </div>
+    </div>
   );
 };
 

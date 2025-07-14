@@ -89,10 +89,13 @@ export default {
           800: '#262626',
           900: '#171717',
         },
+        'duo-green': '#58cc02',
+        'duo-blue': '#1cb0f6',
+        'duo-yellow': '#ffd600',
       },
       fontFamily: {
-        'sans': ['Inter', 'system-ui', 'sans-serif'],
-        'display': ['Poppins', 'system-ui', 'sans-serif'],
+        'sans': ['Readex Pro', 'Nunito', 'Quicksand', 'Segoe UI', 'Arial Rounded MT Bold', 'Arial', 'sans-serif', ...require('tailwindcss/defaultTheme').fontFamily.sans],
+        'display': ['JetBrains Mono', 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'Menlo', 'monospace'],
         'mono': ['JetBrains Mono', 'monospace'],
       },
       fontSize: {

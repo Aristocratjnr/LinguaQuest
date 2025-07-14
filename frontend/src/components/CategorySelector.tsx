@@ -21,6 +21,45 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
   const [difficulty, setDifficulty] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [windowSize, setWindowSize] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 1200,
+    height: typeof window !== 'undefined' ? window.innerHeight : 800,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Responsive breakpoints
+  const isLargeDesktop = windowSize.width >= 1200;
+  const isDesktop = windowSize.width >= 992;
+  const isTablet = windowSize.width >= 768;
+  const isMobile = windowSize.width < 768;
+  const isSmallMobile = windowSize.width < 400;
+
+  // Calculate dynamic font sizes
+  const getFontSize = (mobileSize: number, tabletSize: number, desktopSize: number) => {
+    if (isSmallMobile) return `${mobileSize * 0.9}px`;
+    if (isMobile) return `${mobileSize}px`;
+    if (isTablet) return `${tabletSize}px`;
+    return `${desktopSize}px`;
+  };
+
+  // Calculate dynamic spacing
+  const getSpacing = (mobileSize: number, tabletSize: number, desktopSize: number) => {
+    if (isSmallMobile) return `${mobileSize * 0.8}px`;
+    if (isMobile) return `${mobileSize}px`;
+    if (isTablet) return `${tabletSize}px`;
+    return `${desktopSize}px`;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,7 +97,6 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
   }, []);
 
   const handleConfirm = () => {
-    // Add validation to ensure values are selected before proceeding
     if (!category || !difficulty) {
       setError("Please select both a category and difficulty");
       return;
@@ -102,7 +140,7 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
   return (
     <div className="container-fluid d-flex align-items-center justify-content-center min-vh-100 px-2 px-sm-3 px-md-4"
          style={{ 
-           background: 'linear-gradient(135deg, #58cc02 0%, #1cb0f6 100%)', 
+           background: 'linear-gradient(135deg, #58cc02 0%, #4CAF50 100%)', 
            fontFamily: "'JetBrains Mono', monospace",
            minHeight: '100vh',
            padding: '16px'
@@ -146,7 +184,7 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
             {categories.map(c => (
               <div className="col-12 col-sm-6" key={c.key}>
                 <motion.button
-                  className={`btn w-100 py-3 px-2 position-relative ${category === c.key ? 'border-primary' : ''}`}
+                  className="btn w-100 py-3 px-2 position-relative"
                   style={{ 
                     borderRadius: '12px', 
                     transition: 'all 0.2s cubic-bezier(.4,0,.2,1)',
@@ -154,7 +192,7 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
                     fontWeight: 500,
                     fontSize: '1.05rem',
                     letterSpacing: '.01em',
-                    background: category === c.key ? '#f0f9ff' : 'white',
+                    background: category === c.key ? '#e8f5e8' : 'white',
                     color: '#22223b',
                     border: category === c.key ? '2px solid #58cc02' : '1.5px solid #e0e7ef',
                   }}
@@ -171,7 +209,7 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
                     <span className="fw-medium">{c.label}</span>
                   </div>
                   {category === c.key && (
-                    <span className="position-absolute top-0 end-0 translate-middle badge rounded-pill bg-primary p-2 shadow"
+                    <span className="position-absolute top-0 end-0 translate-middle badge rounded-pill p-2 shadow"
                           style={{ fontSize: '.7rem', right: 8, top: 8, background: '#58cc02' }}>
                       <i className="material-icons" style={{ fontSize: '.8rem', color: 'white' }}>check</i>
                       <span className="visually-hidden">Selected</span>
@@ -182,8 +220,8 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
             ))}
           </div>
           
-          <h5 className="mb-3 d-flex align-items-center" style={{ fontWeight: 600, fontSize: '1.05rem', color: '#1cb0f6', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            <i className="material-icons me-2" style={{ fontSize: '1.1rem', color: '#1cb0f6' }}>signal_cellular_alt</i>
+          <h5 className="mb-3 d-flex align-items-center" style={{ fontWeight: 600, fontSize: '1.05rem', color: '#58cc02', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <i className="material-icons me-2" style={{ fontSize: '1.1rem', color: '#58cc02' }}>signal_cellular_alt</i>
             Difficulty Level
           </h5>
           <div className="d-flex flex-column flex-sm-row gap-2 mb-4">
@@ -193,52 +231,73 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
                 className="btn py-2 flex-grow-1"
                 style={{ 
                   borderRadius: '12px',
-                  background: difficulty === d.key ? '#f0f9ff' : 'white',
-                  border: difficulty === d.key ? `2px solid #1cb0f6` : '1.5px solid #e0e7ef',
+                  background: difficulty === d.key ? '#e8f5e8' : 'white',
+                  border: difficulty === d.key ? '2px solid #58cc02' : '1.5px solid #e0e7ef',
                   color: '#22223b',
                   fontWeight: 500,
                   fontSize: '1.01rem',
-                  boxShadow: difficulty === d.key ? `0 4px 12px rgba(28,176,246,0.2)` : '0 2px 8px rgba(0,0,0,0.05)',
+                  boxShadow: difficulty === d.key ? '0 4px 12px rgba(88,204,2,0.2)' : '0 2px 8px rgba(0,0,0,0.05)',
                   transition: 'all 0.2s cubic-bezier(.4,0,.2,1)'
                 }}
                 onClick={() => {
                   setDifficulty(d.key);
                   setError(null);
                 }}
-                whileHover={{ scale: 1.03, boxShadow: `0 4px 16px #6366f11a` }}
+                whileHover={{ scale: 1.03, boxShadow: '0 4px 16px rgba(99,102,241,0.1)' }}
                 whileTap={{ scale: 0.97 }}
                 aria-pressed={difficulty === d.key}
               >
                 <div className="d-flex align-items-center justify-content-center gap-1">
                   <span>{d.label}</span>
                   {difficulty === d.key && (
-                    <i className="material-icons ms-2" style={{ fontSize: '.95rem', color: '#1cb0f6' }}>check_circle</i>
+                    <i className="material-icons ms-2" style={{ fontSize: '.95rem', color: '#58cc02' }}>check_circle</i>
                   )}
                 </div>
               </motion.button>
             ))}
           </div>
           
-          <motion.button
-            className="btn btn-lg w-100 py-3 text-white mt-2 shadow-sm"
-            style={{ 
-              background: '#58cc02',
-              border: 'none',
-              borderRadius: '12px',
-              fontWeight: 600,
-              fontSize: '1.08rem',
-              letterSpacing: '.01em',
-              boxShadow: '0 4px 18px rgba(88,204,2,0.2)'
-            }}
-            onClick={handleConfirm}
-            whileHover={{ scale: 1.02, boxShadow: '0 8px 28px rgba(60,60,60,0.13)' }}
-            whileTap={{ scale: 0.97 }}
-            disabled={!category || !difficulty}
-            aria-label="Start Game"
-          >
-            <i className="material-icons align-middle me-2">play_arrow</i>
-            Start Game
-          </motion.button>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%'
+          }}>
+            <motion.button
+              onClick={handleConfirm}
+              whileHover={{ 
+                scale: 1.02, 
+                boxShadow: '0 6px 0 #3caa3c',
+                transition: { type: 'spring', stiffness: 400 }
+              }}
+              whileTap={{ 
+                scale: 0.98, 
+                boxShadow: '0 2px 0 #3caa3c',
+                transition: { duration: 0.1 }
+              }}
+              style={{
+                background: '#58cc02',
+                color: 'white',
+                border: 'none',
+                borderRadius: '16px',
+                padding: isSmallMobile ? '12px 16px' : isMobile ? '14px 20px' : '16px 32px',
+                fontSize: getFontSize(14, 16, 18),
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                width: '100%',
+                maxWidth: isDesktop ? '400px' : '300px',
+                boxShadow: '0 4px 0 #3caa3c',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                fontFamily: '"JetBrains Mono", "Courier New", monospace'
+              }}
+              disabled={!category || !difficulty}
+              aria-label="Start Game"
+            >
+              <i className="material-icons align-middle me-2">play_arrow</i>
+              START GAME
+            </motion.button>
+          </div>
         </div>
         
         <div className="card-footer py-3 text-center text-muted small border-top"
