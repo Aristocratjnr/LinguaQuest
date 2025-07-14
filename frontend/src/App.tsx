@@ -721,14 +721,43 @@ function App() {
       )}
       {/* Help Modal */}
       {showHelp && (
-        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ background: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
-          <div className="card shadow mx-3" style={{ maxWidth: 480, maxHeight: '90vh', overflow: 'auto' }}>
-            <div className="card-header bg-primary text-white py-3">
-              <h5 className="mb-0 d-flex align-items-center">
-                <i className="material-icons me-2">help_outline</i>
-                Voice Commands
-              </h5>
+        <motion.div
+          className="fixed inset-0 d-flex align-items-center justify-content-center p-4 z-50"
+          style={{ background: theme === 'dark' ? 'rgba(24,28,42,0.85)' : 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="bg-white dark:bg-[#232946] rounded-4 overflow-hidden w-100 position-relative shadow-lg"
+            style={{ maxWidth: 480, width: '100%', borderRadius: 24, boxShadow: theme === 'dark' ? '0 10px 30px #181c2a' : '0 10px 30px rgba(0,0,0,0.10)' }}
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: 'spring', damping: 25 }}
+          >
+            {/* Header */}
+            <div className="d-flex align-items-center justify-content-between px-4 py-3 border-bottom" style={{ background: theme === 'dark' ? '#181c2a' : '#f8f9fa', borderTopLeftRadius: 24, borderTopRightRadius: 24 }}>
+              <div className="d-flex align-items-center gap-2">
+                <span className="d-flex align-items-center justify-content-center" style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700' }}>
+                  <i className="material-icons" style={{ fontSize: '1.5rem' }}>help_outline</i>
+                </span>
+                <h2 className="fw-bold mb-0" style={{ color: '#58a700', fontSize: '1.15rem', letterSpacing: '.01em' }}>Voice Commands</h2>
+                <span className="badge px-3 py-1 d-flex align-items-center ms-2" style={{ backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700', borderRadius: '12px', fontWeight: 600, fontSize: '0.85rem', letterSpacing: '.01em' }}>
+                  <i className="material-icons me-1" style={{ fontSize: '1rem' }}>mic</i>
+                  Assistant
+                </span>
+              </div>
+              <motion.button whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
+                onClick={() => setShowHelp(false)}
+                className="btn btn-sm btn-outline-secondary rounded-circle ms-2 d-flex align-items-center justify-content-center"
+                style={{ width: 36, height: 36, border: 'none', background: theme === 'dark' ? '#232946' : '#f8f9fa' }}
+                aria-label="Close help"
+              >
+                <i className="material-icons">close</i>
+              </motion.button>
             </div>
+            {/* Body */}
             <div className="card-body p-4">
               <ul className="list-group list-group-flush">
                 {VOICE_COMMANDS.map(cmd => (
@@ -743,14 +772,15 @@ function App() {
                 ))}
               </ul>
             </div>
-            <div className="card-footer d-flex justify-content-end p-3">
-              <button className="btn btn-primary px-4" onClick={() => setShowHelp(false)}>
-                <i className="material-icons align-middle me-2">close</i>
-                Close
-              </button>
+            {/* Info/Help Section */}
+            <div className="text-muted small px-4 py-3 d-flex align-items-center gap-2 border-top" style={{ color: theme === 'dark' ? '#a5b4fc' : '#6c757d', fontSize: '0.9rem', background: theme === 'dark' ? '#181c2a' : '#f8f9fa', borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }}>
+              <span className="d-flex align-items-center justify-content-center" style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700' }}>
+                <i className="material-icons" style={{ fontSize: '1.1rem' }}>info</i>
+              </span>
+              Try saying a command or tap the mic button. Voice commands work best in supported browsers.
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
 
       {/* Audio elements */}
@@ -770,7 +800,7 @@ function App() {
             Settings
           </motion.button>
         </div>
-        &copy; {new Date().getFullYear()} LinguaQuest
+        &copy; {new Date().getFullYear()} LinguaQuest. Developed by: Opuku Boakye Michael
       </footer>
     </div>
   );
