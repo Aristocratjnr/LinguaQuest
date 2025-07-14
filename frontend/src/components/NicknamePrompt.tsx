@@ -168,15 +168,13 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
   };
 
   return (
-    <div className="nickname-prompt-container" style={{
+    <div  style={{
       minHeight: '100vh',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))',
       padding: '1rem',
-      fontFamily: '"JetBrains Mono", monospace',
-      color: 'var(--text-dark, #222)'
+      background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))'
     }}>
       <motion.div 
         className="nickname-card"

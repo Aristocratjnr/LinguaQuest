@@ -72,15 +72,22 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
   };
 
   return (
-    <div className="welcome-container container-fluid d-flex align-items-center justify-content-center min-vh-100 px-2 px-sm-3 px-md-4"
-         style={{
-           background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))',
-           backgroundAttachment: 'fixed',
-           overflow: 'hidden',
-           margin: 0,
-           width: 'auto',
-           color: 'var(--text-dark, #222)'
-         }}>
+    <div
+      className="welcome-container"
+      style={{
+        minHeight: '100vh',
+        width: '100vw',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))',
+        backgroundAttachment: 'fixed',
+        padding: '1rem',
+        color: 'var(--text-dark, #222)',
+        boxSizing: 'border-box',
+        overflow: 'auto',
+      }}
+    >
       {/* Animated background elements */}
       <motion.div 
         className="position-absolute top-0 start-0 w-100 h-100"
@@ -101,22 +108,20 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
       />
       
       <motion.div 
-        className="welcome-card shadow-lg mx-3 my-4 position-relative"
+        className="welcome-card shadow-lg position-relative"
         style={{ 
-          maxWidth: 500, 
-          width: '95%',
-          minWidth: 600, 
-          borderRadius: '24px',
+          width: '100%',
+          borderRadius: '16px',
           overflow: 'hidden',
           fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
           border: 'none',
           zIndex: 1,
           backdropFilter: 'blur(4px)',
-          marginRight: '0.9rem',
-          marginLeft: '0.9rem',
-          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
           background: 'var(--duo-card, #fff)',
-          color: 'inherit'
+          color: 'inherit',
+          margin: '0 auto',
+          maxWidth: '400px' // Added max-width for better control
         }}
         initial={{ opacity: 0, y: 32 }}
         animate={{ opacity: 1, y: 0 }}
@@ -127,23 +132,23 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         }}
       >
         {/* Logo Header */}
-        <div className="card-header text-center py-3 py-sm-4 border-bottom-0 d-flex flex-column align-items-center" 
+        <div className="card-header text-center py-3 border-bottom-0 d-flex flex-column align-items-center" 
              style={{ 
                background: 'transparent',
              }}>
           <motion.div 
-            className="mb-2 mb-sm-3 p-2 rounded-circle d-flex align-items-center justify-content-center mx-auto" 
+            className="mb-2 p-2 rounded-circle d-flex align-items-center justify-content-center mx-auto" 
             style={{ 
               background: '#58cc02', 
-              width: 'clamp(60px, 15vw, 80px)', 
-              height: 'clamp(60px, 15vw, 80px)',
-              boxShadow: '0 4px 20px rgba(88, 204, 2, 0.4)'
+              width: '60px', 
+              height: '60px',
+              boxShadow: '0 4px 12px rgba(88, 204, 2, 0.3)'
             }}
             initial={{ scale: 0.8, rotate: -15 }}
             animate={{ 
               scale: 1, 
               rotate: 0,
-              boxShadow: '0 8px 30px rgba(88, 204, 2, 0.6)'
+              boxShadow: '0 6px 20px rgba(88, 204, 2, 0.4)'
             }}
             transition={{ 
               type: 'spring', 
@@ -157,20 +162,20 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
               alt="LinguaQuest Logo" 
               className="img-fluid" 
               style={{ 
-                height: 'clamp(36px, 9vw, 48px)', 
-                width: 'clamp(36px, 9vw, 48px)', 
+                height: '36px', 
+                width: '36px', 
                 objectFit: 'contain',
-                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
+                filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.1))'
               }} 
             />
           </motion.div>
           <motion.h1 
             className="fw-bold mb-0" 
             style={{ 
-              letterSpacing: '-0.02em',
-              fontSize: 'clamp(1.5rem, 5vw, 1.75rem)',
-              color: 'var(--text-dark, #222)',
-              textShadow: '0 1px 2px rgba(0,0,0,0.05)'
+              padding: '0.8rem',
+          background: '#ffffff',
+          textAlign: 'center',
+          color: 'var(--text-light, #e0e7ff)'
             }}
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -179,9 +184,9 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
             LinguaQuest
           </motion.h1>
           <motion.p 
-            className="mt-1 mt-sm-2 mb-0" 
+            className="mt-1 mb-0" 
             style={{ 
-              fontSize: 'clamp(0.9rem, 3vw, 1rem)', 
+              fontSize: '0.9rem', 
               letterSpacing: '0.01em',
               fontWeight: 500,
               color: 'var(--text-dark, #6b7280)'
@@ -197,7 +202,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         {/* Slide Content */}
         <div className="card-body p-0" style={{ background: 'transparent' }}>
           {/* Slider */}
-          <div className="position-relative" style={{ minHeight: 'clamp(280px, 60vw, 320px)', overflow: 'hidden' }}>
+          <div className="position-relative" style={{ minHeight: '240px', overflow: 'hidden' }}>
             <AnimatePresence custom={direction} initial={false}>
               <motion.div
                 key={currentSlide}
@@ -206,24 +211,24 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
                 initial="enter"
                 animate="center"
                 exit="exit"
-                className="p-3 p-sm-4 p-md-5 text-center d-flex flex-column align-items-center"
+                className="p-3 p-sm-4 text-center d-flex flex-column align-items-center"
                 style={{ position: 'absolute', width: '100%' }}
               >
                 <motion.div 
-                  className="mb-3 mb-sm-4 p-2 p-sm-3 rounded-circle d-flex align-items-center justify-content-center mx-auto" 
+                  className="mb-3 p-2 rounded-circle d-flex align-items-center justify-content-center mx-auto" 
                   style={{ 
                     background: `${slides[currentSlide].color}15`, 
-                    width: 'clamp(90px, 25vw, 120px)', 
-                    height: 'clamp(90px, 25vw, 120px)',
-                    fontSize: 'clamp(2.5rem, 8vw, 3.5rem)',
+                    width: '80px', 
+                    height: '80px',
+                    fontSize: '2.5rem',
                     border: `2px solid ${slides[currentSlide].color}30`,
-                    boxShadow: `0 4px 20px ${slides[currentSlide].color}20`
+                    boxShadow: `0 4px 12px ${slides[currentSlide].color}20`
                   }}
                   initial={{ scale: 0.8, rotate: -15 }}
                   animate={{ 
                     scale: 1, 
                     rotate: 0,
-                    boxShadow: `0 8px 30px ${slides[currentSlide].color}30`
+                    boxShadow: `0 6px 20px ${slides[currentSlide].color}30`
                   }}
                   transition={{ 
                     type: 'spring',
@@ -237,13 +242,13 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
                 
                 <motion.h2 
                   style={{ 
-                    fontSize: 'clamp(1.25rem, 5vw, 1.5rem)', 
+                    fontSize: '1.25rem', 
                     fontWeight: 700, 
                     color: 'var(--text-dark, #222)',
-                    marginBottom: 'clamp(0.75rem, 2vw, 1rem)',
+                    marginBottom: '0.75rem',
                     letterSpacing: '-0.01em',
                     lineHeight: 1.3,
-                    padding: '0 1rem'
+                    padding: '0 0.5rem'
                   }}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -254,9 +259,9 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
                 
                 <motion.p 
                   style={{ 
-                    fontSize: 'clamp(0.95rem, 3vw, 1.1rem)', 
+                    fontSize: '0.95rem', 
                     color: 'var(--text-dark, #4b5563)',
-                    lineHeight: 1.6,
+                    lineHeight: 1.5,
                     maxWidth: '90%',
                     letterSpacing: '0.01em',
                     marginBottom: 0,
@@ -275,19 +280,19 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           
           {/* Get Started Button - Only show on the last slide */}
           {currentSlide === slides.length - 1 && (
-            <div className="px-3 px-sm-4 px-md-5 pb-3 pb-sm-4">
+            <div className="px-3 pb-3">
               <motion.button
-                className="btn btn-primary btn-lg w-100 text-center d-flex align-items-center justify-content-center"
+                className="btn btn-primary w-100 text-center d-flex align-items-center justify-content-center"
                 style={{ 
                   background: '#58cc02',
                   border: 'none',
-                  borderRadius: '16px',
-                  padding: 'clamp(0.75rem, 3vw, 1rem)',
-                  fontSize: 'clamp(1rem, 3vw, 1.1rem)',
+                  borderRadius: '12px',
+                  padding: '0.75rem',
+                  fontSize: '1rem',
                   fontFamily: "'JetBrains Mono', monospace",
                   fontWeight: 'bold',
                   letterSpacing: '1px',
-                  boxShadow: '0 4px 0 #3caa3c',
+                  boxShadow: '0 3px 0 #3caa3c',
                   position: 'relative',
                   overflow: 'hidden',
                   color: 'white',
@@ -296,7 +301,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
                 onClick={onGetStarted}
                 whileHover={{ 
                   scale: 1.02, 
-                  boxShadow: '0 6px 0 #3caa3c',
+                  boxShadow: '0 4px 0 #3caa3c',
                   transition: { type: 'spring', stiffness: 400 }
                 }}
                 whileTap={{ scale: 0.98 }}
@@ -305,7 +310,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
                 transition={{ delay: 0.4, type: 'spring' }}
               >
                 <span className="position-relative z-10">
-                  <i className="material-icons align-middle me-2" style={{ fontSize: 'clamp(1rem, 3vw, 1.2rem)' }}>
+                  <i className="material-icons align-middle me-2" style={{ fontSize: '1rem' }}>
                     arrow_forward
                   </i>
                   GET STARTED
@@ -330,15 +335,15 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           )}
           
           {/* Navigation Dots */}
-          <div className="d-flex justify-content-center pb-2 pb-sm-3 pb-md-4">
+          <div className="d-flex justify-content-center pb-2">
             {slides.map((slide, index) => (
               <motion.div
                 key={index}
                 className="mx-1 cursor-pointer"
                 style={{ 
-                  width: currentSlide === index ? 24 : 8,
-                  height: 8,
-                  borderRadius: 4,
+                  width: currentSlide === index ? 20 : 6,
+                  height: 6,
+                  borderRadius: 3,
                   background: currentSlide === index ? slide.color : '#d1d5db',
                   cursor: 'pointer',
                 }}
@@ -354,22 +359,21 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           </div>
           
           {/* Navigation Buttons */}
-          <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center px-3 px-sm-4 px-md-5 pb-3 pb-sm-4 gap-2 gap-sm-3 gap-md-0">
+          <div className="d-flex flex-row justify-content-between align-items-center px-3 pb-3 gap-2">
             <motion.button 
-              className="btn btn-outline-secondary btn-sm w-100 w-sm-auto d-flex align-items-center justify-content-center"
+              className="btn btn-outline-secondary btn-sm w-100 d-flex align-items-center justify-content-center"
               style={{ 
-                borderRadius: '12px',
+                borderRadius: '8px',
                 fontFamily: "'JetBrains Mono', monospace",
                 letterSpacing: '1px',
                 opacity: currentSlide === 0 ? 0 : 1,
                 pointerEvents: currentSlide === 0 ? 'none' : 'auto',
-                minWidth: 'clamp(90px, 25vw, 100px)',
                 borderColor: '#d1d5db',
                 color: 'var(--text-dark, #4b5563)',
                 gap: '4px',
                 fontWeight: 'bold',
                 backgroundColor: 'rgba(255,255,255,0.7)',
-                padding: '0.375rem 0.75rem',
+                padding: '0.375rem',
                 textTransform: 'uppercase'
               }}
               onClick={() => paginate(-1)}
@@ -378,50 +382,49 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
               whileTap={{ scale: 0.98 }}
               transition={{ type: 'spring', stiffness: 300 }}
             >
-              <i className="material-icons" style={{ fontSize: 'clamp(0.9rem, 3vw, 1rem)' }}>arrow_back</i>
-              <span>PREVIOUS</span>
+              <i className="material-icons" style={{ fontSize: '0.9rem' }}>arrow_back</i>
+              <span>PREV</span>
             </motion.button>
             
             {currentSlide < slides.length - 1 ? (
               <motion.button 
-                className="btn btn-primary btn-sm w-100 w-sm-auto d-flex align-items-center justify-content-center"
+                className="btn btn-primary btn-sm w-100 d-flex align-items-center justify-content-center"
                 style={{ 
-                  borderRadius: '12px',
+                  borderRadius: '8px',
                   fontFamily: "'JetBrains Mono', monospace",
                   letterSpacing: '1px',
                   background: '#58cc02',
                   border: 'none',
-                  minWidth: 'clamp(90px, 25vw, 100px)',
                   gap: '4px',
-                  boxShadow: '0 4px 0 #3caa3c',
+                  boxShadow: '0 3px 0 #3caa3c',
                   color: 'var(--text-light, #e0e7ff)',
                   fontWeight: 'bold',
-                  padding: '0.375rem 0.75rem',
+                  padding: '0.375rem',
                   textTransform: 'uppercase'
                 }}
                 onClick={() => paginate(1)}
                 whileHover={{ 
                   scale: 1.02, 
-                  boxShadow: '0 6px 0 #3caa3c',
+                  boxShadow: '0 4px 0 #3caa3c',
                   transition: { type: 'spring', stiffness: 400 }
                 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ type: 'spring', stiffness: 300 }}
               >
-                                  <span>NEXT</span>
-                <i className="material-icons" style={{ fontSize: 'clamp(0.9rem, 3vw, 1rem)' }}>arrow_forward</i>
+                <span>NEXT</span>
+                <i className="material-icons" style={{ fontSize: '0.9rem' }}>arrow_forward</i>
               </motion.button>
             ) : (
-              <div style={{ minWidth: 'clamp(90px, 25vw, 100px)' }} /> // Spacer for alignment
+              <div style={{ minWidth: '90px' }} /> // Spacer for alignment
             )}
           </div>
         </div>
         
         {/* Footer */}
-        <div className="card-footer py-2 py-sm-3 text-center border-top-0 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-1 gap-sm-2 gap-md-0" 
+        <div className="card-footer py-2 text-center border-top-0 d-flex flex-row justify-content-between align-items-center gap-2" 
              style={{ 
                background: 'transparent',
-               fontSize: 'clamp(0.75rem, 3vw, 0.8rem)',
+               fontSize: '0.75rem',
                color: 'var(--text-dark, #6b7280)',
                borderTop: '1px solid rgba(0, 0, 0, 0.05)'
              }}>
@@ -436,11 +439,11 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           <motion.button 
             className="btn btn-sm p-0 text-primary"
             style={{ 
-              fontSize: 'clamp(0.75rem, 3vw, 0.8rem)',
+              fontSize: '0.75rem',
               background: 'transparent',
               border: 'none',
               letterSpacing: '1px',
-              minWidth: 90,
+              minWidth: 80,
               fontWeight: 'bold',
               textTransform: 'uppercase'
             }}
