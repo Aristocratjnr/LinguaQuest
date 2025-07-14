@@ -203,7 +203,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         ]} currentStep={0} />
         {/* Header */}
         <div style={{
-          padding: '1.5rem',
+          padding: '1rem 1.25rem 1rem 1.25rem',
           background: '#ffffff',
           textAlign: 'center',
           color: 'var(--text-light, #e0e7ff)'
@@ -291,7 +291,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         </div>
         
         {/* Body */}
-        <div style={{ padding: '1.5rem' }}>
+        <div style={{ padding: '1rem 1.25rem' }}>
           <div style={{ marginBottom: '1.5rem' }}>
             <div style={{
               display: 'flex',
