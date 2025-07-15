@@ -424,7 +424,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         <div className="card-footer py-2 text-center border-top-0 d-flex flex-row justify-content-between align-items-center gap-2" 
              style={{ 
                background: 'transparent',
-               fontSize: '0.75rem',
+               fontSize: '0.71rem',
                color: 'var(--text-dark, #6b7280)',
                borderTop: '1px solid rgba(0, 0, 0, 0.05)'
              }}>
@@ -439,7 +439,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           <motion.button 
             className="btn btn-sm p-0 text-primary"
             style={{ 
-              fontSize: '0.75rem',
+              fontSize: '0.71rem',
               background: 'transparent',
               border: 'none',
               letterSpacing: '1px',
