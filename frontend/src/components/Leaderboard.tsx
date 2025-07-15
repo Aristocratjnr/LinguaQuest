@@ -30,7 +30,13 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
         setLoading(true);
         setError('');
         const leaderboardRes = await gameApi.getLeaderboard(limit, page * limit, sortBy, sortDir);
-        setEntries(leaderboardRes);
+        console.log('Leaderboard response:', leaderboardRes);
+        if (!Array.isArray(leaderboardRes)) {
+          setError('Leaderboard data is not an array. Check backend response format.');
+          setEntries([]);
+        } else {
+          setEntries(leaderboardRes);
+        }
       } catch (err) {
         setError('Failed to load leaderboard data.');
       } finally {

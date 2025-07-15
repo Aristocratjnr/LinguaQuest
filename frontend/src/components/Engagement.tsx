@@ -116,7 +116,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
       >
        {/* Header with mascot - Updated Avatar Section */}
 <div style={{
-  background: 'var(--duo-green, #58cc02)',
+  background: '#ffffff',
   padding: getSpacing(12, 16, 24),
   display: 'flex',
   flexDirection: 'column',
@@ -180,7 +180,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
     textAlign: 'center'
   }}>
     <h1 style={{
-      color: '#ffff',
+      color: '#1cb0f6',
       fontWeight: 900,
       marginBottom: '12px',
       fontSize: getFontSize(18, 22, 26),

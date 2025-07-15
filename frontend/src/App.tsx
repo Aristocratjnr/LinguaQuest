@@ -987,52 +987,7 @@ function AppContent() {
 
       {/* Modals */}
       {showLeaderboard && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            borderRadius: '16px',
-            width: '90%',
-            maxWidth: '500px',
-            maxHeight: '80vh',
-            overflow: 'hidden',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.15)'
-          }}>
-            <div style={{
-              padding: '16px',
-              borderBottom: `1px solid ${DUOLINGO_COLORS.gray}`,
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <h2 style={{ margin: 0, color: DUOLINGO_COLORS.green }}>Leaderboard</h2>
-              <button 
-                onClick={() => setShowLeaderboard(false)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  fontSize: '24px',
-                  cursor: 'pointer',
-                  color: DUOLINGO_COLORS.darkGray
-                }}
-              >
-                ×
-              </button>
-            </div>
-            <div style={{ padding: '16px', maxHeight: '60vh', overflowY: 'auto' }}>
-              <Leaderboard onClose={() => setShowLeaderboard(false)} />
-            </div>
-          </div>
-        </div>
+        <Leaderboard onClose={() => setShowLeaderboard(false)} />
       )}
       
       {showHelp && (
@@ -1054,7 +1009,9 @@ function AppContent() {
             maxWidth: '500px',
             maxHeight: '80vh',
             overflow: 'hidden',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.15)'
+            boxShadow: '0 8px 32px rgba(0,0,0,0.25)', // more prominent shadow
+            background: '#fff', // solid white background
+            border: `1.5px solid ${DUOLINGO_COLORS.lightGray}` // subtle border
           }}>
             <div style={{
               padding: '16px',
