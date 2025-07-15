@@ -664,17 +664,24 @@ function AppContent() {
           
           {/* User profile */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              background: DUOLINGO_COLORS.gray,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              overflow: 'hidden',
-              border: `2px solid ${DUOLINGO_COLORS.green}`
-            }}>
+            <div 
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                background: DUOLINGO_COLORS.gray,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                border: `2px solid ${DUOLINGO_COLORS.green}`,
+                cursor: 'pointer',
+                transition: 'box-shadow 0.2s',
+              }}
+              onClick={() => setShowSettingsPage(true)}
+              onMouseOver={e => e.currentTarget.style.boxShadow = '0 0 0 3px #d7f7c8'}
+              onMouseOut={e => e.currentTarget.style.boxShadow = 'none'}
+            >
               <img 
                 src={user?.avatar_url || avatar} 
                 alt="User" 
@@ -723,21 +730,25 @@ function AppContent() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           style={{
             marginTop: '24px',
-            marginBottom: '36px'
+            marginBottom: '48px'
           }}
         >
         <div style={{
           display: 'flex',
           alignItems: 'center',
-            justifyContent: 'space-between',
-            background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-            borderRadius: '32px',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
-            padding: '32px 28px',
-            border: '1px solid rgba(88, 204, 2, 0.08)',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
+          justifyContent: 'space-between',
+          background: 'rgba(255,255,255,0.45)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderRadius: '32px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
+          padding: '40px 32px',
+          border: '1.5px solid rgba(88,204,2,0.12)',
+          position: 'relative',
+          overflow: 'visible',
+          gap: '0',
+          minHeight: '180px'
+        }}>
             {/* Decorative background elements */}
             <motion.div
               animate={{
@@ -789,7 +800,9 @@ function AppContent() {
                 minWidth: 0, 
                 flex: 1,
                 position: 'relative',
-                zIndex: 1
+                zIndex: 1,
+                marginRight: '20px',
+                minHeight: '140px'
               }}
             >
             <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
@@ -807,7 +820,8 @@ function AppContent() {
                 margin: '0 20px',
                 borderRadius: '1px',
                 position: 'relative',
-                zIndex: 1
+                zIndex: 1,
+                flexShrink: 0
               }}
             />
             
@@ -825,7 +839,9 @@ function AppContent() {
                 padding: '12px 16px',
                 borderRadius: '20px',
                 border: '1px solid rgba(88, 204, 2, 0.1)',
-                boxShadow: '0 2px 8px rgba(88, 204, 2, 0.08)'
+                boxShadow: '0 2px 8px rgba(88, 204, 2, 0.08)',
+                flexShrink: 0,
+                minWidth: '120px'
               }}
             >
             <Timer seconds={ROUND_TIME} timeLeft={timeLeft} isActive={timerActive} />
@@ -852,7 +868,9 @@ function AppContent() {
                 border: '1px solid rgba(88, 204, 2, 0.2)',
                 position: 'relative',
                 zIndex: 1,
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                flexShrink: 0,
+                marginLeft: '20px'
               }}
             >
               <motion.span
@@ -902,8 +920,11 @@ function AppContent() {
           display: 'flex',
           alignItems: 'flex-start',
           position: 'relative',
-          background: '#f8fafc',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.07)'
+          background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          boxShadow: '0 2px 12px rgba(88,204,2,0.10)',
+          border: '1.5px solid rgba(88,204,2,0.18)'
         }}>
           <div style={{ width: '100%' }}>
             <div className="card-title">Scenario</div>
@@ -927,8 +948,11 @@ function AppContent() {
           display: 'flex',
           alignItems: 'flex-start',
           position: 'relative',
-          background: '#f8fafc',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.07)'
+          background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          boxShadow: '0 2px 12px rgba(88,204,2,0.10)',
+          border: '1.5px solid rgba(88,204,2,0.18)'
         }}>
           <div style={{ width: '100%' }}>
             <div className="card-title">Your Argument</div>
@@ -963,8 +987,11 @@ function AppContent() {
           display: 'flex',
           alignItems: 'flex-start',
           position: 'relative',
-          background: '#f8fafc',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.07)'
+          background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          boxShadow: '0 2px 12px rgba(88,204,2,0.10)',
+          border: '1.5px solid rgba(88,204,2,0.18)'
         }}>
           <div style={{ width: '100%' }}>
             <div className="card-title">AI Response</div>
@@ -990,8 +1017,11 @@ function AppContent() {
           display: 'flex',
           alignItems: 'flex-start',
           position: 'relative',
-          background: '#f8fafc',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.07)'
+          background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          boxShadow: '0 2px 12px rgba(88,204,2,0.10)',
+          border: '1.5px solid rgba(88,204,2,0.18)'
         }}>
           <div style={{ width: '100%' }}>
             <div className="card-title">Feedback</div>

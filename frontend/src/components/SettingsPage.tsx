@@ -93,13 +93,25 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const bgGradient = isDark
     ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
     : 'linear-gradient(135deg, #f5f7fa 0%, #e4e9f3 100%)';
-  const cardBg = isDark ? '#232946' : '#fff';
-  const cardHeaderBg = isDark ? 'rgba(79, 70, 229, 0.10)' : 'rgba(79, 70, 229, 0.05)';
-  const cardFooterBg = cardHeaderBg;
+  
+  // Glassmorphism styles
+  const glassBackground = isDark 
+    ? 'rgba(35, 41, 70, 0.25)'
+    : 'rgba(255, 255, 255, 0.25)';
+  const glassBackdropFilter = 'blur(12px)';
+  const glassBorder = isDark
+    ? '1px solid rgba(255, 255, 255, 0.05)'
+    : '1px solid rgba(255, 255, 255, 0.3)';
+  const glassBoxShadow = isDark
+    ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+    : '0 8px 32px rgba(31, 38, 135, 0.15)';
+  
+  const cardHeaderBg = 'transparent';
+  const cardFooterBg = 'transparent';
   const textColor = isDark ? '#e0e7ff' : '#4f46e5';
   const labelColor = isDark ? '#a5b4fc' : '#4f46e5';
-  const borderColor = isDark ? '#444c6e' : '#e0e7ef';
-  const inputBg = isDark ? '#181c2a' : '#fff';
+  const borderColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.3)';
+  const inputBg = isDark ? 'rgba(24, 28, 42, 0.5)' : 'rgba(255, 255, 255, 0.5)';
   const inputText = isDark ? '#e0e7ff' : '#22223b';
 
   return (
@@ -108,7 +120,9 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
            background: bgGradient,
            padding: '1rem',
            paddingTop: '2rem',
-           paddingBottom: '2rem'
+           paddingBottom: '2rem',
+           backgroundSize: 'cover',
+           backgroundPosition: 'center'
          }}>
       <motion.div
         className="card shadow-lg w-100"
@@ -118,9 +132,12 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           borderRadius: 16, 
           fontFamily: "'JetBrains Mono', monospace", 
           minHeight: 'auto',
-          background: cardBg, 
+          background: glassBackground,
+          backdropFilter: glassBackdropFilter,
+          WebkitBackdropFilter: glassBackdropFilter, // for Safari
+          border: glassBorder,
+          boxShadow: glassBoxShadow,
           color: inputText, 
-          boxShadow: isDark ? '0 10px 30px #181c2a' : '0 10px 30px rgba(0,0,0,0.10)',
           margin: '0 auto'
         }}
         initial={{ opacity: 0, y: 32 }}
@@ -129,12 +146,17 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       >
         {/* --- HEADER --- */}
         <div className="card-header d-flex justify-content-between align-items-center border-bottom py-3 px-3 px-sm-4"
-             style={{ background: 'transparent', borderBottom: isDark ? '1.5px solid #444c6e' : '1.5px solid #e0e7ef' }}>
+             style={{ 
+               background: 'transparent', 
+               borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.3)'
+             }}>
           <div className="d-flex align-items-center gap-2 flex-wrap">
             <span className="d-flex align-items-center justify-content-center me-2" style={{
               width: 36, height: 36, borderRadius: 12,
-              backgroundColor: isDark ? '#232946' : '#e8f5e9',
-              color: '#58a700', boxShadow: '0 2px 8px rgba(88,167,0,0.07)'
+              backgroundColor: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(232, 245, 233, 0.6)',
+              backdropFilter: 'blur(4px)',
+              color: '#58a700', 
+              boxShadow: '0 2px 8px rgba(88,167,0,0.07)'
             }}>
               <i className="material-icons" style={{ fontSize: '1.5rem' }}>settings</i>
             </span>
@@ -142,15 +164,20 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               Settings
             </h2>
             <span className="badge px-3 py-1 d-flex align-items-center ms-2" style={{
-              backgroundColor: isDark ? '#232946' : '#e8f5e9',
-              color: '#58a700', borderRadius: '12px', fontWeight: 600, fontSize: 'clamp(0.75rem, 3vw, 0.85rem)', letterSpacing: '.01em'
+              backgroundColor: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(232, 245, 233, 0.6)',
+              backdropFilter: 'blur(4px)',
+              color: '#58a700', 
+              borderRadius: '12px', 
+              fontWeight: 600, 
+              fontSize: 'clamp(0.75rem, 3vw, 0.85rem)', 
+              letterSpacing: '.01em'
             }}>
               <i className="material-icons me-1" style={{ fontSize: '1rem' }}>tune</i>
               Profile
             </span>
           </div>
           <button 
-            className={`btn btn-sm btn-outline-secondary rounded-circle ms-2${isDark ? ' border-light text-light' : ''}`} 
+            className={`btn btn-sm rounded-circle ms-2${isDark ? ' text-light' : ''}`} 
             onClick={onClose} 
             style={{ 
               width: 40, 
@@ -159,7 +186,8 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               alignItems: 'center', 
               justifyContent: 'center', 
               border: 'none', 
-              background: isDark ? '#232946' : '#f8f9fa',
+              background: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(248, 249, 250, 0.6)',
+              backdropFilter: 'blur(4px)',
               minWidth: '40px',
               minHeight: '40px'
             }}
@@ -171,7 +199,14 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           {/* Profile Section */}
           <div className="mb-4">
             <div className="d-flex align-items-center gap-2 mb-3 fw-bold" style={{ fontSize: 'clamp(0.9rem, 3.5vw, 1rem)', color: '#58a700' }}>
-              <span className="d-flex align-items-center justify-content-center" style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: isDark ? '#232946' : '#e8f5e9', color: '#58a700' }}>
+              <span className="d-flex align-items-center justify-content-center" style={{ 
+                width: 28, 
+                height: 28, 
+                borderRadius: 8, 
+                backgroundColor: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(232, 245, 233, 0.6)',
+                backdropFilter: 'blur(4px)',
+                color: '#58a700' 
+              }}>
                 <i className="material-icons" style={{ fontSize: '1.1rem' }}>face</i>
               </span>
               Profile
@@ -189,7 +224,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                         width: 'clamp(44px, 8vw, 52px)', 
                         height: 'clamp(44px, 8vw, 52px)', 
                         cursor: 'pointer', 
-                        boxShadow: avatar === a ? '0 0 8px #4f46e5' : '0 2px 6px #0001', 
+                        boxShadow: avatar === a ? '0 0 8px #4f46e5' : '0 2px 6px rgba(0,0,0,0.1)', 
                         opacity: avatar === a ? 1 : 0.7, 
                         borderWidth: 2,
                         minWidth: '44px',
@@ -216,6 +251,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                     fontFamily: "'JetBrains Mono', monospace", 
                     fontSize: 'clamp(0.9rem, 3.5vw, 1rem)', 
                     background: inputBg, 
+                    backdropFilter: 'blur(4px)',
                     color: inputText, 
                     borderColor,
                     padding: '0.75rem 1rem',
@@ -229,7 +265,14 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           {/* Preferences Section */}
           <div className="mb-4">
             <div className="d-flex align-items-center gap-2 mb-3 fw-bold" style={{ fontSize: 'clamp(0.9rem, 3.5vw, 1rem)', color: '#58a700' }}>
-              <span className="d-flex align-items-center justify-content-center" style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: isDark ? '#232946' : '#e8f5e9', color: '#58a700' }}>
+              <span className="d-flex align-items-center justify-content-center" style={{ 
+                width: 28, 
+                height: 28, 
+                borderRadius: 8, 
+                backgroundColor: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(232, 245, 233, 0.6)',
+                backdropFilter: 'blur(4px)',
+                color: '#58a700' 
+              }}>
                 <i className="material-icons" style={{ fontSize: '1.1rem' }}>tune</i>
               </span>
               Preferences
@@ -237,45 +280,91 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             <div className="row g-3">
               <div className="col-12 col-sm-6 mb-3 mb-sm-0">
                 <label className="form-label mb-2" style={{ color: labelColor, fontSize: 'clamp(0.85rem, 3vw, 0.9rem)' }}>Language</label>
-                <select 
-                  className="form-select" 
-                  value={language} 
-                  onChange={handleLanguageChange} 
-                  style={{ 
-                    fontFamily: "'JetBrains Mono', monospace", 
-                    background: inputBg, 
-                    color: inputText, 
-                    borderColor,
-                    fontSize: 'clamp(0.9rem, 3.5vw, 1rem)',
-                    padding: '0.75rem 1rem',
-                    minHeight: '44px'
-                  }}
-                >
-                  {LANGUAGES.map(l => (
-                    <option key={l.code} value={l.code}>{l.label}</option>
-                  ))}
-                </select>
+                <div className="position-relative" style={{ 
+                  borderRadius: '12px',
+                  overflow: 'hidden'
+                }}>
+                  <select 
+                    className="form-select" 
+                    value={language} 
+                    onChange={handleLanguageChange} 
+                    style={{ 
+                      fontFamily: "'JetBrains Mono', monospace", 
+                      background: inputBg, 
+                      color: inputText, 
+                      borderColor,
+                      fontSize: 'clamp(0.9rem, 3.5vw, 1rem)',
+                      padding: '0.75rem 1rem',
+                      minHeight: '44px',
+                      borderRadius: '12px',
+                      WebkitAppearance: 'none',
+                      MozAppearance: 'none',
+                      appearance: 'none',
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
+                      boxShadow: isDark ? 'inset 0 1px 3px rgba(0, 0, 0, 0.1)' : 'inset 0 1px 3px rgba(255, 255, 255, 0.3)',
+                      transition: 'all 0.3s ease',
+                      border: glassBorder
+                    }}
+                  >
+                    {LANGUAGES.map(l => (
+                      <option key={l.code} value={l.code}>{l.label}</option>
+                    ))}
+                  </select>
+                  <div className="position-absolute" style={{
+                    top: '50%',
+                    right: '1rem',
+                    transform: 'translateY(-50%)',
+                    pointerEvents: 'none',
+                    color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.5)'
+                  }}>
+                    <i className="material-icons" style={{ fontSize: '1.4rem' }}>expand_more</i>
+                  </div>
+                </div>
               </div>
               <div className="col-12 col-sm-6">
                 <label className="form-label mb-2" style={{ color: labelColor, fontSize: 'clamp(0.85rem, 3vw, 0.9rem)' }}>Theme</label>
-                <select 
-                  className="form-select" 
-                  value={theme} 
-                  onChange={handleThemeChange} 
-                  style={{ 
-                    fontFamily: "'JetBrains Mono', monospace", 
-                    background: inputBg, 
-                    color: inputText, 
-                    borderColor,
-                    fontSize: 'clamp(0.9rem, 3.5vw, 1rem)',
-                    padding: '0.75rem 1rem',
-                    minHeight: '44px'
-                  }}
-                >
-                  {THEMES.map(t => (
-                    <option key={t.code} value={t.code}>{t.label}</option>
-                  ))}
-                </select>
+                <div className="position-relative" style={{ 
+                  borderRadius: '12px',
+                  overflow: 'hidden'
+                }}>
+                  <select 
+                    className="form-select" 
+                    value={theme} 
+                    onChange={handleThemeChange} 
+                    style={{ 
+                      fontFamily: "'JetBrains Mono', monospace", 
+                      background: inputBg, 
+                      color: inputText, 
+                      borderColor,
+                      fontSize: 'clamp(0.9rem, 3.5vw, 1rem)',
+                      padding: '0.75rem 1rem',
+                      minHeight: '44px',
+                      borderRadius: '12px',
+                      WebkitAppearance: 'none',
+                      MozAppearance: 'none',
+                      appearance: 'none',
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
+                      boxShadow: isDark ? 'inset 0 1px 3px rgba(0, 0, 0, 0.1)' : 'inset 0 1px 3px rgba(255, 255, 255, 0.3)',
+                      transition: 'all 0.3s ease',
+                      border: glassBorder
+                    }}
+                  >
+                    {THEMES.map(t => (
+                      <option key={t.code} value={t.code}>{t.label}</option>
+                    ))}
+                  </select>
+                  <div className="position-absolute" style={{
+                    top: '50%',
+                    right: '1rem',
+                    transform: 'translateY(-50%)',
+                    pointerEvents: 'none',
+                    color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.5)'
+                  }}>
+                    <i className="material-icons" style={{ fontSize: '1.4rem' }}>expand_more</i>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -283,7 +372,14 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           {/* Real-Time Toggles */}
           <div className="mb-4">
             <div className="d-flex align-items-center gap-2 mb-3 fw-bold" style={{ fontSize: 'clamp(0.9rem, 3.5vw, 1rem)', color: '#58a700' }}>
-              <span className="d-flex align-items-center justify-content-center" style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: isDark ? '#232946' : '#e8f5e9', color: '#58a700' }}>
+              <span className="d-flex align-items-center justify-content-center" style={{ 
+                width: 28, 
+                height: 28, 
+                borderRadius: 8, 
+                backgroundColor: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(232, 245, 233, 0.6)',
+                backdropFilter: 'blur(4px)',
+                color: '#58a700' 
+              }}>
                 <i className="material-icons" style={{ fontSize: '1.1rem' }}>volume_up</i>
               </span>
               Real-Time Controls
@@ -322,7 +418,14 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           {/* Live Preview */}
           <div className="mb-4">
             <div className="d-flex align-items-center gap-2 mb-3 fw-bold" style={{ fontSize: 'clamp(0.9rem, 3.5vw, 1rem)', color: '#58a700' }}>
-              <span className="d-flex align-items-center justify-content-center" style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: isDark ? '#232946' : '#e8f5e9', color: '#58a700' }}>
+              <span className="d-flex align-items-center justify-content-center" style={{ 
+                width: 28, 
+                height: 28, 
+                borderRadius: 8, 
+                backgroundColor: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(232, 245, 233, 0.6)',
+                backdropFilter: 'blur(4px)',
+                color: '#58a700' 
+              }}>
                 <i className="material-icons" style={{ fontSize: '1.1rem' }}>visibility</i>
               </span>
               Live Preview
@@ -367,7 +470,14 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
           <hr className="my-4" />
           <div className="d-flex align-items-center gap-2 mb-3 fw-bold" style={{ fontSize: 'clamp(0.9rem, 3.5vw, 1rem)', color: '#58a700' }}>
-            <span className="d-flex align-items-center justify-content-center" style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: isDark ? '#232946' : '#e8f5e9', color: '#58a700' }}>
+            <span className="d-flex align-items-center justify-content-center" style={{ 
+              width: 28, 
+              height: 28, 
+              borderRadius: 8, 
+              backgroundColor: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(232, 245, 233, 0.6)',
+              backdropFilter: 'blur(4px)',
+              color: '#58a700' 
+            }}>
               <i className="material-icons" style={{ fontSize: '1.1rem' }}>emoji_events</i>
             </span>
             Engagement Stats
@@ -447,27 +557,37 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           fontSize: 'clamp(0.75rem, 3vw, 0.85rem)',
           lineHeight: '1.4'
         }}>
-          <span className="d-flex align-items-center justify-content-center" style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: isDark ? '#232946' : '#e8f5e9', color: '#58a700' }}>
+          <span className="d-flex align-items-center justify-content-center" style={{ 
+            width: 24, 
+            height: 24, 
+            borderRadius: '50%', 
+            backgroundColor: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(232, 245, 233, 0.6)',
+            backdropFilter: 'blur(4px)',
+            color: '#58a700' 
+          }}>
             <i className="material-icons" style={{ fontSize: '1.1rem' }}>info</i>
           </span>
           Your settings are saved automatically. Need help? Contact support or check the FAQ.
         </div>
         <div className="card-footer py-3 text-center border-top" style={{ 
-          background: cardFooterBg, 
+          background: 'transparent', 
           fontSize: 'clamp(0.8rem, 3.5vw, 0.9rem)', 
-          borderTop: isDark ? '1.5px solid #444c6e' : '1.5px solid #e0e7ef' 
+          borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.3)'
         }}>
           <motion.button 
             whileHover={{ scale: 1.03 }} 
             whileTap={{ scale: 0.97 }} 
-            className={`btn btn-outline-primary px-4 w-100 w-sm-auto rounded-pill${isDark ? ' border-light text-light' : ''}`} 
+            className={`btn btn-outline-primary px-4 w-100 w-sm-auto rounded-pill${isDark ? ' text-light' : ''}`} 
             onClick={onClose} 
             style={{ 
               borderRadius: 16, 
               fontWeight: 600, 
               letterSpacing: '.01em',
               minHeight: '44px',
-              fontSize: 'clamp(0.85rem, 3.5vw, 0.9rem)'
+              fontSize: 'clamp(0.85rem, 3.5vw, 0.9rem)',
+              background: isDark ? 'rgba(79, 70, 229, 0.1)' : 'rgba(79, 70, 229, 0.05)',
+              backdropFilter: 'blur(4px)',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(79, 70, 229, 0.3)'
             }}
           >
             <i className="material-icons align-middle me-2">arrow_back</i>
@@ -479,4 +599,4 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   );
 };
 
-export default SettingsPage; 
+export default SettingsPage;

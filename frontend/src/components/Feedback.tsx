@@ -41,10 +41,22 @@ const Feedback: React.FC<FeedbackProps> = ({
   };
 
   return (
-    <motion.div 
+    <motion.div
+      className="feedback-card mb-4"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
+      style={{
+        background: 'rgba(255,255,255,0.45)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        borderRadius: '24px',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
+        border: '1.5px solid rgba(88,204,2,0.10)',
+        padding: '32px 24px',
+        marginBottom: '32px',
+        position: 'relative'
+      }}
     >
       {/* Evaluate Button */}
       <motion.button
@@ -175,7 +187,13 @@ const Feedback: React.FC<FeedbackProps> = ({
       {/* Help Text */}
       <div className="text-muted small mt-3 d-flex align-items-center" style={{ 
         color: '#6c757d',
-        fontSize: '0.8rem'
+        fontSize: '0.8rem',
+        background: 'rgba(255,255,255,0.45)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        borderRadius: '12px',
+        padding: '8px 14px',
+        marginTop: '12px'
       }}>
         <span className="d-flex align-items-center justify-content-center me-2" style={{
           width: '20px',

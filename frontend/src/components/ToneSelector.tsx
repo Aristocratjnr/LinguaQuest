@@ -119,10 +119,10 @@ const ToneSelector: React.FC<ToneSelectorProps> = ({ tone, onChange, loading, di
 
       {/* Tip Box */}
       <div className="p-3 rounded-3 d-flex align-items-start gap-3" style={{ 
-        backgroundColor: '#f8f9fa',
+        background: 'rgba(255,255,255,0.45)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
         borderRadius: '16px',
-        // Removed borderLeft
-        // Add subtle box shadow for separation
         boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
         marginTop: '12px'
       }}>
@@ -149,7 +149,13 @@ const ToneSelector: React.FC<ToneSelectorProps> = ({ tone, onChange, loading, di
     {/* Help Text */}
     <div className="text-muted small d-flex align-items-center" style={{ 
       color: '#6c757d',
-      fontSize: '0.8rem'
+      fontSize: '0.8rem',
+      background: 'rgba(255,255,255,0.45)',
+      backdropFilter: 'blur(8px)',
+      WebkitBackdropFilter: 'blur(8px)',
+      borderRadius: '12px',
+      padding: '8px 14px',
+      marginTop: '12px'
     }}>
       <span className="d-flex align-items-center justify-content-center me-2" style={{
         width: '20px',

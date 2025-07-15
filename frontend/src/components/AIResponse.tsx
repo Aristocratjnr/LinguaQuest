@@ -114,9 +114,12 @@ const AIResponse: React.FC<AIResponseProps> = ({
         <motion.div 
           className="p-4 mb-3 rounded-3 position-relative"
           style={{ 
-            backgroundColor: '#f8f9fa',
+            background: 'rgba(255,255,255,0.45)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
             borderLeft: '4px solid #58a700',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            borderRadius: '16px'
           }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -177,9 +180,10 @@ const AIResponse: React.FC<AIResponseProps> = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
           style={{ 
-            backgroundColor: '#e8f5e9',
+            background: 'rgba(255,255,255,0.45)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
             borderRadius: '16px',
-            // Removed borderLeft
             boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
           }}
         >
@@ -203,7 +207,13 @@ const AIResponse: React.FC<AIResponseProps> = ({
       {/* Help Text */}
       <div className="text-muted small mt-3 d-flex align-items-center" style={{ 
         color: '#6c757d',
-        fontSize: '0.8rem'
+        fontSize: '0.8rem',
+        background: 'rgba(255,255,255,0.45)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        borderRadius: '12px',
+        padding: '8px 14px',
+        marginTop: '12px'
       }}>
         <span className="d-flex align-items-center justify-content-center me-2" style={{
           width: '20px',

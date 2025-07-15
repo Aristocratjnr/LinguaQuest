@@ -87,8 +87,9 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
     <motion.div
       className={modal ? "bg-white dark:bg-[#232946] rounded-4 overflow-hidden w-100 position-relative shadow-lg" : "bg-white dark:bg-[#232946] rounded-4 overflow-hidden w-100 shadow-lg my-4"}
       style={{ 
-        maxWidth: 900, 
-        width: '100%', 
+        maxWidth: '95vw',
+        width: '100%',
+        minWidth: 0,
         borderRadius: 32, 
         boxShadow: theme === 'dark' 
           ? '0 20px 60px rgba(0,0,0,0.4), 0 8px 32px rgba(0,0,0,0.2)' 
@@ -97,7 +98,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
         background: theme === 'dark' 
           ? 'linear-gradient(135deg, #232946 0%, #1a1f35 100%)' 
           : 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-        overflow: 'hidden'
+        overflow: 'hidden',
       }}
       {...motionProps}
     >
@@ -108,7 +109,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
           : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
         borderTopLeftRadius: 32, 
         borderTopRightRadius: 32,
-        padding: '24px 32px',
+        padding: 'clamp(16px, 5vw, 32px)',
         borderBottom: theme === 'dark' 
           ? '1px solid rgba(255,255,255,0.1)' 
           : '1px solid rgba(88, 204, 2, 0.1)',
@@ -159,7 +160,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
             <div>
               <h2 className="fw-bold mb-0" style={{ 
                 color: theme === 'dark' ? '#ffffff' : '#2d3748', 
-                fontSize: '1.5rem', 
+                fontSize: 'clamp(1.2rem, 3vw, 1.5rem)', 
                 letterSpacing: '.01em',
                 fontFamily: 'JetBrains Mono, monospace',
                 fontWeight: 700
@@ -168,7 +169,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
               </h2>
               <span style={{
                 color: theme === 'dark' ? '#a0aec0' : '#718096',
-                fontSize: '0.9rem',
+                fontSize: 'clamp(0.7rem, 2vw, 0.9rem)',
                 fontFamily: 'JetBrains Mono, monospace'
               }}>
                 Global Rankings
@@ -180,7 +181,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
               borderRadius: '20px',
               padding: '8px 16px',
               fontWeight: 600,
-              fontSize: '0.85rem',
+              fontSize: 'clamp(0.7rem, 2vw, 0.85rem)',
               letterSpacing: '.01em',
               border: '1px solid rgba(88, 204, 2, 0.2)',
               display: 'flex',
@@ -189,7 +190,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
               boxShadow: '0 2px 8px rgba(88, 204, 2, 0.15)'
             }}>
               <i className="material-icons" style={{ fontSize: '16px' }}>emoji_events</i>
-              Top Players
+            Top Players
             </div>
         </div>
         {modal && (
@@ -232,10 +233,10 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
         </div>
       </div>
       {/* Controls and Content */}
-      <div className="p-0 p-md-4" style={{ minHeight: 400 }}>
+      <div className="p-0 p-md-4" style={{ minHeight: 400, padding: 'clamp(8px, 3vw, 32px)' }}>
         {/* Controls */}
         <div style={{
-          padding: '24px 32px',
+          padding: 'clamp(12px, 3vw, 32px)',
           borderBottom: theme === 'dark' 
             ? '1px solid rgba(255,255,255,0.1)' 
             : '1px solid rgba(88, 204, 2, 0.1)',
@@ -285,7 +286,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
             <div className="flex items-center gap-3 w-full sm:w-auto">
               <div style={{ 
                 color: theme === 'dark' ? '#a0aec0' : '#718096',
-                fontSize: '14px',
+                fontSize: 'clamp(0.8rem, 2vw, 14px)',
                 fontWeight: 600,
                 fontFamily: 'JetBrains Mono, monospace'
               }}>
@@ -356,7 +357,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
         </div>
         {/* Content Table */}
         <div style={{ 
-          padding: '24px 32px',
+          padding: 'clamp(12px, 3vw, 32px)',
           maxHeight: '60vh',
           overflowY: 'auto'
         }}>
@@ -548,7 +549,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
                       <h3 style={{ 
                         fontWeight: 700, 
                         color: theme === 'dark' ? '#ffffff' : '#2d3748',
-                        fontSize: '16px',
+                        fontSize: 'clamp(1rem, 2vw, 1.5rem)',
                         marginBottom: '8px',
                         fontFamily: 'JetBrains Mono, monospace',
                         overflow: 'hidden',
@@ -619,13 +620,13 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
                       <div style={{ 
                         fontWeight: 700, 
-                        fontSize: '20px',
+                        fontSize: 'clamp(1.2rem, 3vw, 20px)',
                         color: '#58cc02',
                         textShadow: '0 1px 2px rgba(88, 204, 2, 0.1)'
                       }}>
                         {entry.total_score}
                       </div>
-                      <div style={{ display: 'flex', gap: '12px', fontSize: '14px', color: theme === 'dark' ? '#a0aec0' : '#718096' }}>
+                      <div style={{ display: 'flex', gap: '12px', fontSize: 'clamp(0.9rem, 2vw, 14px)', color: theme === 'dark' ? '#a0aec0' : '#718096' }}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                           <i className="material-icons" style={{ fontSize: '16px', color: '#ff9500' }}>local_fire_department</i>
                           {entry.current_streak ?? '-'}
@@ -636,7 +637,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
                         </span>
                       </div>
                       <div style={{
-                        fontSize: '12px',
+                        fontSize: 'clamp(0.8rem, 2vw, 12px)',
                         color: theme === 'dark' ? '#718096' : '#a0aec0',
                         fontFamily: 'JetBrains Mono, monospace'
                       }}>
@@ -654,7 +655,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '24px 32px',
+          padding: 'clamp(12px, 3vw, 32px)',
           borderTop: theme === 'dark' 
             ? '1px solid rgba(255,255,255,0.1)' 
             : '1px solid rgba(88, 204, 2, 0.1)',
@@ -756,7 +757,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
       </div>
       {/* Info/Help Section */}
       <div style={{
-        padding: '20px 32px',
+        padding: 'clamp(10px, 2vw, 32px)',
         borderTop: theme === 'dark' 
           ? '1px solid rgba(255,255,255,0.1)' 
           : '1px solid rgba(88, 204, 2, 0.1)',
@@ -769,7 +770,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
         alignItems: 'center',
         gap: '12px',
         color: theme === 'dark' ? '#a5b4fc' : '#6c757d',
-        fontSize: '14px',
+        fontSize: 'clamp(12px, 2vw, 14px)',
         fontFamily: 'JetBrains Mono, monospace'
       }}>
         <div style={{

@@ -484,4 +484,24 @@ def create_session(session_data: dict, nickname: str):
         "total_score": 0,
         "rounds_played": 0,
         "status": "active"
-    } 
+    }
+
+@app.patch("/api/v1/streak")
+def reset_streak(nickname: str, streak: int = 1):
+    """Reset user's streak (simplified)"""
+    return {
+        "nickname": nickname,
+        "current_streak": streak,
+        "highest_streak": 5,  # Keep the highest streak unchanged
+        "message": f"Streak reset to {streak} for user {nickname}"
+    }
+
+@app.patch("/api/v1/level")
+def reset_level(nickname: str, level: int = 1):
+    """Reset user's level (simplified)"""
+    return {
+        "nickname": nickname,
+        "level": level,
+        "xp": 0,  # Reset XP to 0 when level is reset
+        "message": f"Level reset to {level} for user {nickname}"
+    }
