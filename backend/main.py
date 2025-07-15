@@ -246,8 +246,8 @@ def libre_translate(text, source, target):
     return "[Translation error: All translation services failed]"
 
 # NLLB setup
-# Use a more comprehensive NLLB model
-NLLB_MODEL_NAME = "facebook/nllb-200-3B"  # More accurate but larger model
+# Use a smaller NLLB model that's more accessible
+NLLB_MODEL_NAME = "facebook/nllb-200-distilled-600M"  # Smaller, faster model
 
 # Initialize model with better error handling
 try:

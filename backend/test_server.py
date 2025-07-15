@@ -2,6 +2,31 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import re
 from ai_service import ai_service
+from simple_nlp_services import (
+    SimpleSentimentAnalyzer as EnhancedSentimentAnalyzer,
+    SimpleArgumentEvaluator as ArgumentEvaluator,
+    SimpleConversationalAI as ConversationalAI,
+    SimpleSpeechToText as SpeechToText
+)
+
+# Initialize services once at startup
+sentiment_analyzer = EnhancedSentimentAnalyzer()
+argument_evaluator = ArgumentEvaluator()
+conversational_ai = ConversationalAI()
+
+# Simple translation without heavy ML models for testing
+LANG_CODE_MAP = {
+    'en': 'eng_Latn',
+    'twi': 'aka_Latn',
+    'gaa': 'gaa_Latn',
+    'ewe': 'ewe_Latn',
+    'es': 'spa_Latn',
+    'de': 'deu_Latn',
+    'pt': 'por_Latn',
+    'sw': 'swh_Latn',
+    'yo': 'yor_Latn',
+    'ha': 'hau_Latn',
+}
 
 app = FastAPI()
 
@@ -116,10 +141,10 @@ def get_leaderboard_legacy():
 
 @app.post("/scenario")
 def get_scenario(request: dict | None = None):
-    """Get a random scenario based on category and difficulty"""
+    """Get a random scenario based on category and difficulty with simple translation"""
     import random
-    category = request.get("category", "daily") if request else "daily"
-    difficulty = request.get("difficulty", "beginner") if request else "beginner"
+    category = request.get("category", "general") if request else "general"
+    difficulty = request.get("difficulty", "medium") if request else "medium"
     language = request.get("language", "en") if request else "en"
 
     scenarios = {
@@ -198,15 +223,20 @@ def get_scenario(request: dict | None = None):
     scenario_list = category_dict.get(difficulty, category_dict["beginner"])
     scenario = random.choice(scenario_list)
 
-    # Translate scenario if language is not English
+    # Translate scenario if language is not English using simple translation
     if language != "en":
-        translation_request = {
-            "text": scenario,
-            "src_lang": "en",
-            "tgt_lang": language
-        }
-        translated_result = translate_text(translation_request)
-        scenario = translated_result["translated_text"]
+        try:
+            translation_request = {
+                "text": scenario,
+                "src_lang": "en",
+                "tgt_lang": language
+            }
+            translated_result = translate_text(translation_request)
+            if translated_result["translated_text"] != scenario:
+                return {"scenario": translated_result["translated_text"], "language": language}
+        except Exception as e:
+            print(f"Translation failed: {e}")
+            return {"scenario": f"{scenario} [Translation not available for {language}]", "language": "en"}
 
     return {"scenario": scenario, "language": language}
 
@@ -311,38 +341,152 @@ def translate_text(request: dict):
 
 @app.post("/evaluate")
 def evaluate_argument(request: dict):
-    """Evaluate the persuasiveness of an argument using AI"""
+    """Evaluate the persuasiveness of an argument using enhanced NLP services"""
     argument = request.get("argument", "")
     tone = request.get("tone", "polite")
     scenario = request.get("scenario", "General persuasion scenario")
     
-    # Use AI service for evaluation
-    result = ai_service.evaluate_argument(argument, tone, scenario)
+
+    try:
+        # Analyze sentiment
+        sentiment_result = sentiment_analyzer.analyze_sentiment(argument)
+        tone_result = sentiment_analyzer.analyze_tone(argument)
+        
+        # Evaluate argument with context
+        eval_result = argument_evaluator.evaluate_argument(
+            argument=argument,
+            topic=scenario,
+            tone=tone
+        )
+        
+        score = eval_result.get('score', 0)
+        feedback = eval_result.get('feedback', [])
+        persuaded = eval_result.get('persuaded', False)
+        
+        # Add sentiment-based feedback
+        sentiment = sentiment_result['sentiment']
+        sentiment_confidence = sentiment_result['confidence']
+        
+        if sentiment == 'positive' and sentiment_confidence > 0.6:
+            score += 5
+            feedback.append("Your argument has a positive, persuasive tone.")
+        elif sentiment == 'negative' and sentiment_confidence > 0.6:
+            score -= 3
+            feedback.append("Your argument sounds negative or confrontational.")
+        else:
+            feedback.append("Your argument is neutral in sentiment.")
+        
+        # Add tone feedback
+        dominant_tone = tone_result['dominant_tone']
+        tone_confidence = tone_result['confidence']
+        
+        if tone_confidence > 0.5:
+            if dominant_tone == 'polite':
+                feedback.append("Your polite tone enhances persuasiveness.")
+            elif dominant_tone == 'passionate':
+                feedback.append("Your passionate tone shows conviction.")
+            elif dominant_tone == 'confrontational':
+                feedback.append("Consider a more respectful tone.")
+        
+        return {
+            "persuaded": persuaded,
+            "feedback": " ".join(feedback),
+            "score": score,
+            "strengths": [
+                f"Sentiment: {sentiment} (confidence: {sentiment_confidence:.2f})",
+                f"Dominant tone: {dominant_tone} (confidence: {tone_confidence:.2f})"
+            ],
+            "suggestions": eval_result.get('suggestions', [])
+        }
     
-    return {
-        "persuaded": result["persuaded"],
-        "feedback": result["feedback"],
-        "score": result["score"],
-        "strengths": result.get("strengths", []),
-        "suggestions": result.get("suggestions", [])
-    }
+    except Exception as e:
+        print(f"Evaluation error: {e}")
+        return {
+            "persuaded": False,
+            "feedback": "Evaluation error.",
+            "score": 0,
+            "strengths": [],
+            "suggestions": []
+        }
 
 @app.post("/dialogue")
 def dialogue(request: dict):
-    """Generate AI dialogue response based on scenario and user argument"""
+    """Generate AI dialogue response with enhanced NLP and multilingual support"""
     scenario = request.get("scenario", "")
     user_argument = request.get("user_argument", "")
     ai_stance = request.get("ai_stance", "disagree")
     language = request.get("language", "twi")
     
-    # Use AI service for dialogue generation
-    result = ai_service.generate_dialogue_response(scenario, user_argument, ai_stance, language)
-    
-    return {
-        "ai_response": result["ai_response"],
-        "new_stance": result["new_stance"],
-        "reasoning": result.get("reasoning", "")
-    }
+    try:
+        
+        # Generate AI response using conversational model
+        context = [f"Scenario: {scenario}"] if scenario else []
+        ai_response = conversational_ai.generate_response(
+            user_input=user_argument,
+            context=context,
+            personality="neutral",
+            stance=ai_stance
+        )
+        
+        # Evaluate argument strength
+        eval_result = argument_evaluator.evaluate_argument(
+            argument=user_argument,
+            topic=scenario,
+            tone="neutral"
+        )
+        
+        score = eval_result.get('score', 0)
+        current_stance = ai_stance
+        
+        # Update stance based on argument strength
+        if score >= 75:
+            if current_stance == 'disagree':
+                new_stance = 'neutral'
+            elif current_stance == 'neutral':
+                new_stance = 'agree'
+            else:
+                new_stance = 'agree'
+        elif score >= 50:
+            if current_stance == 'disagree':
+                new_stance = 'neutral'
+            else:
+                new_stance = current_stance
+        else:
+            if current_stance == 'agree':
+                new_stance = 'neutral'
+            else:
+                new_stance = current_stance
+        
+        # Translate response if needed
+        if language != "en":
+            try:
+                translation_request = {
+                    "text": ai_response,
+                    "src_lang": "en",
+                    "tgt_lang": language
+                }
+                translated_result = translate_text(translation_request)
+                ai_response = translated_result["translated_text"]
+            except Exception as e:
+                print(f"Translation error: {e}")
+                # Fall back to English with a note
+                ai_response = f"{ai_response} [Translation not available]"
+                language = "en"
+        
+        return {
+            "ai_response": ai_response,
+            "new_stance": new_stance,
+            "reasoning": eval_result.get('feedback', [''])[0]  # Use first feedback item as reasoning
+        }
+        
+    except Exception as e:
+        print(f"Dialogue error: {e}")
+        # Provide a fallback response
+        return {
+            "ai_response": "I understand your point. Can you elaborate?",
+            "new_stance": ai_stance,
+            "reasoning": "Error processing dialogue."
+        }
 
 # Game options and categories endpoints
 @app.get("/api/v1/game/categories")

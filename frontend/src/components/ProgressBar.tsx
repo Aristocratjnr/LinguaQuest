@@ -61,13 +61,15 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ round, totalRounds }) => {
         <span className="material-icons" style={{ color: '#764ba2', fontSize: '1.3em' }}>outlined_flag</span>
       </div>
       {/* Main progress bar */}
-      <div className="progress" style={{ 
-        height: '0.7em', 
-        borderRadius: '0.4em', 
+      <div style={{
+        height: '0.7em',
+        borderRadius: '0.4em',
         backgroundColor: '#e5e5e5',
         overflow: 'visible',
         width: '100%',
         minWidth: 0,
+        maxWidth: '420px', // wider progress line
+        margin: '0 auto', // center the line
       }}>
         <motion.div 
           className="progress-bar"

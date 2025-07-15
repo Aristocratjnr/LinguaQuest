@@ -127,6 +127,8 @@ function AppContent() {
   const totalXp = userStats?.total_score ?? 0;
   const dailyXp = totalXp % DAILY_GOAL;
   const dailyProgress = Math.min(1, dailyXp / DAILY_GOAL);
+  // Add this state near other user stats
+  const [hasStreakFreeze, setHasStreakFreeze] = useState(true); // For demo, always true. Replace with real logic if available.
 
   // Apply theme class to body
   useEffect(() => {
@@ -805,6 +807,27 @@ function AppContent() {
                 padding: 4,
                 boxShadow: '0 2px 8px #ff9c1a22',
               }}>local_fire_department</span>
+              {/* Streak Freeze (Duolingo feature) */}
+              <span
+                className="material-icons"
+                title="Streak Freeze: Protect your streak for one missed day!"
+                style={{
+                  fontSize: 26,
+                  color: hasStreakFreeze ? '#1cb0f6' : '#b0bec5',
+                  position: 'absolute',
+                  bottom: -8,
+                  left: -10,
+                  background: '#fff',
+                  borderRadius: '50%',
+                  padding: 2,
+                  boxShadow: hasStreakFreeze ? '0 2px 8px #1cb0f622' : 'none',
+                  opacity: hasStreakFreeze ? 1 : 0.6,
+                  border: hasStreakFreeze ? '1.5px solid #b3e5fc' : '1.5px solid #eceff1',
+                  zIndex: 2,
+                  cursor: hasStreakFreeze ? 'pointer' : 'not-allowed',
+                  transition: 'all 0.2s',
+                }}
+              >ac_unit</span>
               {/* Streak number */}
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
@@ -898,7 +921,7 @@ function AppContent() {
       <main style={{
         flex: 1,
         padding: '0 16px 16px',
-        maxWidth: '640px',
+        maxWidth: '1100px',
         width: '100%',
         margin: '0 auto',
         background: theme === 'dark'
@@ -918,16 +941,22 @@ function AppContent() {
             background: 'rgba(255,255,255,0.45)',
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
-            borderRadius: '18px',
-            padding: '12px 20px',
-            margin: '18px 0 8px 0',
-            boxShadow: '0 2px 8px rgba(88,204,2,0.08)',
-            border: '1.2px solid rgba(88,204,2,0.10)',
+            borderRadius: '14px', // smaller radius
+            padding: '8px 12px', // smaller padding
+            margin: '14px 0 8px 0', // smaller margin
+            boxShadow: '0 1px 4px rgba(88,204,2,0.08)',
+            border: '1px solid rgba(88,204,2,0.10)',
             fontFamily: 'JetBrains Mono, monospace',
-            fontSize: '1rem',
+            fontSize: '0.98rem',
             fontWeight: 600,
             color: '#3caa3c',
-            gap: '12px'
+            gap: '10px',
+            maxWidth: '420px', // smaller and responsive
+            width: '100%',
+            minWidth: 0,
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            boxSizing: 'border-box',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -970,9 +999,9 @@ function AppContent() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           style={{
-            margin: '24px 0 48px 0',
+            margin: '12px auto 24px auto', // center horizontally
             width: '100%',
-            maxWidth: '100%',
+            maxWidth: '700px', // wider for responsiveness
             minWidth: 0,
             boxSizing: 'border-box',
           }}
@@ -984,20 +1013,21 @@ function AppContent() {
           background: theme === 'dark'
             ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
             : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderRadius: '28px',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          borderRadius: '20px', // smaller radius
           boxShadow: theme === 'dark'
-            ? '0 2px 12px rgba(35,41,70,0.25)'
-            : '0 2px 12px rgba(88,204,2,0.10)',
+            ? '0 2px 8px rgba(35,41,70,0.18)'
+            : '0 2px 8px rgba(88,204,2,0.08)',
           border: theme === 'dark'
-            ? '1.5px solid #232946'
-            : '1.5px solid rgba(88,204,2,0.18)',
+            ? '1px solid #232946'
+            : '1px solid rgba(88,204,2,0.12)',
           color: theme === 'dark' ? '#e0e7ff' : undefined,
           position: 'relative',
           overflow: 'visible',
           gap: '0',
-          minHeight: '180px',
+          minHeight: '110px', // smaller height
+          padding: '12px 10px', // smaller padding
         }}>
             {/* Decorative background elements */}
             <motion.div
@@ -1162,156 +1192,170 @@ function AppContent() {
             </motion.div>
           </div>
         </motion.div>
-        {/* Scenario card - Polished */}
-        <div className="duo-card" style={{
-          borderRadius: '28px',
-          padding: '36px 28px 32px 24px',
-          marginBottom: '32px',
+        {/* Two-column layout for cards */}
+        <div style={{
           display: 'flex',
+          gap: '32px',
           alignItems: 'flex-start',
-          position: 'relative',
-          background: theme === 'dark'
-            ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
-            : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          boxShadow: theme === 'dark'
-            ? '0 2px 12px rgba(35,41,70,0.25)'
-            : '0 2px 12px rgba(88,204,2,0.10)',
-          border: theme === 'dark'
-            ? '1.5px solid #232946'
-            : '1.5px solid rgba(88,204,2,0.18)',
-          color: theme === 'dark' ? '#e0e7ff' : undefined,
+          width: '100%',
+          flexWrap: 'wrap',
         }}>
-          <div style={{ width: '100%' }}>
-            <div className="card-title">Scenario</div>
-            <div className="card-body">
-              <Scenario
-                scenario={scenario}
-                language={language}
-                loading={loading}
-                onLanguageChange={handleScenarioLanguageChange}
-                languages={LANGUAGES}
-              />
+          {/* Left column: Scenario, AI Response, and Feedback */}
+          <div style={{ flex: 1, minWidth: '320px', maxWidth: '520px' }}>
+            {/* Scenario card - Polished */}
+            <div className="duo-card" style={{
+              borderRadius: '28px',
+              padding: '36px 28px 32px 24px',
+              marginBottom: '32px',
+              display: 'flex',
+              alignItems: 'flex-start',
+              position: 'relative',
+              background: theme === 'dark'
+                ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
+                : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: theme === 'dark'
+                ? '0 2px 12px rgba(35,41,70,0.25)'
+                : '0 2px 12px rgba(88,204,2,0.10)',
+              border: theme === 'dark'
+                ? '1.5px solid #232946'
+                : '1.5px solid rgba(88,204,2,0.18)',
+              color: theme === 'dark' ? '#e0e7ff' : undefined,
+            }}>
+              <div style={{ width: '100%' }}>
+                <div className="card-title">Scenario</div>
+                <div className="card-body">
+                  <Scenario
+                    scenario={scenario}
+                    language={language}
+                    loading={loading}
+                    onLanguageChange={handleScenarioLanguageChange}
+                    languages={LANGUAGES}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        
-        {/* Input area - Polished */}
-        <div className="duo-card" style={{
-          borderRadius: '28px',
-          padding: '36px 28px 32px 24px',
-          marginBottom: '32px',
-          display: 'flex',
-          alignItems: 'flex-start',
-          position: 'relative',
-          background: theme === 'dark'
-            ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
-            : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          boxShadow: theme === 'dark'
-            ? '0 2px 12px rgba(35,41,70,0.25)'
-            : '0 2px 12px rgba(88,204,2,0.10)',
-          border: theme === 'dark'
-            ? '1.5px solid #232946'
-            : '1.5px solid rgba(88,204,2,0.18)',
-          color: theme === 'dark' ? '#e0e7ff' : undefined,
-        }}>
-          <div style={{ width: '100%' }}>
-            <div className="card-title">Your Argument</div>
-            <div className="card-body">
-              <ArgumentInput
-                userArgument={userArgument}
-                onChange={setUserArgument}
-                loading={loading}
-                disabled={loading}
-                onTranslate={handleTranslate}
-                translation={translation}
-                language={language}
-              />
-              <div style={{ marginTop: '24px' }}>
-                <ToneSelector
-                  tone={tone}
-                  onChange={setTone}
-                  loading={loading}
-                  disabled={loading}
-                  tones={TONES}
-                />
+            {/* AI Response area - Polished, no side line */}
+            <div className="duo-card" style={{
+              borderRadius: '28px',
+              padding: '36px 28px 32px 24px',
+              marginBottom: '32px',
+              display: 'flex',
+              alignItems: 'flex-start',
+              position: 'relative',
+              background: theme === 'dark'
+                ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
+                : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: theme === 'dark'
+                ? '0 2px 12px rgba(35,41,70,0.25)'
+                : '0 2px 12px rgba(88,204,2,0.10)',
+              border: theme === 'dark'
+                ? '1.5px solid #232946'
+                : '1.5px solid rgba(88,204,2,0.18)',
+              color: theme === 'dark' ? '#e0e7ff' : undefined,
+            }}>
+              <div style={{ width: '100%' }}>
+                <div className="card-title">AI Response</div>
+                <div className="card-body">
+                  <AIResponse
+                    aiResponse={aiResponse}
+                    newStance={newStance}
+                    loading={loading}
+                    disabled={roundResult !== 'playing'}
+                    onDialogue={handleDialogue}
+                    userArgument={userArgument}
+                    enableVoice={true}
+                  />
+                </div>
+              </div>
+            </div>
+            {/* Feedback area - Polished, no side line */}
+            <div className="duo-card" style={{
+              borderRadius: '28px',
+              padding: '36px 28px 32px 24px',
+              marginBottom: '32px',
+              display: 'flex',
+              alignItems: 'flex-start',
+              position: 'relative',
+              background: theme === 'dark'
+                ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
+                : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: theme === 'dark'
+                ? '0 2px 12px rgba(35,41,70,0.25)'
+                : '0 2px 12px rgba(88,204,2,0.10)',
+              border: theme === 'dark'
+                ? '1.5px solid #232946'
+                : '1.5px solid rgba(88,204,2,0.18)',
+              color: theme === 'dark' ? '#e0e7ff' : undefined,
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }}>
+              <div style={{ width: '100%' }}>
+                <div className="card-title">Feedback</div>
+                <div className="card-body">
+                  <Feedback
+                    feedback={feedback}
+                    score={score}
+                    loading={loading}
+                    disabled={roundResult !== 'playing'}
+                    onEvaluate={handleEvaluate}
+                    userArgument={userArgument}
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        
-        {/* AI Response area - Polished, no side line */}
-        <div className="duo-card" style={{
-          borderRadius: '28px',
-          padding: '36px 28px 32px 24px',
-          marginBottom: '32px',
-          display: 'flex',
-          alignItems: 'flex-start',
-          position: 'relative',
-          background: theme === 'dark'
-            ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
-            : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          boxShadow: theme === 'dark'
-            ? '0 2px 12px rgba(35,41,70,0.25)'
-            : '0 2px 12px rgba(88,204,2,0.10)',
-          border: theme === 'dark'
-            ? '1.5px solid #232946'
-            : '1.5px solid rgba(88,204,2,0.18)',
-          color: theme === 'dark' ? '#e0e7ff' : undefined,
-        }}>
-          <div style={{ width: '100%' }}>
-            <div className="card-title">AI Response</div>
-            <div className="card-body">
-              <AIResponse
-                aiResponse={aiResponse}
-                newStance={newStance}
-                loading={loading}
-                disabled={roundResult !== 'playing'}
-                onDialogue={handleDialogue}
-                userArgument={userArgument}
-                enableVoice={true}
-              />
-            </div>
-          </div>
-        </div>
-        
-        {/* Feedback area - Polished, no side line */}
-        <div className="duo-card" style={{
-          borderRadius: '28px',
-          padding: '36px 28px 32px 24px',
-          marginBottom: '32px',
-          display: 'flex',
-          alignItems: 'flex-start',
-          position: 'relative',
-          background: theme === 'dark'
-            ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
-            : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          boxShadow: theme === 'dark'
-            ? '0 2px 12px rgba(35,41,70,0.25)'
-            : '0 2px 12px rgba(88,204,2,0.10)',
-          border: theme === 'dark'
-            ? '1.5px solid #232946'
-            : '1.5px solid rgba(88,204,2,0.18)',
-          color: theme === 'dark' ? '#e0e7ff' : undefined,
-        }}>
-          <div style={{ width: '100%' }}>
-            <div className="card-title">Feedback</div>
-            <div className="card-body">
-              <Feedback
-                feedback={feedback}
-                score={score}
-                loading={loading}
-                disabled={roundResult !== 'playing'}
-                onEvaluate={handleEvaluate}
-                userArgument={userArgument}
-              />
+          {/* Right column: ArgumentInput and ToneSelector */}
+          <div style={{ flex: 1, minWidth: '320px', maxWidth: '520px' }}>
+            {/* Input area - Polished */}
+            <div className="duo-card" style={{
+              borderRadius: '28px',
+              padding: '36px 28px 32px 24px',
+              marginBottom: '32px',
+              display: 'flex',
+              alignItems: 'flex-start',
+              position: 'relative',
+              background: theme === 'dark'
+                ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
+                : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              boxShadow: theme === 'dark'
+                ? '0 2px 12px rgba(35,41,70,0.25)'
+                : '0 2px 12px rgba(88,204,2,0.10)',
+              border: theme === 'dark'
+                ? '1.5px solid #232946'
+                : '1.5px solid rgba(88,204,2,0.18)',
+              color: theme === 'dark' ? '#e0e7ff' : undefined,
+            }}>
+              <div style={{ width: '100%' }}>
+                <div className="card-title">Your Argument</div>
+                <div className="card-body">
+                  <ArgumentInput
+                    userArgument={userArgument}
+                    onChange={setUserArgument}
+                    loading={loading}
+                    disabled={loading}
+                    onTranslate={handleTranslate}
+                    translation={translation}
+                    language={language}
+                  />
+                  <div style={{ marginTop: '24px' }}>
+                    <ToneSelector
+                      tone={tone}
+                      onChange={setTone}
+                      loading={loading}
+                      disabled={loading}
+                      tones={TONES}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1320,22 +1364,27 @@ function AppContent() {
         <div style={{
           display: 'flex',
           gap: '12px',
-          marginTop: '16px'
+          marginTop: '16px',
+          justifyContent: 'center', // center align
+          alignItems: 'center',
         }}>
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             style={{
-              flex: 1,
               background: DUOLINGO_COLORS.green,
               color: DUOLINGO_COLORS.white,
               border: 'none',
-              borderRadius: '12px',
-              padding: '14px',
-              fontWeight: 'bold',
-              fontSize: '16px',
+              borderRadius: '8px', // smaller radius
+              padding: '8px 18px', // smaller padding, more compact
+              fontWeight: 600,
+              fontSize: '14px', // smaller font
               cursor: 'pointer',
-              boxShadow: `0 4px 0 ${DUOLINGO_COLORS.darkGreen}`
+              boxShadow: `0 4px 0 ${DUOLINGO_COLORS.darkGreen}`,
+              minWidth: '120px', // set a minimum width
+              maxWidth: '160px', // set a maximum width
+              width: 'auto', // do not stretch
+              flex: 'none', // do not stretch
             }}
             onClick={fetchScenario}
             disabled={loading || roundResult !== 'playing'}
