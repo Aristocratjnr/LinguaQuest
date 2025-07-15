@@ -95,20 +95,50 @@ SCENARIOS_TWI = [
     "Mekae sɛ ɛho hia sɛ yɛbɔ mmɔden wɔ sukuu."
 ]
 
+# Ga scenarios
+SCENARIOS_GAA = [
+    "Misusu akɛ niyenii fɛɛfɛo ye nyam.",
+    "Misumɔɔ nɔ ni matsu nii leebi.",
+    "Miyeɔ mihe akɛ hesusumɔ he hiaa wɔ skul."
+]
+
+# Ewe scenarios
+SCENARIOS_EWE = [
+    "Mesusu be nuɖuɖu nyuitɔwo vivina.",
+    "Melɔ̃ be mawɔ dɔ ŋdi sia ŋdi.",
+    "Mexɔe se be edze be míawɔ dɔ sesĩe le suku."
+]
+
 @app.post("/scenario", response_model=ScenarioResponse)
 def get_scenario(req: ScenarioRequest):
     try:
         print(f"Received scenario request: category={req.category}, difficulty={req.difficulty}, language={req.language}")
         
-        # Get English scenario first
+        # Determine available scenarios based on language
+        if req.language == "twi":
+            available_scenarios = SCENARIOS_TWI
+        elif req.language == "gaa":
+            available_scenarios = SCENARIOS_GAA
+        elif req.language == "ewe":
+            available_scenarios = SCENARIOS_EWE
+        else:
+            # Fallback for unsupported languages
+            available_scenarios = []
+        
+        # Use language-specific scenarios if available
+        if available_scenarios:
+            scenario = random.choice(available_scenarios)
+            print(f"Selected scenario: {scenario}")
+            return ScenarioResponse(scenario=scenario, language=req.language)
+
+        # Fallback to English and then translate
         scenario_en = random.choice(SCENARIOS_EN)
         print(f"Selected English scenario: {scenario_en}")
-        
-        # If requested language is English, return as is
-        if req.language == "en":
+
+        if req.language == "en":  # Direct return for English
             return ScenarioResponse(scenario=scenario_en, language="en")
-        
-        # If requested language is different, translate it
+
+        # Attempt translation
         try:
             print(f"Translating to {req.language} using NLLB...")
             translated_scenario = nllb_translate(scenario_en, "en", req.language)
@@ -116,16 +146,14 @@ def get_scenario(req: ScenarioRequest):
             return ScenarioResponse(scenario=translated_scenario, language=req.language)
         except Exception as translation_error:
             print(f"NLLB translation error: {translation_error}")
-            # Fallback to LibreTranslate
+            # Fallback translations
             try:
                 print(f"Falling back to LibreTranslate for {req.language}...")
                 translated_scenario = libre_translate(scenario_en, "en", req.language)
                 print(f"LibreTranslate result: {translated_scenario}")
                 return ScenarioResponse(scenario=translated_scenario, language=req.language)
-            
             except Exception as fallback_error:
                 print(f"Fallback translation error: {fallback_error}")
-                # Return English scenario with a note if translation fails
                 return ScenarioResponse(scenario=f"{scenario_en} [Translation unavailable]", language="en")
     except Exception as e:
         print(f"Scenario generation error: {e}")
