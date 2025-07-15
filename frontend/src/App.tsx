@@ -7,7 +7,7 @@ import Confetti from 'react-confetti';
 import successSfx from './assets/sounds/sfx-success.mp3';
 import failSfx from './assets/sounds/sfx-failed.mp3';
 import clickSfx from './assets/sounds/sfx-button-click.mp3';
-import Onboarding from './components/Onboarding';
+
 import Timer from './components/Timer';
 import ProgressBar from './components/ProgressBar';
 import Scenario from './components/Scenario';
@@ -434,35 +434,33 @@ function AppContent() {
     setCategory(cat);
     setDifficulty(diff);
     setShowCategorySelector(false);
-    setShowOnboarding(false);
-    
-    // Start game session
-    if (user) {
-      try {
-        const sessionId = await startGameSession({
-          category: cat,
-          difficulty: diff
-        });
-        setCurrentSessionId(sessionId);
-      } catch (error) {
-        console.error('Failed to start game session:', error);
-      }
-    }
-    
-    // Fetch the first scenario now that category and difficulty are set
+    setRound(1);
+    setScore(0);
+    setDisplayedXp(0);
+    setTimeLeft(ROUND_TIME);
+    setTimerActive(true);
+    setRoundResult('playing');
+    setUserArgument('');
+    setTranslation('');
+    setFeedback('');
+    setAiResponse('');
+    setNewStance('');
     setLoading(true);
-    try {
-      const res = await axios.post<ScenarioResponse>('http://127.0.0.1:8000/scenario', { 
-        category: cat, 
-        difficulty: diff,
-        language: language // Pass current language to get scenario in that language
-      });
-      setScenario(res.data.scenario);
-      setLanguage(res.data.language || language);
-    } catch (e) {
-      setScenario('Error loading scenario.');
-    }
-    setLoading(false);
+    // Animate transition
+    setTimeout(async () => {
+      try {
+        const res = await axios.post<ScenarioResponse>('http://127.0.0.1:8000/scenario', { 
+          category: cat, 
+          difficulty: diff,
+          language: language // Pass current language to get scenario in that language
+        });
+        setScenario(res.data.scenario);
+        setLanguage(res.data.language || language);
+      } catch (e) {
+        setScenario('Error loading scenario.');
+      }
+      setLoading(false);
+    }, 350);
   };
 
   // Submit score and end session on game over
@@ -588,29 +586,47 @@ function AppContent() {
   }
 
   if (showCategorySelector) {
-    return <CategorySelector onConfirm={handleCategoryConfirm} />;
+    return (
+      <CategorySelector onConfirm={async (cat, diff) => {
+        setCategory(cat);
+        setDifficulty(diff);
+        setShowCategorySelector(false);
+        setRound(1);
+        setScore(0);
+        setDisplayedXp(0);
+        setTimeLeft(ROUND_TIME);
+        setTimerActive(true);
+        setRoundResult('playing');
+        setUserArgument('');
+        setTranslation('');
+        setFeedback('');
+        setAiResponse('');
+        setNewStance('');
+        setLoading(true);
+        // Animate transition
+        setTimeout(async () => {
+          try {
+            const res = await axios.post<ScenarioResponse>('http://127.0.0.1:8000/scenario', { 
+              category: cat, 
+              difficulty: diff,
+              language: language // Pass current language to get scenario in that language
+            });
+            setScenario(res.data.scenario);
+            setLanguage(res.data.language || language);
+          } catch (e) {
+            setScenario('Error loading scenario.');
+          }
+          setLoading(false);
+        }, 350);
+      }} />
+    );
   }
 
   if (showSettingsPage) {
     return <SettingsPage onClose={() => setShowSettingsPage(false)} />;
   }
 
-  if (showOnboarding) {
-    return (
-      <>
-        <Onboarding show={showOnboarding} onStart={() => { setShowOnboarding(false); playClick(); }} playClick={playClick} />
-        <button 
-          className="btn btn-outline-primary position-absolute" 
-          style={{ bottom: '2rem', left: '50%', transform: 'translateX(-50%)', borderRadius: '.75rem' }} 
-          onClick={() => setShowLeaderboard(true)}
-        >
-          <i className="material-icons align-middle me-2">leaderboard</i>
-          View Leaderboard
-        </button>
-        {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
-      </>
-    );
-  }
+ 
 
   // Main game layout with Duolingo styling
   return (
@@ -723,6 +739,64 @@ function AppContent() {
         width: '100%',
         margin: '0 auto'
       }}>
+        {/* Category & Difficulty Indicator */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: 'rgba(255,255,255,0.45)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            borderRadius: '18px',
+            padding: '12px 20px',
+            margin: '18px 0 8px 0',
+            boxShadow: '0 2px 8px rgba(88,204,2,0.08)',
+            border: '1.2px solid rgba(88,204,2,0.10)',
+            fontFamily: 'JetBrains Mono, monospace',
+            fontSize: '1rem',
+            fontWeight: 600,
+            color: '#3caa3c',
+            gap: '12px'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <i className="material-icons" style={{ fontSize: '20px', color: '#58cc02' }}>view_module</i>
+              {category ? category.charAt(0).toUpperCase() + category.slice(1) : 'Category'}
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <i className="material-icons" style={{ fontSize: '20px', color: '#1cb0f6' }}>signal_cellular_alt</i>
+              {difficulty ? difficulty.charAt(0).toUpperCase() + difficulty.slice(1) : 'Difficulty'}
+            </span>
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            style={{
+              background: '#58cc02',
+              color: 'white',
+              border: 'none',
+              borderRadius: '12px',
+              padding: '8px 18px',
+              fontWeight: 700,
+              fontSize: '0.95rem',
+              cursor: 'pointer',
+              boxShadow: '0 2px 0 #3caa3c',
+              fontFamily: 'JetBrains Mono, monospace',
+              letterSpacing: '0.01em',
+              transition: 'all 0.2s',
+              marginLeft: '12px'
+            }}
+            onClick={() => setShowCategorySelector(true)}
+          >
+            <i className="material-icons" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '4px' }}>edit</i>
+            Change
+          </motion.button>
+        </motion.div>
         {/* Progress/XP/Timer Card - Enhanced */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

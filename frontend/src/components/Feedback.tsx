@@ -34,180 +34,202 @@ const Feedback: React.FC<FeedbackProps> = ({
     return '#ff3b30'; // Red
   };
 
-  const getScoreEmoji = (score: number): string => {
-    if (score >= 8) return '🎯';
-    if (score >= 5) return '👍';
-    return '👎';
+  const getScoreIcon = (score: number): string => {
+    if (score >= 8) return 'emoji_events';
+    if (score >= 5) return 'thumb_up';
+    return 'thumb_down';
   };
 
   return (
-    <motion.div
-      className="feedback-card mb-4"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      style={{
-        background: 'rgba(255,255,255,0.45)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-        borderRadius: '24px',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
-        border: '1.5px solid rgba(88,204,2,0.10)',
-        padding: '32px 24px',
-        marginBottom: '32px',
-        position: 'relative'
-      }}
-    >
-      {/* Evaluate Button */}
-      <motion.button
-        className="btn w-100 mb-4 py-3 d-flex align-items-center justify-content-center"
-        onClick={onEvaluate}
-        disabled={loading || !userArgument || disabled}
-        style={{ 
-          backgroundColor: loading ? '#cccccc' : '#58a700',
-          color: 'white',
-          border: 'none',
-          borderRadius: '12px',
-          fontWeight: 600,
-          fontSize: '1rem',
-          boxShadow: loading ? 'none' : '0 4px 0 rgba(88, 167, 0, 0.2)',
-          position: 'relative',
-          overflow: 'hidden'
-        }}
-        whileHover={!loading && !disabled ? { 
-          y: -2,
-          boxShadow: '0 6px 0 rgba(88, 167, 0, 0.2)'
-        } : {}}
-        whileTap={!loading && !disabled ? { 
-          y: 2,
-          boxShadow: '0 2px 0 rgba(88, 167, 0, 0.2)'
-        } : {}}
-      >
-        {loading ? (
-          <>
-            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-            Analyzing...
-          </>
-        ) : (
-          <>
-            <i className="material-icons align-middle me-2">analytics</i>
-            Evaluate Persuasiveness
-          </>
-        )}
-      </motion.button>
-
-      {/* Feedback Section */}
-      {feedback && (
-        <motion.div 
-          className="p-4 mb-4 rounded-3"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          transition={{ duration: 0.3 }}
-          style={{ 
-            backgroundColor: '#f8f9fa',
-            borderLeft: '4px solid #58a700'
-          }}
-        >
-          <div className="d-flex align-items-start gap-3">
-            <div className="d-flex align-items-center justify-content-center" style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              backgroundColor: '#e8f5e9',
-              color: '#58a700',
-              flexShrink: 0
+    <div>
+      {feedback ? (
+        <div style={{ marginBottom: '24px' }}>
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.6)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            padding: '20px',
+            borderRadius: '20px',
+            boxShadow: '0 4px 12px rgba(88, 204, 2, 0.08)',
+            border: '1px solid rgba(88, 204, 2, 0.12)',
+            position: 'relative',
+            overflow: 'hidden',
+            marginBottom: '20px'
+          }}>
+            <div style={{ 
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '12px'
             }}>
-              <i className="material-icons" style={{ fontSize: '1.2rem' }}>feedback</i>
-            </div>
-            <div>
-              <div className="fw-bold mb-2" style={{ color: '#58a700' }}>AI Feedback</div>
-              <p className="mb-0" style={{ lineHeight: 1.5, color: '#333' }}>{feedback}</p>
-            </div>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Score Section */}
-      {score !== null && (
-        <motion.div 
-          className="p-4 rounded-3"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-          style={{ 
-            backgroundColor: '#f8f9fa',
-            borderLeft: '4px solid ' + getScoreColor(score)
-          }}
-        >
-          <div className="d-flex align-items-center justify-content-between mb-3">
-            <div className="d-flex align-items-center gap-3">
-              <div className="d-flex align-items-center justify-content-center" style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '12px',
-                backgroundColor: '#e8f5e9',
-                color: getScoreColor(score),
-                fontSize: '1.5rem'
+              <i className="material-icons" style={{ 
+                color: '#58cc02', 
+                fontSize: '24px',
+                marginTop: '2px'
               }}>
-                {getScoreEmoji(score)}
+                rate_review
+              </i>
+              <div style={{ 
+                fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: '1rem',
+                lineHeight: 1.6,
+                color: '#333',
+                whiteSpace: 'pre-wrap',
+                flex: 1
+              }}>
+                {feedback}
               </div>
-              <div>
-                <div className="fw-bold" style={{ color: '#58a700' }}>Persuasiveness Score</div>
-                <div className="small text-muted">How convincing your argument was</div>
-              </div>
-            </div>
-            <div className="display-4 fw-bold" style={{ color: getScoreColor(score) }}>
-              {score}
-              <span className="fs-6 text-muted">/10</span>
             </div>
           </div>
-
-          <div className="progress" style={{ height: '12px', borderRadius: '6px' }}>
-            <div 
-              className="progress-bar" 
-              role="progressbar" 
-              style={{ 
-                width: `${score*10}%`, 
-                backgroundColor: getScoreColor(score),
-                borderRadius: '6px'
+          
+          {score !== null && (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              style={{
+                background: 'rgba(255, 255, 255, 0.6)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                padding: '20px',
+                borderRadius: '20px',
+                boxShadow: '0 4px 12px rgba(88, 204, 2, 0.08)',
+                border: '1px solid rgba(88, 204, 2, 0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '16px'
               }}
-              aria-valuenow={score} 
-              aria-valuemin={0} 
-              aria-valuemax={10}
-            />
-          </div>
-
-          <div className="d-flex justify-content-between mt-2 small text-muted">
-            <span>Needs work</span>
-            <span>Perfect!</span>
-          </div>
-        </motion.div>
+            >
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}>
+                <div style={{
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  color: '#58cc02',
+                  textAlign: 'center',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <i className="material-icons" style={{ fontSize: '20px' }}>
+                    psychology
+                  </i>
+                  Persuasiveness Score
+                </div>
+                <div style={{
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '2rem',
+                  fontWeight: 'bold',
+                  color: getScoreColor(score),
+                  boxShadow: '0 4px 12px rgba(88, 204, 2, 0.15)',
+                  border: '2px solid rgba(88, 204, 2, 0.2)',
+                  position: 'relative'
+                }}>
+                  {score}/10
+                  <i className="material-icons" style={{ 
+                    position: 'absolute',
+                    right: '-8px',
+                    top: '-8px',
+                    background: 'white',
+                    borderRadius: '50%',
+                    padding: '4px',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                    color: getScoreColor(score),
+                    fontSize: '20px'
+                  }}>
+                    {getScoreIcon(score)}
+                  </i>
+                </div>
+              </div>
+              <div style={{ 
+                flex: 1,
+                color: '#4b4b4b',
+                fontSize: '0.95rem',
+                padding: '0 12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                <i className="material-icons" style={{ 
+                  color: getScoreColor(score),
+                  fontSize: '24px'
+                }}>
+                  {score >= 8 ? 'lightbulb' : score >= 6 ? 'tips_and_updates' : 'build'}
+                </i>
+                <span>
+                  {score >= 8 ? (
+                    'Excellent! Your argument was highly persuasive and well-crafted.'
+                  ) : score >= 6 ? (
+                    'Good job! Your argument was persuasive, with room for improvement.'
+                  ) : score >= 4 ? (
+                    'Fair attempt. Try to strengthen your key points and address counterarguments.'
+                  ) : (
+                    'Your argument needs more development. Consider using more persuasive techniques.'
+                  )}
+                </span>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      ) : (
+        <div style={{ textAlign: 'center', margin: '24px 0' }}>
+          <p style={{ 
+            marginBottom: '16px', 
+            color: '#666', 
+            fontSize: '0.95rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px'
+          }}>
+            <i className="material-icons" style={{ fontSize: '20px', opacity: 0.8 }}>
+              {userArgument ? 'assessment' : 'edit_note'}
+            </i>
+            {userArgument ? 'Ready to evaluate your argument?' : 'Enter your argument to evaluate persuasiveness'}
+          </p>
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            disabled={!userArgument || loading || disabled}
+            onClick={onEvaluate}
+            style={{
+              background: '#58cc02',
+              color: 'white',
+              border: 'none',
+              borderRadius: '12px',
+              padding: '14px 36px',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              cursor: !userArgument || loading || disabled ? 'not-allowed' : 'pointer',
+              opacity: !userArgument || loading || disabled ? 0.7 : 1,
+              boxShadow: '0 4px 0 #3caa3c',
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px'
+            }}
+          >
+            <i className="material-icons" style={{ fontSize: '20px' }}>
+              {loading ? 'hourglass_top' : 'analytics'}
+            </i>
+            {loading ? 'Evaluating...' : 'Evaluate Persuasiveness'}
+          </motion.button>
+        </div>
       )}
-
-      {/* Help Text */}
-      <div className="text-muted small mt-3 d-flex align-items-center" style={{ 
-        color: '#6c757d',
-        fontSize: '0.8rem',
-        background: 'rgba(255,255,255,0.45)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-        borderRadius: '12px',
-        padding: '8px 14px',
-        marginTop: '12px'
-      }}>
-        <span className="d-flex align-items-center justify-content-center me-2" style={{
-          width: '20px',
-          height: '20px',
-          borderRadius: '50%',
-          backgroundColor: '#e8f5e9',
-          color: '#58a700'
-        }}>
-          <i className="material-icons" style={{ fontSize: '0.9rem' }}>info</i>
-        </span>
-        The AI evaluates how persuasive your argument is based on structure and content
-      </div>
-    </motion.div>
+    </div>
   );
 };
 
-export default Feedback;
+export default Feedback; 

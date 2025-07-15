@@ -114,12 +114,13 @@ const AIResponse: React.FC<AIResponseProps> = ({
         <motion.div 
           className="p-4 mb-3 rounded-3 position-relative"
           style={{ 
-            background: 'rgba(255,255,255,0.45)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
+            background: 'rgba(255,255,255,0.6)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
             borderLeft: '4px solid #58a700',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-            borderRadius: '16px'
+            boxShadow: '0 4px 20px rgba(88, 167, 0, 0.08)',
+            borderRadius: '16px',
+            border: '1px solid rgba(88, 167, 0, 0.12)'
           }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -153,12 +154,14 @@ const AIResponse: React.FC<AIResponseProps> = ({
               style={{ 
                 width: 40, 
                 height: 40,
-                border: 'none'
+                border: 'none',
+                background: speaking ? '#58a700' : 'rgba(255, 255, 255, 0.48)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
               }}
               onClick={handleSpeak}
               disabled={speaking}
               title="Hear response"
-              whileHover={{ backgroundColor: speaking ? '#28a745' : '#f1f1f1' }}
+              whileHover={{ backgroundColor: speaking ? '#48961f' : '#f1f1f19e' }}
               whileTap={{ scale: 0.85 }}
             >
               <i className="material-icons" style={{ 
@@ -180,26 +183,44 @@ const AIResponse: React.FC<AIResponseProps> = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
           style={{ 
-            background: 'rgba(255,255,255,0.45)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
+            background: 'rgba(255,255,255,0.6)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
             borderRadius: '16px',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
+            boxShadow: '0 4px 12px rgba(88, 167, 0, 0.08)',
+            border: '1px solid rgba(88, 167, 0, 0.12)'
           }}
         >
           <div className="d-flex align-items-center justify-content-center mt-1" style={{
-            width: '24px',
-            height: '24px',
+            width: '32px',
+            height: '32px',
             borderRadius: '50%',
-            backgroundColor: '#58a700',
+            background: 'linear-gradient(135deg, #68b90f 0%, #58a700 100%)',
             color: 'white',
-            flexShrink: 0
+            flexShrink: 0,
+            boxShadow: '0 2px 6px rgba(88, 167, 0, 0.2)'
           }}>
-            <i className="material-icons" style={{ fontSize: '1rem' }}>psychology</i>
+            <i className="material-icons" style={{ fontSize: '1.1rem' }}>psychology</i>
           </div>
           <div>
-            <div className="fw-bold mb-1" style={{ color: '#58a700' }}>Current Stance:</div>
-            <div style={{ color: '#6c757d', fontSize: '0.92rem', fontWeight: 400 }}>{newStance}</div>
+            <div className="fw-bold mb-1" style={{ 
+              color: '#58a700',
+              fontSize: '0.95rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}>
+              <i className="material-icons" style={{ fontSize: '0.95rem' }}>sync_alt</i>
+              Current Stance
+            </div>
+            <div style={{ 
+              color: '#4b4b4b', 
+              fontSize: '0.92rem', 
+              fontWeight: 400,
+              lineHeight: '1.4'
+            }}>
+              {newStance}
+            </div>
           </div>
         </motion.div>
       )}
@@ -208,12 +229,13 @@ const AIResponse: React.FC<AIResponseProps> = ({
       <div className="text-muted small mt-3 d-flex align-items-center" style={{ 
         color: '#6c757d',
         fontSize: '0.8rem',
-        background: 'rgba(255,255,255,0.45)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
+        background: 'rgba(255,255,255,0.6)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
         borderRadius: '12px',
         padding: '8px 14px',
-        marginTop: '12px'
+        marginTop: '12px',
+        border: '1px solid rgba(88, 167, 0, 0.06)'
       }}>
         <span className="d-flex align-items-center justify-content-center me-2" style={{
           width: '20px',
