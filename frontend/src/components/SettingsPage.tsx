@@ -96,15 +96,15 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   
   // Glassmorphism styles
   const glassBackground = isDark 
-    ? 'rgba(35, 41, 70, 0.25)'
+    ? 'rgba(35, 41, 70, 0.35)'
     : 'rgba(255, 255, 255, 0.25)';
-  const glassBackdropFilter = 'blur(12px)';
+  const glassBackdropFilter = 'blur(16px)';
   const glassBorder = isDark
-    ? '1px solid rgba(255, 255, 255, 0.05)'
-    : '1px solid rgba(255, 255, 255, 0.3)';
+    ? '1px solid rgba(255, 255, 255, 0.08)'
+    : '1px solid rgba(255, 255, 255, 0.4)';
   const glassBoxShadow = isDark
-    ? '0 8px 32px rgba(0, 0, 0, 0.3)'
-    : '0 8px 32px rgba(31, 38, 135, 0.15)';
+    ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+    : '0 8px 32px rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)';
   
   const cardHeaderBg = 'transparent';
   const cardFooterBg = 'transparent';
@@ -122,23 +122,33 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
            paddingTop: '2rem',
            paddingBottom: '2rem',
            backgroundSize: 'cover',
-           backgroundPosition: 'center'
+           backgroundPosition: 'center',
+           // Add a subtle pattern overlay for depth
+           backgroundImage: isDark 
+             ? 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.03\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'1\'/%3E%3C/g%3E%3C/svg%3E")'
+             : 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'0.03\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'1\'/%3E%3C/g%3E%3C/svg%3E")'
          }}>
       <motion.div
         className="card shadow-lg w-100"
         style={{ 
           maxWidth: 'min(95vw, 500px)',
           width: '100%',
-          borderRadius: 16, 
+          borderRadius: 20, 
           fontFamily: "'JetBrains Mono', monospace", 
           minHeight: 'auto',
           background: glassBackground,
           backdropFilter: glassBackdropFilter,
-          WebkitBackdropFilter: glassBackdropFilter, // for Safari
+          WebkitBackdropFilter: glassBackdropFilter, 
           border: glassBorder,
           boxShadow: glassBoxShadow,
           color: inputText, 
-          margin: '0 auto'
+          margin: '0 auto',
+          // Add a subtle light reflection at the top
+          backgroundImage: isDark
+            ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 0%, transparent 40%)'
+            : 'linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 0%, transparent 40%)',
+          // Ensure consistent edge rounding
+          overflow: 'hidden'
         }}
         initial={{ opacity: 0, y: 32 }}
         animate={{ opacity: 1, y: 0 }}
@@ -148,7 +158,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         <div className="card-header d-flex justify-content-between align-items-center border-bottom py-3 px-3 px-sm-4"
              style={{ 
                background: 'transparent', 
-               borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.3)'
+               borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(255, 255, 255, 0.3)'
              }}>
           <div className="d-flex align-items-center gap-2 flex-wrap">
             <span className="d-flex align-items-center justify-content-center me-2" style={{

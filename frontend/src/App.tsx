@@ -133,9 +133,12 @@ function AppContent() {
     if (theme === 'dark') {
       document.body.classList.add('dark');
       document.body.classList.remove('light');
-    } else {
+    } else if (theme === 'light') {
       document.body.classList.add('light');
       document.body.classList.remove('dark');
+    } else {
+      document.body.classList.remove('dark');
+      document.body.classList.remove('light');
     }
   }, [theme]);
 
@@ -845,12 +848,12 @@ function AppContent() {
                 width: '36px',
                 height: '36px',
                 borderRadius: '50%',
-                background: DUOLINGO_COLORS.gray,
+                background: theme === 'dark' ? '#232946' : DUOLINGO_COLORS.gray,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 overflow: 'hidden',
-                border: `2px solid ${DUOLINGO_COLORS.green}`,
+                border: theme === 'dark' ? '2px solid #e0e7ff' : `2px solid ${DUOLINGO_COLORS.green}`,
                 cursor: 'pointer',
                 transition: 'box-shadow 0.2s',
               }}
@@ -868,7 +871,7 @@ function AppContent() {
               <span style={{
                 fontFamily: 'JetBrains Mono, monospace',
                 fontWeight: 400,
-                color: DUOLINGO_COLORS.darkGray,
+                color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
                 fontSize: '13px',
                 opacity: 0.7,
                 letterSpacing: '0.01em',
@@ -878,7 +881,7 @@ function AppContent() {
               </span>
               <span style={{
                 fontWeight: 'bold',
-                color: DUOLINGO_COLORS.darkGray,
+                color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
                 fontSize: '14px',
                 fontFamily: 'JetBrains Mono, monospace',
                 letterSpacing: '0.01em',
@@ -897,7 +900,11 @@ function AppContent() {
         padding: '0 16px 16px',
         maxWidth: '640px',
         width: '100%',
-        margin: '0 auto'
+        margin: '0 auto',
+        background: theme === 'dark'
+          ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
+          : 'none',
+        minHeight: '100vh',
       }}>
         {/* Category & Difficulty Indicator */}
         <motion.div
@@ -974,12 +981,19 @@ function AppContent() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+          background: theme === 'dark'
+            ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
+            : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           borderRadius: '28px',
-          boxShadow: '0 2px 12px rgba(88,204,2,0.10)',
-          border: '1.5px solid rgba(88,204,2,0.18)',
+          boxShadow: theme === 'dark'
+            ? '0 2px 12px rgba(35,41,70,0.25)'
+            : '0 2px 12px rgba(88,204,2,0.10)',
+          border: theme === 'dark'
+            ? '1.5px solid #232946'
+            : '1.5px solid rgba(88,204,2,0.18)',
+          color: theme === 'dark' ? '#e0e7ff' : undefined,
           position: 'relative',
           overflow: 'visible',
           gap: '0',
@@ -1156,11 +1170,18 @@ function AppContent() {
           display: 'flex',
           alignItems: 'flex-start',
           position: 'relative',
-          background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+          background: theme === 'dark'
+            ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
+            : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          boxShadow: '0 2px 12px rgba(88,204,2,0.10)',
-          border: '1.5px solid rgba(88,204,2,0.18)'
+          boxShadow: theme === 'dark'
+            ? '0 2px 12px rgba(35,41,70,0.25)'
+            : '0 2px 12px rgba(88,204,2,0.10)',
+          border: theme === 'dark'
+            ? '1.5px solid #232946'
+            : '1.5px solid rgba(88,204,2,0.18)',
+          color: theme === 'dark' ? '#e0e7ff' : undefined,
         }}>
           <div style={{ width: '100%' }}>
             <div className="card-title">Scenario</div>
@@ -1184,11 +1205,18 @@ function AppContent() {
           display: 'flex',
           alignItems: 'flex-start',
           position: 'relative',
-          background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+          background: theme === 'dark'
+            ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
+            : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          boxShadow: '0 2px 12px rgba(88,204,2,0.10)',
-          border: '1.5px solid rgba(88,204,2,0.18)'
+          boxShadow: theme === 'dark'
+            ? '0 2px 12px rgba(35,41,70,0.25)'
+            : '0 2px 12px rgba(88,204,2,0.10)',
+          border: theme === 'dark'
+            ? '1.5px solid #232946'
+            : '1.5px solid rgba(88,204,2,0.18)',
+          color: theme === 'dark' ? '#e0e7ff' : undefined,
         }}>
           <div style={{ width: '100%' }}>
             <div className="card-title">Your Argument</div>
@@ -1223,11 +1251,18 @@ function AppContent() {
           display: 'flex',
           alignItems: 'flex-start',
           position: 'relative',
-          background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+          background: theme === 'dark'
+            ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
+            : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          boxShadow: '0 2px 12px rgba(88,204,2,0.10)',
-          border: '1.5px solid rgba(88,204,2,0.18)'
+          boxShadow: theme === 'dark'
+            ? '0 2px 12px rgba(35,41,70,0.25)'
+            : '0 2px 12px rgba(88,204,2,0.10)',
+          border: theme === 'dark'
+            ? '1.5px solid #232946'
+            : '1.5px solid rgba(88,204,2,0.18)',
+          color: theme === 'dark' ? '#e0e7ff' : undefined,
         }}>
           <div style={{ width: '100%' }}>
             <div className="card-title">AI Response</div>
@@ -1253,11 +1288,18 @@ function AppContent() {
           display: 'flex',
           alignItems: 'flex-start',
           position: 'relative',
-          background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+          background: theme === 'dark'
+            ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
+            : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          boxShadow: '0 2px 12px rgba(88,204,2,0.10)',
-          border: '1.5px solid rgba(88,204,2,0.18)'
+          boxShadow: theme === 'dark'
+            ? '0 2px 12px rgba(35,41,70,0.25)'
+            : '0 2px 12px rgba(88,204,2,0.10)',
+          border: theme === 'dark'
+            ? '1.5px solid #232946'
+            : '1.5px solid rgba(88,204,2,0.18)',
+          color: theme === 'dark' ? '#e0e7ff' : undefined,
         }}>
           <div style={{ width: '100%' }}>
             <div className="card-title">Feedback</div>
@@ -1386,10 +1428,10 @@ function AppContent() {
           <footer style={{
             padding: '12px 16px',
             marginTop: 'auto',
-            boxShadow: '0 -2px 4px rgba(0,0,0,0.05)',
+            boxShadow: theme === 'dark' ? '0 -2px 8px #181c2a' : '0 -2px 4px rgba(0,0,0,0.05)',
             display: 'flex',
             justifyContent: 'center',
-            background: '#fff',
+            background: theme === 'dark' ? '#181c2a' : '#fff',
             position: 'relative',
             zIndex: 1
           }}>
@@ -1409,7 +1451,7 @@ function AppContent() {
                   flexDirection: 'column',
                   alignItems: 'center',
                   gap: '4px',
-                  color: DUOLINGO_COLORS.darkGray,
+                  color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
                   cursor: 'pointer',
                   transition: 'color 0.2s',
                 }}
@@ -1429,7 +1471,7 @@ function AppContent() {
                   flexDirection: 'column',
                   alignItems: 'center',
                   gap: '4px',
-                  color: DUOLINGO_COLORS.darkGray,
+                  color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
                   cursor: 'pointer',
                   transition: 'color 0.2s',
                 }}
@@ -1449,7 +1491,7 @@ function AppContent() {
                   flexDirection: 'column',
                   alignItems: 'center',
                   gap: '4px',
-                  color: DUOLINGO_COLORS.darkGray,
+                  color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
                   cursor: 'pointer',
                   transition: 'color 0.2s',
                 }}
@@ -1465,11 +1507,11 @@ function AppContent() {
             width: '100%',
             textAlign: 'center',
             fontSize: '12px',
-            color: DUOLINGO_COLORS.darkGray,
+            color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
             opacity: 0.7,
             fontFamily: 'JetBrains Mono, monospace',
             padding: '8px 0 16px 0',
-            background: '#fff',
+            background: theme === 'dark' ? '#181c2a' : '#fff',
             letterSpacing: '0.01em',
             zIndex: 0
           }}>
