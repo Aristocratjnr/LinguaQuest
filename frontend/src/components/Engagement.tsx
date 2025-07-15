@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
+import { useUser } from '../context/UserContext';
 
 const quotes = [
   '"Learning another language is like becoming another person." — Haruki Murakami',
@@ -23,32 +24,18 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
   avatar, 
   onStart 
 }) => {
+  const { user, userStats } = useUser();
   const [tipIndex, setTipIndex] = useState(0);
   const [quoteIndex, setQuoteIndex] = useState(0);
-  const [streak, setStreak] = useState<number | null>(null);
-  const [xp, setXp] = useState<number | null>(null);
-  const [loadingStats, setLoadingStats] = useState(true);
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 1200,
     height: typeof window !== 'undefined' ? window.innerHeight : 800,
   });
 
-  useEffect(() => {
-    setLoadingStats(true);
-    Promise.all([
-      axios.get(`http://127.0.0.1:8000/streak?nickname=${encodeURIComponent(nickname)}`),
-      axios.get(`http://127.0.0.1:8000/stats/${encodeURIComponent(nickname)}`)
-    ])
-      .then(([streakRes, statsRes]) => {
-        setStreak(streakRes.data.streak);
-        setXp(statsRes.data.total_score);
-      })
-      .catch(() => {
-        setStreak(0);
-        setXp(0);
-      })
-      .finally(() => setLoadingStats(false));
-  }, [nickname]);
+  // Use user data from context instead of making API calls
+  const streak = user?.current_streak || 0;
+  const xp = userStats?.total_score || 0;
+  const loadingStats = !user || !userStats;
 
   useEffect(() => {
     const handleResize = () => {

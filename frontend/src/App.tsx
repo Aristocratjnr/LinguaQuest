@@ -117,7 +117,7 @@ function AppContent() {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const { theme } = useSettings();
-  const { user, submitScore, startGameSession, endGameSession, incrementStreak, awardBadge } = useUser();
+  const { user, submitScore, startGameSession, endGameSession, incrementStreak, resetStreak, awardBadge } = useUser();
   const [showLogin, setShowLogin] = useState(false);
   const [showListeningModal, setShowListeningModal] = useState(false);
 
@@ -211,16 +211,85 @@ function AppContent() {
       const res = await axios.post<EvaluateResponse>('http://127.0.0.1:8000/evaluate', {
         argument: userArgument,
         tone,
+        scenario, // Include scenario for better context
       });
+      
       setFeedback(res.data.feedback);
       setScore(res.data.score);
+      
+      // Real-time XP calculation based on persuasiveness
+      const baseXp = Math.floor(res.data.score * 10); // Base XP from score
+      const bonusXp = res.data.persuaded ? 50 : 0; // Bonus XP for successful persuasion
+      const earnedXp = baseXp + bonusXp;
+      
+      // Update XP with animation
+      setDisplayedXp(prevXp => {
+        const newXp = prevXp + earnedXp;
+        // Level is based on total XP
+        const newLevel = Math.floor(newXp / 100) + 1; // Level up every 100 XP
+        
+        // Update level in real-time if it changed
+        if (user) {
+          axios.patch(`http://127.0.0.1:8000/api/v1/level?nickname=${encodeURIComponent(user.nickname)}&level=${newLevel}`)
+            .then(() => {
+              // Update leaderboard with new level
+              const leaderboardUpdate = {
+                nickname: user.nickname,
+                total_score: newXp,
+                level: newLevel
+              };
+              return axios.post('/api/v1/leaderboard', leaderboardUpdate);
+            })
+            .catch(error => console.error('Failed to update level/leaderboard:', error));
+        }
+        return newXp;
+      });
+      
       if (res.data.persuaded) {
         setRoundResult('success');
         setTimerActive(false);
+        
+        if (user) {
+          // Submit score first
+          await submitScore({
+            score: earnedXp,
+            details: {
+              argument: userArgument,
+              feedback: res.data.feedback,
+              persuasiveness: res.data.score,
+              scenario: scenario,
+              bonusXp: bonusXp
+            }
+          });
+          
+          // Update streak
+          await incrementStreak();
+          
+          // Update leaderboard entry with new data
+          const leaderboardUpdate = {
+            nickname: user.nickname,
+            total_score: displayedXp + earnedXp,
+            // Optionally, you can remove current_streak or fetch it separately if needed
+            last_activity: new Date().toISOString()
+          };
+          
+          // Update leaderboard
+          await axios.post('/api/v1/leaderboard', leaderboardUpdate)
+            .catch(error => console.error('Failed to update leaderboard:', error));
+          
+          // Show confetti for successful persuasion
+          setShowConfetti(true);
+          setTimeout(() => setShowConfetti(false), 3000);
+          
+          // Play success sound
+          audioSuccess.current?.play();
+        }
       }
     } catch (e) {
       setFeedback('Evaluation error.');
       setScore(null);
+      // Play fail sound
+      audioFail.current?.play();
     }
     setLoading(false);
   };
@@ -359,13 +428,20 @@ function AppContent() {
     }
     if (roundResult === 'fail') {
       setAllPersuaded(false);
+      // Reset streak on failure (optional - depends on game design)
+      // Uncomment the following lines if you want to reset streak on any failure
+      // if (user) {
+      //   resetStreak().catch(error => {
+      //     console.error('Failed to reset streak:', error);
+      //   });
+      // }
     }
     if (roundResult === 'playing' && round === 1) {
       setRoundWins(0);
       setAllPersuaded(true);
       setUniqueWords(new Set());
     }
-  }, [roundResult, userArgument, round, user, incrementStreak]);
+  }, [roundResult, userArgument, round, user, incrementStreak, resetStreak]);
 
   // Unlock badges on game over
   useEffect(() => {
@@ -803,25 +879,27 @@ function AppContent() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           style={{
-            marginTop: '24px',
-            marginBottom: '48px'
+            margin: '24px 0 48px 0',
+            width: '100%',
+            maxWidth: '100%',
+            minWidth: 0,
+            boxSizing: 'border-box',
           }}
         >
         <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: 'rgba(255,255,255,0.45)',
+          background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          borderRadius: '32px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
-          padding: '40px 32px',
-          border: '1.5px solid rgba(88,204,2,0.12)',
+          borderRadius: '28px',
+          boxShadow: '0 2px 12px rgba(88,204,2,0.10)',
+          border: '1.5px solid rgba(88,204,2,0.18)',
           position: 'relative',
           overflow: 'visible',
           gap: '0',
-          minHeight: '180px'
+          minHeight: '180px',
         }}>
             {/* Decorative background elements */}
             <motion.div

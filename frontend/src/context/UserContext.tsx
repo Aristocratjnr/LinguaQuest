@@ -237,6 +237,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     try {
       const stats = await gameApi.getUserStats(user.nickname);
       setUserStats(stats);
+      
+      // Also update the user object to reflect the latest streak info
+      const updatedUser = await userApi.getUser(user.nickname);
+      setUser(updatedUser);
     } catch (err: any) {
       console.error('Failed to refresh user stats:', err);
     }

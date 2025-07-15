@@ -35,8 +35,8 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     setLoading(true);
     setError(null);
     Promise.all([
-      axios.get(`/streak`, { params: { nickname } }),
-      axios.get(`/level`, { params: { nickname } })
+      axios.get(`http://127.0.0.1:8000/api/v1/streak`, { params: { nickname } }),
+      axios.get(`http://127.0.0.1:8000/api/v1/level`, { params: { nickname } })
     ])
       .then(([streakRes, levelRes]) => {
         setStreak(streakRes.data.streak);
@@ -49,7 +49,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const handleResetStreak = async () => {
     setResetting(true);
     try {
-      const res = await axios.patch(`/streak?nickname=${encodeURIComponent(nickname)}&streak=1`);
+      const res = await axios.patch(`http://127.0.0.1:8000/api/v1/streak?nickname=${encodeURIComponent(nickname)}&streak=1`);
       setStreak(res.data.streak);
       toast.success('Streak reset to 1.');
     } catch {
@@ -61,7 +61,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const handleResetLevel = async () => {
     setResetting(true);
     try {
-      const res = await axios.patch(`/level?nickname=${encodeURIComponent(nickname)}&level=1`);
+      const res = await axios.patch(`http://127.0.0.1:8000/api/v1/level?nickname=${encodeURIComponent(nickname)}&level=1`);
       setLevel(res.data.level);
       toast.success('Level reset to 1.');
     } catch {
