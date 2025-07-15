@@ -56,7 +56,7 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
           <LogicFlowStepper steps={[
             { label: 'Nickname', icon: 'person' },
             { label: 'Avatar', icon: 'face' },
-            { label: 'Login', icon: 'login' }
+            { label: 'Age', icon: 'cake' }
           ]} currentStep={1} />
         </div>
         {/* Header */}

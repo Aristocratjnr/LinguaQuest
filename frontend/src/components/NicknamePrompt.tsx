@@ -199,7 +199,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         <LogicFlowStepper steps={[
           { label: 'Nickname', icon: 'person' },
           { label: 'Avatar', icon: 'face' },
-          { label: 'Login', icon: 'login' }
+          { label: 'Age', icon: 'cake' }
         ]} currentStep={0} />
         {/* Header */}
         <div style={{
