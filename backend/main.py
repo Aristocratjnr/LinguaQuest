@@ -67,23 +67,136 @@ conversational_ai = ConversationalAI()
 speech_to_text = SpeechToText()
 
 # --- Scenario Endpoint ---
+class ScenarioRequest(BaseModel):
+    category: str = "general"
+    difficulty: str = "medium"
+    language: str = "twi"  # Default to Twi
+
 class ScenarioResponse(BaseModel):
     scenario: str
     language: str
 
+# English scenarios as base
+SCENARIOS_EN = [
+    "I think eating fast food is enjoyable.",
+    "I prefer to work early in the morning.",
+    "I believe it is important to work hard in school.",
+    "Technology makes our lives easier.",
+    "Social media brings people together.",
+    "Learning multiple languages is essential.",
+    "Traditional values are more important than modern ideas.",
+    "Climate change is the most pressing issue of our time."
+]
+
+# Twi scenarios (for reference)
 SCENARIOS_TWI = [
     "Mekae sɛ didi ntutummu yɛ fɛ.",
     "Mepɛ sɛ meyɛ adwuma anɔpa biara.",
     "Mekae sɛ ɛho hia sɛ yɛbɔ mmɔden wɔ sukuu."
 ]
 
+# Ga scenarios
+SCENARIOS_GAA = [
+    "Misusu akɛ niyenii fɛɛfɛo ye nyam.",
+    "Misumɔɔ nɔ ni matsu nii leebi.",
+    "Miyeɔ mihe akɛ hesusumɔ he hiaa wɔ skul."
+]
+
+# Ewe scenarios
+SCENARIOS_EWE = [
+    "Mesusu be nuɖuɖu nyuitɔwo vivina.",
+    "Melɔ̃ be mawɔ dɔ ŋdi sia ŋdi.",
+    "Mexɔe se be edze be míawɔ dɔ sesĩe le suku."
+]
+
 @app.post("/scenario", response_model=ScenarioResponse)
-def get_scenario():
+def get_scenario(req: ScenarioRequest):
     try:
-        scenario = random.choice(SCENARIOS_TWI)
-        return ScenarioResponse(scenario=scenario, language="twi")
+        print(f"Received scenario request: category={req.category}, difficulty={req.difficulty}, language={req.language}")
+        
+        # If language is English, return an English scenario directly
+        if req.language == "en":
+            scenario = random.choice(SCENARIOS_EN)
+            return ScenarioResponse(scenario=scenario, language="en")
+        
+        # For non-English languages, try this order:
+        # 1. Pre-translated scenarios if available
+        # 2. NLLB translation
+        # 3. Fallback translator
+        # 4. LibreTranslate
+        # 5. Return English with a message
+        
+        # 1. Check for pre-translated scenarios
+        available_scenarios = None
+        if req.language == "twi":
+            available_scenarios = SCENARIOS_TWI
+        elif req.language == "gaa":
+            available_scenarios = SCENARIOS_GAA
+        elif req.language == "ewe":
+            available_scenarios = SCENARIOS_EWE
+            
+        if available_scenarios:
+            scenario = random.choice(available_scenarios)
+            print(f"Using pre-translated scenario: {scenario}")
+            return ScenarioResponse(scenario=scenario, language=req.language)
+        
+        # Get a random English scenario to translate
+        scenario_en = random.choice(SCENARIOS_EN)
+        print(f"Selected English scenario for translation: {scenario_en}")
+        
+        # 2. Try NLLB translation first if available
+        if nllb_model is not None and nllb_tokenizer is not None:
+            try:
+                print(f"Attempting NLLB translation to {req.language}...")
+                translated = nllb_translate(scenario_en, "en", req.language)
+                if translated and not translated.startswith("["):
+                    print(f"NLLB translation successful: {translated}")
+                    return ScenarioResponse(scenario=translated, language=req.language)
+                print("NLLB translation returned invalid result")
+            except Exception as e:
+                print(f"NLLB translation failed: {e}")
+        else:
+            print("NLLB translation not available - model not loaded")
+        
+        # 3. Try fallback translator for African languages
+        if req.language in ["twi", "gaa", "ewe"]:
+            try:
+                from integrations.translation.fallback_translator import FallbackTranslator
+                translated = FallbackTranslator.translate(scenario_en, "en", req.language)
+                if translated and not translated.startswith("["):
+                    print(f"Fallback translation successful: {translated}")
+                    return ScenarioResponse(scenario=translated, language=req.language)
+                print("Fallback translation returned invalid result")
+            except Exception as e:
+                print(f"Fallback translation failed: {e}")
+        
+        # 4. Try LibreTranslate as last resort
+        try:
+            print(f"Attempting LibreTranslate translation to {req.language}...")
+            translated = libre_translate(scenario_en, "en", req.language)
+            if translated and not translated.startswith("["):
+                print(f"LibreTranslate translation successful: {translated}")
+                return ScenarioResponse(scenario=translated, language=req.language)
+            print("LibreTranslate translation returned invalid result")
+        except Exception as e:
+            print(f"LibreTranslate translation failed: {e}")
+        
+        # 5. If all translation attempts fail, return English with a message
+        print("All translation attempts failed - returning English with message")
+        return ScenarioResponse(
+            scenario=f"{scenario_en} [Translation not available for {req.language}]",
+            language="en"
+        )
+        
     except Exception as e:
-        return ScenarioResponse(scenario="Error generating scenario.", language="twi")
+        print(f"Scenario generation error: {e}")
+        return ScenarioResponse(
+            scenario="Error generating scenario.", 
+            language="en"
+        )
+    except Exception as e:
+        print(f"Scenario generation error: {e}")
+        return ScenarioResponse(scenario="Error generating scenario.", language="en")
 
 # --- Translation Endpoint ---
 class TranslationRequest(BaseModel):
@@ -133,18 +246,34 @@ def libre_translate(text, source, target):
     return "[Translation error: All translation services failed]"
 
 # NLLB setup
-NLLB_MODEL_NAME = "facebook/nllb-200-distilled-600M"
-nllb_tokenizer = AutoTokenizer.from_pretrained(NLLB_MODEL_NAME)
-nllb_model = AutoModelForSeq2SeqLM.from_pretrained(NLLB_MODEL_NAME)
+# Use a smaller NLLB model that's more accessible
+NLLB_MODEL_NAME = "facebook/nllb-200-distilled-600M"  # Smaller, faster model
 
+# Initialize model with better error handling
+try:
+    nllb_tokenizer = AutoTokenizer.from_pretrained(NLLB_MODEL_NAME)
+    nllb_model = AutoModelForSeq2SeqLM.from_pretrained(NLLB_MODEL_NAME)
+    print(f"Successfully loaded NLLB model: {NLLB_MODEL_NAME}")
+except Exception as e:
+    print(f"Failed to load NLLB model: {e}")
+    nllb_tokenizer = None
+    nllb_model = None
+
+# Updated language code mapping for African languages
 LANG_CODE_MAP = {
     'en': 'eng_Latn',
     'fr': 'fra_Latn',
     'twi': 'aka_Latn',  # Akan/Twi
-    'ak': 'aka_Latn',
-    'ewe': 'ewe_Latn',
-    'gaa': 'gaa_Latn',
-    # Add more as needed
+    'ak': 'aka_Latn',   # Alternative code for Akan
+    'ewe': 'ewe_Latn',  # Ewe
+    'gaa': 'gaa_Latn',  # Ga
+    # Add other commonly used languages
+    'es': 'spa_Latn',
+    'de': 'deu_Latn',
+    'pt': 'por_Latn',
+    'sw': 'swh_Latn',  # Swahili
+    'yo': 'yor_Latn',  # Yoruba
+    'ha': 'hau_Latn',  # Hausa
 }
 
 def nllb_translate(text, src_lang, tgt_lang):

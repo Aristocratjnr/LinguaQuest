@@ -4,77 +4,59 @@ import Loader from './Loader';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSettings } from '../context/SettingsContext';
 import { gameApi, LeaderboardEntry } from '../services/api';
+import { useUser } from '../context/UserContext';
 
-interface Entry extends LeaderboardEntry {
-  date?: string;
-  level?: number;
+interface LeaderboardProps {
+  onClose: () => void;
+  modal?: boolean;
 }
 
-const Leaderboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
   const { theme } = useSettings();
-  const [entries, setEntries] = useState<Entry[]>([]);
+  const { user } = useUser();
+  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [engagementMap, setEngagementMap] = useState<Record<string, {streak: number, level: number}>>({});
   const [sortBy, setSortBy] = useState<'score' | 'streak' | 'level'>('score');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [search, setSearch] = useState('');
-  const [profileModal, setProfileModal] = useState<null | Entry>(null);
+  const [profileModal, setProfileModal] = useState<null | LeaderboardEntry>(null);
+  const [page, setPage] = useState(0);
+  const limit = 20;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError('');
-        const leaderboardRes = await gameApi.getLeaderboard(100);
-        
-        setEntries(leaderboardRes.leaderboard);
-        
-        // Create engagement map from leaderboard data
-        const map: Record<string, {streak: number, level: number}> = {};
-        leaderboardRes.leaderboard.forEach((entry) => {
-          map[entry.nickname] = { 
-            streak: entry.current_streak, 
-            level: Math.min(10, Math.max(1, Math.floor(entry.current_streak / 3) + 1)) // Calculate level from streak
-          };
-        });
-        setEngagementMap(map);
+        const leaderboardRes = await gameApi.getLeaderboard(limit, page * limit, sortBy, sortDir);
+        console.log('Leaderboard response:', leaderboardRes);
+        if (!Array.isArray(leaderboardRes)) {
+          setError('Leaderboard data is not an array. Check backend response format.');
+          setEntries([]);
+        } else {
+          setEntries(leaderboardRes);
+        }
       } catch (err) {
         setError('Failed to load leaderboard data.');
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
-  }, []);
+  }, [sortBy, sortDir, page]);
 
-  // Sorting/filtering logic
-  const filteredEntries = entries
-    .filter(e => e.name.toLowerCase().includes(search.toLowerCase()))
-    .map(e => ({
-      ...e,
-      streak: engagementMap[e.name]?.streak,
-      level: engagementMap[e.name]?.level
-    }));
-
-  const sortedEntries = [...filteredEntries].sort((a, b) => {
-    const aVal = sortBy === 'score' ? a.score : 
-                sortBy === 'streak' ? (a.streak ?? -1) : 
-                (a.level ?? -1);
-    const bVal = sortBy === 'score' ? b.score : 
-                sortBy === 'streak' ? (b.streak ?? -1) : 
-                (b.level ?? -1);
-    
-    return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
-  });
+  // Filtered and searched entries
+  const filteredEntries = entries.filter(e =>
+    e.nickname.toLowerCase().includes(search.toLowerCase())
+  );
 
   // Badge logic
-  const getBadges = (entry: Entry, rank: number) => {
+  const getBadges = (entry: LeaderboardEntry, rank: number) => {
     const badges = [];
-    if ((entry.streak ?? 0) >= 5) badges.push({ text: '🔥 Streaker', color: '#ff9500' });
+    if ((entry.current_streak ?? 0) >= 5) badges.push({ text: '🔥 Streaker', color: '#ff9500' });
     if ((entry.level ?? 0) >= 5) badges.push({ text: '🏅 Pro', color: '#34c759' });
-    if (rank < 3) badges.push({ text: `🥇 Top ${rank+1}`, color: '#5856d6' });
+    if (rank < 3) badges.push({ text: `🥇 Top ${rank + 1}`, color: '#5856d6' });
     return badges;
   };
 
@@ -85,247 +67,691 @@ const Leaderboard: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     return '#58a700'; // Duolingo green
   };
 
-  return (
-    <motion.div
-      className="fixed inset-0 d-flex align-items-center justify-content-center p-4 z-50"
-      style={{ background: theme === 'dark' ? 'rgba(24,28,42,0.85)' : 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <motion.div
-        className="bg-white dark:bg-[#232946] rounded-4 overflow-hidden w-100 position-relative shadow-lg"
-        style={{ maxWidth: 700, width: '100%', borderRadius: 24, boxShadow: theme === 'dark' ? '0 10px 30px #181c2a' : '0 10px 30px rgba(0,0,0,0.10)' }}
-        initial={{ y: 50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 50, opacity: 0 }}
-        transition={{ type: 'spring', damping: 25 }}
-      >
-        {/* Header */}
-        <div className="d-flex align-items-center justify-content-between px-4 py-3 border-bottom" style={{ background: theme === 'dark' ? '#181c2a' : '#f8f9fa', borderTopLeftRadius: 24, borderTopRightRadius: 24 }}>
-          <div className="d-flex align-items-center gap-2">
-            <span className="d-flex align-items-center justify-content-center" style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700' }}>
-              <i className="material-icons" style={{ fontSize: '1.5rem' }}>leaderboard</i>
-            </span>
-            <h2 className="fw-bold mb-0" style={{ color: '#58a700', fontSize: '1.15rem', letterSpacing: '.01em' }}>Leaderboard</h2>
-            <span className="badge px-3 py-1 d-flex align-items-center ms-2" style={{ backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700', borderRadius: '12px', fontWeight: 600, fontSize: '0.85rem', letterSpacing: '.01em' }}>
-              <i className="material-icons me-1" style={{ fontSize: '1rem' }}>emoji_events</i>
-              Top Players
-            </span>
-          </div>
-          <motion.button whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
+  // Skeleton loader
+  const skeletonRows = Array.from({ length: limit }, (_, i) => i);
+
+  // Empty state
+  const isEmpty = !loading && filteredEntries.length === 0;
+
+  // Main leaderboard content (shared by modal and non-modal)
+  const motionProps = modal
+    ? {
+        initial: { y: 50, opacity: 0 },
+        animate: { y: 0, opacity: 1 },
+        exit: { y: 50, opacity: 0 },
+        transition: { type: 'spring' as const, damping: 25 },
+      }
+    : {};
+
+  // Remove leaderboardContent variable and all references to it
+  // Render all modal content directly in the modal card (motion.div)
+  if (modal) {
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        background: 'rgba(20,20,30,0.75)',
+        backdropFilter: 'blur(6px)',
+        zIndex: 4000,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.8, opacity: 0 }}
+          transition={{ duration: 0.4 }}
+          style={{
+            background: 'linear-gradient(135deg, #fffbe6 0%, #ffe082 100%)',
+            borderRadius: 32,
+            boxShadow: '0 0 0 4px #ffe08255, 0 16px 48px #ffb30033, 0 2px 8px #ffb30022',
+            minWidth: 320,
+            maxWidth: 600,
+            width: '95vw',
+            minHeight: 320,
+            maxHeight: '90vh',
+            padding: '40px 24px 32px 24px',
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            position: 'relative',
+            border: '3px solid #ffb300',
+          }}
+        >
+          <button
             onClick={onClose}
-            className="btn btn-sm btn-outline-secondary rounded-circle ms-2 d-flex align-items-center justify-content-center"
-            style={{ width: 36, height: 36, border: 'none', background: theme === 'dark' ? '#232946' : '#f8f9fa' }}
-            aria-label="Close leaderboard"
+            style={{
+              position: 'absolute',
+              top: 16,
+              right: 16,
+              background: 'none',
+              border: 'none',
+              fontSize: 36,
+              color: '#ffb300',
+              cursor: 'pointer',
+              zIndex: 10,
+              padding: 0,
+              lineHeight: 1,
+              filter: 'drop-shadow(0 2px 8px #ffb30088)'
+            }}
+            title="Close Leaderboard"
+            aria-label="Close Leaderboard"
           >
-            <i className="material-icons">close</i>
-          </motion.button>
-        </div>
-        {/* Controls and Content */}
-        <div className="p-0 p-md-4" style={{ minHeight: 400 }}>
-          {/* Controls */}
-          <div className="p-4 flex flex-col sm:flex-row gap-3 justify-between items-center border-b">
-            <div className="relative w-full sm:w-64">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i className="material-icons text-gray-400">search</i>
+            <span className="material-icons" style={{ fontSize: 36 }}>close</span>
+          </button>
+          {/* Header */}
+          <div style={{ 
+            background: 'none',
+            borderTopLeftRadius: 32, 
+            borderTopRightRadius: 32,
+            padding: 'clamp(16px, 5vw, 32px)',
+            borderBottom: '1px solid rgba(255, 193, 7, 0.18)',
+            position: 'relative',
+            overflow: 'hidden',
+            width: '100%',
+            marginBottom: 0
+          }}>
+            <div className="d-flex align-items-center justify-content-between" style={{ position: 'relative', zIndex: 1 }}>
+              <div className="d-flex align-items-center gap-3">
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '16px',
+                  background: 'linear-gradient(135deg, #ffe082 0%, #ffd54f 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 16px #ffb30033',
+                  border: '1px solid #ffecb3'
+                }}>
+                  <i className="material-icons" style={{ 
+                    fontSize: '24px', 
+                    color: '#ffb300',
+                    filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))'
+                  }}>
+                    leaderboard
+                  </i>
+                </div>
+                <div>
+                  <h2 className="fw-bold mb-0" style={{ 
+                    color: '#b28704', 
+                    fontSize: 'clamp(1.2rem, 3vw, 1.5rem)', 
+                    letterSpacing: '.01em',
+                    fontFamily: 'JetBrains Mono, monospace',
+                    fontWeight: 700
+                  }}>
+                    Leaderboard
+                  </h2>
+                  <span style={{
+                    color: '#b28704',
+                    fontSize: 'clamp(0.7rem, 2vw, 0.9rem)',
+                    fontFamily: 'JetBrains Mono, monospace'
+                  }}>
+                    Global Rankings
+                  </span>
+                </div>
+                <div style={{
+                  background: 'linear-gradient(135deg, #fffde7 0%, #ffe082 100%)',
+                  color: '#ffb300',
+                  borderRadius: '20px',
+                  padding: '8px 16px',
+                  fontWeight: 600,
+                  fontSize: 'clamp(0.7rem, 2vw, 0.85rem)',
+                  letterSpacing: '.01em',
+                  border: '1px solid #ffe082',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 2px 8px #ffb30022'
+                }}>
+                  <i className="material-icons" style={{ fontSize: '16px' }}>emoji_events</i>
+                  Top Players
+                </div>
               </div>
-              <input
-                type="text"
-                className="block w-full pl-10 pr-3 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="Search players..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-              />
-            </div>
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <div className="text-sm font-medium" style={{ color: '#6c757d' }}>Sort by:</div>
-              <select
-                className="border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                value={sortBy}
-                onChange={e => setSortBy(e.target.value as any)}
-              >
-                <option value="score">Score</option>
-                <option value="streak">Streak</option>
-                <option value="level">Level</option>
-              </select>
-              <button
-                className="p-2 rounded-xl hover:bg-gray-100"
-                onClick={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
-              >
-                {sortDir === 'asc' ? (
-                  <i className="material-icons text-green-600">arrow_upward</i>
-                ) : (
-                  <i className="material-icons text-green-600">arrow_downward</i>
-                )}
-              </button>
             </div>
           </div>
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto p-4">
-            {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <Loader label="Loading leaderboard..." size="md" />
+          {/* Controls and Content */}
+          <div className="p-0 p-md-4" style={{ minHeight: 400, padding: 'clamp(8px, 3vw, 32px)', width: '100%' }}>
+            {/* Controls */}
+            <div style={{
+              padding: 'clamp(12px, 3vw, 32px)',
+              borderBottom: theme === 'dark' 
+                ? '1px solid rgba(255,255,255,0.1)' 
+                : '1px solid rgba(88, 204, 2, 0.1)',
+              background: theme === 'dark' 
+                ? 'rgba(255,255,255,0.02)' 
+                : 'rgba(88, 204, 2, 0.02)'
+            }}>
+              <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+                {/* Search Input */}
+                <div className="relative w-full sm:w-80">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i className="material-icons" style={{ 
+                      color: theme === 'dark' ? '#a0aec0' : '#718096',
+                      fontSize: '20px'
+                    }}>search</i>
+                </div>
+                <input
+                  type="text"
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px 12px 48px',
+                      border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)'}`,
+                      borderRadius: '16px',
+                      background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#ffffff',
+                      color: theme === 'dark' ? '#ffffff' : '#2d3748',
+                      fontSize: '14px',
+                      outline: 'none',
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+                    }}
+                    className="focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  placeholder="Search players..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                    onFocus={e => {
+                      e.target.style.borderColor = '#58cc02';
+                      e.target.style.boxShadow = '0 4px 16px rgba(88, 204, 2, 0.15)';
+                    }}
+                    onBlur={e => {
+                      e.target.style.borderColor = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)';
+                      e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
+                    }}
+                />
               </div>
-            ) : error ? (
-              <div className="p-4 rounded-xl text-center" style={{ backgroundColor: '#fee2e2', color: '#b91c1c' }}>
-                {error}
+                
+                {/* Sort Controls */}
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <div style={{ 
+                    color: theme === 'dark' ? '#a0aec0' : '#718096',
+                    fontSize: 'clamp(0.8rem, 2vw, 14px)',
+                    fontWeight: 600,
+                    fontFamily: 'JetBrains Mono, monospace'
+                  }}>
+                    Sort by:
+                  </div>
+                <select
+                    style={{
+                      padding: '10px 16px',
+                      border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)'}`,
+                      borderRadius: '12px',
+                      background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#ffffff',
+                      color: theme === 'dark' ? '#ffffff' : '#2d3748',
+                      fontSize: '14px',
+                      outline: 'none',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+                    }}
+                    className="focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  value={sortBy}
+                  onChange={e => setSortBy(e.target.value as any)}
+                    onFocus={e => {
+                      e.target.style.borderColor = '#58cc02';
+                      e.target.style.boxShadow = '0 4px 16px rgba(88, 204, 2, 0.15)';
+                    }}
+                    onBlur={e => {
+                      e.target.style.borderColor = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)';
+                      e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
+                    }}
+                >
+                  <option value="score">Score</option>
+                  <option value="streak">Streak</option>
+                  <option value="level">Level</option>
+                </select>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{
+                      padding: '10px',
+                      borderRadius: '12px',
+                      background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(88, 204, 2, 0.05)',
+                      border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)'}`,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  onClick={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
+                    onMouseOver={e => {
+                      e.currentTarget.style.background = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.1)';
+                      e.currentTarget.style.borderColor = '#58cc02';
+                    }}
+                    onMouseOut={e => {
+                      e.currentTarget.style.background = theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(88, 204, 2, 0.05)';
+                      e.currentTarget.style.borderColor = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)';
+                    }}
+                  >
+                    <i className="material-icons" style={{ 
+                      color: '#58cc02',
+                      fontSize: '20px'
+                    }}>
+                      {sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward'}
+                    </i>
+                  </motion.button>
+                </div>
               </div>
-            ) : (
-              <div className="space-y-3">
-                {sortedEntries.map((entry, index) => {
-                  const badges = getBadges(entry, index);
-                  return (
-                    <motion.div
-                      key={entry.name + index}
-                      className="flex items-center gap-4 p-4 rounded-xl hover:shadow-md transition-all"
-                      style={{ backgroundColor: '#f8f9fa' }}
-                      whileHover={{ y: -2 }}
-                      onClick={() => setProfileModal(entry)}
-                    >
-                      <div className="flex-shrink-0 relative">
-                        <div
-                          className="flex items-center justify-center w-10 h-10 rounded-full font-bold"
-                          style={{
-                            backgroundColor: getRankColor(index),
-                            color: 'white'
-                          }}
-                        >
-                          {index + 1}
-                        </div>
+            </div>
+            {/* Content Table */}
+            <div style={{ 
+              padding: 'clamp(12px, 3vw, 32px)',
+              maxHeight: '60vh',
+              overflowY: 'auto'
+            }}>
+              {loading ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {skeletonRows.map(i => (
+                    <div key={i} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '16px',
+                      padding: '20px',
+                      borderRadius: '20px',
+                      background: theme === 'dark' ? 'rgba(255,255,255,0.02)' : '#f8f9fa',
+                      border: theme === 'dark' ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(88, 204, 2, 0.08)',
+                      animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    }}>
+                      <div style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        background: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#e2e8f0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 'bold',
+                        color: theme === 'dark' ? 'rgba(255,255,255,0.3)' : '#cbd5e0'
+                      }}>
+                        {i + 1}
                       </div>
-                      <img
-                        src={entry.avatar || defaultAvatar}
-                        alt="avatar"
-                        className="w-12 h-12 rounded-full border-2 border-white shadow"
-                        style={{ borderColor: getRankColor(index) }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold truncate" style={{ color: '#333' }}>{entry.name}</h3>
-                        {badges.length > 0 && (
-                          <div className="flex gap-1 mt-1 flex-wrap">
+                      <div style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '50%',
+                        background: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#e2e8f0'
+                      }} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{
+                          height: '16px',
+                          background: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#e2e8f0',
+                          borderRadius: '8px',
+                          width: '60%',
+                          marginBottom: '8px'
+                        }}></div>
+                        <div style={{
+                          height: '12px',
+                          background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#f1f5f9',
+                          borderRadius: '6px',
+                          width: '40%'
+                        }}></div>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                        <div style={{
+                          height: '16px',
+                          background: theme === 'dark' ? 'rgba(255,255,255,0.1)' : '#e2e8f0',
+                          borderRadius: '8px',
+                          width: '60px'
+                        }}></div>
+                        <div style={{
+                          height: '12px',
+                          background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#f1f5f9',
+                          borderRadius: '6px',
+                          width: '40px'
+                        }}></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : error ? (
+                <div style={{
+                  padding: '24px',
+                  borderRadius: '16px',
+                  textAlign: 'center',
+                  background: theme === 'dark' ? 'rgba(239, 68, 68, 0.1)' : '#fee2e2',
+                  color: theme === 'dark' ? '#fca5a5' : '#b91c1c',
+                  border: theme === 'dark' ? '1px solid rgba(239, 68, 68, 0.2)' : '1px solid #fecaca'
+                }}>
+                  <i className="material-icons" style={{ fontSize: '48px', marginBottom: '16px', opacity: 0.7 }}>error_outline</i>
+                  <div style={{ fontSize: '16px', fontWeight: 600 }}>{error}</div>
+                </div>
+              ) : isEmpty ? (
+                <div style={{
+                  padding: '48px 24px',
+                  borderRadius: '20px',
+                  textAlign: 'center',
+                  background: theme === 'dark' ? 'rgba(255,255,255,0.02)' : '#f8f9fa',
+                  color: theme === 'dark' ? '#a0aec0' : '#718096',
+                  border: theme === 'dark' ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(88, 204, 2, 0.08)'
+                }}>
+                  <i className="material-icons" style={{ fontSize: '64px', marginBottom: '16px', opacity: 0.5 }}>search_off</i>
+                  <div style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>No players found</div>
+                  <div style={{ fontSize: '14px', opacity: 0.8 }}>Try adjusting your search criteria</div>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {filteredEntries.map((entry, index) => {
+                    const badges = getBadges(entry, index);
+                    const isCurrentUser = user && user.nickname === entry.nickname;
+                    return (
+                      <motion.div
+                        key={entry.nickname + entry.rank}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '16px',
+                          padding: '20px',
+                          borderRadius: '20px',
+                          background: isCurrentUser 
+                            ? 'linear-gradient(135deg, #d7f7c8 0%, #58cc02 100%)' 
+                            : theme === 'dark' 
+                              ? 'rgba(255,255,255,0.02)' 
+                              : '#ffffff',
+                          border: isCurrentUser
+                            ? '2.5px solid #1cb0f6'
+                            : theme === 'dark' 
+                              ? '1px solid rgba(255,255,255,0.05)' 
+                              : '1px solid rgba(88, 204, 2, 0.08)',
+                          boxShadow: isCurrentUser
+                            ? '0 0 16px 4px #1cb0f655, 0 8px 32px rgba(88, 204, 2, 0.18)'
+                            : '0 2px 8px rgba(0,0,0,0.04)',
+                          position: 'relative',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          overflow: 'hidden'
+                        }}
+                        whileHover={{ 
+                          y: -2,
+                          boxShadow: isCurrentUser
+                            ? '0 0 32px 8px #1cb0f6aa, 0 12px 40px rgba(88, 204, 2, 0.2)'
+                            : '0 4px 16px rgba(0,0,0,0.08)'
+                        }}
+                       animate={isCurrentUser ? { boxShadow: [
+                         '0 0 16px 4px #1cb0f655, 0 8px 32px rgba(88, 204, 2, 0.18)',
+                         '0 0 32px 8px #1cb0f6aa, 0 8px 32px rgba(88, 204, 2, 0.18)',
+                         '0 0 16px 4px #1cb0f655, 0 8px 32px rgba(88, 204, 2, 0.18)'
+                       ] } : {}}
+                       transition={isCurrentUser ? { duration: 2, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut' } : {}}
+                        onClick={() => setProfileModal(entry)}
+                      >
+                        {/* Current user indicator */}
+                        {isCurrentUser && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '8px',
+                            right: '8px',
+                            width: '8px',
+                            height: '8px',
+                            borderRadius: '50%',
+                            background: '#58cc02',
+                            boxShadow: '0 0 8px rgba(88, 204, 2, 0.5)'
+                          }} />
+                        )}
+                        
+                        {/* Rank */}
+                        <div style={{ flexShrink: 0, position: 'relative' }}>
+                          <div
+                            style={{
+                              width: '48px',
+                              height: '48px',
+                              borderRadius: '50%',
+                              background: `linear-gradient(135deg, ${getRankColor(entry.rank - 1)} 0%, ${getRankColor(entry.rank - 1)}dd 100%)`,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontWeight: 'bold',
+                              fontSize: '18px',
+                              color: '#ffffff',
+                              boxShadow: `0 4px 16px ${getRankColor(entry.rank - 1)}40`,
+                              border: '2px solid rgba(255,255,255,0.2)'
+                            }}
+                          >
+                            {entry.rank}
+                          </div>
+                        </div>
+                        
+                        {/* Avatar */}
+                        <img
+                          src={(entry as any).avatar_url || entry.avatar || defaultAvatar}
+                          alt="avatar"
+                          style={{
+                            width: '56px',
+                            height: '56px',
+                            borderRadius: '50%',
+                            border: `3px solid ${getRankColor(entry.rank - 1)}`,
+                            objectFit: 'cover',
+                            background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#f0f2f5',
+                            boxShadow: `0 4px 16px ${getRankColor(entry.rank - 1)}30`
+                          }}
+                          onError={e => { e.currentTarget.src = defaultAvatar; }}
+                        />
+                        
+                        {/* Player Info */}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <h3 style={{ 
+                            fontWeight: 700, 
+                            color: theme === 'dark' ? '#ffffff' : '#2d3748',
+                            fontSize: 'clamp(1rem, 2vw, 1.5rem)',
+                            marginBottom: '8px',
+                            fontFamily: 'JetBrains Mono, monospace',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}>
+                            {entry.nickname}
+                            {isCurrentUser && (
+                              <span style={{
+                                marginLeft: '8px',
+                                fontSize: '12px',
+                                color: '#58cc02',
+                                fontWeight: 600
+                              }}>
+                                (You)
+                              </span>
+                            )}
+                          </h3>
+                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                            <span style={{
+                              fontSize: '12px',
+                              padding: '4px 8px',
+                              borderRadius: '12px',
+                              background: theme === 'dark' ? 'rgba(59, 130, 246, 0.2)' : '#dbeafe',
+                              color: theme === 'dark' ? '#93c5fd' : '#1e40af',
+                              fontWeight: 600,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}>
+                              <i className="material-icons" style={{ fontSize: '14px' }}>language</i>
+                              {entry.favorite_language}
+                            </span>
+                            <span style={{
+                              fontSize: '12px',
+                              padding: '4px 8px',
+                              borderRadius: '12px',
+                              background: theme === 'dark' ? 'rgba(34, 197, 94, 0.2)' : '#dcfce7',
+                              color: theme === 'dark' ? '#86efac' : '#166534',
+                              fontWeight: 600,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}>
+                              <i className="material-icons" style={{ fontSize: '14px' }}>military_tech</i>
+                              {entry.badges_count} Badges
+                            </span>
                             {badges.map((badge, i) => (
                               <span
                                 key={i}
-                                className="text-xs px-2 py-1 rounded-full"
-                                style={{ backgroundColor: badge.color, color: 'white' }}
+                                style={{
+                                  fontSize: '12px',
+                                  padding: '4px 8px',
+                                  borderRadius: '12px',
+                                  background: badge.color,
+                                  color: '#ffffff',
+                                  fontWeight: 600,
+                                  boxShadow: `0 2px 8px ${badge.color}40`
+                                }}
                               >
                                 {badge.text}
                               </span>
                             ))}
                           </div>
-                        )}
-                      </div>
-                      <div className="flex flex-col items-end">
-                        <div className="font-bold" style={{ color: '#58a700' }}>{entry.score}</div>
-                        <div className="flex gap-3 text-sm text-gray-500">
-                          <span title="Streak">
-                            <i className="material-icons align-text-bottom text-sm text-yellow-600">local_fire_department</i> {entry.streak ?? '-'}
-                          </span>
-                          <span title="Level">
-                            <i className="material-icons align-text-bottom text-sm text-blue-500">star</i> {entry.level ?? '-'}
-                          </span>
                         </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-        {/* Info/Help Section */}
-        <div className="text-muted small px-4 py-3 d-flex align-items-center gap-2 border-top" style={{ color: theme === 'dark' ? '#a5b4fc' : '#6c757d', fontSize: '0.9rem', background: theme === 'dark' ? '#181c2a' : '#f8f9fa', borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }}>
-          <span className="d-flex align-items-center justify-content-center" style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: theme === 'dark' ? '#232946' : '#e8f5e9', color: '#58a700' }}>
-            <i className="material-icons" style={{ fontSize: '1.1rem' }}>info</i>
-          </span>
-          Scores update in real time. Click a player for details and badges.
-        </div>
-        {/* Profile Modal (unchanged) */}
-        <AnimatePresence>
-          {profileModal && (
-            <motion.div
-              className="fixed inset-0 flex items-center justify-content-center p-4 z-50"
-              style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setProfileModal(null)}
-            >
-              <motion.div
-                className="bg-white rounded-2xl overflow-hidden w-full max-w-md"
-                initial={{ y: 50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 50, opacity: 0 }}
-                onClick={e => e.stopPropagation()}
-              >
-                <div className="p-5 border-b flex items-center justify-content-between" style={{ backgroundColor: '#f8f9fa' }}>
-                  <h3 className="text-lg font-bold" style={{ color: '#58a700' }}>Player Profile</h3>
-                  <button
-                    onClick={() => setProfileModal(null)}
-                    className="rounded-full p-1 hover:bg-gray-200"
-                  >
-                    <i className="material-icons">close</i>
-                  </button>
-                </div>
-                <div className="p-5 text-center">
-                  <img
-                    src={profileModal.avatar || defaultAvatar}
-                    alt="avatar"
-                    className="w-20 h-20 rounded-full border-4 border-white shadow-lg mx-auto mb-4"
-                    style={{ borderColor: getRankColor(sortedEntries.findIndex(e => e.name === profileModal.name)) }}
-                  />
-                  <h3 className="text-xl font-bold mb-1" style={{ color: '#333' }}>{profileModal.name}</h3>
-                  <div className="text-gray-500 mb-4">{new Date(profileModal.date).toLocaleDateString()}</div>
-                  <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="bg-blue-50 p-3 rounded-xl">
-                      <div className="text-sm text-blue-600 mb-1">Score</div>
-                      <div className="text-2xl font-bold" style={{ color: '#58a700' }}>{profileModal.score}</div>
-                    </div>
-                    <div className="bg-yellow-50 p-3 rounded-xl">
-                      <div className="text-sm text-yellow-600 mb-1">Streak</div>
-                      <div className="text-2xl font-bold" style={{ color: '#ff9500' }}>{profileModal.streak ?? '-'}</div>
-                    </div>
-                    <div className="bg-green-50 p-3 rounded-xl">
-                      <div className="text-sm text-green-600 mb-1">Level</div>
-                      <div className="text-2xl font-bold" style={{ color: '#34c759' }}>{profileModal.level ?? '-'}</div>
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-3" style={{ color: '#58a700' }}>Badges</h4>
-                    {getBadges(profileModal, sortedEntries.findIndex(e => e.name === profileModal.name)).length > 0 ? (
-                      <div className="flex flex-wrap gap-2 justify-content-center">
-                        {getBadges(profileModal, sortedEntries.findIndex(e => e.name === profileModal.name)).map((badge, i) => (
-                          <div
-                            key={i}
-                            className="px-3 py-2 rounded-full flex items-center gap-1"
-                            style={{ backgroundColor: badge.color, color: 'white' }}
-                          >
-                            <span>{badge.text}</span>
+                        
+                        {/* Score and Stats */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                          <div style={{ 
+                            fontWeight: 700, 
+                            fontSize: 'clamp(1.2rem, 3vw, 20px)',
+                            color: '#58cc02',
+                            textShadow: '0 1px 2px rgba(88, 204, 2, 0.1)'
+                          }}>
+                            {entry.total_score}
                           </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-gray-400">No badges yet</div>
-                    )}
-                  </div>
+                          <div style={{ display: 'flex', gap: '12px', fontSize: 'clamp(0.9rem, 2vw, 14px)', color: theme === 'dark' ? '#a0aec0' : '#718096' }}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <i className="material-icons" style={{ fontSize: '16px', color: '#ff9500' }}>local_fire_department</i>
+                              {entry.current_streak ?? '-'}
+                            </span>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                              <i className="material-icons" style={{ fontSize: '16px', color: '#3b82f6' }}>star</i>
+                              {entry.level ?? '-'}
+                            </span>
+                          </div>
+                          <div style={{
+                            fontSize: 'clamp(0.8rem, 2vw, 12px)',
+                            color: theme === 'dark' ? '#718096' : '#a0aec0',
+                            fontFamily: 'JetBrains Mono, monospace'
+                          }}>
+                            Last: {entry.last_activity ? new Date(entry.last_activity).toLocaleDateString() : '-'}
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
                 </div>
-                <div className="p-4 border-t flex justify-content-center">
-                  <button
-                    className="px-6 py-2 rounded-xl font-medium"
-                    style={{ backgroundColor: '#58a700', color: 'white' }}
-                    onClick={() => setProfileModal(null)}
-                  >
-                    Close
-                  </button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-    </motion.div>
-  );
+              )}
+            </div>
+            {/* Pagination Controls */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: 'clamp(12px, 3vw, 32px)',
+              borderTop: theme === 'dark' 
+                ? '1px solid rgba(255,255,255,0.1)' 
+                : '1px solid rgba(88, 204, 2, 0.1)',
+              background: theme === 'dark' 
+                ? 'rgba(255,255,255,0.02)' 
+                : 'rgba(88, 204, 2, 0.02)'
+            }}>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '12px',
+                  background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(88, 204, 2, 0.05)',
+                  border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)'}`,
+                  color: theme === 'dark' ? '#ffffff' : '#2d3748',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontFamily: 'JetBrains Mono, monospace'
+                }}
+                onClick={() => setPage(p => Math.max(0, p - 1))}
+                disabled={page === 0 || loading}
+                onMouseOver={e => {
+                  if (!(page === 0 || loading)) {
+                    e.currentTarget.style.background = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.1)';
+                    e.currentTarget.style.borderColor = '#58cc02';
+                  }
+                }}
+                onMouseOut={e => {
+                  if (!(page === 0 || loading)) {
+                    e.currentTarget.style.background = theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(88, 204, 2, 0.05)';
+                    e.currentTarget.style.borderColor = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)';
+                  }
+                }}
+              >
+                <i className="material-icons" style={{ fontSize: '18px' }}>chevron_left</i>
+                Previous
+              </motion.button>
+              
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 16px',
+                borderRadius: '12px',
+                background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(88, 204, 2, 0.05)',
+                border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)'}`,
+                color: theme === 'dark' ? '#a0aec0' : '#718096',
+                fontSize: '14px',
+                fontWeight: 600,
+                fontFamily: 'JetBrains Mono, monospace'
+              }}>
+                <i className="material-icons" style={{ fontSize: '16px', color: '#58cc02' }}>pageview</i>
+                Page {page + 1}
+              </div>
+              
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '12px',
+                  background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(88, 204, 2, 0.05)',
+                  border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)'}`,
+                  color: theme === 'dark' ? '#ffffff' : '#2d3748',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontFamily: 'JetBrains Mono, monospace'
+                }}
+                onClick={() => setPage(p => p + 1)}
+                disabled={loading || entries.length < limit}
+                onMouseOver={e => {
+                  if (!(loading || entries.length < limit)) {
+                    e.currentTarget.style.background = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.1)';
+                    e.currentTarget.style.borderColor = '#58cc02';
+                  }
+                }}
+                onMouseOut={e => {
+                  if (!(loading || entries.length < limit)) {
+                    e.currentTarget.style.background = theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(88, 204, 2, 0.05)';
+                    e.currentTarget.style.borderColor = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)';
+                  }
+                }}
+              >
+                Next
+                <i className="material-icons" style={{ fontSize: '18px' }}>chevron_right</i>
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  } else {
+    return (
+      <div className="container my-4">
+        {/* ... existing code ... */}
+      </div>
+    );
+  }
 };
 
 export default Leaderboard;

@@ -102,13 +102,15 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
           style={{ 
             minHeight: 120, 
             resize: 'vertical',
-            backgroundColor: '#f8f9fa',
+            background: 'rgba(255,255,255,0.45)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
             border: '2px solid #e9ecef',
             borderRadius: '12px',
             padding: '1rem',
             fontSize: '1rem',
             lineHeight: 1.5,
-            boxShadow: 'none',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
             transition: 'all 0.2s ease'
           }}
           placeholder="Type your argument here..."
@@ -194,8 +196,11 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
           animate={{ opacity: 1, height: 'auto' }}
           transition={{ duration: 0.3 }}
           style={{ 
-            backgroundColor: '#e8f5e9',
-            borderLeft: '4px solid #58a700'
+            background: 'rgba(255,255,255,0.45)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            borderRadius: '16px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
           }}
         >
           <div className="d-flex align-items-start gap-2">
@@ -211,7 +216,7 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
             </div>
             <div>
               <div className="fw-bold mb-1" style={{ color: '#58a700' }}>Translation:</div>
-              <p className="mb-0" style={{ lineHeight: 1.5, color: '#333' }}>{translation}</p>
+              <p className="mb-0" style={{ lineHeight: 1.5, color: '#6c757d', fontSize: '0.92rem', fontWeight: 400 }}>{translation}</p>
             </div>
           </div>
         </motion.div>
@@ -220,7 +225,13 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
       {/* Help Text */}
       <div className="text-muted small d-flex align-items-center" style={{ 
         color: '#6c757d',
-        fontSize: '0.8rem'
+        fontSize: '0.8rem',
+        background: 'rgba(255,255,255,0.45)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        borderRadius: '12px',
+        padding: '8px 14px',
+        marginTop: '12px'
       }}>
         <span className="d-flex align-items-center justify-content-center me-2" style={{
           width: '20px',

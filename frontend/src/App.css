@@ -1,54 +1,46 @@
-body, .lq-bg {
-  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f3 40%, #d1c4e9 100%);
-  background-attachment: fixed;
-  background-size: cover;
-  transition: background 0.5s;
+body, .app-container {
+  font-family: 'Nunito', 'Quicksand', 'Segoe UI', Arial, sans-serif;
+  background: #f0f2f5;
+  color: #222;
 }
 
-@media (max-width: 600px) {
-  body, .lq-bg {
-    background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
-  }
-}
-
-/* Optionally, add a soft animated gradient overlay */
-.lq-bg-animated {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse at 60% 20%, #a5b4fc55 0%, transparent 70%),
-              radial-gradient(ellipse at 20% 80%, #fbc2eb44 0%, transparent 70%),
-              linear-gradient(135deg, #f5f7fa 0%, #e4e9f3 100%);
-  animation: lq-bg-fade 12s ease-in-out infinite alternate;
-}
-
-@keyframes lq-bg-fade {
-  0% { opacity: 1; }
-  100% { opacity: 0.95; }
-}
-
-/* Professional Typography */
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0 0 1rem 0;
-  color: var(--gray-900);
+  font-family: 'Nunito', 'Quicksand', 'Segoe UI', Arial, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #58cc02;
+  margin-bottom: 0.5em;
 }
 
-h1 { font-size: 2.25rem; }
-h2 { font-size: 1.875rem; }
-h3 { font-size: 1.5rem; }
-h4 { font-size: 1.25rem; }
-h5 { font-size: 1.125rem; }
-h6 { font-size: 1rem; }
+.card-title, .scenario-title, .feedback-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #3caa3c;
+  margin-bottom: 0.5em;
+}
 
-p {
-  margin: 0 0 1rem 0;
-  color: var(--gray-700);
+.card-body, .scenario-body, .feedback-body {
+  font-size: 1.08rem;
+  font-weight: 500;
+  color: #222;
+  line-height: 1.7;
+}
+
+input, textarea, select, button {
+  font-family: inherit;
+  font-size: 1rem;
+  border-radius: 12px;
+}
+
+.btn, button {
+  font-family: inherit;
+  font-weight: 700;
+  border-radius: 12px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.btn:active, button:active {
+  transform: scale(0.97);
 }
 
 .lq-root {
@@ -341,6 +333,40 @@ body.dark .lq-card, .dark .lq-card {
   color: #e0e7ff !important;
 }
 
+body.dark .duo-card, .dark .duo-card {
+  background: #232946 !important;
+  color: #e0e7ff !important;
+  box-shadow: 0 4px 24px #0008;
+}
+body.dark .card-title, .dark .card-title {
+  background: linear-gradient(90deg, #a5f3fc 60%, #a5b4fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  color: #a5b4fc !important;
+  text-shadow: 0 2px 8px #23294688;
+}
+body.dark .card-body, .dark .card-body {
+  color: #e0e7ff !important;
+}
+body.dark .p-4.mb-4.rounded-3, .dark .p-4.mb-4.rounded-3 {
+  background: #232946 !important;
+  color: #e0e7ff !important;
+  box-shadow: 0 2px 8px #0008 !important;
+}
+body.dark .p-3.rounded-3, .dark .p-3.rounded-3 {
+  background: #2d3350 !important;
+  color: #e0e7ff !important;
+  box-shadow: 0 1px 4px #0006 !important;
+}
+body.dark .fw-bold.mb-1, .dark .fw-bold.mb-1 {
+  color: #a5b4fc !important;
+}
+body.dark .mb-0, .dark .mb-0 {
+  color: #a5b4fc !important;
+}
+
 @media (max-width: 600px) {
   .lq-header, .lq-card, .lq-leaderboard-card {
     max-width: 98vw;
@@ -579,14 +605,23 @@ body.dark .lq-card, .dark .lq-card {
 }
 
 .duo-card {
-  background: var(--duo-card);
-  border-radius: 2rem;
-  box-shadow: var(--duo-shadow);
-  padding: 2rem 1.5rem;
-  margin-bottom: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  background: #fff;
+  color: #222;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.card-title {
+  background: linear-gradient(90deg, #58cc02 60%, #1cb0f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  color: #3caa3c;
+  text-shadow: 0 2px 8px rgba(88,204,2,0.08);
+}
+
+.card-body {
+  color: #222;
 }
 
 .duo-btn {
@@ -723,4 +758,21 @@ body.dark .lq-card, .dark .lq-card {
   position: fixed;
   left: 0; top: 0; width: 100vw; height: 100vh;
   z-index: 9999;
+} 
+
+.p-4.mb-4.rounded-3 {
+  background: #f8f9fa;
+  color: #222;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.p-3.rounded-3 {
+  background: #f8f9fa;
+  color: #222;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.fw-bold.mb-1 {
+  color: #58cc02;
+}
+.mb-0 {
+  color: #222;
 } 

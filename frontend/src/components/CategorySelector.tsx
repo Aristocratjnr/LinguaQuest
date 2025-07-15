@@ -140,7 +140,7 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
   return (
     <div className="container-fluid d-flex align-items-center justify-content-center min-vh-100 px-2 px-sm-3 px-md-4"
          style={{ 
-           background: 'linear-gradient(135deg, #58cc02 0%, #4CAF50 100%)', 
+           background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))',
            fontFamily: "'JetBrains Mono', monospace",
            minHeight: '100vh',
            padding: '16px'
@@ -161,7 +161,7 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
         transition={{ duration: 0.4 }}
       >
         <div className="card-header text-center py-4 border-bottom"
-             style={{ background: '#58cc02', color: 'white' }}>
+             style={{ color: 'white' }}>
           <h2 className="card-title fw-bold mb-0" style={{ color: 'white', fontSize: '1.25rem', letterSpacing: '.01em' }}>
             <i className="material-icons align-middle me-2" style={{ color: 'rgba(255,255,255,0.9)' }}>category</i>
             CHOOSE YOUR CHALLENGE
