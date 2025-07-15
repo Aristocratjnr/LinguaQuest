@@ -172,10 +172,10 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           <motion.h1 
             className="fw-bold mb-0" 
             style={{ 
-              padding: '0.8rem',
-          background: '#ffffff',
-          textAlign: 'center',
-          color: 'var(--text-light, #e0e7ff)'
+              padding: '0.6rem',
+              background: '#ffffff',
+              textAlign: 'center',
+              color: 'var(--text-light, #e0e7ff)'
             }}
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -186,10 +186,10 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           <motion.p 
             className="mt-1 mb-0" 
             style={{ 
-              fontSize: '0.9rem', 
-              letterSpacing: '0.01em',
-              fontWeight: 500,
-              color: 'var(--text-dark, #6b7280)'
+              margin: '0.5rem 0 0',
+              opacity: 0.9,
+              fontSize: '0.875rem',
+              color: 'var(--text-dark, #222)'
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
