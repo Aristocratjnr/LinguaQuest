@@ -49,7 +49,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const handleResetStreak = async () => {
     setResetting(true);
     try {
-      const res = await axios.patch('/streak', { nickname, streak: 1 });
+      const res = await axios.patch(`/streak?nickname=${encodeURIComponent(nickname)}&streak=1`);
       setStreak(res.data.streak);
       toast.success('Streak reset to 1.');
     } catch {
@@ -61,7 +61,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const handleResetLevel = async () => {
     setResetting(true);
     try {
-      const res = await axios.patch('/level', { nickname, level: 1 });
+      const res = await axios.patch(`/level?nickname=${encodeURIComponent(nickname)}&level=1`);
       setLevel(res.data.level);
       toast.success('Level reset to 1.');
     } catch {

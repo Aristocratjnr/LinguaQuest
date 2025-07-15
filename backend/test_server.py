@@ -54,18 +54,16 @@ def create_user(user_data: dict):
 @app.get("/api/v1/leaderboard")
 def get_leaderboard(limit: int = 100):
     """Get leaderboard data (simplified)"""
-    return {
-        "leaderboard": [
-            {
-                "nickname": "testuser",
-                "avatar_url": None,
-                "total_score": 100,
-                "games_played": 5,
-                "current_streak": 3,
-                "highest_score": 25
-            }
-        ]
-    }
+    return [
+        {
+            "nickname": "testuser",
+            "avatar_url": None,
+            "total_score": 100,
+            "games_played": 5,
+            "current_streak": 3,
+            "highest_score": 25
+        }
+    ]
 
 @app.post("/api/v1/scores")
 def submit_score(score_data: dict, nickname: str):

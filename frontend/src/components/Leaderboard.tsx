@@ -205,10 +205,15 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
                       </div>
                     </div>
                     <img
-                      src={entry.avatar || defaultAvatar}
+                      src={(entry as any).avatar_url || entry.avatar || defaultAvatar}
                       alt="avatar"
-                      className="w-12 h-12 rounded-full border-2 border-white shadow"
-                      style={{ borderColor: getRankColor(entry.rank - 1) }}
+                      className="w-12 h-12 rounded-full border-2 shadow"
+                      style={{
+                        borderColor: getRankColor(entry.rank - 1),
+                        objectFit: 'cover',
+                        background: '#f0f2f5'
+                      }}
+                      onError={e => { e.currentTarget.src = defaultAvatar; }}
                     />
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold truncate" style={{ color: '#333' }}>{entry.nickname}</h3>

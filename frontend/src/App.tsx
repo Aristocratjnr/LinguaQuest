@@ -607,26 +607,32 @@ function AppContent() {
           maxWidth: '1200px',
           margin: '0 auto'
         }}>
-          {/* Logo and title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '12px',
-              background: DUOLINGO_COLORS.green,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <img src={logo} alt="Logo" style={{ height: '24px' }} />
-            </div>
-            <h1 style={{
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{
               color: DUOLINGO_COLORS.green,
-              fontSize: '20px',
-              fontWeight: 'bold',
-              margin: 0
-            }}>LinguaQuest</h1>
+              fontSize: '22px',
+              fontWeight: 700,
+              fontFamily: 'JetBrains Mono, monospace',
+              letterSpacing: '0.01em',
+              opacity: 0.92
+            }}>
+              LinguaQuest
+            </span>
+            <span className="material-icons" style={{ fontSize: '22px', color: DUOLINGO_COLORS.green, opacity: 0.85 }}>psychology</span>
           </div>
+          <span style={{
+            color: DUOLINGO_COLORS.darkGray,
+            fontSize: '12px',
+            fontFamily: 'JetBrains Mono, monospace',
+            fontWeight: 400,
+            opacity: 0.7,
+            marginTop: '2px',
+            letterSpacing: '0.01em'
+          }}>
+            Language Game
+          </span>
+        </div>
           
           {/* User profile */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -647,14 +653,29 @@ function AppContent() {
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
               />
             </div>
-            {/* Display nickname */}
-            <span style={{
-              fontWeight: 'bold',
-              color: DUOLINGO_COLORS.darkGray,
-              fontSize: '14px'
-            }}>
-              {nickname}
-            </span>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <span style={{
+                fontFamily: 'JetBrains Mono, monospace',
+                fontWeight: 400,
+                color: DUOLINGO_COLORS.darkGray,
+                fontSize: '13px',
+                opacity: 0.7,
+                letterSpacing: '0.01em',
+                lineHeight: 1.1
+              }}>
+                Welcome back
+              </span>
+              <span style={{
+                fontWeight: 'bold',
+                color: DUOLINGO_COLORS.darkGray,
+                fontSize: '14px',
+                fontFamily: 'JetBrains Mono, monospace',
+                letterSpacing: '0.01em',
+                lineHeight: 1.1
+              }}>
+                {nickname}
+              </span>
+            </div>
           </div>
         </div>
       </header>
@@ -667,20 +688,25 @@ function AppContent() {
         width: '100%',
         margin: '0 auto'
       }}>
+        {/* Progress/XP/Timer Card - Polished */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           background: 'var(--duo-card, #fff)',
-          borderRadius: '24px',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
-          padding: '24px 20px',
-          marginBottom: '28px',
-          gap: '24px',
-          flexWrap: 'wrap',
+          borderRadius: '28px',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
+          padding: '28px 24px',
+          marginBottom: '32px',
+          gap: '28px',
+          flexWrap: 'wrap'
         }}>
           <div style={{ minWidth: 0, flex: 1 }}>
             <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
+          </div>
+          {/* Timer beside ProgressBar */}
+          <div style={{ display: 'flex', alignItems: 'center', marginLeft: '16px' }}>
+            <Timer seconds={ROUND_TIME} timeLeft={timeLeft} isActive={timerActive} />
           </div>
           <div style={{
             display: 'flex',
@@ -710,14 +736,16 @@ function AppContent() {
             <span style={{ color: '#58cc02', fontWeight: 700 }}>{displayedXp}</span>
           </div>
         </div>
-        {/* Scenario card - Duolingo style */}
+        {/* Scenario card - Polished */}
         <div className="duo-card" style={{
-          borderRadius: '32px',
-          padding: '40px 32px 36px 28px',
+          borderRadius: '28px',
+          padding: '36px 28px 32px 24px',
           marginBottom: '32px',
           display: 'flex',
           alignItems: 'flex-start',
           position: 'relative',
+          background: '#f8fafc',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.07)'
         }}>
           <div style={{ width: '100%' }}>
             <div className="card-title">Scenario</div>
@@ -733,14 +761,16 @@ function AppContent() {
           </div>
         </div>
         
-        {/* Input area - Duolingo style */}
+        {/* Input area - Polished */}
         <div className="duo-card" style={{
-          borderRadius: '32px',
-          padding: '40px 32px 36px 28px',
+          borderRadius: '28px',
+          padding: '36px 28px 32px 24px',
           marginBottom: '32px',
           display: 'flex',
           alignItems: 'flex-start',
           position: 'relative',
+          background: '#f8fafc',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.07)'
         }}>
           <div style={{ width: '100%' }}>
             <div className="card-title">Your Argument</div>
@@ -767,14 +797,16 @@ function AppContent() {
           </div>
         </div>
         
-        {/* AI Response area - Duolingo style */}
+        {/* AI Response area - Polished, no side line */}
         <div className="duo-card" style={{
-          borderRadius: '32px',
-          padding: '40px 32px 36px 28px',
+          borderRadius: '28px',
+          padding: '36px 28px 32px 24px',
           marginBottom: '32px',
           display: 'flex',
           alignItems: 'flex-start',
           position: 'relative',
+          background: '#f8fafc',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.07)'
         }}>
           <div style={{ width: '100%' }}>
             <div className="card-title">AI Response</div>
@@ -792,14 +824,16 @@ function AppContent() {
           </div>
         </div>
         
-        {/* Feedback area - Duolingo style */}
+        {/* Feedback area - Polished, no side line */}
         <div className="duo-card" style={{
-          borderRadius: '32px',
-          padding: '40px 32px 36px 28px',
+          borderRadius: '28px',
+          padding: '36px 28px 32px 24px',
           marginBottom: '32px',
           display: 'flex',
           alignItems: 'flex-start',
           position: 'relative',
+          background: '#f8fafc',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.07)'
         }}>
           <div style={{ width: '100%' }}>
             <div className="card-title">Feedback</div>
@@ -878,112 +912,147 @@ function AppContent() {
         )}
       </main>
 
-      {/* Status messages - Duolingo style */}
-      {(roundResult === 'success' || roundResult === 'fail' || roundResult === 'gameover') && (
+      {/* Status Modal - Duolingo style */}
+      {(roundResult === 'success' || roundResult === 'gameover') && (
         <div style={{
           position: 'fixed',
-          bottom: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: roundResult === 'success' ? DUOLINGO_COLORS.green : 
-                     roundResult === 'fail' ? DUOLINGO_COLORS.red : DUOLINGO_COLORS.blue,
-          color: DUOLINGO_COLORS.white,
-          padding: '12px 24px',
-          borderRadius: '50px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          zIndex: 100,
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.45)',
+          zIndex: 2000,
           display: 'flex',
           alignItems: 'center',
-          gap: '8px'
+          justifyContent: 'center',
         }}>
-          {roundResult === 'success' && (
-            <>
-              <span style={{ fontSize: '20px' }}>🎉</span>
-              <span>Great job! +1 Point</span>
-            </>
-          )}
-          {roundResult === 'fail' && (
-            <>
-              <span style={{ fontSize: '20px' }}>⏱️</span>
-              <span>Time's up! Next round</span>
-            </>
-          )}
-          {roundResult === 'gameover' && (
-            <>
-              <span style={{ fontSize: '20px' }}>🏆</span>
-              <span>Game Complete!</span>
-            </>
-          )}
+          <div style={{
+            background: roundResult === 'success' ? DUOLINGO_COLORS.green : DUOLINGO_COLORS.blue,
+            color: DUOLINGO_COLORS.white,
+            padding: '32px 36px',
+            borderRadius: '32px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+            minWidth: '320px',
+            maxWidth: '90vw',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '16px',
+          }}>
+            {roundResult === 'success' && (
+              <>
+                <span className="material-icons" style={{ fontSize: '40px' }}>check_circle</span>
+                <span style={{ fontSize: '1.3rem', fontWeight: 600 }}>Great job! +1 Point</span>
+              </>
+            )}
+            {roundResult === 'gameover' && (
+              <>
+                <span className="material-icons" style={{ fontSize: '40px' }}>emoji_events</span>
+                <span style={{ fontSize: '1.3rem', fontWeight: 600 }}>Game Complete!</span>
+              </>
+            )}
+          </div>
         </div>
       )}
 
       {/* Footer - Duolingo style */}
-      <footer style={{
-        padding: '12px 16px',
-        marginTop: 'auto',
-        boxShadow: '0 -2px 4px rgba(0,0,0,0.05)',
-        display: 'flex',
-        justifyContent: 'center'
-      }}>
-        <div style={{
-          display: 'flex',
-          gap: '20px',
-          maxWidth: '800px',
-          width: '100%',
-          justifyContent: 'center'
-        }}>
-          <button 
-            onClick={() => setShowLeaderboard(true)}
-            style={{
-              background: 'none',
-              border: 'none',
+      {!showLeaderboard && !showHelp && !showSettingsPage && (
+        <>
+          <footer style={{
+            padding: '12px 16px',
+            marginTop: 'auto',
+            boxShadow: '0 -2px 4px rgba(0,0,0,0.05)',
+            display: 'flex',
+            justifyContent: 'center',
+            background: '#fff',
+            position: 'relative',
+            zIndex: 1
+          }}>
+            <div style={{
               display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '4px',
-              color: DUOLINGO_COLORS.darkGray,
-              cursor: 'pointer'
-            }}
-          >
-            <span style={{ fontSize: '20px' }}>🏆</span>
-            <span style={{ fontSize: '12px' }}>Leaderboard</span>
-          </button>
-          
-          <button 
-            onClick={() => setShowSettingsPage(true)}
-            style={{
-              background: 'none',
-              border: 'none',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '4px',
-              color: DUOLINGO_COLORS.darkGray,
-              cursor: 'pointer'
-            }}
-          >
-            <span style={{ fontSize: '20px' }}>⚙️</span>
-            <span style={{ fontSize: '12px' }}>Settings</span>
-          </button>
-          
-          <button 
-            onClick={() => setShowHelp(true)}
-            style={{
-              background: 'none',
-              border: 'none',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '4px',
-              color: DUOLINGO_COLORS.darkGray,
-              cursor: 'pointer'
-            }}
-          >
-            <span style={{ fontSize: '20px' }}>❓</span>
-            <span style={{ fontSize: '12px' }}>Help</span>
-          </button>
-        </div>
-      </footer>
+              gap: '32px',
+              maxWidth: '800px',
+              width: '100%',
+              justifyContent: 'center'
+            }}>
+              <button 
+                onClick={() => setShowLeaderboard(true)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '4px',
+                  color: DUOLINGO_COLORS.darkGray,
+                  cursor: 'pointer',
+                  transition: 'color 0.2s',
+                }}
+                onMouseOver={e => e.currentTarget.style.color = DUOLINGO_COLORS.green}
+                onMouseOut={e => e.currentTarget.style.color = DUOLINGO_COLORS.darkGray}
+              >
+                <span className="material-icons" style={{ fontSize: '28px', marginBottom: '2px', transition: 'color 0.2s' }}>leaderboard</span>
+                <span style={{ fontSize: '12px', fontFamily: 'JetBrains Mono, monospace', opacity: 0.85 }}>Leaderboard</span>
+              </button>
+              
+              <button 
+                onClick={() => setShowSettingsPage(true)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '4px',
+                  color: DUOLINGO_COLORS.darkGray,
+                  cursor: 'pointer',
+                  transition: 'color 0.2s',
+                }}
+                onMouseOver={e => e.currentTarget.style.color = DUOLINGO_COLORS.green}
+                onMouseOut={e => e.currentTarget.style.color = DUOLINGO_COLORS.darkGray}
+              >
+                <span className="material-icons" style={{ fontSize: '28px', marginBottom: '2px', transition: 'color 0.2s' }}>settings</span>
+                <span style={{ fontSize: '12px', fontFamily: 'JetBrains Mono, monospace', opacity: 0.85 }}>Settings</span>
+              </button>
+              
+              <button 
+                onClick={() => setShowHelp(true)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '4px',
+                  color: DUOLINGO_COLORS.darkGray,
+                  cursor: 'pointer',
+                  transition: 'color 0.2s',
+                }}
+                onMouseOver={e => e.currentTarget.style.color = DUOLINGO_COLORS.green}
+                onMouseOut={e => e.currentTarget.style.color = DUOLINGO_COLORS.darkGray}
+              >
+                <span className="material-icons" style={{ fontSize: '28px', marginBottom: '2px', transition: 'color 0.2s' }}>help_outline</span>
+                <span style={{ fontSize: '12px', fontFamily: 'JetBrains Mono, monospace', opacity: 0.85 }}>Help</span>
+              </button>
+            </div>
+          </footer>
+          <div style={{
+            width: '100%',
+            textAlign: 'center',
+            fontSize: '12px',
+            color: DUOLINGO_COLORS.darkGray,
+            opacity: 0.7,
+            fontFamily: 'JetBrains Mono, monospace',
+            padding: '8px 0 16px 0',
+            background: '#fff',
+            letterSpacing: '0.01em',
+            zIndex: 0
+          }}>
+            &copy; {new Date().getFullYear()} LinguaQuest. All rights reserved. Developed by Opoku Boakye Michael
+          </div>
+        </>
+      )}
 
       {/* Modals */}
       {showLeaderboard && (
