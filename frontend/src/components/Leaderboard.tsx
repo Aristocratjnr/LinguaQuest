@@ -87,10 +87,10 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
     <motion.div
       className={modal ? "bg-white dark:bg-[#232946] rounded-4 overflow-hidden w-100 position-relative shadow-lg" : "bg-white dark:bg-[#232946] rounded-4 overflow-hidden w-100 shadow-lg my-4"}
       style={{ 
-        maxWidth: '95vw',
+        maxWidth: modal ? '540px' : '95vw', // Expanded from 420px to 540px for modal
         width: '100%',
-        minWidth: 0,
-        borderRadius: 32, 
+        minWidth: modal ? 'min(90vw, 320px)' : 0, // Ensures good mobile sizing
+        borderRadius: 24, // Slightly smaller for mobile
         boxShadow: theme === 'dark' 
           ? '0 20px 60px rgba(0,0,0,0.4), 0 8px 32px rgba(0,0,0,0.2)' 
           : '0 20px 60px rgba(0,0,0,0.12), 0 8px 32px rgba(0,0,0,0.08)',
