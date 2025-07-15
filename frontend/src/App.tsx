@@ -27,6 +27,9 @@ import { UserProvider, useUser } from './context/UserContext';
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Age from './components/Age';
+import mascotImg from './assets/images/logo.png'; // Use logo as mascot, or replace with mascot image
+import chestClosed from './assets/images/chest-closed.png';
+import chestOpen from './assets/images/chest-open.png';
 
 // Duolingo color palette
 const DUOLINGO_COLORS = {
@@ -129,6 +132,29 @@ function AppContent() {
   const dailyProgress = Math.min(1, dailyXp / DAILY_GOAL);
   // Add this state near other user stats
   const [hasStreakFreeze, setHasStreakFreeze] = useState(true); // For demo, always true. Replace with real logic if available.
+  // Add this state near other user stats
+  const [showMascotCelebrate, setShowMascotCelebrate] = useState(false);
+  // Add state for achievement popup
+  const [showAchievementPopup, setShowAchievementPopup] = useState(false);
+  const [unlockedBadge, setUnlockedBadge] = useState<{ name: string, description: string } | null>(null);
+  // Add state for daily chest
+  const [chestOpenState, setChestOpenState] = useState(false);
+  const [showChestReward, setShowChestReward] = useState(false);
+  const [chestReward, setChestReward] = useState<string | null>(null);
+  // Motivational mascot tips
+  const MASCOT_TIPS = [
+    "Keep going! You're doing great!",
+    "Practice makes perfect!",
+    "Don't give up, you're almost there!",
+    "Try to use new words in your arguments!",
+    "Remember: Consistency is key!",
+    "Celebrate your progress!",
+    "Every round is a new opportunity!",
+    "You're building a language superpower!",
+  ];
+  const [mascotTipIndex, setMascotTipIndex] = useState(0);
+  const [showMascotBubble, setShowMascotBubble] = useState(true);
+  const [mascotBubbleMsg, setMascotBubbleMsg] = useState(MASCOT_TIPS[0]);
 
   // Apply theme class to body
   useEffect(() => {
@@ -464,7 +490,28 @@ function AppContent() {
       if (uniqueWords.size >= 20) unlocked.push('creative');
       if (allPersuaded && round === TOTAL_ROUNDS + 1) unlocked.push('perfect');
       setBadges(unlocked);
-      
+      // Show achievement popup for each badge
+      if (unlocked.length > 0) {
+        const badgeNames = {
+          streak: 'Streak Master',
+          highscore: 'High Scorer',
+          creative: 'Creative Thinker',
+          perfect: 'Perfect Player'
+        };
+        const badgeDescriptions = {
+          streak: 'Won 3 or more rounds in a game',
+          highscore: 'Achieved a high score of 8 or more',
+          creative: 'Used 20 or more unique words',
+          perfect: 'Persuaded AI in all rounds'
+        };
+        // Show popup for the first badge (can be extended to cycle through all)
+        setUnlockedBadge({
+          name: badgeNames[unlocked[0] as keyof typeof badgeNames],
+          description: badgeDescriptions[unlocked[0] as keyof typeof badgeDescriptions]
+        });
+        setShowAchievementPopup(true);
+        setTimeout(() => setShowAchievementPopup(false), 3500);
+      }
       // Award badges in database
       unlocked.forEach(async (badgeType) => {
         try {
@@ -649,6 +696,64 @@ function AppContent() {
       setLoading(false);
   };
 
+  // Animate mascot when daily goal is reached
+  useEffect(() => {
+    if (dailyProgress >= 1) {
+      setShowMascotCelebrate(true);
+      const timeout = setTimeout(() => setShowMascotCelebrate(false), 2500);
+      return () => clearTimeout(timeout);
+    }
+  }, [dailyProgress]);
+
+  // Daily chest reward logic
+  const handleOpenChest = () => {
+    if (!chestOpenState) {
+      setChestOpenState(true);
+      // Random reward: XP, badge, or streak freeze
+      const rewards = [
+        '+25 XP',
+        '+50 XP',
+        'Streak Freeze',
+        'Lucky Badge',
+        'Bonus Badge',
+      ];
+      const reward = rewards[Math.floor(Math.random() * rewards.length)];
+      setChestReward(reward);
+      setShowChestReward(true);
+      setTimeout(() => {
+        setShowChestReward(false);
+        setChestOpenState(false);
+      }, 3200);
+    }
+  };
+
+  // Cycle through tips every 10 seconds
+  useEffect(() => {
+    if (!showMascotBubble) return;
+    const interval = setInterval(() => {
+      setMascotTipIndex(idx => {
+        const next = (idx + 1) % MASCOT_TIPS.length;
+        setMascotBubbleMsg(MASCOT_TIPS[next]);
+        return next;
+      });
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [showMascotBubble]);
+
+  // Show special mascot messages on success/fail/gameover
+  useEffect(() => {
+    if (roundResult === 'success') {
+      setMascotBubbleMsg('🎉 Great job! You persuaded the AI!');
+      setShowMascotBubble(true);
+    } else if (roundResult === 'fail') {
+      setMascotBubbleMsg('😅 Don\'t worry, try again next round!');
+      setShowMascotBubble(true);
+    } else if (roundResult === 'gameover') {
+      setMascotBubbleMsg('🏆 Game complete! Check your achievements!');
+      setShowMascotBubble(true);
+    }
+  }, [roundResult]);
+
   // Onboarding screens
   if (showWelcome) {
     return <WelcomePage onGetStarted={() => {
@@ -770,6 +875,45 @@ function AppContent() {
             </div>
             {/* Streak + Daily Goal Ring */}
             <div style={{ position: 'relative', width: 54, height: 54, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {/* Mascot pop-up when daily goal is reached */}
+              {showMascotCelebrate && (
+                <motion.img
+                  src={mascotImg}
+                  alt="Mascot Celebrate"
+                  initial={{ y: 30, opacity: 0, scale: 0.7 }}
+                  animate={{ y: -60, opacity: 1, scale: 1.1, rotate: [0, 10, -10, 0] }}
+                  exit={{ y: 30, opacity: 0, scale: 0.7 }}
+                  transition={{ duration: 1, type: 'spring', bounce: 0.4 }}
+                  style={{
+                    position: 'absolute',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    top: -60,
+                    width: 48,
+                    height: 48,
+                    zIndex: 10,
+                    filter: 'drop-shadow(0 4px 16px #58cc0255)',
+                    pointerEvents: 'none',
+                  }}
+                />
+              )}
+              {/* Sparkle/confetti effect */}
+              {showMascotCelebrate && (
+                <Confetti
+                  width={120}
+                  height={80}
+                  numberOfPieces={40}
+                  recycle={false}
+                  gravity={0.2}
+                  colors={[DUOLINGO_COLORS.green, DUOLINGO_COLORS.blue, DUOLINGO_COLORS.orange, DUOLINGO_COLORS.purple]}
+                  style={{
+                    position: 'absolute',
+                    left: '-30px',
+                    top: '-60px',
+                    pointerEvents: 'none',
+                  }}
+                />
+              )}
               {/* SVG Circular Progress */}
               <svg width={54} height={54} style={{ position: 'absolute', top: 0, left: 0 }}>
                 <circle
@@ -866,6 +1010,50 @@ function AppContent() {
           </div>
           {/* User profile and right side */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {/* Daily Reward Chest */}
+            <div
+              style={{
+                width: 38,
+                height: 38,
+                marginRight: 8,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                position: 'relative',
+                transition: 'transform 0.2s',
+                zIndex: 2,
+              }}
+              title="Daily Reward Chest: Open for a surprise!"
+              onClick={handleOpenChest}
+            >
+              <motion.span
+                className="material-icons"
+                initial={{ scale: 1 }}
+                animate={{ scale: chestOpenState ? 1.15 : 1, rotate: chestOpenState ? [0, -10, 10, 0] : 0 }}
+                transition={{ duration: 0.7, type: 'spring', bounce: 0.5 }}
+                style={{
+                  fontSize: 36,
+                  color: chestOpenState ? '#ffb300' : '#8d6e63',
+                  filter: chestOpenState ? 'brightness(1.2)' : 'none',
+                  transition: 'color 0.2s',
+                  userSelect: 'none',
+                }}
+              >{chestOpenState ? 'emoji_events' : 'card_giftcard'}</motion.span>
+              {/* Sparkle when open */}
+              {chestOpenState && (
+                <span className="material-icons" style={{
+                  position: 'absolute',
+                  top: -10,
+                  right: -10,
+                  color: '#ffd700',
+                  fontSize: 24,
+                  filter: 'drop-shadow(0 2px 8px #ffd70088)',
+                  zIndex: 3,
+                  animation: 'chest-sparkle 1.2s infinite',
+                }}>auto_awesome</span>
+              )}
+            </div>
             <div 
               style={{
                 width: '36px',
@@ -2051,6 +2239,218 @@ function AppContent() {
       <audio ref={audioSuccess} src={successSfx} preload="auto" />
       <audio ref={audioFail} src={failSfx} preload="auto" />
       <audio ref={audioClick} src={clickSfx} preload="auto" />
+
+      {/* Achievement Popup */}
+      {showAchievementPopup && unlockedBadge && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.45)',
+          zIndex: 3000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <motion.div
+            initial={{ scale: 0.7, opacity: 0 }}
+            animate={{ scale: 1.1, opacity: 1 }}
+            exit={{ scale: 0.7, opacity: 0 }}
+            transition={{ duration: 0.5, type: 'spring' }}
+            style={{
+              background: 'linear-gradient(135deg, #fffbe6 0%, #e0ffe6 100%)',
+              color: '#3caa3c',
+              borderRadius: '32px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+              minWidth: '320px',
+              maxWidth: '90vw',
+              textAlign: 'center',
+              padding: '40px 36px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '18px',
+              position: 'relative',
+            }}
+          >
+            <Confetti
+              width={window.innerWidth}
+              height={window.innerHeight}
+              recycle={false}
+              numberOfPieces={180}
+              colors={[DUOLINGO_COLORS.green, DUOLINGO_COLORS.blue, DUOLINGO_COLORS.orange, DUOLINGO_COLORS.purple]}
+              style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none' }}
+            />
+            <span className="material-icons" style={{ fontSize: '48px', color: '#ff9c1a', filter: 'drop-shadow(0 2px 6px #ff9c1a33)' }}>emoji_events</span>
+            <h2 style={{ fontWeight: 800, fontSize: '2rem', margin: 0 }}>{unlockedBadge.name}</h2>
+            <div style={{ fontSize: '1.1rem', color: '#6c6f7d', marginBottom: '8px' }}>{unlockedBadge.description}</div>
+            <button
+              onClick={() => setShowAchievementPopup(false)}
+              style={{
+                marginTop: '12px',
+                padding: '10px 28px',
+                borderRadius: '18px',
+                background: '#58cc02',
+                color: '#fff',
+                border: 'none',
+                fontWeight: 700,
+                fontSize: '1rem',
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px #58cc0222',
+                transition: 'all 0.2s',
+              }}
+            >
+              Awesome!
+            </button>
+          </motion.div>
+        </div>
+      )}
+      {/* Daily Chest Reward Popup */}
+      {showChestReward && chestReward && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.45)',
+          zIndex: 3500,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <motion.div
+            initial={{ scale: 0.7, opacity: 0 }}
+            animate={{ scale: 1.1, opacity: 1 }}
+            exit={{ scale: 0.7, opacity: 0 }}
+            transition={{ duration: 0.5, type: 'spring' }}
+            style={{
+              background: 'linear-gradient(135deg, #fffbe6 0%, #e0ffe6 100%)',
+              color: '#3caa3c',
+              borderRadius: '32px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+              minWidth: '320px',
+              maxWidth: '90vw',
+              textAlign: 'center',
+              padding: '40px 36px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '18px',
+              position: 'relative',
+            }}
+          >
+            <Confetti
+              width={window.innerWidth}
+              height={window.innerHeight}
+              recycle={false}
+              numberOfPieces={120}
+              colors={[DUOLINGO_COLORS.green, DUOLINGO_COLORS.blue, DUOLINGO_COLORS.orange, DUOLINGO_COLORS.purple]}
+              style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none' }}
+            />
+            <span className="material-icons" style={{ fontSize: 64, color: '#ffb300', marginBottom: 8, filter: 'drop-shadow(0 2px 8px #ffd70088)' }}>emoji_events</span>
+            <h2 style={{ fontWeight: 800, fontSize: '2rem', margin: 0 }}>Daily Reward!</h2>
+            <div style={{ fontSize: '1.3rem', color: '#ff9c1a', marginBottom: '8px', fontWeight: 700 }}>{chestReward}</div>
+            <button
+              onClick={() => setShowChestReward(false)}
+              style={{
+                marginTop: '12px',
+                padding: '10px 28px',
+                borderRadius: '18px',
+                background: '#58cc02',
+                color: '#fff',
+                border: 'none',
+                fontWeight: 700,
+                fontSize: '1rem',
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px #58cc0222',
+                transition: 'all 0.2s',
+              }}
+            >
+              Thanks!
+            </button>
+          </motion.div>
+        </div>
+      )}
+      {/* Motivational Mascot Floating UI */}
+      <div style={{
+        position: 'fixed',
+        left: 24,
+        bottom: 24,
+        zIndex: 2000,
+        display: 'flex',
+        alignItems: 'flex-end',
+        pointerEvents: 'none',
+      }}>
+        <motion.div
+          initial={{ y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.7, type: 'spring' }}
+          style={{ position: 'relative', pointerEvents: 'auto' }}
+        >
+          {/* Speech bubble */}
+          {showMascotBubble && (
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              style={{
+                background: 'linear-gradient(135deg, #fffbe6 0%, #e0ffe6 100%)',
+                color: '#3caa3c',
+                borderRadius: '18px',
+                boxShadow: '0 2px 8px #58cc0222',
+                padding: '16px 22px',
+                fontWeight: 600,
+                fontSize: '1rem',
+                marginBottom: 12,
+                maxWidth: 260,
+                minWidth: 120,
+                textAlign: 'center',
+                position: 'relative',
+                pointerEvents: 'auto',
+              }}
+              onClick={() => setShowMascotBubble(false)}
+              title="Click to hide tip"
+            >
+              {mascotBubbleMsg}
+              <span style={{
+                position: 'absolute',
+                left: 24,
+                bottom: -16,
+                width: 0,
+                height: 0,
+                borderLeft: '12px solid transparent',
+                borderRight: '12px solid transparent',
+                borderTop: '16px solid #fffbe6',
+                filter: 'drop-shadow(0 2px 4px #58cc0222)',
+              }} />
+            </motion.div>
+          )}
+          {/* Mascot image */}
+          <motion.img
+            src={mascotImg}
+            alt="Mascot"
+            initial={{ scale: 0.9, opacity: 0.7 }}
+            animate={{ scale: 1, opacity: 1, rotate: [0, 5, -5, 0] }}
+            transition={{ duration: 2, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: '50%',
+              background: '#fff',
+              boxShadow: '0 2px 8px #58cc0222',
+              border: '2.5px solid #58cc02',
+              pointerEvents: 'auto',
+              cursor: 'pointer',
+            }}
+            onClick={() => setShowMascotBubble(b => !b)}
+            title="Click mascot for a tip!"
+          />
+        </motion.div>
+      </div>
     </div>
   );
 }

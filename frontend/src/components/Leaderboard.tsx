@@ -465,20 +465,20 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
                       padding: '20px',
                       borderRadius: '20px',
                       background: isCurrentUser 
-                        ? theme === 'dark' 
-                          ? 'linear-gradient(135deg, rgba(88, 204, 2, 0.15) 0%, rgba(88, 204, 2, 0.05) 100%)' 
-                          : 'linear-gradient(135deg, rgba(88, 204, 2, 0.1) 0%, rgba(88, 204, 2, 0.05) 100%)'
+                        ? 'linear-gradient(135deg, #d7f7c8 0%, #58cc02 100%)' 
                         : theme === 'dark' 
                           ? 'rgba(255,255,255,0.02)' 
                           : '#ffffff',
                       border: isCurrentUser
-                        ? '2px solid #58cc02'
+                        ? '2.5px solid #1cb0f6'
                         : theme === 'dark' 
                           ? '1px solid rgba(255,255,255,0.05)' 
                           : '1px solid rgba(88, 204, 2, 0.08)',
                       boxShadow: isCurrentUser
-                        ? '0 8px 32px rgba(88, 204, 2, 0.15)'
+                        ? '0 0 16px 4px #1cb0f655, 0 8px 32px rgba(88, 204, 2, 0.18)'
                         : '0 2px 8px rgba(0,0,0,0.04)',
+                      position: 'relative',
+                      overflow: 'visible',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
                       position: 'relative',
@@ -487,9 +487,15 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
                     whileHover={{ 
                       y: -2,
                       boxShadow: isCurrentUser
-                        ? '0 12px 40px rgba(88, 204, 2, 0.2)'
+                        ? '0 0 32px 8px #1cb0f6aa, 0 12px 40px rgba(88, 204, 2, 0.2)'
                         : '0 4px 16px rgba(0,0,0,0.08)'
                     }}
+                   animate={isCurrentUser ? { boxShadow: [
+                     '0 0 16px 4px #1cb0f655, 0 8px 32px rgba(88, 204, 2, 0.18)',
+                     '0 0 32px 8px #1cb0f6aa, 0 8px 32px rgba(88, 204, 2, 0.18)',
+                     '0 0 16px 4px #1cb0f655, 0 8px 32px rgba(88, 204, 2, 0.18)'
+                   ] } : {}}
+                   transition={isCurrentUser ? { duration: 2, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut' } : {}}
                     onClick={() => setProfileModal(entry)}
                   >
                     {/* Current user indicator */}
