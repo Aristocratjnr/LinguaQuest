@@ -24,6 +24,7 @@ import WelcomePage from './components/WelcomePage';
 import SettingsPage from './components/SettingsPage';
 import { useSettings } from './context/SettingsContext';
 import { UserProvider, useUser } from './context/UserContext';
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Age from './components/Age';
 
@@ -117,9 +118,15 @@ function AppContent() {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const { theme } = useSettings();
-  const { user, submitScore, startGameSession, endGameSession, incrementStreak, resetStreak, awardBadge } = useUser();
+  const { user, userStats, submitScore, startGameSession, endGameSession, incrementStreak, resetStreak, awardBadge } = useUser();
   const [showLogin, setShowLogin] = useState(false);
   const [showListeningModal, setShowListeningModal] = useState(false);
+  // Add Duolingo streak and XP progress variables
+  const DAILY_GOAL = 100;
+  const streak = userStats?.current_streak ?? 0;
+  const totalXp = userStats?.total_score ?? 0;
+  const dailyXp = totalXp % DAILY_GOAL;
+  const dailyProgress = Math.min(1, dailyXp / DAILY_GOAL);
 
   // Apply theme class to body
   useEffect(() => {
@@ -727,34 +734,111 @@ function AppContent() {
           maxWidth: '1200px',
           margin: '0 auto'
         }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{
-              color: DUOLINGO_COLORS.green,
-              fontSize: '22px',
-              fontWeight: 700,
-              fontFamily: 'JetBrains Mono, monospace',
-              letterSpacing: '0.01em',
-              opacity: 0.92
-            }}>
-              LinguaQuest
-            </span>
-            <span className="material-icons" style={{ fontSize: '22px', color: DUOLINGO_COLORS.green, opacity: 0.85 }}>psychology</span>
+          {/* Left: Logo + Streak */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '18px', minWidth: 0 }}>
+            {/* Logo and app name */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{
+                  color: DUOLINGO_COLORS.green,
+                  fontSize: '22px',
+                  fontWeight: 700,
+                  fontFamily: 'JetBrains Mono, monospace',
+                  letterSpacing: '0.01em',
+                  opacity: 0.92
+                }}>
+                  LinguaQuest
+                </span>
+                <span className="material-icons" style={{ fontSize: '22px', color: DUOLINGO_COLORS.green, opacity: 0.85 }}>psychology</span>
+              </div>
+              <span style={{
+                color: DUOLINGO_COLORS.darkGray,
+                fontSize: '12px',
+                fontFamily: 'JetBrains Mono, monospace',
+                fontWeight: 400,
+                opacity: 0.7,
+                marginTop: '2px',
+                letterSpacing: '0.01em'
+              }}>
+                Language Game
+              </span>
+            </div>
+            {/* Streak + Daily Goal Ring */}
+            <div style={{ position: 'relative', width: 54, height: 54, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {/* SVG Circular Progress */}
+              <svg width={54} height={54} style={{ position: 'absolute', top: 0, left: 0 }}>
+                <circle
+                  cx={27}
+                  cy={27}
+                  r={24}
+                  fill="none"
+                  stroke="#e5e5e5"
+                  strokeWidth={6}
+                />
+                <motion.circle
+                  cx={27}
+                  cy={27}
+                  r={24}
+                  fill="none"
+                  stroke="#ff9c1a"
+                  strokeWidth={6}
+                  strokeDasharray={2 * Math.PI * 24}
+                  strokeDashoffset={2 * Math.PI * 24 * (1 - dailyProgress)}
+                  strokeLinecap="round"
+                  initial={{ strokeDashoffset: 2 * Math.PI * 24 }}
+                  animate={{ strokeDashoffset: 2 * Math.PI * 24 * (1 - dailyProgress) }}
+                  transition={{ duration: 0.8, ease: 'easeOut' }}
+                />
+              </svg>
+              {/* Flame icon */}
+              <span className="material-icons" style={{
+                fontSize: 32,
+                color: '#ff9c1a',
+                filter: 'drop-shadow(0 2px 6px #ff9c1a33)',
+                zIndex: 1,
+                position: 'relative',
+                background: 'white',
+                borderRadius: '50%',
+                padding: 4,
+                boxShadow: '0 2px 8px #ff9c1a22',
+              }}>local_fire_department</span>
+              {/* Streak number */}
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                style={{
+                  position: 'absolute',
+                  bottom: 2,
+                  right: 2,
+                  background: '#fff',
+                  borderRadius: '10px',
+                  padding: '2px 8px',
+                  fontWeight: 700,
+                  fontSize: 14,
+                  color: '#ff9c1a',
+                  boxShadow: '0 1px 4px #ff9c1a22',
+                  border: '1.5px solid #ffe0b2',
+                  zIndex: 2,
+                  minWidth: 24,
+                  textAlign: 'center',
+                  fontFamily: 'JetBrains Mono, monospace',
+                }}
+              >
+                {userStats ? streak : <span style={{ opacity: 0.5 }}>--</span>}
+              </motion.div>
+            </div>
+            {/* Daily XP label */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0 }}>
+              <span style={{ fontWeight: 700, color: '#ff9c1a', fontSize: 15, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.01em' }}>
+                {userStats ? `${dailyXp} / ${DAILY_GOAL} XP` : '-- / 100 XP'}
+              </span>
+              <span style={{ color: '#6c6f7d', fontSize: 12, opacity: 0.7, fontFamily: 'JetBrains Mono, monospace' }}>
+                Daily Goal
+              </span>
+            </div>
           </div>
-          <span style={{
-            color: DUOLINGO_COLORS.darkGray,
-            fontSize: '12px',
-            fontFamily: 'JetBrains Mono, monospace',
-            fontWeight: 400,
-            opacity: 0.7,
-            marginTop: '2px',
-            letterSpacing: '0.01em'
-          }}>
-            Language Game
-          </span>
-        </div>
-          
-          {/* User profile */}
+          {/* User profile and right side */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div 
               style={{
