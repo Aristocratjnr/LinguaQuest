@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 
 const quotes = [
   '"Learning another language is like becoming another person." — Haruki Murakami',
@@ -24,12 +25,30 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
 }) => {
   const [tipIndex, setTipIndex] = useState(0);
   const [quoteIndex, setQuoteIndex] = useState(0);
-  const [streak, setStreak] = useState(3);
-  const [xp, setXp] = useState(1250);
+  const [streak, setStreak] = useState<number | null>(null);
+  const [xp, setXp] = useState<number | null>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 1200,
     height: typeof window !== 'undefined' ? window.innerHeight : 800,
   });
+
+  useEffect(() => {
+    setLoadingStats(true);
+    Promise.all([
+      axios.get(`http://127.0.0.1:8000/streak?nickname=${encodeURIComponent(nickname)}`),
+      axios.get(`http://127.0.0.1:8000/stats/${encodeURIComponent(nickname)}`)
+    ])
+      .then(([streakRes, statsRes]) => {
+        setStreak(streakRes.data.streak);
+        setXp(statsRes.data.total_score);
+      })
+      .catch(() => {
+        setStreak(0);
+        setXp(0);
+      })
+      .finally(() => setLoadingStats(false));
+  }, [nickname]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -203,19 +222,33 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
 </div>
 
         {/* Stats section */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-around',
-          padding: getSpacing(12, 16, 24),
-          background: '#f9f9f9',
-          borderBottom: '1px solid #eee',
-          gap: '8px'
-        }}>
-          <div style={{ 
-            textAlign: 'center',
-            flex: 1,
-            minWidth: '120px'
-          }}>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-around',
+            padding: getSpacing(12, 16, 24),
+            background: '#f9f9f9',
+            borderBottom: '1px solid #eee',
+            gap: '8px'
+          }}
+        >
+          {/* Streak Card */}
+          <motion.div
+            key={streak}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.97 }}
+            style={{ 
+              textAlign: 'center',
+              flex: 1,
+              minWidth: '120px'
+            }}
+          >
             <motion.div 
               style={{
                 background: '#ffd700',
@@ -228,18 +261,33 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
                 margin: '0 auto 8px',
                 fontSize: getFontSize(16, 18, 20)
               }}
-              whileHover={{ scale: 1.1 }}
+              animate={{
+                scale: loadingStats ? 1 : [1, 1.12, 1],
+                boxShadow: loadingStats ? 'none' : ['0 0 0 0 #ffd70055', '0 0 0 12px #ffd70022', '0 0 0 0 #ffd70055']
+              }}
+              transition={{
+                duration: 1.2,
+                repeat: loadingStats ? 0 : Infinity,
+                repeatType: 'loop',
+                ease: 'easeInOut'
+              }}
             >
               🔥
             </motion.div>
-            <div style={{
-              fontWeight: 'bold',
-              color: '#3caa3c',
-              fontSize: getFontSize(14, 16, 18),
-              lineHeight: '1.2'
-            }}>
-              {streak}
-            </div>
+            <motion.div
+              key={streak}
+              initial={{ scale: 1.2, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4 }}
+              style={{
+                fontWeight: 'bold',
+                color: '#3caa3c',
+                fontSize: getFontSize(14, 16, 18),
+                lineHeight: '1.2'
+              }}
+            >
+              {loadingStats ? '...' : streak}
+            </motion.div>
             <div style={{
               color: '#222',
               fontSize: getFontSize(10, 11, 12),
@@ -248,13 +296,21 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
             }}>
               DAY STREAK
             </div>
-          </div>
-          
-          <div style={{ 
-            textAlign: 'center',
-            flex: 1,
-            minWidth: '120px'
-          }}>
+          </motion.div>
+          {/* XP Card */}
+          <motion.div
+            key={xp}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.97 }}
+            style={{ 
+              textAlign: 'center',
+              flex: 1,
+              minWidth: '120px'
+            }}
+          >
             <motion.div 
               style={{
                 background: '#1cb0f6',
@@ -267,18 +323,33 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
                 margin: '0 auto 8px',
                 fontSize: getFontSize(16, 18, 20)
               }}
-              whileHover={{ scale: 1.1 }}
+              animate={{
+                scale: loadingStats ? 1 : [1, 1.12, 1],
+                boxShadow: loadingStats ? 'none' : ['0 0 0 0 #1cb0f655', '0 0 0 12px #1cb0f622', '0 0 0 0 #1cb0f655']
+              }}
+              transition={{
+                duration: 1.2,
+                repeat: loadingStats ? 0 : Infinity,
+                repeatType: 'loop',
+                ease: 'easeInOut'
+              }}
             >
               ⚡
             </motion.div>
-            <div style={{
-              fontWeight: 'bold',
-              color: '#3caa3c',
-              fontSize: getFontSize(14, 16, 18),
-              lineHeight: '1.2'
-            }}>
-              {xp}
-            </div>
+            <motion.div
+              key={xp}
+              initial={{ scale: 1.2, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4 }}
+              style={{
+                fontWeight: 'bold',
+                color: '#3caa3c',
+                fontSize: getFontSize(14, 16, 18),
+                lineHeight: '1.2'
+              }}
+            >
+              {loadingStats ? '...' : xp}
+            </motion.div>
             <div style={{
               color: '#222',
               fontSize: getFontSize(10, 11, 12),
@@ -287,8 +358,8 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
             }}>
               TOTAL XP
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Daily motivation */}
         <div style={{
