@@ -27,10 +27,10 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
     },
     {
       title: "Track Your Progress",
-      description: "Earn points, collect badges, and climb the leaderboard as you improve.",
+      description: "Earn points, maintain daily streaks, collect badges, and climb the leaderboard as you improve.",
       icon: "trending_up",
       color: "#FFC800",
-      character: "📈"
+      character: "🔥"
     },
     {
       title: "Ready to Start?",

@@ -478,10 +478,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
                         ? '0 0 16px 4px #1cb0f655, 0 8px 32px rgba(88, 204, 2, 0.18)'
                         : '0 2px 8px rgba(0,0,0,0.04)',
                       position: 'relative',
-                      overflow: 'visible',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
-                      position: 'relative',
                       overflow: 'hidden'
                     }}
                     whileHover={{ 

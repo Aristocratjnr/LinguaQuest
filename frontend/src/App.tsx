@@ -30,6 +30,9 @@ import Age from './components/Age';
 import mascotImg from './assets/images/logo.png'; // Use logo as mascot, or replace with mascot image
 import chestClosed from './assets/images/chest-closed.png';
 import chestOpen from './assets/images/chest-open.png';
+import LanguageSelector from './components/LanguageSelector';
+import ProgressionMap from './components/ProgressionMap';
+import LanguageClub from './components/LanguageClub';
 
 // Duolingo color palette
 const DUOLINGO_COLORS = {
@@ -101,6 +104,7 @@ function AppContent() {
   const [nickname, setNickname] = useState(() => localStorage.getItem('lq_nickname') || '');
   const [avatar, setAvatar] = useState(() => localStorage.getItem('lq_avatar') || '');
   const [showWelcome, setShowWelcome] = useState(true);
+  const [showLanguageSelect, setShowLanguageSelect] = useState(false);
   const [showNicknamePrompt, setShowNicknamePrompt] = useState(false);
   const [showAvatarPicker, setShowAvatarPicker] = useState(!avatar && !showNicknamePrompt);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -155,6 +159,41 @@ function AppContent() {
   const [mascotTipIndex, setMascotTipIndex] = useState(0);
   const [showMascotBubble, setShowMascotBubble] = useState(true);
   const [mascotBubbleMsg, setMascotBubbleMsg] = useState(MASCOT_TIPS[0]);
+  // Progression Map (Skill Tree) state
+  const [showProgressionMap, setShowProgressionMap] = useState(false);
+  // Example skill tree structure (can be replaced with real data)
+  const SKILL_TREE = [
+    { id: 'cat1', label: 'Basics', unlocked: true, children: [
+      { id: 'cat1-easy', label: 'Easy', unlocked: true },
+      { id: 'cat1-med', label: 'Medium', unlocked: false },
+      { id: 'cat1-hard', label: 'Hard', unlocked: false },
+    ]},
+    { id: 'cat2', label: 'Food', unlocked: false, children: [
+      { id: 'cat2-easy', label: 'Easy', unlocked: false },
+      { id: 'cat2-med', label: 'Medium', unlocked: false },
+      { id: 'cat2-hard', label: 'Hard', unlocked: false },
+    ]},
+    { id: 'cat3', label: 'Travel', unlocked: false, children: [
+      { id: 'cat3-easy', label: 'Easy', unlocked: false },
+      { id: 'cat3-med', label: 'Medium', unlocked: false },
+      { id: 'cat3-hard', label: 'Hard', unlocked: false },
+    ]},
+  ];
+  // Language Club/Group Challenges state
+  const [showClubModal, setShowClubModal] = useState(false);
+  // Example club data (replace with real data later)
+  const CLUB = {
+    name: 'Lingua Legends',
+    members: [
+      { nickname: 'You', xp: 320, avatar: avatar || mascotImg },
+      { nickname: 'Ama', xp: 280, avatar: undefined },
+      { nickname: 'Kwame', xp: 210, avatar: undefined },
+      { nickname: 'Esi', xp: 150, avatar: undefined },
+    ],
+    groupGoal: 1000,
+    groupProgress: 760,
+    challenge: 'Earn 1000 XP as a club this week!'
+  };
 
   // Apply theme class to body
   useEffect(() => {
@@ -758,8 +797,22 @@ function AppContent() {
   if (showWelcome) {
     return <WelcomePage onGetStarted={() => {
       setShowWelcome(false);
-      setShowNicknamePrompt(true);
+      setShowLanguageSelect(true);
     }} />;
+  }
+
+  if (showLanguageSelect) {
+    return <LanguageSelector 
+      onSelect={(lang) => {
+        setLanguage(lang);
+        setShowLanguageSelect(false);
+        setShowNicknamePrompt(true);
+      }}
+      onBack={() => {
+        setShowLanguageSelect(false);
+        setShowWelcome(true);
+      }}
+    />;
   }
 
   if (showNicknamePrompt) {
@@ -2304,6 +2357,33 @@ function AppContent() {
             >
               Awesome!
             </button>
+            {/* Social Share Button */}
+            <button
+              onClick={() => {
+                const text = encodeURIComponent(`I just earned the "${unlockedBadge.name}" badge on LinguaQuest! 🏅\n${unlockedBadge.description}\nTry it: https://linguaquest.app`);
+                const url = `https://twitter.com/intent/tweet?text=${text}`;
+                window.open(url, '_blank', 'noopener,noreferrer');
+              }}
+              style={{
+                marginTop: '8px',
+                padding: '8px 22px',
+                borderRadius: '14px',
+                background: '#1cb0f6',
+                color: '#fff',
+                border: 'none',
+                fontWeight: 600,
+                fontSize: '0.98rem',
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px #1cb0f622',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <span className="material-icons" style={{ fontSize: 20, verticalAlign: 'middle' }}>share</span>
+              Share
+            </button>
           </motion.div>
         </div>
       )}
@@ -2451,6 +2531,73 @@ function AppContent() {
           />
         </motion.div>
       </div>
+      {/* Progression Map Button */}
+      <button
+        onClick={() => setShowProgressionMap(true)}
+        style={{
+          position: 'fixed',
+          right: 24,
+          bottom: 24,
+          zIndex: 2100,
+          background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+          color: '#58cc02',
+          border: '2.5px solid #58cc02',
+          borderRadius: '50%',
+          width: 56,
+          height: 56,
+          boxShadow: '0 4px 16px #58cc0222',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 28,
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+        }}
+        title="View Progression Map"
+      >
+        <span className="material-icons">account_tree</span>
+      </button>
+      {/* Progression Map Modal */}
+      {showProgressionMap && (
+        <ProgressionMap
+          skillTree={SKILL_TREE}
+          onClose={() => setShowProgressionMap(false)}
+        />
+      )}
+      {/* Club/Group Challenges Button */}
+      <button
+        onClick={() => setShowClubModal(true)}
+        style={{
+          position: 'fixed',
+          right: 24,
+          bottom: 90,
+          zIndex: 2100,
+          background: 'linear-gradient(135deg, #e3f2fd 0%, #b3e5fc 100%)',
+          color: '#1cb0f6',
+          border: '2.5px solid #1cb0f6',
+          borderRadius: '50%',
+          width: 56,
+          height: 56,
+          boxShadow: '0 4px 16px #1cb0f622',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 28,
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+        }}
+        title="View Language Club"
+      >
+        <span className="material-icons">group</span>
+      </button>
+      {/* Club/Group Challenges Modal */}
+      {showClubModal && (
+        <LanguageClub
+          club={CLUB}
+          mascotImg={mascotImg}
+          onClose={() => setShowClubModal(false)}
+        />
+      )}
     </div>
   );
 }

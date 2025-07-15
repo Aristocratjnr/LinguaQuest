@@ -56,6 +56,7 @@ export interface UserCreate {
 
 export interface UserUpdate {
   avatar_url?: string;
+  preferred_language?: string;
 }
 
 export interface Score {
@@ -370,6 +371,14 @@ export const storage = {
   clearSession: (): void => {
     localStorage.removeItem('lq_session_id');
   },
+
+  getLanguage: (): string | null => {
+    return localStorage.getItem('lq_language');
+  },
+
+  setLanguage: (language: string): void => {
+    localStorage.setItem('lq_language', language);
+  },
 };
 
-export default api; 
+export default api;
