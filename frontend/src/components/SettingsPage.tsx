@@ -103,11 +103,26 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const inputText = isDark ? '#e0e7ff' : '#22223b';
 
   return (
-    <div className={`container-fluid d-flex align-items-center justify-content-center min-vh-100 px-6 px-sm-3 px-md-4${isDark ? ' dark' : ''}`}
-         style={{ background: bgGradient }}>
+    <div className={`container-fluid d-flex align-items-center justify-content-center min-vh-100${isDark ? ' dark' : ''}`}
+         style={{ 
+           background: bgGradient,
+           padding: '1rem',
+           paddingTop: '2rem',
+           paddingBottom: '2rem'
+         }}>
       <motion.div
         className="card shadow-lg w-100"
-        style={{ maxWidth: 480, borderRadius: 16, fontFamily: "'JetBrains Mono', monospace", minHeight: 440, background: cardBg, color: inputText, boxShadow: isDark ? '0 10px 30px #181c2a' : '0 10px 30px rgba(0,0,0,0.10)' }}
+        style={{ 
+          maxWidth: 'min(95vw, 500px)',
+          width: '100%',
+          borderRadius: 16, 
+          fontFamily: "'JetBrains Mono', monospace", 
+          minHeight: 'auto',
+          background: cardBg, 
+          color: inputText, 
+          boxShadow: isDark ? '0 10px 30px #181c2a' : '0 10px 30px rgba(0,0,0,0.10)',
+          margin: '0 auto'
+        }}
         initial={{ opacity: 0, y: 32 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -115,7 +130,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         {/* --- HEADER --- */}
         <div className="card-header d-flex justify-content-between align-items-center border-bottom py-3 px-3 px-sm-4"
              style={{ background: 'transparent', borderBottom: isDark ? '1.5px solid #444c6e' : '1.5px solid #e0e7ef' }}>
-          <div className="d-flex align-items-center gap-2">
+          <div className="d-flex align-items-center gap-2 flex-wrap">
             <span className="d-flex align-items-center justify-content-center me-2" style={{
               width: 36, height: 36, borderRadius: 12,
               backgroundColor: isDark ? '#232946' : '#e8f5e9',
@@ -123,32 +138,46 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             }}>
               <i className="material-icons" style={{ fontSize: '1.5rem' }}>settings</i>
             </span>
-            <h2 className="fw-bold mb-0" style={{ color: isDark ? '#e0e7ff' : '#58a700', fontSize: '1.15rem', letterSpacing: '.01em' }}>
+            <h2 className="fw-bold mb-0" style={{ color: isDark ? '#e0e7ff' : '#58a700', fontSize: 'clamp(1rem, 4vw, 1.15rem)', letterSpacing: '.01em' }}>
               Settings
             </h2>
             <span className="badge px-3 py-1 d-flex align-items-center ms-2" style={{
               backgroundColor: isDark ? '#232946' : '#e8f5e9',
-              color: '#58a700', borderRadius: '12px', fontWeight: 600, fontSize: '0.85rem', letterSpacing: '.01em'
+              color: '#58a700', borderRadius: '12px', fontWeight: 600, fontSize: 'clamp(0.75rem, 3vw, 0.85rem)', letterSpacing: '.01em'
             }}>
               <i className="material-icons me-1" style={{ fontSize: '1rem' }}>tune</i>
               Profile
             </span>
           </div>
-          <button className={`btn btn-sm btn-outline-secondary rounded-circle ms-2${isDark ? ' border-light text-light' : ''}`} onClick={onClose} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', background: isDark ? '#232946' : '#f8f9fa' }}>
+          <button 
+            className={`btn btn-sm btn-outline-secondary rounded-circle ms-2${isDark ? ' border-light text-light' : ''}`} 
+            onClick={onClose} 
+            style={{ 
+              width: 40, 
+              height: 40, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              border: 'none', 
+              background: isDark ? '#232946' : '#f8f9fa',
+              minWidth: '40px',
+              minHeight: '40px'
+            }}
+          >
             <i className="material-icons align-middle">close</i>
           </button>
         </div>
         <div className="card-body p-3 p-sm-4">
           {/* Profile Section */}
           <div className="mb-4">
-            <div className="d-flex align-items-center gap-2 mb-2 fw-bold" style={{ fontSize: '1rem', color: '#58a700' }}>
+            <div className="d-flex align-items-center gap-2 mb-3 fw-bold" style={{ fontSize: 'clamp(0.9rem, 3.5vw, 1rem)', color: '#58a700' }}>
               <span className="d-flex align-items-center justify-content-center" style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: isDark ? '#232946' : '#e8f5e9', color: '#58a700' }}>
                 <i className="material-icons" style={{ fontSize: '1.1rem' }}>face</i>
               </span>
               Profile
             </div>
-            <div className="row g-3 align-items-center flex-column flex-sm-row">
-              <div className="col-12 col-sm-4 text-center mb-2 mb-sm-0">
+            <div className="row g-3 align-items-start">
+              <div className="col-12 col-sm-4 text-center mb-3 mb-sm-0">
                 <div className="d-flex justify-content-center flex-wrap gap-2">
                   {AVATARS.map((a, i) => (
                     <motion.img
@@ -156,7 +185,16 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                       src={a}
                       alt={`Avatar ${i + 1}`}
                       className={`rounded-circle bg-white border ${avatar === a ? 'border-primary' : ''}`}
-                      style={{ width: 44, height: 44, cursor: 'pointer', boxShadow: avatar === a ? '0 0 8px #4f46e5' : '0 2px 6px #0001', opacity: avatar === a ? 1 : 0.7, borderWidth: 2 }}
+                      style={{ 
+                        width: 'clamp(44px, 8vw, 52px)', 
+                        height: 'clamp(44px, 8vw, 52px)', 
+                        cursor: 'pointer', 
+                        boxShadow: avatar === a ? '0 0 8px #4f46e5' : '0 2px 6px #0001', 
+                        opacity: avatar === a ? 1 : 0.7, 
+                        borderWidth: 2,
+                        minWidth: '44px',
+                        minHeight: '44px'
+                      }}
                       onClick={() => handleAvatarChange(a)}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.95 }}
@@ -167,14 +205,22 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 </div>
               </div>
               <div className="col-12 col-sm-8">
-                <label className="form-label mb-1" style={{ color: labelColor }}>Nickname</label>
+                <label className="form-label mb-2" style={{ color: labelColor, fontSize: 'clamp(0.85rem, 3vw, 0.9rem)' }}>Nickname</label>
                 <input
                   type="text"
                   className="form-control"
                   value={nickname}
                   onChange={handleNicknameChange}
                   maxLength={16}
-                  style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '1rem', background: inputBg, color: inputText, borderColor }}
+                  style={{ 
+                    fontFamily: "'JetBrains Mono', monospace", 
+                    fontSize: 'clamp(0.9rem, 3.5vw, 1rem)', 
+                    background: inputBg, 
+                    color: inputText, 
+                    borderColor,
+                    padding: '0.75rem 1rem',
+                    minHeight: '44px'
+                  }}
                 />
               </div>
             </div>
@@ -182,24 +228,50 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
           {/* Preferences Section */}
           <div className="mb-4">
-            <div className="d-flex align-items-center gap-2 mb-2 fw-bold" style={{ fontSize: '1rem', color: '#58a700' }}>
+            <div className="d-flex align-items-center gap-2 mb-3 fw-bold" style={{ fontSize: 'clamp(0.9rem, 3.5vw, 1rem)', color: '#58a700' }}>
               <span className="d-flex align-items-center justify-content-center" style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: isDark ? '#232946' : '#e8f5e9', color: '#58a700' }}>
                 <i className="material-icons" style={{ fontSize: '1.1rem' }}>tune</i>
               </span>
               Preferences
             </div>
-            <div className="row g-3 align-items-center">
-              <div className="col-12 col-sm-6 mb-2 mb-sm-0">
-                <label className="form-label mb-1" style={{ color: labelColor }}>Language</label>
-                <select className="form-select" value={language} onChange={handleLanguageChange} style={{ fontFamily: "'JetBrains Mono', monospace", background: inputBg, color: inputText, borderColor }}>
+            <div className="row g-3">
+              <div className="col-12 col-sm-6 mb-3 mb-sm-0">
+                <label className="form-label mb-2" style={{ color: labelColor, fontSize: 'clamp(0.85rem, 3vw, 0.9rem)' }}>Language</label>
+                <select 
+                  className="form-select" 
+                  value={language} 
+                  onChange={handleLanguageChange} 
+                  style={{ 
+                    fontFamily: "'JetBrains Mono', monospace", 
+                    background: inputBg, 
+                    color: inputText, 
+                    borderColor,
+                    fontSize: 'clamp(0.9rem, 3.5vw, 1rem)',
+                    padding: '0.75rem 1rem',
+                    minHeight: '44px'
+                  }}
+                >
                   {LANGUAGES.map(l => (
                     <option key={l.code} value={l.code}>{l.label}</option>
                   ))}
                 </select>
               </div>
               <div className="col-12 col-sm-6">
-                <label className="form-label mb-1" style={{ color: labelColor }}>Theme</label>
-                <select className="form-select" value={theme} onChange={handleThemeChange} style={{ fontFamily: "'JetBrains Mono', monospace", background: inputBg, color: inputText, borderColor }}>
+                <label className="form-label mb-2" style={{ color: labelColor, fontSize: 'clamp(0.85rem, 3vw, 0.9rem)' }}>Theme</label>
+                <select 
+                  className="form-select" 
+                  value={theme} 
+                  onChange={handleThemeChange} 
+                  style={{ 
+                    fontFamily: "'JetBrains Mono', monospace", 
+                    background: inputBg, 
+                    color: inputText, 
+                    borderColor,
+                    fontSize: 'clamp(0.9rem, 3.5vw, 1rem)',
+                    padding: '0.75rem 1rem',
+                    minHeight: '44px'
+                  }}
+                >
                   {THEMES.map(t => (
                     <option key={t.code} value={t.code}>{t.label}</option>
                   ))}
@@ -210,7 +282,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
           {/* Real-Time Toggles */}
           <div className="mb-4">
-            <div className="d-flex align-items-center gap-2 mb-2 fw-bold" style={{ fontSize: '1rem', color: '#58a700' }}>
+            <div className="d-flex align-items-center gap-2 mb-3 fw-bold" style={{ fontSize: 'clamp(0.9rem, 3.5vw, 1rem)', color: '#58a700' }}>
               <span className="d-flex align-items-center justify-content-center" style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: isDark ? '#232946' : '#e8f5e9', color: '#58a700' }}>
                 <i className="material-icons" style={{ fontSize: '1.1rem' }}>volume_up</i>
               </span>
@@ -218,8 +290,29 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </div>
             <div className="d-flex align-items-center gap-3 flex-wrap">
               <div className="form-check form-switch">
-                <input className="form-check-input" type="checkbox" id="soundSwitch" checked={sound} onChange={handleSoundToggle} />
-                <label className="form-check-label" htmlFor="soundSwitch" style={{ fontFamily: "'JetBrains Mono', monospace", color: labelColor }}>
+                <input 
+                  className="form-check-input" 
+                  type="checkbox" 
+                  id="soundSwitch" 
+                  checked={sound} 
+                  onChange={handleSoundToggle}
+                  style={{ 
+                    width: '3rem',
+                    height: '1.5rem',
+                    cursor: 'pointer'
+                  }}
+                />
+                <label 
+                  className="form-check-label" 
+                  htmlFor="soundSwitch" 
+                  style={{ 
+                    fontFamily: "'JetBrains Mono', monospace", 
+                    color: labelColor,
+                    fontSize: 'clamp(0.85rem, 3vw, 0.9rem)',
+                    cursor: 'pointer',
+                    paddingLeft: '0.5rem'
+                  }}
+                >
                   Sound {sound ? 'On' : 'Off'}
                 </label>
               </div>
@@ -227,8 +320,8 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           </div>
 
           {/* Live Preview */}
-          <div className="mb-2">
-            <div className="d-flex align-items-center gap-2 mb-2 fw-bold" style={{ fontSize: '1rem', color: '#58a700' }}>
+          <div className="mb-4">
+            <div className="d-flex align-items-center gap-2 mb-3 fw-bold" style={{ fontSize: 'clamp(0.9rem, 3.5vw, 1rem)', color: '#58a700' }}>
               <span className="d-flex align-items-center justify-content-center" style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: isDark ? '#232946' : '#e8f5e9', color: '#58a700' }}>
                 <i className="material-icons" style={{ fontSize: '1.1rem' }}>visibility</i>
               </span>
@@ -236,45 +329,112 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </div>
             <div className="d-flex align-items-center gap-3 flex-wrap">
               <div className="d-flex flex-column align-items-center">
-                <img src={avatar} alt="Preview Avatar" className="rounded-circle mb-2" style={{ width: 44, height: 44, border: '2px solid #4f46e5' }} />
-                <span className="badge bg-primary" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{nickname || 'Player'}</span>
+                <img 
+                  src={avatar} 
+                  alt="Preview Avatar" 
+                  className="rounded-circle mb-2" 
+                  style={{ 
+                    width: 'clamp(44px, 8vw, 52px)', 
+                    height: 'clamp(44px, 8vw, 52px)', 
+                    border: '2px solid #4f46e5',
+                    minWidth: '44px',
+                    minHeight: '44px'
+                  }} 
+                />
+                <span 
+                  className="badge bg-primary" 
+                  style={{ 
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: 'clamp(0.75rem, 3vw, 0.85rem)'
+                  }}
+                >
+                  {nickname || 'Player'}
+                </span>
               </div>
               <div className="d-flex flex-column align-items-start">
-                <span className="text-muted small">Language: <b>{LANGUAGES.find(l => l.code === language)?.label}</b></span>
-                <span className="text-muted small">Theme: <b>{THEMES.find(t => t.code === theme)?.label}</b></span>
-                <span className="text-muted small">Sound: <b>{sound ? 'On' : 'Off'}</b></span>
+                <span className="text-muted small" style={{ fontSize: 'clamp(0.75rem, 3vw, 0.85rem)' }}>
+                  Language: <b>{LANGUAGES.find(l => l.code === language)?.label}</b>
+                </span>
+                <span className="text-muted small" style={{ fontSize: 'clamp(0.75rem, 3vw, 0.85rem)' }}>
+                  Theme: <b>{THEMES.find(t => t.code === theme)?.label}</b>
+                </span>
+                <span className="text-muted small" style={{ fontSize: 'clamp(0.75rem, 3vw, 0.85rem)' }}>
+                  Sound: <b>{sound ? 'On' : 'Off'}</b>
+                </span>
               </div>
             </div>
           </div>
 
           <hr className="my-4" />
-          <div className="d-flex align-items-center gap-2 mb-3 fw-bold" style={{ fontSize: '1rem', color: '#58a700' }}>
+          <div className="d-flex align-items-center gap-2 mb-3 fw-bold" style={{ fontSize: 'clamp(0.9rem, 3.5vw, 1rem)', color: '#58a700' }}>
             <span className="d-flex align-items-center justify-content-center" style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: isDark ? '#232946' : '#e8f5e9', color: '#58a700' }}>
               <i className="material-icons" style={{ fontSize: '1.1rem' }}>emoji_events</i>
             </span>
             Engagement Stats
           </div>
           {loading ? (
-            <div className="text-center py-3"><span className="spinner-border" /></div>
+            <div className="text-center py-3">
+              <span className="spinner-border" style={{ width: '2rem', height: '2rem' }} />
+            </div>
           ) : error ? (
-            <div className="alert alert-danger text-center">{error}</div>
+            <div className="alert alert-danger text-center" style={{ fontSize: 'clamp(0.8rem, 3vw, 0.9rem)' }}>{error}</div>
           ) : (
             <div className="d-flex flex-column gap-3 align-items-center">
-              <div className="d-flex align-items-center gap-2">
-                <span className="badge px-3 py-2 d-flex align-items-center" style={{ backgroundColor: '#fff3cd', color: '#b68900', borderRadius: '12px', fontWeight: 600, fontSize: '1rem', letterSpacing: '.01em' }}>
+              <div className="d-flex align-items-center gap-2 flex-wrap justify-content-center">
+                <span className="badge px-3 py-2 d-flex align-items-center" style={{ 
+                  backgroundColor: '#fff3cd', 
+                  color: '#b68900', 
+                  borderRadius: '12px', 
+                  fontWeight: 600, 
+                  fontSize: 'clamp(0.85rem, 3.5vw, 1rem)', 
+                  letterSpacing: '.01em' 
+                }}>
                   <i className="material-icons me-1" style={{ fontSize: '1.1rem', color: '#b68900' }}>local_fire_department</i>
                   Streak: {streak}
                 </span>
-                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} className="btn btn-xs btn-outline-danger ms-2 rounded-pill" style={{ fontSize: '0.8rem', padding: '0.1rem 0.6rem', borderRadius: 16 }} onClick={handleResetStreak} disabled={resetting}>
+                <motion.button 
+                  whileHover={{ scale: 1.05 }} 
+                  whileTap={{ scale: 0.97 }} 
+                  className="btn btn-xs btn-outline-danger ms-2 rounded-pill" 
+                  style={{ 
+                    fontSize: 'clamp(0.75rem, 3vw, 0.8rem)', 
+                    padding: '0.5rem 1rem', 
+                    borderRadius: 16,
+                    minHeight: '36px',
+                    minWidth: '60px'
+                  }} 
+                  onClick={handleResetStreak} 
+                  disabled={resetting}
+                >
                   <i className="material-icons align-middle me-1" style={{ fontSize: '1rem' }}>restart_alt</i>Reset
                 </motion.button>
               </div>
-              <div className="d-flex align-items-center gap-2">
-                <span className="badge px-3 py-2 d-flex align-items-center" style={{ backgroundColor: '#e0f7fa', color: '#007b83', borderRadius: '12px', fontWeight: 600, fontSize: '1rem', letterSpacing: '.01em' }}>
+              <div className="d-flex align-items-center gap-2 flex-wrap justify-content-center">
+                <span className="badge px-3 py-2 d-flex align-items-center" style={{ 
+                  backgroundColor: '#e0f7fa', 
+                  color: '#007b83', 
+                  borderRadius: '12px', 
+                  fontWeight: 600, 
+                  fontSize: 'clamp(0.85rem, 3.5vw, 1rem)', 
+                  letterSpacing: '.01em' 
+                }}>
                   <i className="material-icons me-1" style={{ fontSize: '1.1rem', color: '#007b83' }}>military_tech</i>
                   Level: {level}
                 </span>
-                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} className="btn btn-xs btn-outline-danger ms-2 rounded-pill" style={{ fontSize: '0.8rem', padding: '0.1rem 0.6rem', borderRadius: 16 }} onClick={handleResetLevel} disabled={resetting}>
+                <motion.button 
+                  whileHover={{ scale: 1.05 }} 
+                  whileTap={{ scale: 0.97 }} 
+                  className="btn btn-xs btn-outline-danger ms-2 rounded-pill" 
+                  style={{ 
+                    fontSize: 'clamp(0.75rem, 3vw, 0.8rem)', 
+                    padding: '0.5rem 1rem', 
+                    borderRadius: 16,
+                    minHeight: '36px',
+                    minWidth: '60px'
+                  }} 
+                  onClick={handleResetLevel} 
+                  disabled={resetting}
+                >
                   <i className="material-icons align-middle me-1" style={{ fontSize: '1rem' }}>restart_alt</i>Reset
                 </motion.button>
               </div>
@@ -282,14 +442,34 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           )}
         </div>
         <ToastContainer position="top-center" autoClose={2500} hideProgressBar newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover aria-label="Notification Toasts" />
-        <div className="text-muted small mt-4 d-flex align-items-center justify-content-center gap-2" style={{ color: isDark ? '#a5b4fc' : '#6c757d', fontSize: '0.85rem' }}>
+        <div className="text-muted small mt-4 d-flex align-items-center justify-content-center gap-2 text-center px-3" style={{ 
+          color: isDark ? '#a5b4fc' : '#6c757d', 
+          fontSize: 'clamp(0.75rem, 3vw, 0.85rem)',
+          lineHeight: '1.4'
+        }}>
           <span className="d-flex align-items-center justify-content-center" style={{ width: 24, height: 24, borderRadius: '50%', backgroundColor: isDark ? '#232946' : '#e8f5e9', color: '#58a700' }}>
             <i className="material-icons" style={{ fontSize: '1.1rem' }}>info</i>
           </span>
           Your settings are saved automatically. Need help? Contact support or check the FAQ.
         </div>
-        <div className="card-footer py-3 text-center border-top" style={{ background: cardFooterBg, fontSize: '0.9rem', borderTop: isDark ? '1.5px solid #444c6e' : '1.5px solid #e0e7ef' }}>
-          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className={`btn btn-outline-primary px-4 w-100 w-sm-auto rounded-pill${isDark ? ' border-light text-light' : ''}`} onClick={onClose} style={{ borderRadius: 16, fontWeight: 600, letterSpacing: '.01em' }}>
+        <div className="card-footer py-3 text-center border-top" style={{ 
+          background: cardFooterBg, 
+          fontSize: 'clamp(0.8rem, 3.5vw, 0.9rem)', 
+          borderTop: isDark ? '1.5px solid #444c6e' : '1.5px solid #e0e7ef' 
+        }}>
+          <motion.button 
+            whileHover={{ scale: 1.03 }} 
+            whileTap={{ scale: 0.97 }} 
+            className={`btn btn-outline-primary px-4 w-100 w-sm-auto rounded-pill${isDark ? ' border-light text-light' : ''}`} 
+            onClick={onClose} 
+            style={{ 
+              borderRadius: 16, 
+              fontWeight: 600, 
+              letterSpacing: '.01em',
+              minHeight: '44px',
+              fontSize: 'clamp(0.85rem, 3.5vw, 0.9rem)'
+            }}
+          >
             <i className="material-icons align-middle me-2">arrow_back</i>
             Back
           </motion.button>

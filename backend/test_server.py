@@ -105,6 +105,7 @@ def get_scenario(request: dict | None = None):
     import random
     category = request.get("category", "daily") if request else "daily"
     difficulty = request.get("difficulty", "beginner") if request else "beginner"
+    language = request.get("language", "en") if request else "en"
 
     scenarios = {
         "daily": {
@@ -182,7 +183,17 @@ def get_scenario(request: dict | None = None):
     scenario_list = category_dict.get(difficulty, category_dict["beginner"])
     scenario = random.choice(scenario_list)
 
-    return {"scenario": scenario, "language": "twi"}
+    # Translate scenario if language is not English
+    if language != "en":
+        translation_request = {
+            "text": scenario,
+            "src_lang": "en",
+            "tgt_lang": language
+        }
+        translated_result = translate_text(translation_request)
+        scenario = translated_result["translated_text"]
+
+    return {"scenario": scenario, "language": language}
 
 @app.post("/translate")
 def translate_text(request: dict):

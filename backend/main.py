@@ -67,10 +67,28 @@ conversational_ai = ConversationalAI()
 speech_to_text = SpeechToText()
 
 # --- Scenario Endpoint ---
+class ScenarioRequest(BaseModel):
+    category: str = "general"
+    difficulty: str = "medium"
+    language: str = "twi"  # Default to Twi
+
 class ScenarioResponse(BaseModel):
     scenario: str
     language: str
 
+# English scenarios as base
+SCENARIOS_EN = [
+    "I think eating fast food is enjoyable.",
+    "I prefer to work early in the morning.",
+    "I believe it is important to work hard in school.",
+    "Technology makes our lives easier.",
+    "Social media brings people together.",
+    "Learning multiple languages is essential.",
+    "Traditional values are more important than modern ideas.",
+    "Climate change is the most pressing issue of our time."
+]
+
+# Twi scenarios (for reference)
 SCENARIOS_TWI = [
     "Mekae sɛ didi ntutummu yɛ fɛ.",
     "Mepɛ sɛ meyɛ adwuma anɔpa biara.",
@@ -78,12 +96,40 @@ SCENARIOS_TWI = [
 ]
 
 @app.post("/scenario", response_model=ScenarioResponse)
-def get_scenario():
+def get_scenario(req: ScenarioRequest):
     try:
-        scenario = random.choice(SCENARIOS_TWI)
-        return ScenarioResponse(scenario=scenario, language="twi")
+        print(f"Received scenario request: category={req.category}, difficulty={req.difficulty}, language={req.language}")
+        
+        # Get English scenario first
+        scenario_en = random.choice(SCENARIOS_EN)
+        print(f"Selected English scenario: {scenario_en}")
+        
+        # If requested language is English, return as is
+        if req.language == "en":
+            return ScenarioResponse(scenario=scenario_en, language="en")
+        
+        # If requested language is different, translate it
+        try:
+            print(f"Translating to {req.language} using NLLB...")
+            translated_scenario = nllb_translate(scenario_en, "en", req.language)
+            print(f"NLLB translation result: {translated_scenario}")
+            return ScenarioResponse(scenario=translated_scenario, language=req.language)
+        except Exception as translation_error:
+            print(f"NLLB translation error: {translation_error}")
+            # Fallback to LibreTranslate
+            try:
+                print(f"Falling back to LibreTranslate for {req.language}...")
+                translated_scenario = libre_translate(scenario_en, "en", req.language)
+                print(f"LibreTranslate result: {translated_scenario}")
+                return ScenarioResponse(scenario=translated_scenario, language=req.language)
+            
+            except Exception as fallback_error:
+                print(f"Fallback translation error: {fallback_error}")
+                # Return English scenario with a note if translation fails
+                return ScenarioResponse(scenario=f"{scenario_en} [Translation unavailable]", language="en")
     except Exception as e:
-        return ScenarioResponse(scenario="Error generating scenario.", language="twi")
+        print(f"Scenario generation error: {e}")
+        return ScenarioResponse(scenario="Error generating scenario.", language="en")
 
 # --- Translation Endpoint ---
 class TranslationRequest(BaseModel):

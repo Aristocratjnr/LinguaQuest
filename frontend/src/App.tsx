@@ -53,16 +53,16 @@ const TOTAL_ROUNDS = 5;
 const ROUND_TIME = 50;
 
 const VOICE_COMMANDS = [
-  { phrases: ['next', 'continue', 'proceed', 'suivant', 'weiter', 'siguiente', 'ɛdi so'], action: 'next', desc: 'Go to next round', icon: '⏭️' },
-  { phrases: ['repeat', 'again', 'répéter', 'nochmal', 'otra vez', 'san ka bio'], action: 'repeat', desc: 'Repeat AI response', icon: '🔁' },
-  { phrases: ['leaderboard', 'scores', 'classement', 'rangliste', 'tabla', 'mpuntuo'], action: 'leaderboard', desc: 'Show leaderboard', icon: '🏆' },
-  { phrases: ['settings', 'options', 'paramètres', 'einstellungen', 'ajustes', 'nhyehyɛe'], action: 'settings', desc: 'Open settings', icon: '⚙️' },
-  { phrases: ['start', 'play', 'begin', 'démarrer', 'commencer', 'starten', 'empezar', 'fi'], action: 'start', desc: 'Start game', icon: '▶️' },
-  { phrases: ['profile', 'account', 'profil', 'konto', 'perfil', 'me ho nsɛm'], action: 'profile', desc: 'Open profile', icon: '👤' },
-  { phrases: ['help', 'ayuda', 'aide', 'hilfe', 'boa me'], action: 'help', desc: 'Show help', icon: '❓' },
-  { phrases: ['back', 'return', 'volver', 'retour', 'zurück', 'san kɔ'], action: 'back', desc: 'Go back', icon: '🔙' },
-  { phrases: ['home', 'main', 'inicio', 'accueil', 'heim', 'fie'], action: 'home', desc: 'Go to home', icon: '🏠' },
-  { phrases: ['exit', 'quit', 'salir', 'quitter', 'beenden', 'pue'], action: 'exit', desc: 'Exit game', icon: '🚪' },
+  { phrases: ['next', 'continue', 'proceed', 'suivant', 'weiter', 'siguiente', 'ɛdi so'], action: 'next', desc: 'Go to next round' },
+  { phrases: ['repeat', 'again', 'répéter', 'nochmal', 'otra vez', 'san ka bio'], action: 'repeat', desc: 'Repeat AI response' },
+  { phrases: ['leaderboard', 'scores', 'classement', 'rangliste', 'tabla', 'mpuntuo'], action: 'leaderboard', desc: 'Show leaderboard' },
+  { phrases: ['settings', 'options', 'paramètres', 'einstellungen', 'ajustes', 'nhyehyɛe'], action: 'settings', desc: 'Open settings' },
+  { phrases: ['start', 'play', 'begin', 'démarrer', 'commencer', 'starten', 'empezar', 'fi'], action: 'start', desc: 'Start game' },
+  { phrases: ['profile', 'account', 'profil', 'konto', 'perfil', 'me ho nsɛm'], action: 'profile', desc: 'Open profile' },
+  { phrases: ['help', 'ayuda', 'aide', 'hilfe', 'boa me'], action: 'help', desc: 'Show help' },
+  { phrases: ['back', 'return', 'volver', 'retour', 'zurück', 'san kɔ'], action: 'back', desc: 'Go back' },
+  { phrases: ['home', 'main', 'inicio', 'accueil', 'heim', 'fie'], action: 'home', desc: 'Go to home' },
+  { phrases: ['exit', 'quit', 'salir', 'quitter', 'beenden', 'pue'], action: 'exit', desc: 'Exit game' },
 ];
 
 interface ScenarioResponse { scenario: string; language: string; }
@@ -119,6 +119,7 @@ function AppContent() {
   const { theme } = useSettings();
   const { user, submitScore, startGameSession, endGameSession, incrementStreak, awardBadge } = useUser();
   const [showLogin, setShowLogin] = useState(false);
+  const [showListeningModal, setShowListeningModal] = useState(false);
 
   // Apply theme class to body
   useEffect(() => {
@@ -151,9 +152,13 @@ function AppContent() {
   const fetchScenario = async () => {
     setLoading(true);
     try {
-      const res = await axios.post<ScenarioResponse>('http://127.0.0.1:8000/scenario', { category, difficulty });
+      const res = await axios.post<ScenarioResponse>('http://127.0.0.1:8000/scenario', { 
+        category, 
+        difficulty,
+        language: language // Pass current language to get scenario in that language
+      });
       setScenario(res.data.scenario);
-      setLanguage(res.data.language || 'twi');
+      setLanguage(res.data.language || language);
       setAiStance('disagree');
       setUserArgument('');
       setTranslation('');
@@ -253,11 +258,13 @@ function AppContent() {
     recognition.maxAlternatives = 1;
     setListeningCmd(true);
     setCmdError('');
+    setShowListeningModal(true);
     recognition.start();
     recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript.toLowerCase();
       setLastCmd(transcript);
       setListeningCmd(false);
+      setShowListeningModal(false);
       // Find matching command
       let found = false;
       for (const cmd of VOICE_COMMANDS) {
@@ -307,15 +314,21 @@ function AppContent() {
         }
       }
     };
-    recognition.onerror = () => setListeningCmd(false);
-    recognition.onend = () => setListeningCmd(false);
+    recognition.onerror = () => {
+      setListeningCmd(false);
+      setShowListeningModal(false);
+    };
+    recognition.onend = () => {
+      setListeningCmd(false);
+      setShowListeningModal(false);
+    };
   };
 
-  // Initial scenario load
-  useEffect(() => {
-    fetchScenario();
-    // eslint-disable-next-line
-  }, []);
+  // Scenario will be loaded after category/difficulty selection
+  // useEffect(() => {
+  //   fetchScenario();
+  //   // eslint-disable-next-line
+  // }, []);
 
   // Auto-advance to next round after success/fail
   useEffect(() => {
@@ -435,6 +448,21 @@ function AppContent() {
         console.error('Failed to start game session:', error);
       }
     }
+    
+    // Fetch the first scenario now that category and difficulty are set
+    setLoading(true);
+    try {
+      const res = await axios.post<ScenarioResponse>('http://127.0.0.1:8000/scenario', { 
+        category: cat, 
+        difficulty: diff,
+        language: language // Pass current language to get scenario in that language
+      });
+      setScenario(res.data.scenario);
+      setLanguage(res.data.language || language);
+    } catch (e) {
+      setScenario('Error loading scenario.');
+    }
+    setLoading(false);
   };
 
   // Submit score and end session on game over
@@ -516,23 +544,23 @@ function AppContent() {
     return () => clearInterval(interval);
   }, [score]);
 
-  // Translate scenario when language changes
+  // Fetch new scenario when language changes
   const handleScenarioLanguageChange = async (newLang: string) => {
     setLanguage(newLang);
-    if (scenario && newLang !== 'en') {
+    // Fetch a new scenario in the selected language
       setLoading(true);
       try {
-        const res = await axios.post<TranslationResponse>('http://127.0.0.1:8000/translate', {
-          text: scenario,
-          src_lang: 'en',
-          tgt_lang: newLang,
-        });
-        setScenario(res.data.translated_text);
+      const res = await axios.post<ScenarioResponse>('http://127.0.0.1:8000/scenario', { 
+        category, 
+        difficulty,
+        language: newLang // Get scenario in the new language
+      });
+      setScenario(res.data.scenario);
+      setLanguage(res.data.language || newLang);
       } catch (e) {
-        setScenario('Translation error.');
+      setScenario('Error loading scenario.');
       }
       setLoading(false);
-    }
   };
 
   // Onboarding screens
@@ -688,43 +716,158 @@ function AppContent() {
         width: '100%',
         margin: '0 auto'
       }}>
-        {/* Progress/XP/Timer Card - Polished */}
+        {/* Progress/XP/Timer Card - Enhanced */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          style={{
+            marginTop: '24px',
+            marginBottom: '36px'
+          }}
+        >
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          background: 'var(--duo-card, #fff)',
-          borderRadius: '28px',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.10)',
-          padding: '28px 24px',
-          marginBottom: '32px',
-          gap: '28px',
-          flexWrap: 'wrap'
-        }}>
-          <div style={{ minWidth: 0, flex: 1 }}>
+            justifyContent: 'space-between',
+            background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+            borderRadius: '32px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
+            padding: '32px 28px',
+            border: '1px solid rgba(88, 204, 2, 0.08)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            {/* Decorative background elements */}
+            <motion.div
+              animate={{
+                scale: [1, 1.1, 1],
+                opacity: [0.3, 0.5, 0.3]
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              style={{
+                position: 'absolute',
+                top: '-20px',
+                right: '-20px',
+                width: '80px',
+                height: '80px',
+                background: 'radial-gradient(circle, rgba(88, 204, 2, 0.06) 0%, transparent 70%)',
+                borderRadius: '50%'
+              }}
+            />
+            <motion.div
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.2, 0.4, 0.2]
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1
+              }}
+              style={{
+                position: 'absolute',
+                bottom: '-15px',
+                left: '-15px',
+                width: '60px',
+                height: '60px',
+                background: 'radial-gradient(circle, rgba(28, 176, 246, 0.06) 0%, transparent 70%)',
+                borderRadius: '50%'
+              }}
+            />
+            
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              style={{ 
+                minWidth: 0, 
+                flex: 1,
+                position: 'relative',
+                zIndex: 1
+              }}
+            >
             <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
-          </div>
-          {/* Timer beside ProgressBar */}
-          <div style={{ display: 'flex', alignItems: 'center', marginLeft: '16px' }}>
+            </motion.div>
+            
+            {/* Visual divider */}
+            <motion.div
+              initial={{ opacity: 0, scaleY: 0 }}
+              animate={{ opacity: 1, scaleY: 1 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              style={{
+                width: '2px',
+                height: '40px',
+                background: 'linear-gradient(180deg, rgba(88, 204, 2, 0.3) 0%, rgba(88, 204, 2, 0.1) 50%, transparent 100%)',
+                margin: '0 20px',
+                borderRadius: '1px',
+                position: 'relative',
+                zIndex: 1
+              }}
+            />
+            
+            {/* Timer with enhanced styling */}
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                position: 'relative',
+                zIndex: 1,
+                background: 'linear-gradient(135deg, rgba(88, 204, 2, 0.05) 0%, rgba(88, 204, 2, 0.02) 100%)',
+                padding: '12px 16px',
+                borderRadius: '20px',
+                border: '1px solid rgba(88, 204, 2, 0.1)',
+                boxShadow: '0 2px 8px rgba(88, 204, 2, 0.08)'
+              }}
+            >
             <Timer seconds={ROUND_TIME} timeLeft={timeLeft} isActive={timerActive} />
-          </div>
-          <div style={{
+            </motion.div>
+            
+            {/* Enhanced XP badge */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              whileHover={{ scale: 1.05 }}
+              style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
-            background: '#d7f7c8',
-            padding: '8px 18px',
-            borderRadius: '24px',
+                gap: '8px',
+                background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+                padding: '12px 20px',
+                borderRadius: '28px',
             fontWeight: 'bold',
-            fontSize: '1.1rem',
-            boxShadow: '0 1px 4px #58cc0233',
-            minWidth: '70px',
+                fontSize: '1.2rem',
+                boxShadow: '0 4px 12px rgba(88, 204, 2, 0.15), 0 2px 4px rgba(88, 204, 2, 0.1)',
+                minWidth: '80px',
             justifyContent: 'center',
-          }}>
-            <span style={{
-              width: '20px',
-              height: '20px',
-              background: '#58cc02',
+                border: '1px solid rgba(88, 204, 2, 0.2)',
+                position: 'relative',
+                zIndex: 1,
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <motion.span
+                animate={{
+                  rotate: [0, 360]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  background: 'linear-gradient(135deg, #58cc02 0%, #3caa3c 100%)',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
@@ -732,10 +875,25 @@ function AppContent() {
               color: '#fff',
               fontSize: '12px',
               fontWeight: 700,
-            }}>XP</span>
-            <span style={{ color: '#58cc02', fontWeight: 700 }}>{displayedXp}</span>
+                  boxShadow: '0 2px 4px rgba(88, 204, 2, 0.3)'
+                }}
+              >XP</motion.span>
+              <motion.span 
+                key={displayedXp}
+                initial={{ scale: 1.2, color: '#58cc02' }}
+                animate={{ scale: 1, color: '#58cc02' }}
+                transition={{ duration: 0.3 }}
+                style={{ 
+                  color: '#58cc02', 
+                  fontWeight: 700,
+                  textShadow: '0 1px 2px rgba(88, 204, 2, 0.1)'
+                }}
+              >
+                {displayedXp}
+              </motion.span>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
         {/* Scenario card - Polished */}
         <div className="duo-card" style={{
           borderRadius: '28px',
@@ -1066,74 +1224,409 @@ function AppContent() {
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'rgba(0,0,0,0.5)',
+          background: 'rgba(0,0,0,0.6)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          zIndex: 1000
+          zIndex: 1000,
+          backdropFilter: 'blur(4px)'
         }}>
           <div style={{
-            borderRadius: '16px',
+            borderRadius: '24px',
             width: '90%',
-            maxWidth: '500px',
-            maxHeight: '80vh',
+            maxWidth: '520px',
+            maxHeight: '85vh',
             overflow: 'hidden',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.25)', // more prominent shadow
-            background: '#fff', // solid white background
-            border: `1.5px solid ${DUOLINGO_COLORS.lightGray}` // subtle border
+            boxShadow: '0 16px 48px rgba(0,0,0,0.2), 0 4px 16px rgba(0,0,0,0.1)',
+            background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+            border: '1px solid rgba(88, 204, 2, 0.1)',
+            animation: 'slideIn 0.3s ease-out'
           }}>
+            {/* Header */}
             <div style={{
-              padding: '16px',
-              borderBottom: `1px solid ${DUOLINGO_COLORS.gray}`,
+              padding: '24px 28px 20px',
+              borderBottom: '1px solid rgba(88, 204, 2, 0.1)',
               display: 'flex',
               justifyContent: 'space-between',
-              alignItems: 'center'
+              alignItems: 'center',
+              background: 'linear-gradient(135deg, rgba(88, 204, 2, 0.02) 0%, rgba(88, 204, 2, 0.05) 100%)'
             }}>
-              <h2 style={{ margin: 0, color: DUOLINGO_COLORS.green }}>Voice Commands</h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span className="material-icons" style={{ 
+                  fontSize: '28px', 
+                  color: DUOLINGO_COLORS.green,
+                  background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+                  borderRadius: '12px',
+                  padding: '8px',
+                  boxShadow: '0 2px 8px rgba(88, 204, 2, 0.15)'
+                }}>
+                  mic
+                </span>
+                <h2 style={{ 
+                  margin: 0, 
+                  color: DUOLINGO_COLORS.darkGray,
+                  fontSize: '1.5rem',
+                  fontWeight: 700,
+                  fontFamily: 'JetBrains Mono, monospace'
+                }}>
+                  Voice Commands
+                </h2>
+              </div>
               <button 
                 onClick={() => setShowHelp(false)}
                 style={{
-                  background: 'none',
+                  background: 'rgba(108, 122, 137, 0.1)',
                   border: 'none',
-                  fontSize: '24px',
+                  borderRadius: '12px',
+                  width: '40px',
+                  height: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   cursor: 'pointer',
-                  color: DUOLINGO_COLORS.darkGray
+                  color: DUOLINGO_COLORS.darkGray,
+                  transition: 'all 0.2s ease',
+                  fontSize: '20px'
+                }}
+                onMouseOver={e => {
+                  e.currentTarget.style.background = 'rgba(108, 122, 137, 0.2)';
+                  e.currentTarget.style.color = DUOLINGO_COLORS.green;
+                }}
+                onMouseOut={e => {
+                  e.currentTarget.style.background = 'rgba(108, 122, 137, 0.1)';
+                  e.currentTarget.style.color = DUOLINGO_COLORS.darkGray;
                 }}
               >
-                ×
+                <span className="material-icons">close</span>
               </button>
             </div>
-            <div style={{ padding: '16px', maxHeight: '60vh', overflowY: 'auto' }}>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            
+            {/* Content */}
+            <div style={{ 
+              padding: '20px 28px 28px', 
+              maxHeight: '65vh', 
+              overflowY: 'auto',
+              background: '#fff'
+            }}>
+              <div style={{
+                display: 'grid',
+                gap: '16px',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))'
+              }}>
                 {VOICE_COMMANDS.map(cmd => (
-                  <li key={cmd.action} style={{ padding: '12px 0', borderBottom: `1px solid ${DUOLINGO_COLORS.lightGray}` }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div key={cmd.action} style={{
+                    padding: '20px',
+                    borderRadius: '16px',
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                    border: '1px solid rgba(88, 204, 2, 0.08)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                    transition: 'all 0.2s ease',
+                    cursor: 'pointer'
+                  }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(88, 204, 2, 0.12)';
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
+                  }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                       <div style={{
-                        width: '36px',
-                        height: '36px',
-                        background: DUOLINGO_COLORS.lightGreen,
-                        borderRadius: '8px',
+                        width: '48px',
+                        height: '48px',
+                        background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+                        borderRadius: '12px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '18px'
+                        boxShadow: '0 2px 8px rgba(88, 204, 2, 0.15)',
+                        border: '1px solid rgba(88, 204, 2, 0.2)'
                       }}>
-                        {cmd.icon}
+                        <span className="material-icons" style={{
+                          fontSize: '24px',
+                          color: DUOLINGO_COLORS.green
+                        }}>
+                          {cmd.action === 'next' ? 'skip_next' :
+                           cmd.action === 'repeat' ? 'replay' :
+                           cmd.action === 'leaderboard' ? 'emoji_events' :
+                           cmd.action === 'settings' ? 'settings' :
+                           cmd.action === 'start' ? 'play_arrow' :
+                           cmd.action === 'profile' ? 'person' :
+                           cmd.action === 'help' ? 'help_outline' :
+                           cmd.action === 'back' ? 'arrow_back' :
+                           cmd.action === 'home' ? 'home' :
+                           cmd.action === 'exit' ? 'exit_to_app' : 'mic'}
+                        </span>
                       </div>
-                      <div>
-                        <div style={{ fontWeight: 'bold', color: DUOLINGO_COLORS.darkGreen }}>
-                          {cmd.phrases[0]}
+                      <div style={{ flex: 1 }}>
+                        <div style={{ 
+                          fontWeight: 700, 
+                          color: DUOLINGO_COLORS.darkGray,
+                          fontSize: '1rem',
+                          marginBottom: '4px',
+                          fontFamily: 'JetBrains Mono, monospace'
+                        }}>
+                          {cmd.phrases[0].charAt(0).toUpperCase() + cmd.phrases[0].slice(1)}
                         </div>
-                        <div style={{ fontSize: '14px', color: DUOLINGO_COLORS.darkGray }}>
+                        <div style={{ 
+                          fontSize: '14px', 
+                          color: DUOLINGO_COLORS.darkGray,
+                          opacity: 0.8,
+                          lineHeight: 1.4
+                        }}>
                           {cmd.desc}
                         </div>
+                        <div style={{
+                          marginTop: '8px',
+                          fontSize: '12px',
+                          color: DUOLINGO_COLORS.green,
+                          opacity: 0.7,
+                          fontFamily: 'JetBrains Mono, monospace'
+                        }}>
+                          Try: {cmd.phrases.slice(0, 3).join(', ')}
                       </div>
                     </div>
-                  </li>
+                    </div>
+                  </div>
                 ))}
-              </ul>
+              </div>
+              
+              {/* Footer tip */}
+              <div style={{
+                marginTop: '24px',
+                padding: '16px',
+                background: 'linear-gradient(135deg, rgba(88, 204, 2, 0.05) 0%, rgba(88, 204, 2, 0.02) 100%)',
+                borderRadius: '12px',
+                border: '1px solid rgba(88, 204, 2, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px'
+              }}>
+                <span className="material-icons" style={{
+                  fontSize: '20px',
+                  color: DUOLINGO_COLORS.green
+                }}>
+                  lightbulb
+                </span>
+                <span style={{
+                  fontSize: '14px',
+                  color: DUOLINGO_COLORS.darkGray,
+                  fontFamily: 'JetBrains Mono, monospace'
+                }}>
+                  <strong>Tip:</strong> Speak clearly and naturally. The AI will respond with spoken feedback for recognized commands.
+                </span>
+              </div>
             </div>
           </div>
+        </div>
+      )}
+      
+      {/* Listening Modal - Google Assistant Style */}
+      {showListeningModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 2000,
+          backdropFilter: 'blur(8px)'
+        }}>
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '24px',
+              padding: '48px',
+              borderRadius: '32px',
+              background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.2)',
+              border: '1px solid rgba(88, 204, 2, 0.1)',
+              maxWidth: '400px',
+              width: '90%',
+              textAlign: 'center'
+            }}
+          >
+            {/* Main listening animation */}
+            <div style={{ position: 'relative' }}>
+              {/* Outer pulsing ring */}
+              <motion.div
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.3, 0.1, 0.3]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                style={{
+                  position: 'absolute',
+                  top: '-20px',
+                  left: '-20px',
+                  width: '120px',
+                  height: '120px',
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(88, 204, 2, 0.3) 0%, transparent 70%)',
+                  border: '2px solid rgba(88, 204, 2, 0.2)'
+                }}
+              />
+              
+              {/* Middle pulsing ring */}
+              <motion.div
+                animate={{
+                  scale: [1, 1.1, 1],
+                  opacity: [0.5, 0.2, 0.5]
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.3
+                }}
+                style={{
+                  position: 'absolute',
+                  top: '-10px',
+                  left: '-10px',
+                  width: '100px',
+                  height: '100px',
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(88, 204, 2, 0.4) 0%, transparent 70%)',
+                  border: '2px solid rgba(88, 204, 2, 0.3)'
+                }}
+              />
+              
+              {/* Main microphone button */}
+              <motion.div
+                animate={{
+                  scale: [1, 1.05, 1],
+                  boxShadow: [
+                    '0 8px 32px rgba(88, 204, 2, 0.3)',
+                    '0 12px 40px rgba(88, 204, 2, 0.4)',
+                    '0 8px 32px rgba(88, 204, 2, 0.3)'
+                  ]
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #58cc02 0%, #3caa3c 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 8px 32px rgba(88, 204, 2, 0.3)',
+                  border: '3px solid rgba(255, 255, 255, 0.2)',
+                  position: 'relative',
+                  zIndex: 10
+                }}
+              >
+                <span className="material-icons" style={{
+                  fontSize: '36px',
+                  color: '#ffffff',
+                  filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))'
+                }}>
+                  mic
+                </span>
+              </motion.div>
+            </div>
+            
+            {/* Status text */}
+            <div style={{ textAlign: 'center' }}>
+              <h3 style={{
+                fontSize: '24px',
+                fontWeight: 700,
+                color: '#2d3748',
+                marginBottom: '8px',
+                fontFamily: 'JetBrains Mono, monospace'
+              }}>
+                Listening...
+              </h3>
+              <p style={{
+                fontSize: '16px',
+                color: '#718096',
+                margin: 0,
+                fontFamily: 'JetBrains Mono, monospace'
+              }}>
+                Speak your command clearly
+              </p>
+            </div>
+            
+            {/* Animated dots */}
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+              {[0, 1, 2].map((i) => (
+                <motion.div
+                  key={i}
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0.5, 1, 0.5]
+                  }}
+                  transition={{
+                    duration: 1.2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: i * 0.2
+                  }}
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: '#58cc02'
+                  }}
+                />
+              ))}
+            </div>
+            
+            {/* Cancel button */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                setShowListeningModal(false);
+                setListeningCmd(false);
+              }}
+              style={{
+                padding: '12px 24px',
+                borderRadius: '16px',
+                background: 'rgba(108, 122, 137, 0.1)',
+                border: '1px solid rgba(108, 122, 137, 0.2)',
+                color: '#6c757d',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                fontFamily: 'JetBrains Mono, monospace',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+              onMouseOver={e => {
+                e.currentTarget.style.background = 'rgba(108, 122, 137, 0.2)';
+                e.currentTarget.style.color = '#58cc02';
+              }}
+              onMouseOut={e => {
+                e.currentTarget.style.background = 'rgba(108, 122, 137, 0.1)';
+                e.currentTarget.style.color = '#6c757d';
+              }}
+            >
+              <span className="material-icons" style={{ fontSize: '18px' }}>close</span>
+              Cancel
+            </motion.button>
+          </motion.div>
         </div>
       )}
       
