@@ -1062,49 +1062,94 @@ function AppContent() {
           {/* User profile and right side */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {/* Daily Reward Chest */}
-            <div
+            <motion.button
               style={{
-                width: 38,
-                height: 38,
+                width: 48,
+                height: 48,
                 marginRight: 8,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
                 position: 'relative',
-                transition: 'transform 0.2s',
+                borderRadius: '50%',
+                background: chestOpenState
+                  ? 'linear-gradient(135deg, #ffe082 0%, #ffd54f 100%)'
+                  : 'linear-gradient(135deg, #fffbe6 0%, #ffe082 100%)',
+                border: chestOpenState
+                  ? '2.5px solid #ffb300'
+                  : '2px solid #ffe082',
+                boxShadow: chestOpenState
+                  ? '0 0 24px 8px #ffb300cc, 0 4px 16px #ffb30033'
+                  : '0 2px 8px #ffb30022',
+                transition: 'all 0.2s',
+                outline: 'none',
                 zIndex: 2,
+                overflow: 'visible',
               }}
               title="Daily Reward Chest: Open for a surprise!"
               onClick={handleOpenChest}
+              whileHover={{ scale: 1.12 }}
+              whileTap={{ scale: 0.97 }}
+              animate={chestOpenState ? { scale: [1, 1.08, 1], boxShadow: ['0 0 24px 8px #ffb300cc, 0 4px 16px #ffb30033', '0 0 32px 12px #ffd700cc, 0 8px 32px #ffb30033', '0 0 24px 8px #ffb300cc, 0 4px 16px #ffb30033'] } : {}}
+              transition={{ duration: 1.2, repeat: chestOpenState ? Infinity : 0, repeatType: 'loop', ease: 'easeInOut' }}
+              aria-label="Open Daily Reward Chest"
             >
               <motion.span
                 className="material-icons"
-                initial={{ scale: 1 }}
-                animate={{ scale: chestOpenState ? 1.15 : 1, rotate: chestOpenState ? [0, -10, 10, 0] : 0 }}
-                transition={{ duration: 0.7, type: 'spring', bounce: 0.5 }}
                 style={{
-                  fontSize: 36,
+                  fontSize: 32,
                   color: chestOpenState ? '#ffb300' : '#8d6e63',
                   filter: chestOpenState ? 'brightness(1.2)' : 'none',
-                  transition: 'color 0.2s',
                   userSelect: 'none',
+                  transition: 'color 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 2,
                 }}
-              >{chestOpenState ? 'emoji_events' : 'card_giftcard'}</motion.span>
-              {/* Sparkle when open */}
+                animate={chestOpenState ? { rotate: [0, -10, 10, 0] } : { rotate: 0 }}
+                transition={chestOpenState ? { duration: 1.2, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut' } : {}}
+              >
+                {chestOpenState ? 'emoji_events' : 'card_giftcard'}
+              </motion.span>
+              {/* Animated Sparkle when open */}
               {chestOpenState && (
-                <span className="material-icons" style={{
-                  position: 'absolute',
-                  top: -10,
-                  right: -10,
-                  color: '#ffd700',
-                  fontSize: 24,
-                  filter: 'drop-shadow(0 2px 8px #ffd70088)',
-                  zIndex: 3,
-                  animation: 'chest-sparkle 1.2s infinite',
-                }}>auto_awesome</span>
+                <motion.span
+                  className="material-icons"
+                  style={{
+                    position: 'absolute',
+                    top: -10,
+                    right: -10,
+                    color: '#ffd700',
+                    fontSize: 24,
+                    filter: 'drop-shadow(0 2px 8px #ffd70088)',
+                    zIndex: 3,
+                    pointerEvents: 'none',
+                  }}
+                  animate={{ scale: [1, 1.3, 1], opacity: [0.8, 1, 0.8] }}
+                  transition={{ duration: 1.2, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut' }}
+                >auto_awesome</motion.span>
               )}
-            </div>
+              {/* Pulsing gold glow when open */}
+              {chestOpenState && (
+                <motion.span
+                  style={{
+                    position: 'absolute',
+                    top: -16,
+                    left: -16,
+                    width: 80,
+                    height: 80,
+                    borderRadius: '50%',
+                    background: 'radial-gradient(circle, #ffe08255 0%, transparent 70%)',
+                    zIndex: 1,
+                    pointerEvents: 'none',
+                  }}
+                  animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.15, 1] }}
+                  transition={{ duration: 1.2, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut' }}
+                />
+              )}
+            </motion.button>
             <div 
               style={{
                 width: '36px',
