@@ -1710,315 +1710,6 @@ function AppContent() {
         </div>
       )}
 
-      {/* Footer - Duolingo style */}
-      {!showLeaderboard && !showHelp && !showSettingsPage && (
-        <>
-          <footer style={{
-            padding: '12px 16px',
-            marginTop: 'auto',
-            boxShadow: theme === 'dark' ? '0 -2px 8px #181c2a' : '0 -2px 4px rgba(0,0,0,0.05)',
-            display: 'flex',
-            justifyContent: 'center',
-            background: theme === 'dark' ? '#181c2a' : '#fff',
-            position: 'relative',
-            zIndex: 1
-          }}>
-            <div style={{
-              display: 'flex',
-              gap: '32px',
-              maxWidth: '800px',
-              width: '100%',
-              justifyContent: 'center'
-            }}>
-              <button 
-                onClick={() => setShowLeaderboard(true)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px',
-                  color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
-                  cursor: 'pointer',
-                  transition: 'color 0.2s',
-                }}
-                onMouseOver={e => e.currentTarget.style.color = DUOLINGO_COLORS.green}
-                onMouseOut={e => e.currentTarget.style.color = DUOLINGO_COLORS.darkGray}
-              >
-                <span className="material-icons" style={{ fontSize: '28px', marginBottom: '2px', transition: 'color 0.2s' }}>leaderboard</span>
-                <span style={{ fontSize: '12px', fontFamily: 'JetBrains Mono, monospace', opacity: 0.85 }}>Leaderboard</span>
-              </button>
-              
-              <button 
-                onClick={() => setShowSettingsPage(true)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px',
-                  color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
-                  cursor: 'pointer',
-                  transition: 'color 0.2s',
-                }}
-                onMouseOver={e => e.currentTarget.style.color = DUOLINGO_COLORS.green}
-                onMouseOut={e => e.currentTarget.style.color = DUOLINGO_COLORS.darkGray}
-              >
-                <span className="material-icons" style={{ fontSize: '28px', marginBottom: '2px', transition: 'color 0.2s' }}>settings</span>
-                <span style={{ fontSize: '12px', fontFamily: 'JetBrains Mono, monospace', opacity: 0.85 }}>Settings</span>
-              </button>
-              
-              <button 
-                onClick={() => setShowHelp(true)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px',
-                  color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
-                  cursor: 'pointer',
-                  transition: 'color 0.2s',
-                }}
-                onMouseOver={e => e.currentTarget.style.color = DUOLINGO_COLORS.green}
-                onMouseOut={e => e.currentTarget.style.color = DUOLINGO_COLORS.darkGray}
-              >
-                <span className="material-icons" style={{ fontSize: '28px', marginBottom: '2px', transition: 'color 0.2s' }}>help_outline</span>
-                <span style={{ fontSize: '12px', fontFamily: 'JetBrains Mono, monospace', opacity: 0.85 }}>Help</span>
-              </button>
-            </div>
-          </footer>
-          <div style={{
-            width: '100%',
-            textAlign: 'center',
-            fontSize: '12px',
-            color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
-            opacity: 0.7,
-            fontFamily: 'JetBrains Mono, monospace',
-            padding: '8px 0 16px 0',
-            background: theme === 'dark' ? '#181c2a' : '#fff',
-            letterSpacing: '0.01em',
-            zIndex: 0
-          }}>
-            &copy; {new Date().getFullYear()} LinguaQuest. All rights reserved. Developed by Opoku Boakye Michael
-          </div>
-        </>
-      )}
-
-      {/* Modals */}
-      {showLeaderboard && (
-        <Leaderboard onClose={() => setShowLeaderboard(false)} />
-      )}
-      
-      {showHelp && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0,0,0,0.6)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-          backdropFilter: 'blur(4px)'
-        }}>
-          <div style={{
-            borderRadius: '24px',
-            width: '90%',
-            maxWidth: '520px',
-            maxHeight: '85vh',
-            overflow: 'hidden',
-            boxShadow: '0 16px 48px rgba(0,0,0,0.2), 0 4px 16px rgba(0,0,0,0.1)',
-            background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-            border: '1px solid rgba(88, 204, 2, 0.1)',
-            animation: 'slideIn 0.3s ease-out'
-          }}>
-            {/* Header */}
-            <div style={{
-              padding: '24px 28px 20px',
-              borderBottom: '1px solid rgba(88, 204, 2, 0.1)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              background: 'linear-gradient(135deg, rgba(88, 204, 2, 0.02) 0%, rgba(88, 204, 2, 0.05) 100%)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span className="material-icons" style={{ 
-                  fontSize: '28px', 
-                  color: DUOLINGO_COLORS.green,
-                  background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
-                  borderRadius: '12px',
-                  padding: '8px',
-                  boxShadow: '0 2px 8px rgba(88, 204, 2, 0.15)'
-                }}>
-                  mic
-                </span>
-                <h2 style={{ 
-                  margin: 0, 
-                  color: DUOLINGO_COLORS.darkGray,
-                  fontSize: '1.5rem',
-                  fontWeight: 700,
-                  fontFamily: 'JetBrains Mono, monospace'
-                }}>
-                  Voice Commands
-                </h2>
-              </div>
-              <button 
-                onClick={() => setShowHelp(false)}
-                style={{
-                  background: 'rgba(108, 122, 137, 0.1)',
-                  border: 'none',
-                  borderRadius: '12px',
-                  width: '40px',
-                  height: '40px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  color: DUOLINGO_COLORS.darkGray,
-                  transition: 'all 0.2s ease',
-                  fontSize: '20px'
-                }}
-                onMouseOver={e => {
-                  e.currentTarget.style.background = 'rgba(108, 122, 137, 0.2)';
-                  e.currentTarget.style.color = DUOLINGO_COLORS.green;
-                }}
-                onMouseOut={e => {
-                  e.currentTarget.style.background = 'rgba(108, 122, 137, 0.1)';
-                  e.currentTarget.style.color = DUOLINGO_COLORS.darkGray;
-                }}
-              >
-                <span className="material-icons">close</span>
-              </button>
-            </div>
-            
-            {/* Content */}
-            <div style={{ 
-              padding: '20px 28px 28px', 
-              maxHeight: '65vh', 
-              overflowY: 'auto',
-              background: '#fff'
-            }}>
-              <div style={{
-                display: 'grid',
-                gap: '16px',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))'
-              }}>
-                {VOICE_COMMANDS.map(cmd => (
-                  <div key={cmd.action} style={{
-                    padding: '20px',
-                    borderRadius: '16px',
-                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-                    border: '1px solid rgba(88, 204, 2, 0.08)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                    transition: 'all 0.2s ease',
-                    cursor: 'pointer'
-                  }}
-                  onMouseOver={e => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(88, 204, 2, 0.12)';
-                  }}
-                  onMouseOut={e => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
-                  }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <div style={{
-                        width: '48px',
-                        height: '48px',
-                        background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
-                        borderRadius: '12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 2px 8px rgba(88, 204, 2, 0.15)',
-                        border: '1px solid rgba(88, 204, 2, 0.2)'
-                      }}>
-                        <span className="material-icons" style={{
-                          fontSize: '24px',
-                          color: DUOLINGO_COLORS.green
-                        }}>
-                          {cmd.action === 'next' ? 'skip_next' :
-                           cmd.action === 'repeat' ? 'replay' :
-                           cmd.action === 'leaderboard' ? 'emoji_events' :
-                           cmd.action === 'settings' ? 'settings' :
-                           cmd.action === 'start' ? 'play_arrow' :
-                           cmd.action === 'profile' ? 'person' :
-                           cmd.action === 'help' ? 'help_outline' :
-                           cmd.action === 'back' ? 'arrow_back' :
-                           cmd.action === 'home' ? 'home' :
-                           cmd.action === 'exit' ? 'exit_to_app' : 'mic'}
-                        </span>
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ 
-                          fontWeight: 700, 
-                          color: DUOLINGO_COLORS.darkGray,
-                          fontSize: '1rem',
-                          marginBottom: '4px',
-                          fontFamily: 'JetBrains Mono, monospace'
-                        }}>
-                          {cmd.phrases[0].charAt(0).toUpperCase() + cmd.phrases[0].slice(1)}
-                        </div>
-                        <div style={{ 
-                          fontSize: '14px', 
-                          color: DUOLINGO_COLORS.darkGray,
-                          opacity: 0.8,
-                          lineHeight: 1.4
-                        }}>
-                          {cmd.desc}
-                        </div>
-                        <div style={{
-                          marginTop: '8px',
-                          fontSize: '12px',
-                          color: DUOLINGO_COLORS.green,
-                          opacity: 0.7,
-                          fontFamily: 'JetBrains Mono, monospace'
-                        }}>
-                          Try: {cmd.phrases.slice(0, 3).join(', ')}
-                      </div>
-                    </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-              {/* Footer tip */}
-              <div style={{
-                marginTop: '24px',
-                padding: '16px',
-                background: 'linear-gradient(135deg, rgba(88, 204, 2, 0.05) 0%, rgba(88, 204, 2, 0.02) 100%)',
-                borderRadius: '12px',
-                border: '1px solid rgba(88, 204, 2, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px'
-              }}>
-                <span className="material-icons" style={{
-                  fontSize: '20px',
-                  color: DUOLINGO_COLORS.green
-                }}>
-                  lightbulb
-                </span>
-                <span style={{
-                  fontSize: '14px',
-                  color: DUOLINGO_COLORS.darkGray,
-                  fontFamily: 'JetBrains Mono, monospace'
-                }}>
-                  <strong>Tip:</strong> Speak clearly and naturally. The AI will respond with spoken feedback for recognized commands.
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      
       {/* Listening Modal - Google Assistant Style */}
       {showListeningModal && (
         <div style={{
@@ -2529,65 +2220,136 @@ function AppContent() {
           />
         </motion.div>
       </div>
-      {/* Progression Map Button */}
-      <button
-        onClick={() => setShowProgressionMap(true)}
-        style={{
-          position: 'fixed',
-          right: 24,
-          bottom: 24,
-          zIndex: 2100,
-          background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
-          color: '#58cc02',
-          border: '2.5px solid #58cc02',
-          borderRadius: '50%',
-          width: 56,
-          height: 56,
-          boxShadow: '0 4px 16px #58cc0222',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 28,
-          cursor: 'pointer',
-          transition: 'all 0.2s',
-        }}
-        title="View Progression Map"
-      >
-        <span className="material-icons">account_tree</span>
-      </button>
-      {/* Progression Map Modal */}
-      {showProgressionMap && (
-        <ProgressionMap
-          skillTree={SKILL_TREE}
-          onClose={() => setShowProgressionMap(false)}
-        />
-      )}
-      {/* Club/Group Challenges Button */}
-      <button
-        onClick={() => setShowClubModal(true)}
-        style={{
-          position: 'fixed',
-          right: 24,
-          bottom: 90,
-          zIndex: 2100,
-          background: 'linear-gradient(135deg, #e3f2fd 0%, #b3e5fc 100%)',
-          color: '#1cb0f6',
-          border: '2.5px solid #1cb0f6',
-          borderRadius: '50%',
-          width: 56,
-          height: 56,
-          boxShadow: '0 4px 16px #1cb0f622',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 28,
-          cursor: 'pointer',
-          transition: 'all 0.2s',
-        }}
-        title="View Language Club"
-      >
-        <span className="material-icons">group</span>
-      </button>
+      {/* Floating Action Buttons (FABs) - stack vertically with spacing */}
+      <div style={{
+        position: 'fixed',
+        right: 24,
+        bottom: 24,
+        zIndex: 2100,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 20,
+        alignItems: 'flex-end',
+      }}>
+        {/* Help Button */}
+        <button
+          onClick={() => setShowHelp(true)}
+          style={{
+            background: 'linear-gradient(135deg, #e3e3fd 0%, #b3b5fc 100%)',
+            color: '#1c47f6',
+            border: '2.5px solid #1c47f6',
+            borderRadius: '50%',
+            width: 56,
+            height: 56,
+            boxShadow: '0 4px 16px #1c47f622',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 28,
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+          }}
+          title="Help"
+        >
+          <span className="material-icons">help_outline</span>
+        </button>
+        {/* Settings Button */}
+        <button
+          onClick={() => setShowSettingsPage(true)}
+          style={{
+            background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+            color: '#6c6f7d',
+            border: '2.5px solid #6c6f7d',
+            borderRadius: '50%',
+            width: 56,
+            height: 56,
+            boxShadow: '0 4px 16px #6c6f7d22',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 28,
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+          }}
+          title="Settings"
+        >
+          <span className="material-icons">settings</span>
+        </button>
+        {/* Club/Group Challenges Button */}
+        <button
+          onClick={() => setShowClubModal(true)}
+          style={{
+            background: 'linear-gradient(135deg, #e3f2fd 0%, #b3e5fc 100%)',
+            color: '#1cb0f6',
+            border: '2.5px solid #1cb0f6',
+            borderRadius: '50%',
+            width: 56,
+            height: 56,
+            boxShadow: '0 4px 16px #1cb0f622',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 28,
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+          }}
+          title="View Language Club"
+        >
+          <span className="material-icons">group</span>
+        </button>
+        {/* Leaderboard Button */}
+        <button
+          onClick={() => setShowLeaderboard(true)}
+          style={{
+            background: 'linear-gradient(135deg, #ffe082 0%, #ffd54f 100%)',
+            color: '#ffb300',
+            border: '2.5px solid #ffb300',
+            borderRadius: '50%',
+            width: 56,
+            height: 56,
+            boxShadow: '0 6px 20px #ffb30055, 0 2px 8px #ffb30022',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 28,
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+          }}
+          title="View Leaderboard"
+          onMouseOver={e => {
+            e.currentTarget.style.transform = 'scale(1.08)';
+            e.currentTarget.style.boxShadow = '0 8px 28px #ffb30099, 0 4px 16px #ffb30033';
+          }}
+          onMouseOut={e => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 6px 20px #ffb30055, 0 2px 8px #ffb30022';
+          }}
+        >
+          <span className="material-icons">emoji_events</span>
+        </button>
+        {/* Progression Map Button */}
+        <button
+          onClick={() => setShowProgressionMap(true)}
+          style={{
+            background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+            color: '#58cc02',
+            border: '2.5px solid #58cc02',
+            borderRadius: '50%',
+            width: 56,
+            height: 56,
+            boxShadow: '0 4px 16px #58cc0222',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 28,
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+          }}
+          title="View Progression Map"
+        >
+          <span className="material-icons">account_tree</span>
+        </button>
+      </div>
       {/* Club/Group Challenges Modal */}
       {showClubModal && (
         <LanguageClub
@@ -2595,6 +2357,31 @@ function AppContent() {
           mascotImg={mascotImg}
           onClose={() => setShowClubModal(false)}
         />
+      )}
+      {/* Progression Map Modal */}
+      {showProgressionMap && (
+        <ProgressionMap
+          skillTree={SKILL_TREE}
+          onClose={() => setShowProgressionMap(false)}
+        />
+      )}
+      {/* Leaderboard Modal */}
+      {showLeaderboard && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(20,20,30,0.75)',
+          backdropFilter: 'blur(6px)',
+          zIndex: 4000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <Leaderboard onClose={() => setShowLeaderboard(false)} />
+        </div>
       )}
     </div>
   );
