@@ -32,7 +32,7 @@ const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose })
       left: 0,
       width: '100vw',
       height: '100vh',
-      background: 'rgba(0,0,0,0.55)',
+      background: 'linear-gradient(135deg, #58cc02 0%, #4CAF50 100%)', // solid green gradient
       zIndex: 4100,
       display: 'flex',
       alignItems: 'center',
@@ -59,6 +59,7 @@ const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose })
           position: 'relative',
           border: '2.5px solid #1cb0f6',
         }}
+        className="language-club-modal"
       >
         <button
           onClick={onClose}
@@ -76,11 +77,58 @@ const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose })
         >
           <span className="material-icons">close</span>
         </button>
-        <h2 style={{ color: '#1cb0f6', fontWeight: 800, marginBottom: 18, fontSize: '2rem', letterSpacing: '.01em' }}>
-          <span className="material-icons" style={{ verticalAlign: 'middle', fontSize: 32, marginRight: 8 }}>group</span>
-          {club.name}
-        </h2>
-        <div style={{ fontSize: '1.1rem', color: '#6c6f7d', marginBottom: 18 }}>{club.challenge}</div>
+        {/* Header styled like AvatarPicker */}
+        <div style={{
+          padding: '1.5rem',
+          background: '#ffffff',
+          textAlign: 'center',
+          color: 'var(--text-light, #e0e7ff)',
+          borderRadius: 24,
+          marginBottom: 24,
+          width: '100%',
+          maxWidth: 420,
+        }}>
+          <motion.div
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 400 }}
+          >
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '3rem',
+              height: '3rem',
+              borderRadius: '50%',
+              background: 'rgba(255, 255, 255, 0.2)',
+              marginBottom: '0.75rem',
+              boxShadow: '0 2px 8px #1cb0f622',
+              overflow: 'hidden',
+            }}>
+              <img src={mascotImg} alt="mascot" style={{ width: '2.2rem', height: '2.2rem', borderRadius: '50%', objectFit: 'cover' }} />
+            </div>
+            <h2 style={{
+              margin: 0,
+              fontSize: '1.5rem',
+              fontWeight: 300,
+              letterSpacing: '-0.025em',
+              color: 'var(--text-light, #1cb0f6)',
+              fontFamily: "Fira Mono, Menlo, Consolas, monospace"
+            }}>
+              {club.name}
+            </h2>
+            <p style={{
+              margin: '0.5rem 0 0',
+              opacity: 0.9,
+              fontSize: '0.95rem',
+              color: 'var(--text-dark, #6c6f7d)',
+              fontWeight: 300,
+              fontFamily: "Fira Mono, Menlo, Consolas, monospace"
+            }}>
+              {club.challenge}
+            </p>
+          </motion.div>
+        </div>
         {/* Group Progress Bar */}
         <div style={{ width: '100%', maxWidth: 420, margin: '0 auto 24px auto', background: 'linear-gradient(90deg, #e3f2fd 0%, #b3e5fc 100%)', borderRadius: 18, height: 28, position: 'relative', overflow: 'hidden', boxShadow: '0 2px 8px #1cb0f622', border: '2px solid #1cb0f6' }}>
           <motion.div
@@ -98,14 +146,14 @@ const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose })
               boxShadow: '0 2px 8px #1cb0f655',
             }}
           />
-          <div style={{ position: 'relative', zIndex: 2, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: '#1cb0f6', fontSize: '1.15rem', letterSpacing: '.01em' }}>
+          <div style={{ position: 'relative', zIndex: 2, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1cb0f6', fontSize: '1.15rem', letterSpacing: '.01em', fontFamily: "Fira Mono, Menlo, Consolas, monospace", fontWeight: 300 }}>
             <span className="material-icons" style={{ fontSize: 22, verticalAlign: 'middle', marginRight: 6, color: '#1cb0f6' }}>military_tech</span>
             {club.groupProgress} / {club.groupGoal} XP
           </div>
         </div>
         {/* Club Leaderboard */}
         <div style={{ width: '100%', maxWidth: 420, margin: '0 auto' }}>
-          <h3 style={{ color: '#1cb0f6', fontWeight: 700, fontSize: '1.1rem', marginBottom: 10, letterSpacing: '.01em' }}>
+          <h3 style={{ color: '#1cb0f6', fontWeight: 300, fontSize: '1.1rem', marginBottom: 10, letterSpacing: '.01em', fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>
             <span className="material-icons" style={{ fontSize: 22, verticalAlign: 'middle', marginRight: 6 }}>leaderboard</span>
             Club Leaderboard
           </h3>
@@ -131,16 +179,25 @@ const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose })
                   position: 'relative',
                 }}
               >
-                <span style={{ fontWeight: 900, fontSize: '1.15rem', minWidth: 24, textAlign: 'center' }}>{idx + 1}</span>
+                <span style={{ fontWeight: 300, fontSize: '1.15rem', minWidth: 24, textAlign: 'center', fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{idx + 1}</span>
                 <img src={m.avatar || mascotImg} alt="avatar" style={{ width: 36, height: 36, borderRadius: '50%', border: '2.5px solid #1cb0f6', objectFit: 'cover', background: '#fff', boxShadow: '0 2px 8px #1cb0f622' }} />
-                <span style={{ flex: 1 }}>{m.nickname}</span>
-                <span style={{ fontWeight: 900 }}>{m.xp} XP</span>
+                <span style={{ flex: 1, fontWeight: 300, fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{m.nickname}</span>
+                <span style={{ fontWeight: 300, fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{m.xp} XP</span>
                 {idx === 0 && <span className="material-icons" style={{ color: '#ffd700', fontSize: 22, marginLeft: 6 }}>emoji_events</span>}
               </motion.div>
             ))}
           </div>
         </div>
       </motion.div>
+      <style>{`
+        .language-club-modal::-webkit-scrollbar {
+          display: none;
+        }
+        .language-club-modal {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+      `}</style>
     </div>
   );
 };

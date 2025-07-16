@@ -49,6 +49,7 @@ const LANGUAGES: Language[] = [
 const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack }) => {
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
+  const [showContinueModal, setShowContinueModal] = useState(false);
   const { user } = useUser();
 
   const handleLanguageClick = (code: string) => {
@@ -57,23 +58,29 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
   };
 
   const handleConfirm = async () => {
-    if (selectedLanguage && user) {
-      try {
-        // Store in backend
-        await userApi.updateUser(user.nickname, {
-          preferred_language: selectedLanguage
-        });
+    if (selectedLanguage) {
+      if (user) {
+        try {
+          // Store in backend
+          await userApi.updateUser(user.nickname, {
+            preferred_language: selectedLanguage
+          });
 
-        // Store in local storage
-        storage.setLanguage(selectedLanguage);
+          // Store in local storage
+          storage.setLanguage(selectedLanguage);
 
-        // Notify parent component
-        onSelect(selectedLanguage);
-      } catch (error) {
-        console.error('Failed to update language preference:', error);
-        // Still store in local storage even if backend fails
+          // Show continue modal
+          setShowContinueModal(true);
+        } catch (error) {
+          console.error('Failed to update language preference:', error);
+          // Still store in local storage even if backend fails
+          storage.setLanguage(selectedLanguage);
+          setShowContinueModal(true);
+        }
+      } else {
+        // No user, just store locally and show modal
         storage.setLanguage(selectedLanguage);
-        onSelect(selectedLanguage);
+        setShowContinueModal(true);
       }
     }
   };
@@ -86,6 +93,15 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
       onBack();
     }
   };
+
+  const handleContinue = () => {
+    if (selectedLanguage) {
+      onSelect(selectedLanguage);
+      setShowContinueModal(false);
+    }
+  };
+
+  const selectedLangObj = LANGUAGES.find(l => l.code === selectedLanguage);
 
   return (
     <div className="language-selector-container" style={{
@@ -264,9 +280,9 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
               </motion.div>
             ))}
           </div>
-          {isConfirming && (
+          {isConfirming && !showContinueModal && (
             <motion.button
-              onClick={() => selectedLanguage && onSelect(selectedLanguage)}
+              onClick={handleConfirm}
               disabled={!selectedLanguage}
               whileHover={selectedLanguage ? { scale: 1.02 } : {}}
               whileTap={selectedLanguage ? { scale: 0.98 } : {}}
@@ -311,6 +327,131 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
           </div>
         </div>
       </motion.div>
+      {/* Continue Modal */}
+      <AnimatePresence>
+        {showContinueModal && selectedLangObj && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              background: 'rgba(0,0,0,0.25)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+              padding: '1rem', // for mobile spacing
+            }}
+          >
+            <motion.div
+              style={{
+                background: '#fff',
+                borderRadius: '1.25rem',
+                boxShadow: '0 10px 32px rgba(0,0,0,0.18)',
+                padding: '1.25rem 1rem',
+                minWidth: '0',
+                width: '100%',
+                maxWidth: '340px', // smaller modal
+                textAlign: 'center',
+                position: 'relative',
+                margin: '0 auto',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                fontFamily: '"JetBrains Mono", "Fira Mono", "Menlo", monospace',
+              }}
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 40, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            >
+              {/* Material Icon at the top */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '2.5rem',
+                height: '2.5rem',
+                borderRadius: '50%',
+                background: '#e0f2fe',
+                margin: '0 auto 0.75rem auto',
+              }}>
+                <span className="material-icons" style={{ fontSize: '1.5rem', color: '#1cb0f6' }}>translate</span>
+              </div>
+              <div style={{ marginBottom: '1.25rem', width: '100%' }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '0.75rem',
+                  gap: '0.75rem',
+                  width: '100%',
+                }}>
+                  <img
+                    src={selectedLangObj.flagImg}
+                    alt={`${selectedLangObj.label} flag`}
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '10px',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.08)'
+                    }}
+                  />
+                  <div style={{ textAlign: 'left', flex: 1 }}>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 400, lineHeight: 1.2, fontFamily: 'inherit', letterSpacing: '0.01em' }}>{selectedLangObj.label} <span style={{ fontWeight: 300, color: '#6b7280', fontSize: '0.95rem', fontFamily: 'inherit' }}>({selectedLangObj.nativeName})</span></h3>
+                    <p style={{ margin: 0, color: '#6b7280', fontSize: '0.85rem', lineHeight: 1.3, fontWeight: 300, fontFamily: 'inherit' }}>{selectedLangObj.description}</p>
+                  </div>
+                </div>
+                <div style={{
+                  background: '#f8fafc',
+                  borderRadius: '0.75rem',
+                  padding: '0.75rem',
+                  color: '#64748b',
+                  fontSize: '0.92rem',
+                  marginBottom: '0.75rem',
+                  lineHeight: 1.3,
+                  fontWeight: 300,
+                  fontFamily: 'inherit',
+                }}>
+                  You can come back and reselect the language.
+                </div>
+                <motion.button
+                  onClick={handleContinue}
+                  style={{
+                    width: '100%',
+                    padding: '0.7rem',
+                    borderRadius: '0.5rem',
+                    border: 'none',
+                    background: 'var(--duo-green, #58cc02)',
+                    color: 'var(--text-light, #e0e7ff)',
+                    fontSize: '1rem',
+                    fontWeight: 400,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 0 #3caa3c',
+                    transition: 'all 0.2s',
+                    marginTop: '0.25rem',
+                    fontFamily: 'inherit',
+                  }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <span className="material-icons" style={{ fontSize: '1.15rem', marginRight: '0.45rem', color: '#fff' }}>check_circle</span>
+                  Continue
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
