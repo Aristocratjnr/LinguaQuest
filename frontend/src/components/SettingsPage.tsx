@@ -253,21 +253,34 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 <label className="form-label mb-2" style={{ color: labelColor, fontSize: 'clamp(0.85rem, 3vw, 0.9rem)' }}>Nickname</label>
                 <input
                   type="text"
-                  className="form-control"
+                  className="form-control nickname-input"
                   value={nickname}
                   onChange={handleNicknameChange}
                   maxLength={16}
+                  placeholder="Enter your nickname"
                   style={{ 
                     fontFamily: "'JetBrains Mono', monospace", 
                     fontSize: 'clamp(0.9rem, 3.5vw, 1rem)', 
-                    background: inputBg, 
-                    backdropFilter: 'blur(4px)',
+                    background: isDark ? 'rgba(35, 41, 70, 0.7)' : 'rgba(245, 247, 250, 0.85)',
                     color: inputText, 
-                    borderColor,
+                    border: isDark ? '1.5px solid #44476a' : '1.5px solid #d1d5db',
+                    boxShadow: isDark
+                      ? '0 2px 8px rgba(35,41,70,0.18)'
+                      : '0 2px 8px rgba(88,204,2,0.08)',
+                    borderRadius: '12px',
                     padding: '0.75rem 1rem',
-                    minHeight: '44px'
+                    minHeight: '44px',
+                    backdropFilter: 'blur(4px)'
                   }}
                 />
+                { /* Theme-aware placeholder color for nickname input */ }
+                <style>{`
+                  .nickname-input::placeholder {
+                    color: ${isDark ? '#a5b4fc' : '#4f46e5'};
+                    opacity: 0.7;
+                    transition: color 0.2s;
+                  }
+                `}</style>
               </div>
             </div>
           </div>
@@ -292,7 +305,12 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 <label className="form-label mb-2" style={{ color: labelColor, fontSize: 'clamp(0.85rem, 3vw, 0.9rem)' }}>Language</label>
                 <div className="position-relative" style={{ 
                   borderRadius: '12px',
-                  overflow: 'hidden'
+                  overflow: 'hidden',
+                  border: isDark ? '1.5px solid #44476a' : '1.5px solid #d1d5db',
+                  background: isDark ? 'rgba(35, 41, 70, 0.7)' : 'rgba(245, 247, 250, 0.85)',
+                  boxShadow: isDark
+                    ? '0 2px 8px rgba(35,41,70,0.18)'
+                    : '0 2px 8px rgba(88,204,2,0.08)',
                 }}>
                   <select 
                     className="form-select" 
@@ -314,7 +332,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                       WebkitBackdropFilter: 'blur(8px)',
                       boxShadow: isDark ? 'inset 0 1px 3px rgba(0, 0, 0, 0.1)' : 'inset 0 1px 3px rgba(255, 255, 255, 0.3)',
                       transition: 'all 0.3s ease',
-                      border: glassBorder
+                      border: 'none', // Remove border from select, handled by parent
                     }}
                   >
                     {LANGUAGES.map(l => (
@@ -336,7 +354,12 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 <label className="form-label mb-2" style={{ color: labelColor, fontSize: 'clamp(0.85rem, 3vw, 0.9rem)' }}>Theme</label>
                 <div className="position-relative" style={{ 
                   borderRadius: '12px',
-                  overflow: 'hidden'
+                  overflow: 'hidden',
+                  border: isDark ? '1.5px solid #44476a' : '1.5px solid #d1d5db',
+                  background: isDark ? 'rgba(35, 41, 70, 0.7)' : 'rgba(245, 247, 250, 0.85)',
+                  boxShadow: isDark
+                    ? '0 2px 8px rgba(35,41,70,0.18)'
+                    : '0 2px 8px rgba(88,204,2,0.08)',
                 }}>
                   <select 
                     className="form-select" 
@@ -358,7 +381,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                       WebkitBackdropFilter: 'blur(8px)',
                       boxShadow: isDark ? 'inset 0 1px 3px rgba(0, 0, 0, 0.1)' : 'inset 0 1px 3px rgba(255, 255, 255, 0.3)',
                       transition: 'all 0.3s ease',
-                      border: glassBorder
+                      border: 'none', // Remove border from select, handled by parent
                     }}
                   >
                     {THEMES.map(t => (
