@@ -123,7 +123,7 @@ function AppContent() {
   const [showEngagement, setShowEngagement] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
-  const { user, userStats, submitScore, startGameSession, endGameSession, incrementStreak, resetStreak, awardBadge } = useUser();
+  const { user, userStats, submitScore, startGameSession, endGameSession, incrementStreak, resetStreak, awardBadge, refreshUserStats } = useUser();
   const [showLogin, setShowLogin] = useState(false);
   const [showListeningModal, setShowListeningModal] = useState(false);
   // Add Duolingo streak and XP progress variables
@@ -743,7 +743,7 @@ function AppContent() {
   }, [dailyProgress]);
 
   // Daily chest reward logic
-  const handleOpenChest = () => {
+  const handleOpenChest = async () => {
     if (!chestOpenState) {
       setChestOpenState(true);
       // Random reward: XP, badge, or streak freeze
@@ -757,6 +757,35 @@ function AppContent() {
       const reward = rewards[Math.floor(Math.random() * rewards.length)];
       setChestReward(reward);
       setShowChestReward(true);
+
+      // If XP reward, animate and submit score
+      if (reward.includes('XP')) {
+        const xpAmount = parseInt(reward.replace(/[^0-9]/g, ''));
+        if (!isNaN(xpAmount)) {
+          // Animate XP increase
+          setDisplayedXp(prevXp => {
+            const newXp = prevXp + xpAmount;
+            // Optionally update level, etc. here if needed
+            return newXp;
+          });
+          // Submit score to backend for persistence
+          if (user) {
+            await submitScore({
+              score: xpAmount,
+              details: {
+                source: 'Daily Chest',
+                reward,
+                date: new Date().toISOString(),
+              },
+            });
+            // Refresh user stats to sync nav/progress
+            if (typeof refreshUserStats === 'function') {
+              await refreshUserStats();
+            }
+          }
+        }
+      }
+
       setTimeout(() => {
         setShowChestReward(false);
         setChestOpenState(false);
