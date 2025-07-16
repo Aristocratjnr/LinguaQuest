@@ -124,7 +124,7 @@ function AppContent() {
   const [showEngagement, setShowEngagement] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
-  const { theme } = useSettings();
+  const { theme, sound } = useSettings();
   const { user, userStats, submitScore, startGameSession, endGameSession, incrementStreak, resetStreak, awardBadge } = useUser();
   const [showLogin, setShowLogin] = useState(false);
   const [showListeningModal, setShowListeningModal] = useState(false);
@@ -359,14 +359,14 @@ function AppContent() {
           setTimeout(() => setShowConfetti(false), 3000);
           
           // Play success sound
-          audioSuccess.current?.play();
+          playSuccess();
         }
       }
     } catch (e) {
       setFeedback('Evaluation error.');
       setScore(null);
       // Play fail sound
-      audioFail.current?.play();
+      playFail();
     }
     setLoading(false);
   };
@@ -673,9 +673,9 @@ function AppContent() {
   }, [roundResult, user, score, roundWins, uniqueWords, allPersuaded, badges, submitScore, currentSessionId, endGameSession, round]);
 
   // Play sound effects
-  const playSuccess = () => audioSuccess.current && audioSuccess.current.play();
-  const playFail = () => audioFail.current && audioFail.current.play();
-  const playClick = () => audioClick.current && audioClick.current.play();
+  const playSuccess = () => { if (sound && audioSuccess.current) audioSuccess.current.play(); };
+  const playFail = () => { if (sound && audioFail.current) audioFail.current.play(); };
+  const playClick = () => { if (sound && audioClick.current) audioClick.current.play(); };
 
   // Animate on round result
   useEffect(() => {
