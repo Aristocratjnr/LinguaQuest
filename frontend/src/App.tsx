@@ -1607,47 +1607,59 @@ function AppContent() {
           justifyContent: 'center', // center align
           alignItems: 'center',
         }}>
+          {/* New Scenario Button - icon only, perfectly centered */}
           <motion.button
-            whileHover={{ scale: 1.03 }}
+            whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.97 }}
             style={{
-              background: DUOLINGO_COLORS.green,
-              color: DUOLINGO_COLORS.white,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #58cc02 0%, #3caa3c 100%)',
+              color: '#fff',
               border: 'none',
-              borderRadius: '8px', // smaller radius
-              padding: '8px 18px', // smaller padding, more compact
-              fontWeight: 600,
-              fontSize: '14px', // smaller font
+              borderRadius: '50%',
+              width: 56,
+              height: 56,
+              minWidth: 56,
+              minHeight: 56,
+              boxShadow: '0 4px 16px #58cc0222',
               cursor: 'pointer',
-              boxShadow: `0 4px 0 ${DUOLINGO_COLORS.darkGreen}`,
-              minWidth: '120px', // set a minimum width
-              maxWidth: '160px', // set a maximum width
-              width: 'auto', // do not stretch
-              flex: 'none', // do not stretch
+              fontFamily: 'JetBrains Mono, monospace',
+              transition: 'all 0.2s',
+              position: 'relative',
+              padding: 0,
             }}
             onClick={fetchScenario}
             disabled={loading || roundResult !== 'playing'}
+            title="New Scenario"
+            aria-label="New Scenario"
           >
-            New Scenario
+            <span className="material-icons" style={{ fontSize: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>autorenew</span>
           </motion.button>
-          
+          {/* Microphone Button - unchanged */}
           <motion.button
-            whileHover={{ scale: 1.03 }}
+            whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.97 }}
             style={{
-              width: '56px',
+              width: 56,
+              height: 56,
               background: listeningCmd ? DUOLINGO_COLORS.orange : DUOLINGO_COLORS.blue,
               color: DUOLINGO_COLORS.white,
               border: 'none',
-              borderRadius: '12px',
+              borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              boxShadow: `0 4px 0 ${listeningCmd ? '#d18616' : '#0d8ecf'}`
+              boxShadow: `0 4px 0 ${listeningCmd ? '#d18616' : '#0d8ecf'}`,
+              fontSize: 28,
+              transition: 'all 0.2s',
             }}
             onClick={handleVoiceCommand}
             disabled={listeningCmd}
+            title="Voice Command"
+            aria-label="Voice Command"
           >
             <span style={{ fontSize: '20px' }}>{listeningCmd ? '🎤' : '🎤'}</span>
           </motion.button>
@@ -2381,6 +2393,210 @@ function AppContent() {
           justifyContent: 'center',
         }}>
           <Leaderboard onClose={() => setShowLeaderboard(false)} />
+        </div>
+      )}
+      {/* Help Modal */}
+      {showHelp && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.6)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{
+            borderRadius: '24px',
+            width: '90%',
+            maxWidth: '520px',
+            maxHeight: '85vh',
+            overflow: 'hidden',
+            boxShadow: '0 16px 48px rgba(0,0,0,0.2), 0 4px 16px rgba(0,0,0,0.1)',
+            background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+            border: '1px solid rgba(88, 204, 2, 0.1)',
+            animation: 'slideIn 0.3s ease-out'
+          }}>
+            {/* Header */}
+            <div style={{
+              padding: '24px 28px 20px',
+              borderBottom: '1px solid rgba(88, 204, 2, 0.1)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'linear-gradient(135deg, rgba(88, 204, 2, 0.02) 0%, rgba(88, 204, 2, 0.05) 100%)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span className="material-icons" style={{ 
+                  fontSize: '28px', 
+                  color: '#58cc02',
+                  background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+                  borderRadius: '12px',
+                  padding: '8px',
+                  boxShadow: '0 2px 8px rgba(88, 204, 2, 0.15)'
+                }}>
+                  mic
+                </span>
+                <h2 style={{ 
+                  margin: 0, 
+                  color: '#3caa3c',
+                  fontSize: '1.5rem',
+                  fontWeight: 700,
+                  fontFamily: 'JetBrains Mono, monospace'
+                }}>
+                  Voice Commands
+                </h2>
+              </div>
+              <button 
+                onClick={() => setShowHelp(false)}
+                style={{
+                  background: 'rgba(108, 122, 137, 0.1)',
+                  border: 'none',
+                  borderRadius: '12px',
+                  width: '40px',
+                  height: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: '#3caa3c',
+                  transition: 'all 0.2s ease',
+                  fontSize: '20px'
+                }}
+                onMouseOver={e => {
+                  e.currentTarget.style.background = 'rgba(108, 122, 137, 0.2)';
+                  e.currentTarget.style.color = '#58cc02';
+                }}
+                onMouseOut={e => {
+                  e.currentTarget.style.background = 'rgba(108, 122, 137, 0.1)';
+                  e.currentTarget.style.color = '#3caa3c';
+                }}
+              >
+                <span className="material-icons">close</span>
+              </button>
+            </div>
+            {/* Content */}
+            <div style={{ 
+              padding: '20px 28px 28px', 
+              maxHeight: '65vh', 
+              overflowY: 'auto',
+              background: '#fff'
+            }}>
+              <div style={{
+                display: 'grid',
+                gap: '16px',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))'
+              }}>
+                {VOICE_COMMANDS.map(cmd => (
+                  <div key={cmd.action} style={{
+                    padding: '20px',
+                    borderRadius: '16px',
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                    border: '1px solid rgba(88, 204, 2, 0.08)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                    transition: 'all 0.2s ease',
+                    cursor: 'pointer'
+                  }}
+                  onMouseOver={e => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(88, 204, 2, 0.12)';
+                  }}
+                  onMouseOut={e => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
+                  }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      <div style={{
+                        width: '48px',
+                        height: '48px',
+                        background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+                        borderRadius: '12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 2px 8px rgba(88, 204, 2, 0.15)',
+                        border: '1px solid rgba(88, 204, 2, 0.2)'
+                      }}>
+                        <span className="material-icons" style={{
+                          fontSize: '24px',
+                          color: '#58cc02'
+                        }}>
+                          {cmd.action === 'next' ? 'skip_next' :
+                           cmd.action === 'repeat' ? 'replay' :
+                           cmd.action === 'leaderboard' ? 'emoji_events' :
+                           cmd.action === 'settings' ? 'settings' :
+                           cmd.action === 'start' ? 'play_arrow' :
+                           cmd.action === 'profile' ? 'person' :
+                           cmd.action === 'help' ? 'help_outline' :
+                           cmd.action === 'back' ? 'arrow_back' :
+                           cmd.action === 'home' ? 'home' :
+                           cmd.action === 'exit' ? 'exit_to_app' : 'mic'}
+                        </span>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ 
+                          fontWeight: 700, 
+                          color: '#3caa3c',
+                          fontSize: '1rem',
+                          marginBottom: '4px',
+                          fontFamily: 'JetBrains Mono, monospace'
+                        }}>
+                          {cmd.phrases[0].charAt(0).toUpperCase() + cmd.phrases[0].slice(1)}
+                        </div>
+                        <div style={{ 
+                          fontSize: '14px', 
+                          color: '#3caa3c',
+                          opacity: 0.8,
+                          lineHeight: 1.4
+                        }}>
+                          {cmd.desc}
+                        </div>
+                        <div style={{
+                          marginTop: '8px',
+                          fontSize: '12px',
+                          color: '#58cc02',
+                          opacity: 0.7,
+                          fontFamily: 'JetBrains Mono, monospace'
+                        }}>
+                          Try: {cmd.phrases.slice(0, 3).join(', ')}
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Footer tip */}
+              <div style={{
+                marginTop: '24px',
+                padding: '16px',
+                background: 'linear-gradient(135deg, rgba(88, 204, 2, 0.05) 0%, rgba(88, 204, 2, 0.02) 100%)',
+                borderRadius: '12px',
+                border: '1px solid rgba(88, 204, 2, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px'
+              }}>
+                <span className="material-icons" style={{
+                  fontSize: '20px',
+                  color: '#58cc02'
+                }}>
+                  lightbulb
+                </span>
+                <span style={{
+                  fontSize: '14px',
+                  color: '#3caa3c',
+                  fontFamily: 'JetBrains Mono, monospace'
+                }}>
+                  <strong>Tip:</strong> Speak clearly and naturally. The AI will respond with spoken feedback for recognized commands.
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
