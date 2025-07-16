@@ -911,7 +911,7 @@ function AppContent() {
       {/* Header - Duolingo style */}
       <header style={{
         background: DUOLINGO_COLORS.white,
-        padding: '12px 16px',
+        padding: 'clamp(8px, 2vw, 16px)',
         boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
         position: 'sticky',
         top: 0,
@@ -921,17 +921,20 @@ function AppContent() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          maxWidth: '1200px',
-          margin: '0 auto'
+          flexWrap: 'wrap',
+          minWidth: 0,
+          maxWidth: '100%',
+          margin: '0 auto',
+          gap: 'clamp(8px, 2vw, 24px)',
         }}>
           {/* Left: Logo + Streak */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '18px', minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 18px)', minWidth: 0, flexWrap: 'wrap' }}>
             {/* Logo and app name */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span style={{
                   color: DUOLINGO_COLORS.green,
-                  fontSize: '22px',
+                  fontSize: 'clamp(1.1rem, 4vw, 22px)',
                   fontWeight: 700,
                   fontFamily: 'JetBrains Mono, monospace',
                   letterSpacing: '0.01em',
@@ -939,11 +942,11 @@ function AppContent() {
                 }}>
                   LinguaQuest
                 </span>
-                <span className="material-icons" style={{ fontSize: '22px', color: DUOLINGO_COLORS.green, opacity: 0.85 }}>psychology</span>
+                <span className="material-icons" style={{ fontSize: 'clamp(1.1rem, 4vw, 22px)', color: DUOLINGO_COLORS.green, opacity: 0.85 }}>psychology</span>
               </div>
               <span style={{
                 color: DUOLINGO_COLORS.darkGray,
-                fontSize: '12px',
+                fontSize: 'clamp(0.7rem, 3vw, 12px)',
                 fontFamily: 'JetBrains Mono, monospace',
                 fontWeight: 400,
                 opacity: 0.7,
@@ -954,7 +957,7 @@ function AppContent() {
               </span>
             </div>
             {/* Streak + Daily Goal Ring */}
-            <div style={{ position: 'relative', width: 54, height: 54, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ position: 'relative', width: 'clamp(38px, 12vw, 54px)', height: 'clamp(38px, 12vw, 54px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {/* Mascot pop-up when daily goal is reached */}
               {showMascotCelebrate && (
                 <motion.img
@@ -969,8 +972,8 @@ function AppContent() {
                     left: '50%',
                     transform: 'translateX(-50%)',
                     top: -60,
-                    width: 48,
-                    height: 48,
+                    width: 'clamp(32px, 10vw, 48px)',
+                    height: 'clamp(32px, 10vw, 48px)',
                     zIndex: 10,
                     filter: 'drop-shadow(0 4px 16px #58cc0255)',
                     pointerEvents: 'none',
@@ -980,8 +983,8 @@ function AppContent() {
               {/* Sparkle/confetti effect */}
               {showMascotCelebrate && (
                 <Confetti
-                  width={120}
-                  height={80}
+                  width={80}
+                  height={60}
                   numberOfPieces={40}
                   recycle={false}
                   gravity={0.2}
@@ -995,7 +998,7 @@ function AppContent() {
                 />
               )}
               {/* SVG Circular Progress */}
-              <svg width={54} height={54} style={{ position: 'absolute', top: 0, left: 0 }}>
+              <svg width="100%" height="100%" viewBox="0 0 54 54" style={{ position: 'absolute', top: 0, left: 0, minWidth: 0, minHeight: 0 }}>
                 <circle
                   cx={27}
                   cy={27}
@@ -1021,7 +1024,7 @@ function AppContent() {
               </svg>
               {/* Flame icon */}
               <span className="material-icons" style={{
-                fontSize: 32,
+                fontSize: 'clamp(1.2rem, 6vw, 32px)',
                 color: '#ff9c1a',
                 filter: 'drop-shadow(0 2px 6px #ff9c1a33)',
                 zIndex: 1,
@@ -1036,7 +1039,7 @@ function AppContent() {
                 className="material-icons"
                 title="Streak Freeze: Protect your streak for one missed day!"
                 style={{
-                  fontSize: 26,
+                  fontSize: 'clamp(1rem, 5vw, 26px)',
                   color: hasStreakFreeze ? '#1cb0f6' : '#b0bec5',
                   position: 'absolute',
                   bottom: -8,
@@ -1065,7 +1068,7 @@ function AppContent() {
                   borderRadius: '10px',
                   padding: '2px 8px',
                   fontWeight: 700,
-                  fontSize: 14,
+                  fontSize: 'clamp(0.8rem, 3vw, 14px)',
                   color: '#ff9c1a',
                   boxShadow: '0 1px 4px #ff9c1a22',
                   border: '1.5px solid #ffe0b2',
@@ -1079,7 +1082,7 @@ function AppContent() {
               </motion.div>
             </div>
             {/* Daily XP label */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0, flex: '1 1 80px', maxWidth: '100%' }}>
               <span style={{ fontWeight: 700, color: '#ff9c1a', fontSize: 15, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.01em' }}>
                 {userStats ? `${dailyXp} / ${DAILY_GOAL} XP` : '-- / 100 XP'}
               </span>
@@ -1089,13 +1092,13 @@ function AppContent() {
             </div>
           </div>
           {/* User profile and right side */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(4px, 2vw, 8px)', minWidth: 0, flexWrap: 'wrap' }}>
             {/* Daily Reward Chest */}
             <motion.button
               style={{
-                width: 48,
-                height: 48,
-                marginRight: 8,
+                width: 'clamp(32px, 10vw, 48px)',
+                height: 'clamp(32px, 10vw, 48px)',
+                marginRight: 'clamp(2px, 1vw, 8px)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -1127,7 +1130,7 @@ function AppContent() {
               <motion.span
                 className="material-icons"
                 style={{
-                  fontSize: 32,
+                  fontSize: 'clamp(1.1rem, 6vw, 32px)',
                   color: chestOpenState ? '#ffb300' : '#8d6e63',
                   filter: chestOpenState ? 'brightness(1.2)' : 'none',
                   userSelect: 'none',
@@ -1151,7 +1154,7 @@ function AppContent() {
                     top: -10,
                     right: -10,
                     color: '#ffd700',
-                    fontSize: 24,
+                    fontSize: 'clamp(1rem, 5vw, 24px)',
                     filter: 'drop-shadow(0 2px 8px #ffd70088)',
                     zIndex: 3,
                     pointerEvents: 'none',
@@ -1165,10 +1168,10 @@ function AppContent() {
                 <motion.span
                   style={{
                     position: 'absolute',
-                    top: -16,
-                    left: -16,
-                    width: 80,
-                    height: 80,
+                    top: -12,
+                    left: -12,
+                    width: 'clamp(40px, 18vw, 80px)',
+                    height: 'clamp(40px, 18vw, 80px)',
                     borderRadius: '50%',
                     background: 'radial-gradient(circle, #ffe08255 0%, transparent 70%)',
                     zIndex: 1,
@@ -1181,8 +1184,8 @@ function AppContent() {
             </motion.button>
             <div 
               style={{
-                width: '36px',
-                height: '36px',
+                width: 'clamp(24px, 8vw, 36px)',
+                height: 'clamp(24px, 8vw, 36px)',
                 borderRadius: '50%',
                 background: theme === 'dark' ? '#232946' : DUOLINGO_COLORS.gray,
                 display: 'flex',
@@ -1200,7 +1203,7 @@ function AppContent() {
               <img 
                 src={user?.avatar_url || avatar} 
                 alt="User" 
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                style={{ width: '100%', height: '100%', objectFit: 'cover', minWidth: 0, minHeight: 0 }} 
               />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
@@ -1208,7 +1211,7 @@ function AppContent() {
                 fontFamily: 'JetBrains Mono, monospace',
                 fontWeight: 400,
                 color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
-                fontSize: '13px',
+                fontSize: 'clamp(0.7rem, 3vw, 13px)',
                 opacity: 0.7,
                 letterSpacing: '0.01em',
                 lineHeight: 1.1
@@ -1218,7 +1221,7 @@ function AppContent() {
               <span style={{
                 fontWeight: 'bold',
                 color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
-                fontSize: '14px',
+                fontSize: 'clamp(0.8rem, 3vw, 14px)',
                 fontFamily: 'JetBrains Mono, monospace',
                 letterSpacing: '0.01em',
                 lineHeight: 1.1
