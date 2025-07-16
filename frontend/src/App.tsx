@@ -2153,46 +2153,76 @@ function AppContent() {
             exit={{ scale: 0.7, opacity: 0 }}
             transition={{ duration: 0.5, type: 'spring' }}
             style={{
-              background: 'linear-gradient(135deg, #fffbe6 0%, #e0ffe6 100%)',
-              color: '#3caa3c',
-              borderRadius: '32px',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+              background: 'rgba(255, 255, 255, 0.92)',
+              backdropFilter: 'blur(18px)',
+              WebkitBackdropFilter: 'blur(18px)',
+              color: '#3c2c00',
+              borderRadius: '36px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.18), 0 0 0 4px #ffcc8055',
               minWidth: '320px',
               maxWidth: '90vw',
               textAlign: 'center',
-              padding: '40px 36px',
+              padding: '48px 40px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '18px',
+              gap: '22px',
               position: 'relative',
+              border: '2.5px solid #ffb300',
+              overflow: 'hidden',
             }}
           >
+            {/* White overlay for extra clarity */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'rgba(255,255,255,0.55)',
+              zIndex: 0,
+              pointerEvents: 'none',
+            }} />
             <Confetti
               width={window.innerWidth}
               height={window.innerHeight}
               recycle={false}
               numberOfPieces={120}
               colors={[DUOLINGO_COLORS.green, DUOLINGO_COLORS.blue, DUOLINGO_COLORS.orange, DUOLINGO_COLORS.purple]}
-              style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none' }}
+              style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none', zIndex: 1 }}
             />
-            <span className="material-icons" style={{ fontSize: 64, color: '#ffb300', marginBottom: 8, filter: 'drop-shadow(0 2px 8px #ffd70088)' }}>emoji_events</span>
-            <h2 style={{ fontWeight: 800, fontSize: '2rem', margin: 0 }}>Daily Reward!</h2>
-            <div style={{ fontSize: '1.3rem', color: '#ff9c1a', marginBottom: '8px', fontWeight: 700 }}>{chestReward}</div>
+            <span className="material-icons" style={{ fontSize: 72, color: '#ffb300', marginBottom: 8, filter: 'drop-shadow(0 2px 8px #ffd70088)', zIndex: 2 }}>emoji_events</span>
+            <h2 style={{ fontWeight: 900, fontSize: '2.2rem', margin: 0, color: '#ffb300', textShadow: '0 2px 8px #fff, 0 1px 2px #0008', zIndex: 2 }}>Daily Reward!</h2>
+            {/* Reward text - highly visible pill */}
+            <div style={{
+              display: 'inline-block',
+              fontSize: '2.1rem',
+              color: '#fff',
+              background: 'linear-gradient(90deg, #ffb300 0%, #ffec80 100%)',
+              padding: '12px 36px',
+              borderRadius: '32px',
+              fontWeight: 900,
+              marginBottom: '12px',
+              boxShadow: '0 2px 12px #ffb30055, 0 0 0 2px #fff8',
+              border: '2.5px solid #ffb300',
+              textShadow: '0 2px 8px #000b, 0 1px 2px #fff8',
+              letterSpacing: '0.03em',
+              zIndex: 2,
+              position: 'relative',
+            }}>{chestReward}</div>
             <button
               onClick={() => setShowChestReward(false)}
               style={{
                 marginTop: '12px',
-                padding: '10px 28px',
-                borderRadius: '18px',
+                padding: '14px 36px',
+                borderRadius: '22px',
                 background: '#58cc02',
                 color: '#fff',
                 border: 'none',
-                fontWeight: 700,
-                fontSize: '1rem',
+                fontWeight: 800,
+                fontSize: '1.15rem',
                 cursor: 'pointer',
                 boxShadow: '0 2px 8px #58cc0222',
                 transition: 'all 0.2s',
+                zIndex: 2,
+                textShadow: '0 1px 2px #0008',
               }}
             >
               Thanks!
