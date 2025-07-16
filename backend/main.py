@@ -35,6 +35,7 @@ from game_api import router as game_router
 from engagement_api_v2 import router as engagement_v2_router
 from progression_api import router as progression_router
 from progression_tracking import router as progression_tracking_router
+from language_club import router as language_club_router
 
 app = FastAPI()
 
@@ -60,6 +61,7 @@ app.include_router(game_router, prefix="/api/v1", tags=["game"])
 app.include_router(engagement_v2_router, prefix="/api/v1", tags=["engagement"])
 app.include_router(progression_router, prefix="/api/v1", tags=["progression"])
 app.include_router(progression_tracking_router, prefix="/api/v1", tags=["progression-tracking"])
+app.include_router(language_club_router, prefix="/api/v1", tags=["language-club"])
 
 # Keep the old engagement router for backward compatibility
 app.include_router(engagement_router, tags=["engagement-legacy"])
