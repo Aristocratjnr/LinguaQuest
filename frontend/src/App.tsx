@@ -802,7 +802,7 @@ function AppContent() {
   if (showLanguageSelect) {
     return <LanguageSelector 
       onSelect={(lang) => {
-        setLanguage(lang);
+        setLanguage(lang); // from context, not local state
         setShowLanguageSelect(false);
         setShowNicknamePrompt(true);
       }}

@@ -32,7 +32,7 @@ const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose })
       left: 0,
       width: '100vw',
       height: '100vh',
-      background: 'linear-gradient(135deg, #58cc02 0%, #4CAF50 100%)', // solid green gradient
+      background: 'linear-gradient(135deg,rgb(237, 241, 233) 0%,rgb(235, 241, 235) 100%)', // solid green gradient
       zIndex: 4100,
       display: 'flex',
       alignItems: 'center',

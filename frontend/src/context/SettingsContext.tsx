@@ -26,7 +26,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   const [nickname, setNickname] = useState(() => localStorage.getItem('lq_nickname') || 'Player');
   const [avatar, setAvatar] = useState(() => localStorage.getItem('lq_avatar') || defaultAvatar);
-  const [language, setLanguage] = useState('twi');
+  const [language, setLanguageState] = useState(() => localStorage.getItem('lq_language') || 'twi');
   const [theme, setThemeState] = useState(() => localStorage.getItem('lq_theme') || 'system');
   const [sound, setSound] = useState(true);
 
@@ -44,6 +44,11 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     setThemeState(t);
     localStorage.setItem('lq_theme', t);
   };
+  // Persist language
+  const handleSetLanguage = (l: string) => {
+    setLanguageState(l);
+    localStorage.setItem('lq_language', l);
+  };
 
   return (
     <SettingsContext.Provider value={{
@@ -52,7 +57,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
       avatar,
       setAvatar: handleSetAvatar,
       language,
-      setLanguage,
+      setLanguage: handleSetLanguage,
       theme,
       setTheme: handleSetTheme,
       sound,
