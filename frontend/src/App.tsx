@@ -79,6 +79,7 @@ interface DialogueResponse { ai_response: string; new_stance: string; }
 interface LeaderboardResponse { leaderboard: any[]; }
 
 function AppContent() {
+  const { theme, sound, nickname, avatar, setNickname, setAvatar } = useSettings();
   const [scenario, setScenario] = useState('');
   const [language, setLanguage] = useState('twi');
   const [aiStance, setAiStance] = useState('disagree');
@@ -101,8 +102,6 @@ function AppContent() {
   const audioSuccess = useRef<HTMLAudioElement|null>(null);
   const audioFail = useRef<HTMLAudioElement|null>(null);
   const audioClick = useRef<HTMLAudioElement|null>(null);
-  const [nickname, setNickname] = useState(() => localStorage.getItem('lq_nickname') || '');
-  const [avatar, setAvatar] = useState(() => localStorage.getItem('lq_avatar') || '');
   const [showWelcome, setShowWelcome] = useState(true);
   const [showLanguageSelect, setShowLanguageSelect] = useState(false);
   const [showNicknamePrompt, setShowNicknamePrompt] = useState(false);
@@ -124,7 +123,6 @@ function AppContent() {
   const [showEngagement, setShowEngagement] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
-  const { theme, sound } = useSettings();
   const { user, userStats, submitScore, startGameSession, endGameSession, incrementStreak, resetStreak, awardBadge } = useUser();
   const [showLogin, setShowLogin] = useState(false);
   const [showListeningModal, setShowListeningModal] = useState(false);
@@ -577,7 +575,7 @@ function AppContent() {
   // Handle nickname confirm
   const handleNicknameConfirm = (name: string) => {
     setNickname(name);
-    localStorage.setItem('lq_nickname', name);
+    // localStorage.setItem('lq_nickname', name); // No longer needed, handled by context
     setShowNicknamePrompt(false);
     setShowAvatarPicker(true);
   };
@@ -585,7 +583,7 @@ function AppContent() {
   // Handle avatar confirm
   const handleAvatarConfirm = (avatarUrl: string) => {
     setAvatar(avatarUrl);
-    localStorage.setItem('lq_avatar', avatarUrl);
+    // localStorage.setItem('lq_avatar', avatarUrl); // No longer needed, handled by context
     setShowAvatarPicker(false);
     setShowLogin(true);
   };
