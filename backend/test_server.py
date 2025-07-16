@@ -631,6 +631,88 @@ def update_session(session_id: str, session_data: dict):
         "status": session_data.get("status", "active")
     }
 
+@app.get("/api/v1/progression/{nickname}")
+def get_user_progression(nickname: str):
+    """Get user's progression stages (test implementation)"""
+    # Return predefined progression stages
+    return [
+        {
+            "id": "basics",
+            "label": "Language Basics",
+            "unlocked": True,
+            "children": [
+                {
+                    "id": "basics_1",
+                    "label": "Introduction",
+                    "unlocked": True,
+                    "children": []
+                },
+                {
+                    "id": "basics_2",
+                    "label": "Simple Phrases",
+                    "unlocked": False,
+                    "children": []
+                },
+                {
+                    "id": "basics_3",
+                    "label": "Basic Grammar",
+                    "unlocked": False,
+                    "children": []
+                }
+            ]
+        },
+        {
+            "id": "intermediate",
+            "label": "Intermediate Skills",
+            "unlocked": False,
+            "children": [
+                {
+                    "id": "intermediate_1",
+                    "label": "Advanced Phrases",
+                    "unlocked": False,
+                    "children": []
+                },
+                {
+                    "id": "intermediate_2",
+                    "label": "Complex Grammar",
+                    "unlocked": False,
+                    "children": []
+                }
+            ]
+        },
+        {
+            "id": "advanced",
+            "label": "Advanced Topics",
+            "unlocked": False,
+            "children": [
+                {
+                    "id": "advanced_1",
+                    "label": "Idiomatic Expressions",
+                    "unlocked": False,
+                    "children": []
+                },
+                {
+                    "id": "advanced_2",
+                    "label": "Cultural Context",
+                    "unlocked": False,
+                    "children": []
+                }
+            ]
+        }
+    ]
+
+@app.post("/api/v1/progression/{nickname}/unlock/{stage_id}")
+def unlock_stage(nickname: str, stage_id: str):
+    """Unlock a progression stage for a user (test implementation)"""
+    # In a real implementation, this would update the database
+    return {"message": "Stage unlocked successfully"}
+
+@app.post("/api/v1/progression/{nickname}/reset")
+def reset_progression(nickname: str):
+    """Reset user's progression stages to initial state (test implementation)"""
+    # In a real implementation, this would reset stages in the database
+    return {"message": "Progression reset successfully"}
+
 @app.post("/api/v1/sessions")
 def create_session(session_data: dict, nickname: str):
     """Create a new game session (simplified)"""

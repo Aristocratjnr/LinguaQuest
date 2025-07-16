@@ -928,7 +928,7 @@ function AppContent() {
           gap: 'clamp(8px, 2vw, 24px)',
         }}>
           {/* Left: Logo + Streak */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 18px)', minWidth: 0, flexWrap: 'wrap' }}>
+          <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 18px)', minWidth: 0, flex: 1, flexWrap: 'wrap' }}>
             {/* Logo and app name */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -1092,7 +1092,7 @@ function AppContent() {
             </div>
           </div>
           {/* User profile and right side */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(4px, 2vw, 8px)', minWidth: 0, flexWrap: 'wrap' }}>
+          <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: 'clamp(4px, 2vw, 8px)', minWidth: 0, flexWrap: 'wrap', flexShrink: 0 }}>
             {/* Daily Reward Chest */}
             <motion.button
               style={{
@@ -1208,26 +1208,26 @@ function AppContent() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
               <span style={{
-                fontFamily: 'JetBrains Mono, monospace',
-                fontWeight: 400,
-                color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
-                fontSize: 'clamp(0.7rem, 3vw, 13px)',
-                opacity: 0.7,
-                letterSpacing: '0.01em',
-                lineHeight: 1.1
-              }}>
-                Welcome back
-              </span>
-              <span style={{
-                fontWeight: 'bold',
-                color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
-                fontSize: 'clamp(0.8rem, 3vw, 14px)',
-                fontFamily: 'JetBrains Mono, monospace',
-                letterSpacing: '0.01em',
-                lineHeight: 1.1
-              }}>
-                {nickname}
-              </span>
+                 fontFamily: 'JetBrains Mono, monospace',
+                 fontWeight: 400,
+                 color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
+                 fontSize: 'clamp(0.7rem, 3vw, 13px)',
+                 opacity: 0.7,
+                 letterSpacing: '0.01em',
+                 lineHeight: 1.1
+               }}>
+                 Welcome back
+               </span>
+               <span style={{
+                 fontWeight: 'bold',
+                 color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
+                 fontSize: 'clamp(0.8rem, 3vw, 14px)',
+                 fontFamily: 'JetBrains Mono, monospace',
+                 letterSpacing: '0.01em',
+                 lineHeight: 1.1
+               }}>
+                 {nickname}
+               </span>
             </div>
           </div>
         </div>
@@ -1322,29 +1322,55 @@ function AppContent() {
             boxSizing: 'border-box',
           }}
         >
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: theme === 'dark'
-            ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
-            : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
-          borderRadius: '20px', // smaller radius
-          boxShadow: theme === 'dark'
-            ? '0 2px 8px rgba(35,41,70,0.18)'
-            : '0 2px 8px rgba(88,204,2,0.08)',
-          border: theme === 'dark'
-            ? '1px solid #232946'
-            : '1px solid rgba(88,204,2,0.12)',
-          color: theme === 'dark' ? '#e0e7ff' : undefined,
-          position: 'relative',
-          overflow: 'visible',
-          gap: '0',
-          minHeight: '110px', // smaller height
-          padding: '12px 10px', // smaller padding
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: theme === 'dark'
+              ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
+              : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            borderRadius: '20px',
+            boxShadow: theme === 'dark'
+              ? '0 2px 8px rgba(35,41,70,0.18)'
+              : '0 2px 8px rgba(88,204,2,0.08)',
+            border: theme === 'dark'
+              ? '1px solid #232946'
+              : '1px solid rgba(88,204,2,0.12)',
+            color: theme === 'dark' ? '#e0e7ff' : undefined,
+            position: 'relative',
+            overflow: 'visible',
+            gap: '0',
+            minHeight: '110px',
+            padding: '12px 10px',
+            flexWrap: 'wrap',
+          }}
+        >
+          {/* Responsive style for mobile: stack vertically */}
+          <style>{`
+            @media (max-width: 600px) {
+              .progress-section-flex {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 12px !important;
+                min-height: 0 !important;
+                padding: 8px 2vw !important;
+              }
+              .progress-section-divider {
+                display: none !important;
+              }
+              .progress-section-timer, .progress-section-xp {
+                margin: 0 auto !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+                justify-content: center !important;
+              }
+            }
+          `}</style>
+          <div className="progress-section-flex" style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
             {/* Decorative background elements */}
             <motion.div
               animate={{
@@ -1387,7 +1413,6 @@ function AppContent() {
                 borderRadius: '50%'
               }}
             />
-            
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -1398,14 +1423,16 @@ function AppContent() {
                 position: 'relative',
                 zIndex: 1,
                 marginRight: '20px',
-                minHeight: '140px'
+                minHeight: '100px',
+                width: '100%',
+                boxSizing: 'border-box',
               }}
             >
             <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
             </motion.div>
-            
             {/* Visual divider */}
             <motion.div
+              className="progress-section-divider"
               initial={{ opacity: 0, scaleY: 0 }}
               animate={{ opacity: 1, scaleY: 1 }}
               transition={{ duration: 0.6, delay: 0.5 }}
@@ -1420,9 +1447,9 @@ function AppContent() {
                 flexShrink: 0
               }}
             />
-            
             {/* Timer with enhanced styling */}
             <motion.div 
+              className="progress-section-timer"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
@@ -1442,9 +1469,9 @@ function AppContent() {
             >
             <Timer seconds={ROUND_TIME} timeLeft={timeLeft} isActive={timerActive} />
             </motion.div>
-            
             {/* Enhanced XP badge */}
             <motion.div
+              className="progress-section-xp"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.6 }}
@@ -1507,6 +1534,7 @@ function AppContent() {
               </motion.span>
             </motion.div>
           </div>
+        </div>
         </motion.div>
         {/* Two-column layout for cards */}
         <div style={{
@@ -2480,7 +2508,6 @@ function AppContent() {
       {/* Progression Map Modal */}
       {showProgressionMap && (
         <ProgressionMap
-          skillTree={SKILL_TREE}
           onClose={() => setShowProgressionMap(false)}
         />
       )}

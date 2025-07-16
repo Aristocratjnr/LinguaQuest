@@ -1,15 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-interface SkillNode {
-  id: string;
-  label: string;
-  unlocked: boolean;
-  children?: SkillNode[];
-}
+import { progressionApi, storage, handleApiError, ProgressionStage } from '../services/api';
 
 interface ProgressionMapProps {
-  skillTree: SkillNode[];
   onClose: () => void;
 }
 
@@ -20,15 +13,46 @@ const nodeColors = {
   childLocked: '#e0e0e0',
 };
 
-const ProgressionMap: React.FC<ProgressionMapProps> = ({ skillTree, onClose }) => {
-  const [selectedNode, setSelectedNode] = useState<SkillNode | null>(null);
+const ProgressionMap: React.FC<ProgressionMapProps> = ({ onClose }) => {
+  const [skillTree, setSkillTree] = useState<ProgressionStage[]>([]);
+  const [selectedNode, setSelectedNode] = useState<ProgressionStage | null>(null);
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProgression = async () => {
+      try {
+        const nickname = storage.getNickname();
+        if (!nickname) {
+          setError('User not logged in');
+          setLoading(false);
+          return;
+        }
+
+        const data = await progressionApi.getProgression(nickname);
+        setSkillTree(data);
+        setError('');
+      } catch (err) {
+        setError(handleApiError(err));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProgression();
+
+    // Set up polling for real-time updates
+    const pollInterval = setInterval(fetchProgression, 30000); // Poll every 30 seconds
+
+    return () => clearInterval(pollInterval);
+  }, []);
 
   // Count unlocked nodes
   const totalNodes = skillTree.reduce((acc, cat) => acc + (cat.children ? cat.children.length : 0), skillTree.length);
   const unlockedNodes = skillTree.reduce((acc, cat) => acc + (cat.children ? cat.children.filter(c => c.unlocked).length : 0) + (cat.unlocked ? 1 : 0), 0);
 
   // Render a single node (category or child)
-  const renderNode = (node: SkillNode, isChild = false) => {
+const renderNode = (node: ProgressionStage, isChild = false) =>
     const color = node.unlocked
       ? isChild ? nodeColors.childUnlocked : nodeColors.unlocked
       : isChild ? nodeColors.childLocked : nodeColors.locked;
@@ -146,10 +170,22 @@ const ProgressionMap: React.FC<ProgressionMapProps> = ({ skillTree, onClose }) =
           >
             <span className="material-icons">close</span>
           </button>
-          <h2 style={{ color: '#58cc02', marginBottom: 8, fontSize: '2rem', letterSpacing: '.01em', fontFamily: 'Fira Mono, Menlo, Consolas, monospace', fontWeight: 300 }}>
+<h2 style={{ color: '#58cc02', marginBottom: 8, fontSize: '2rem', letterSpacing: '.01em', fontFamily: 'Fira Mono, Menlo, Consolas, monospace', fontWeight: 300 }}>
             <span className="material-icons" style={{ verticalAlign: 'middle', fontSize: 32, marginRight: 8 }}>account_tree</span>
             Progression Map
           </h2>
+          {loading && (
+            <div style={{ color: '#58cc02', marginBottom: 18, textAlign: 'center' }}>
+              <span className="material-icons" style={{ fontSize: 24, verticalAlign: 'middle', marginRight: 8 }}>hourglass_top</span>
+              Loading...
+            </div>
+          )}
+          {error && (
+            <div style={{ color: '#ff4b4b', marginBottom: 18, textAlign: 'center' }}>
+              <span className="material-icons" style={{ fontSize: 24, verticalAlign: 'middle', marginRight: 8 }}>error</span>
+              {error}
+            </div>
+          )}
           <div style={{ color: '#3caa3c', marginBottom: 18, fontSize: '1.1rem', fontFamily: 'Fira Mono, Menlo, Consolas, monospace', fontWeight: 300 }}>
             {unlockedNodes} / {totalNodes} skills unlocked
           </div>
