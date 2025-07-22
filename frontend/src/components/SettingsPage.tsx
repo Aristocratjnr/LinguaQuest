@@ -9,6 +9,8 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useUser } from '../context/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 const AVATARS = [avatar1, avatar2, avatar3, avatar4];
 const LANGUAGES = [
@@ -30,6 +32,9 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [resetting, setResetting] = useState(false);
+  const { user, logout } = useUser();
+  const [loggedOut, setLoggedOut] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
@@ -113,6 +118,13 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const borderColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.3)';
   const inputBg = isDark ? 'rgba(24, 28, 42, 0.5)' : 'rgba(255, 255, 255, 0.5)';
   const inputText = isDark ? '#e0e7ff' : '#22223b';
+
+  const langMap: Record<string, string> = {
+    twi: 'ak',
+    gaa: 'gaa',
+    ewe: 'ee',
+    en: 'en',
+  };
 
   return (
     <div className={`container-fluid d-flex align-items-center justify-content-center min-vh-100${isDark ? ' dark' : ''}`}
@@ -258,8 +270,11 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                   onChange={handleNicknameChange}
                   maxLength={16}
                   placeholder="Enter your nickname"
+                  lang={langMap[language] || 'en'}
+                  inputMode="text"
+                  spellCheck={language === 'en'}
                   style={{ 
-                    fontFamily: "'JetBrains Mono', monospace", 
+                    fontFamily: "Noto Sans, Arial Unicode MS, system-ui, 'JetBrains Mono', monospace", 
                     fontSize: 'clamp(0.9rem, 3.5vw, 1rem)', 
                     background: isDark ? 'rgba(35, 41, 70, 0.7)' : 'rgba(245, 247, 250, 0.85)',
                     color: inputText, 
@@ -584,6 +599,39 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </div>
           )}
         </div>
+        {user && !loggedOut && (
+  <div style={{ marginTop: 32, textAlign: 'center', borderTop: '1px solid #e5e5e5', paddingTop: 24 }}>
+    <button
+      onClick={() => {
+        logout();
+        setLoggedOut(true);
+        navigate('/signin');
+      }}
+      style={{
+        background: '#ff6b6b',
+        color: 'white',
+        border: 'none',
+        borderRadius: '12px',
+        padding: '12px 36px',
+        fontSize: '1rem',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+        boxShadow: '0 4px 0 #ff6b6b33',
+        transition: 'all 0.2s',
+      }}
+    >
+      Log Out
+    </button>
+    <div style={{ color: '#ff6b6b', marginTop: 12, fontSize: '0.95rem' }}>
+      Logging out... You will be redirected to sign in.
+    </div>
+  </div>
+)}
+{loggedOut && (
+  <div style={{ marginTop: 32, textAlign: 'center', color: '#ff6b6b', fontWeight: 700 }}>
+    You have logged out. Redirecting to sign in...
+  </div>
+)}
         <ToastContainer position="top-center" autoClose={2500} hideProgressBar newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover aria-label="Notification Toasts" />
         <div className="text-muted small mt-4 d-flex align-items-center justify-content-center gap-2 text-center px-3" style={{ 
           color: isDark ? '#a5b4fc' : '#6c757d', 

@@ -81,6 +81,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   }, []);
 
   const createUser = async (userData: UserCreate) => {
+    if (user) throw new Error('You are already logged in. Log out to create a new profile.');
     try {
       setIsLoading(true);
       setError(null);

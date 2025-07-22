@@ -33,6 +33,9 @@ from database import init_db
 from user_api import router as user_router
 from game_api import router as game_router
 from engagement_api_v2 import router as engagement_v2_router
+from progression_api import router as progression_router
+from progression_tracking import router as progression_tracking_router
+from language_club import router as language_club_router
 
 app = FastAPI()
 
@@ -56,6 +59,9 @@ async def startup_event():
 app.include_router(user_router, prefix="/api/v1", tags=["users"])
 app.include_router(game_router, prefix="/api/v1", tags=["game"])
 app.include_router(engagement_v2_router, prefix="/api/v1", tags=["engagement"])
+app.include_router(progression_router, prefix="/api/v1", tags=["progression"])
+app.include_router(progression_tracking_router, prefix="/api/v1", tags=["progression-tracking"])
+app.include_router(language_club_router, prefix="/api/v1", tags=["language-club"])
 
 # Keep the old engagement router for backward compatibility
 app.include_router(engagement_router, tags=["engagement-legacy"])
@@ -410,7 +416,11 @@ def evaluate_argument(req: EvaluateRequest):
             elif dominant_tone == 'confrontational':
                 feedback.append("Consider a more respectful tone.")
         
-        return EvaluateResponse(persuaded=persuaded, feedback=" ".join(feedback), score=score)
+        # Clamp score between 0 and 100
+        score = max(0, min(100, score))
+        # Normalize to 0-10 scale for frontend display
+        normalized_score = round(score / 10)
+        return EvaluateResponse(persuaded=persuaded, feedback=" ".join(feedback), score=normalized_score)
     except Exception as e:
         print(f"Evaluation error: {e}")
         return EvaluateResponse(persuaded=False, feedback="Evaluation error.", score=0)

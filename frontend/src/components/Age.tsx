@@ -5,14 +5,20 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
   const [age, setAge] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess(false);
     const num = Number(age);
     
     if (!age) {
       setError('Please enter your age to continue');
+      return;
+    }
+    if (!/^\d+$/.test(age)) {
+      setError('Please enter a valid number');
       return;
     }
     if (isNaN(num)) {
@@ -31,6 +37,7 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
+      setSuccess(true);
       if (onConfirm) onConfirm(num);
     }, 800);
   };
@@ -39,7 +46,7 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
   const avatarUrl = typeof window !== 'undefined' ? localStorage.getItem('lq_avatar') : null;
 
   return (
-    <div style={{
+    <div className="age-verification-container" style={{
       minHeight: '100vh',
       display: 'flex',
       alignItems: 'center',
@@ -49,6 +56,7 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
       padding: '1rem',
     }}>
       <motion.div
+        className="age-verification-card"
         style={{
           width: '100%',
           maxWidth: '420px',
@@ -70,6 +78,7 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
         }}>
           {avatarUrl ? (
             <motion.img
+              className="age-verification-avatar"
               src={avatarUrl}
               alt="Selected Avatar"
               style={{
@@ -89,6 +98,7 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
             />
           ) : (
             <motion.div
+              className="age-verification-avatar"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -110,7 +120,7 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
               }}>person</span>
             </motion.div>
           )}
-          <h2 style={{
+          <h2 className="age-verification-title" style={{
             margin: 0,
             fontSize: '1.5rem',
             fontWeight: 700,
@@ -130,7 +140,7 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} style={{ marginTop: '1.5rem' }}>
+        <form onSubmit={handleSubmit} style={{ marginTop: '1.5rem' }} autoComplete="off" aria-label="Age Verification Form">
           <div style={{ marginBottom: '1.5rem' }}>
             <label htmlFor="age" style={{
               display: 'block',
@@ -150,7 +160,9 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
               onChange={e => {
                 const val = e.target.value.replace(/[^0-9]/g, '');
                 if (val === '' || (Number(val) >= 0 && Number(val) <= 120)) {
-                  setAge(val);
+                  setAge(val.replace(/^0+/, ''));
+                  setError('');
+                  setSuccess(false);
                 }
               }}
               placeholder="Enter your age"
@@ -158,12 +170,12 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
                 width: '100%',
                 padding: '1rem 1.25rem',
                 borderRadius: '14px',
-                border: '2px solid #e5e5e5',
+                border: error ? '2px solid #ff4d4f' : success ? '2px solid #58cc02' : '2px solid #e5e5e5',
                 fontSize: '1.1rem',
                 fontWeight: 600,
                 color: '#222',
                 transition: 'all 0.2s ease',
-                outline: 'none',
+                outline: error ? '2px solid #ff4d4f' : success ? '2px solid #58cc02' : 'none',
                 background: '#f9fdf7',
                 textAlign: 'center',
                 boxSizing: 'border-box',
@@ -171,13 +183,17 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
               }}
               min="13"
               max="120"
-              disabled={loading}
+              disabled={loading || success}
               autoFocus
+              aria-invalid={!!error}
+              aria-describedby={error ? 'age-error' : undefined}
             />
           </div>
 
           {error && (
             <motion.div
+              id="age-error"
+              role="alert"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -200,6 +216,30 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
               {error}
             </motion.div>
           )}
+          {success && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{
+                color: '#22c55e',
+                fontWeight: 600,
+                marginBottom: '1.25rem',
+                fontSize: '0.95rem',
+                background: '#f0fdf4',
+                padding: '0.85rem 1rem',
+                borderRadius: '12px',
+                border: '1px solid #bbf7d0',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              }}
+            >
+              <span className="material-icons" style={{ fontSize: '1.1rem' }}>check_circle</span>
+              Age verified!
+            </motion.div>
+          )}
 
           <motion.button
             type="submit"
@@ -208,21 +248,23 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
               padding: '0.875rem',
               borderRadius: '0.5rem',
               border: 'none',
-              background: loading ? '#e2e8f0' : '#58cc02',
+              background: loading ? '#e2e8f0' : success ? '#22c55e' : '#58cc02',
               color: loading ? '#94a3b8' : '#fff',
               fontSize: '1rem',
               fontWeight: 600,
-              cursor: loading ? 'not-allowed' : 'pointer',
+              cursor: loading || success ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: loading ? 'none' : '0 4px 0 #3caa3c',
+              boxShadow: loading || success ? 'none' : '0 4px 0 #3caa3c',
               transition: 'all 0.2s',
               gap: '0.5rem',
+              opacity: loading || success ? 0.7 : 1,
             }}
-            whileHover={!loading ? { scale: 1.02 } : {}}
-            whileTap={!loading ? { scale: 0.98 } : {}}
-            disabled={loading}
+            whileHover={!loading && !success ? { scale: 1.02 } : {}}
+            whileTap={!loading && !success ? { scale: 0.98 } : {}}
+            disabled={loading || success}
+            aria-disabled={loading || success}
           >
             {loading ? (
               <>
@@ -237,6 +279,11 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
                 }} />
                 Verifying...
               </>
+            ) : success ? (
+              <>
+                <span className="material-icons" style={{ fontSize: '1.1rem' }}>check_circle</span>
+                Verified
+              </>
             ) : (
               'Continue'
             )}
@@ -248,6 +295,22 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
       <style>{`
         @keyframes spin {
           to { transform: rotate(360deg); }
+        }
+        @media (max-width: 600px) {
+          .age-verification-container {
+            padding: 0.5rem !important;
+          }
+          .age-verification-card {
+            padding: 1.25rem 0.5rem !important;
+            max-width: 98vw !important;
+          }
+          .age-verification-avatar {
+            width: 60px !important;
+            height: 60px !important;
+          }
+          .age-verification-title {
+            font-size: 1.15rem !important;
+          }
         }
       `}</style>
     </div>

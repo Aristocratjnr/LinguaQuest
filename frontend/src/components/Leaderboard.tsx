@@ -97,8 +97,9 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
         backdropFilter: 'blur(6px)',
         zIndex: 4000,
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'center',
+        paddingTop: '5vh',
       }}>
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
@@ -112,10 +113,12 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
             minWidth: 320,
             maxWidth: 600,
             width: '95vw',
-            minHeight: 320,
-            maxHeight: '90vh',
-            padding: '40px 24px 32px 24px',
+            minHeight: 120,
+            maxHeight: '70vh',
             overflowY: 'auto',
+            // maxHeight: '90vh', // Remove this line
+            padding: '40px 24px 32px 24px',
+            // overflowY: 'auto', // Remove this line
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -157,10 +160,10 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
             marginBottom: 0
           }}>
             <div className="d-flex align-items-center justify-content-between" style={{ position: 'relative', zIndex: 1 }}>
-              <div className="d-flex align-items-center gap-3">
+              <div className="d-flex align-items-center gap-4">
                 <div style={{
-                  width: '48px',
-                  height: '48px',
+                  width: '40px',
+                  height: '40px',
                   borderRadius: '16px',
                   background: 'linear-gradient(135deg, #ffe082 0%, #ffd54f 100%)',
                   display: 'flex',
@@ -183,14 +186,20 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
                     fontSize: 'clamp(1.2rem, 3vw, 1.5rem)', 
                     letterSpacing: '.01em',
                     fontFamily: 'JetBrains Mono, monospace',
-                    fontWeight: 700
+                    fontWeight: 700,
+                    minWidth: 0,
+                    whiteSpace: 'nowrap',
                   }}>
                     Leaderboard
                   </h2>
                   <span style={{
                     color: '#b28704',
                     fontSize: 'clamp(0.7rem, 2vw, 0.9rem)',
-                    fontFamily: 'JetBrains Mono, monospace'
+                    fontFamily: 'JetBrains Mono, monospace',
+                    minWidth: 0,
+                    display: 'block',
+                    overflow: 'visible',
+                    whiteSpace: 'normal',
                   }}>
                     Global Rankings
                   </span>
@@ -219,15 +228,16 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
           <div className="p-0 p-md-4" style={{ minHeight: 400, padding: 'clamp(8px, 3vw, 32px)', width: '100%' }}>
             {/* Controls */}
             <div style={{
-              padding: 'clamp(12px, 3vw, 32px)',
+              padding: '8px 8px',
               borderBottom: theme === 'dark' 
                 ? '1px solid rgba(255,255,255,0.1)' 
                 : '1px solid rgba(88, 204, 2, 0.1)',
               background: theme === 'dark' 
                 ? 'rgba(255,255,255,0.02)' 
-                : 'rgba(88, 204, 2, 0.02)'
+                : 'rgba(88, 204, 2, 0.02)',
+              marginBottom: 10,
             }}>
-              <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+              <div className="flex flex-col sm:flex-row gap-3 justify-between items-center">
                 {/* Search Input */}
                 <div className="relative w-full sm:w-80">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -238,67 +248,68 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
                 </div>
                 <input
                   type="text"
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px 12px 48px',
-                      border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)'}`,
-                      borderRadius: '16px',
-                      background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#ffffff',
-                      color: theme === 'dark' ? '#ffffff' : '#2d3748',
-                      fontSize: '14px',
-                      outline: 'none',
-                      transition: 'all 0.2s ease',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-                    }}
-                    className="focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  style={{
+                    width: '80%',
+                    padding: '6px 10px 6px 36px',
+                    border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)'}`,
+                    borderRadius: '10px',
+                    background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#ffffff',
+                    color: theme === 'dark' ? '#ffffff' : '#2d3748',
+                    fontSize: '13px',
+                    outline: 'none',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.03)'
+                  }}
+                  className="focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   placeholder="Search players..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                    onFocus={e => {
-                      e.target.style.borderColor = '#58cc02';
-                      e.target.style.boxShadow = '0 4px 16px rgba(88, 204, 2, 0.15)';
-                    }}
-                    onBlur={e => {
-                      e.target.style.borderColor = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)';
-                      e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
-                    }}
+                  lang={langMap[language] || 'en'}
+                  onFocus={e => {
+                    e.target.style.borderColor = '#58cc02';
+                    e.target.style.boxShadow = '0 2px 8px rgba(88, 204, 2, 0.10)';
+                  }}
+                  onBlur={e => {
+                    e.target.style.borderColor = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)';
+                    e.target.style.boxShadow = '0 1px 4px rgba(0,0,0,0.03)';
+                  }}
                 />
               </div>
                 
                 {/* Sort Controls */}
-                <div className="flex items-center gap-3 w-full sm:w-auto">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
                   <div style={{ 
                     color: theme === 'dark' ? '#a0aec0' : '#718096',
-                    fontSize: 'clamp(0.8rem, 2vw, 14px)',
+                    fontSize: '13px',
                     fontWeight: 600,
                     fontFamily: 'JetBrains Mono, monospace'
                   }}>
                     Sort by:
                   </div>
                 <select
-                    style={{
-                      padding: '10px 16px',
-                      border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)'}`,
-                      borderRadius: '12px',
-                      background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#ffffff',
-                      color: theme === 'dark' ? '#ffffff' : '#2d3748',
-                      fontSize: '14px',
-                      outline: 'none',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-                    }}
-                    className="focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  style={{
+                    padding: '6px 10px',
+                    border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)'}`,
+                    borderRadius: '10px',
+                    background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#ffffff',
+                    color: theme === 'dark' ? '#ffffff' : '#2d3748',
+                    fontSize: '13px',
+                    outline: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.03)'
+                  }}
+                  className="focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   value={sortBy}
                   onChange={e => setSortBy(e.target.value as any)}
-                    onFocus={e => {
-                      e.target.style.borderColor = '#58cc02';
-                      e.target.style.boxShadow = '0 4px 16px rgba(88, 204, 2, 0.15)';
-                    }}
-                    onBlur={e => {
-                      e.target.style.borderColor = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)';
-                      e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.04)';
-                    }}
+                  onFocus={e => {
+                    e.target.style.borderColor = '#58cc02';
+                    e.target.style.boxShadow = '0 2px 8px rgba(88, 204, 2, 0.10)';
+                  }}
+                  onBlur={e => {
+                    e.target.style.borderColor = theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)';
+                    e.target.style.boxShadow = '0 1px 4px rgba(0,0,0,0.03)';
+                  }}
                 >
                   <option value="score">Score</option>
                   <option value="streak">Streak</option>
@@ -341,8 +352,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
             {/* Content Table */}
             <div style={{ 
               padding: 'clamp(12px, 3vw, 32px)',
-              maxHeight: '60vh',
-              overflowY: 'auto'
+              // maxHeight and overflowY removed to make all content visible
             }}>
               {loading ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

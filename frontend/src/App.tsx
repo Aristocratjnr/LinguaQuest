@@ -33,6 +33,8 @@ import chestOpen from './assets/images/chest-open.png';
 import LanguageSelector from './components/LanguageSelector';
 import ProgressionMap from './components/ProgressionMap';
 import LanguageClub from './components/LanguageClub';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import LoginPage from './components/LoginPage';
 
 // Duolingo color palette
 const DUOLINGO_COLORS = {
@@ -123,7 +125,7 @@ function AppContent() {
   const [showEngagement, setShowEngagement] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
-  const { user, userStats, submitScore, startGameSession, endGameSession, incrementStreak, resetStreak, awardBadge } = useUser();
+  const { user, userStats, submitScore, startGameSession, endGameSession, incrementStreak, resetStreak, awardBadge, refreshUserStats, loginUser } = useUser();
   const [showLogin, setShowLogin] = useState(false);
   const [showListeningModal, setShowListeningModal] = useState(false);
   // Add Duolingo streak and XP progress variables
@@ -192,6 +194,9 @@ function AppContent() {
     groupProgress: 760,
     challenge: 'Earn 1000 XP as a club this week!'
   };
+  // Add responsive styles and global age validation error UI
+  const [ageError, setAgeError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   // Apply theme class to body
   useEffect(() => {
@@ -289,8 +294,10 @@ function AppContent() {
         scenario, // Include scenario for better context
       });
       
+      console.log('Evaluation API response score:', res.data.score);
       setFeedback(res.data.feedback);
       setScore(res.data.score);
+      console.log('Set score to:', res.data.score);
       
       // Real-time XP calculation based on persuasiveness
       const baseXp = Math.floor(res.data.score * 10); // Base XP from score
@@ -468,24 +475,6 @@ function AppContent() {
     };
   };
 
-  // Scenario will be loaded after category/difficulty selection
-  // useEffect(() => {
-  //   fetchScenario();
-  //   // eslint-disable-next-line
-  // }, []);
-
-  // Auto-advance to next round after success/fail
-  useEffect(() => {
-    if (roundResult === 'success' || roundResult === 'fail') {
-      const timeout = setTimeout(() => {
-        if (round < TOTAL_ROUNDS) {
-          nextRound();
-        }
-      }, 2000);
-      return () => clearTimeout(timeout);
-    }
-  }, [roundResult, round, TOTAL_ROUNDS]);
-
   // Track round wins and unique words
   useEffect(() => {
     if (roundResult === 'success') {
@@ -589,10 +578,24 @@ function AppContent() {
   };
 
   // Handle age confirm
-  const handleLogin = (age: number) => {
+  const handleLogin = async (age: number) => {
+    if (isNaN(age) || age < 13 || age > 120) {
+      setAgeError('Please enter a valid age between 13 and 120.');
+      return;
+    }
+    setAgeError(null);
     setShowLogin(false);
     setShowEngagement(true);
     // You can store the age if needed
+    // Record login in backend after nickname is set
+    if (nickname) {
+      try {
+        await loginUser(nickname);
+      } catch (err) {
+        // Optionally handle login error (e.g., show a message)
+        console.error('Failed to record login:', err);
+      }
+    }
   };
 
   // Handle engagement start
@@ -743,7 +746,7 @@ function AppContent() {
   }, [dailyProgress]);
 
   // Daily chest reward logic
-  const handleOpenChest = () => {
+  const handleOpenChest = async () => {
     if (!chestOpenState) {
       setChestOpenState(true);
       // Random reward: XP, badge, or streak freeze
@@ -757,6 +760,35 @@ function AppContent() {
       const reward = rewards[Math.floor(Math.random() * rewards.length)];
       setChestReward(reward);
       setShowChestReward(true);
+
+      // If XP reward, animate and submit score
+      if (reward.includes('XP')) {
+        const xpAmount = parseInt(reward.replace(/[^0-9]/g, ''));
+        if (!isNaN(xpAmount)) {
+          // Animate XP increase
+          setDisplayedXp(prevXp => {
+            const newXp = prevXp + xpAmount;
+            // Optionally update level, etc. here if needed
+            return newXp;
+          });
+          // Submit score to backend for persistence
+          if (user) {
+            await submitScore({
+              score: xpAmount,
+              details: {
+                source: 'Daily Chest',
+                reward,
+                date: new Date().toISOString(),
+              },
+            });
+            // Refresh user stats to sync nav/progress
+            if (typeof refreshUserStats === 'function') {
+              await refreshUserStats();
+            }
+          }
+        }
+      }
+
       setTimeout(() => {
         setShowChestReward(false);
         setChestOpenState(false);
@@ -867,7 +899,7 @@ function AppContent() {
   }
 
   if (showSettingsPage) {
-    return <SettingsPage onClose={() => setShowSettingsPage(false)} />;
+    return <SettingsPage onClose={() => navigate('/')} />;
   }
 
  
@@ -882,7 +914,7 @@ function AppContent() {
       {/* Header - Duolingo style */}
       <header style={{
         background: DUOLINGO_COLORS.white,
-        padding: '12px 16px',
+        padding: 'clamp(8px, 2vw, 16px)',
         boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
         position: 'sticky',
         top: 0,
@@ -892,17 +924,20 @@ function AppContent() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          maxWidth: '1200px',
-          margin: '0 auto'
+          flexWrap: 'wrap',
+          minWidth: 0,
+          maxWidth: '100%',
+          margin: '0 auto',
+          gap: 'clamp(8px, 2vw, 24px)',
         }}>
           {/* Left: Logo + Streak */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '18px', minWidth: 0 }}>
+          <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 18px)', minWidth: 0, flex: 1, flexWrap: 'wrap' }}>
             {/* Logo and app name */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span style={{
                   color: DUOLINGO_COLORS.green,
-                  fontSize: '22px',
+                  fontSize: 'clamp(1.1rem, 4vw, 22px)',
                   fontWeight: 700,
                   fontFamily: 'JetBrains Mono, monospace',
                   letterSpacing: '0.01em',
@@ -910,11 +945,11 @@ function AppContent() {
                 }}>
                   LinguaQuest
                 </span>
-                <span className="material-icons" style={{ fontSize: '22px', color: DUOLINGO_COLORS.green, opacity: 0.85 }}>psychology</span>
+                <span className="material-icons" style={{ fontSize: 'clamp(1.1rem, 4vw, 22px)', color: DUOLINGO_COLORS.green, opacity: 0.85 }}>psychology</span>
               </div>
               <span style={{
                 color: DUOLINGO_COLORS.darkGray,
-                fontSize: '12px',
+                fontSize: 'clamp(0.7rem, 3vw, 12px)',
                 fontFamily: 'JetBrains Mono, monospace',
                 fontWeight: 400,
                 opacity: 0.7,
@@ -925,7 +960,7 @@ function AppContent() {
               </span>
             </div>
             {/* Streak + Daily Goal Ring */}
-            <div style={{ position: 'relative', width: 54, height: 54, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ position: 'relative', width: 'clamp(38px, 12vw, 54px)', height: 'clamp(38px, 12vw, 54px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {/* Mascot pop-up when daily goal is reached */}
               {showMascotCelebrate && (
                 <motion.img
@@ -940,8 +975,8 @@ function AppContent() {
                     left: '50%',
                     transform: 'translateX(-50%)',
                     top: -60,
-                    width: 48,
-                    height: 48,
+                    width: 'clamp(32px, 10vw, 48px)',
+                    height: 'clamp(32px, 10vw, 48px)',
                     zIndex: 10,
                     filter: 'drop-shadow(0 4px 16px #58cc0255)',
                     pointerEvents: 'none',
@@ -951,8 +986,8 @@ function AppContent() {
               {/* Sparkle/confetti effect */}
               {showMascotCelebrate && (
                 <Confetti
-                  width={120}
-                  height={80}
+                  width={80}
+                  height={60}
                   numberOfPieces={40}
                   recycle={false}
                   gravity={0.2}
@@ -966,7 +1001,7 @@ function AppContent() {
                 />
               )}
               {/* SVG Circular Progress */}
-              <svg width={54} height={54} style={{ position: 'absolute', top: 0, left: 0 }}>
+              <svg width="100%" height="100%" viewBox="0 0 54 54" style={{ position: 'absolute', top: 0, left: 0, minWidth: 0, minHeight: 0 }}>
                 <circle
                   cx={27}
                   cy={27}
@@ -992,7 +1027,7 @@ function AppContent() {
               </svg>
               {/* Flame icon */}
               <span className="material-icons" style={{
-                fontSize: 32,
+                fontSize: 'clamp(1.2rem, 6vw, 32px)',
                 color: '#ff9c1a',
                 filter: 'drop-shadow(0 2px 6px #ff9c1a33)',
                 zIndex: 1,
@@ -1007,7 +1042,7 @@ function AppContent() {
                 className="material-icons"
                 title="Streak Freeze: Protect your streak for one missed day!"
                 style={{
-                  fontSize: 26,
+                  fontSize: 'clamp(1rem, 5vw, 26px)',
                   color: hasStreakFreeze ? '#1cb0f6' : '#b0bec5',
                   position: 'absolute',
                   bottom: -8,
@@ -1036,7 +1071,7 @@ function AppContent() {
                   borderRadius: '10px',
                   padding: '2px 8px',
                   fontWeight: 700,
-                  fontSize: 14,
+                  fontSize: 'clamp(0.8rem, 3vw, 14px)',
                   color: '#ff9c1a',
                   boxShadow: '0 1px 4px #ff9c1a22',
                   border: '1.5px solid #ffe0b2',
@@ -1050,7 +1085,7 @@ function AppContent() {
               </motion.div>
             </div>
             {/* Daily XP label */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 0, flex: '1 1 80px', maxWidth: '100%' }}>
               <span style={{ fontWeight: 700, color: '#ff9c1a', fontSize: 15, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '0.01em' }}>
                 {userStats ? `${dailyXp} / ${DAILY_GOAL} XP` : '-- / 100 XP'}
               </span>
@@ -1060,13 +1095,13 @@ function AppContent() {
             </div>
           </div>
           {/* User profile and right side */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: 'clamp(4px, 2vw, 8px)', minWidth: 0, flexWrap: 'wrap', flexShrink: 0 }}>
             {/* Daily Reward Chest */}
             <motion.button
               style={{
-                width: 48,
-                height: 48,
-                marginRight: 8,
+                width: 'clamp(32px, 10vw, 48px)',
+                height: 'clamp(32px, 10vw, 48px)',
+                marginRight: 'clamp(2px, 1vw, 8px)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -1098,7 +1133,7 @@ function AppContent() {
               <motion.span
                 className="material-icons"
                 style={{
-                  fontSize: 32,
+                  fontSize: 'clamp(1.1rem, 6vw, 32px)',
                   color: chestOpenState ? '#ffb300' : '#8d6e63',
                   filter: chestOpenState ? 'brightness(1.2)' : 'none',
                   userSelect: 'none',
@@ -1122,7 +1157,7 @@ function AppContent() {
                     top: -10,
                     right: -10,
                     color: '#ffd700',
-                    fontSize: 24,
+                    fontSize: 'clamp(1rem, 5vw, 24px)',
                     filter: 'drop-shadow(0 2px 8px #ffd70088)',
                     zIndex: 3,
                     pointerEvents: 'none',
@@ -1136,10 +1171,10 @@ function AppContent() {
                 <motion.span
                   style={{
                     position: 'absolute',
-                    top: -16,
-                    left: -16,
-                    width: 80,
-                    height: 80,
+                    top: -12,
+                    left: -12,
+                    width: 'clamp(40px, 18vw, 80px)',
+                    height: 'clamp(40px, 18vw, 80px)',
                     borderRadius: '50%',
                     background: 'radial-gradient(circle, #ffe08255 0%, transparent 70%)',
                     zIndex: 1,
@@ -1152,8 +1187,8 @@ function AppContent() {
             </motion.button>
             <div 
               style={{
-                width: '36px',
-                height: '36px',
+                width: 'clamp(24px, 8vw, 36px)',
+                height: 'clamp(24px, 8vw, 36px)',
                 borderRadius: '50%',
                 background: theme === 'dark' ? '#232946' : DUOLINGO_COLORS.gray,
                 display: 'flex',
@@ -1171,31 +1206,31 @@ function AppContent() {
               <img 
                 src={user?.avatar_url || avatar} 
                 alt="User" 
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                style={{ width: '100%', height: '100%', objectFit: 'cover', minWidth: 0, minHeight: 0 }} 
               />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
               <span style={{
-                fontFamily: 'JetBrains Mono, monospace',
-                fontWeight: 400,
-                color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
-                fontSize: '13px',
-                opacity: 0.7,
-                letterSpacing: '0.01em',
-                lineHeight: 1.1
-              }}>
-                Welcome back
-              </span>
-              <span style={{
-                fontWeight: 'bold',
-                color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
-                fontSize: '14px',
-                fontFamily: 'JetBrains Mono, monospace',
-                letterSpacing: '0.01em',
-                lineHeight: 1.1
-              }}>
-                {nickname}
-              </span>
+                 fontFamily: 'JetBrains Mono, monospace',
+                 fontWeight: 400,
+                 color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
+                 fontSize: 'clamp(0.7rem, 3vw, 13px)',
+                 opacity: 0.7,
+                 letterSpacing: '0.01em',
+                 lineHeight: 1.1
+               }}>
+                 Welcome back
+               </span>
+               <span style={{
+                 fontWeight: 'bold',
+                 color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
+                 fontSize: 'clamp(0.8rem, 3vw, 14px)',
+                 fontFamily: 'JetBrains Mono, monospace',
+                 letterSpacing: '0.01em',
+                 lineHeight: 1.1
+               }}>
+                 {nickname}
+               </span>
             </div>
           </div>
         </div>
@@ -1290,29 +1325,55 @@ function AppContent() {
             boxSizing: 'border-box',
           }}
         >
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: theme === 'dark'
-            ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
-            : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
-          backdropFilter: 'blur(10px)',
-          WebkitBackdropFilter: 'blur(10px)',
-          borderRadius: '20px', // smaller radius
-          boxShadow: theme === 'dark'
-            ? '0 2px 8px rgba(35,41,70,0.18)'
-            : '0 2px 8px rgba(88,204,2,0.08)',
-          border: theme === 'dark'
-            ? '1px solid #232946'
-            : '1px solid rgba(88,204,2,0.12)',
-          color: theme === 'dark' ? '#e0e7ff' : undefined,
-          position: 'relative',
-          overflow: 'visible',
-          gap: '0',
-          minHeight: '110px', // smaller height
-          padding: '12px 10px', // smaller padding
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: theme === 'dark'
+              ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
+              : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+            borderRadius: '20px',
+            boxShadow: theme === 'dark'
+              ? '0 2px 8px rgba(35,41,70,0.18)'
+              : '0 2px 8px rgba(88,204,2,0.08)',
+            border: theme === 'dark'
+              ? '1px solid #232946'
+              : '1px solid rgba(88,204,2,0.12)',
+            color: theme === 'dark' ? '#e0e7ff' : undefined,
+            position: 'relative',
+            overflow: 'visible',
+            gap: '0',
+            minHeight: '110px',
+            padding: '12px 10px',
+            flexWrap: 'wrap',
+          }}
+        >
+          {/* Responsive style for mobile: stack vertically */}
+          <style>{`
+            @media (max-width: 600px) {
+              .progress-section-flex {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 12px !important;
+                min-height: 0 !important;
+                padding: 8px 2vw !important;
+              }
+              .progress-section-divider {
+                display: none !important;
+              }
+              .progress-section-timer, .progress-section-xp {
+                margin: 0 auto !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+                justify-content: center !important;
+              }
+            }
+          `}</style>
+          <div className="progress-section-flex" style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
             {/* Decorative background elements */}
             <motion.div
               animate={{
@@ -1355,7 +1416,6 @@ function AppContent() {
                 borderRadius: '50%'
               }}
             />
-            
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -1366,14 +1426,16 @@ function AppContent() {
                 position: 'relative',
                 zIndex: 1,
                 marginRight: '20px',
-                minHeight: '140px'
+                minHeight: '100px',
+                width: '100%',
+                boxSizing: 'border-box',
               }}
             >
             <ProgressBar round={round} totalRounds={TOTAL_ROUNDS} />
             </motion.div>
-            
             {/* Visual divider */}
             <motion.div
+              className="progress-section-divider"
               initial={{ opacity: 0, scaleY: 0 }}
               animate={{ opacity: 1, scaleY: 1 }}
               transition={{ duration: 0.6, delay: 0.5 }}
@@ -1388,9 +1450,9 @@ function AppContent() {
                 flexShrink: 0
               }}
             />
-            
             {/* Timer with enhanced styling */}
             <motion.div 
+              className="progress-section-timer"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
@@ -1410,9 +1472,9 @@ function AppContent() {
             >
             <Timer seconds={ROUND_TIME} timeLeft={timeLeft} isActive={timerActive} />
             </motion.div>
-            
             {/* Enhanced XP badge */}
             <motion.div
+              className="progress-section-xp"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.6 }}
@@ -1475,6 +1537,7 @@ function AppContent() {
               </motion.span>
             </motion.div>
           </div>
+        </div>
         </motion.div>
         {/* Two-column layout for cards */}
         <div style={{
@@ -1593,6 +1656,28 @@ function AppContent() {
                 </div>
               </div>
             </div>
+            {(roundResult === 'success' || roundResult === 'fail') && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                <button
+                  onClick={nextRound}
+                  style={{
+                    background: '#58cc02',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: '14px 36px',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 0 #3caa3c',
+                    transition: 'all 0.2s ease',
+                    margin: '0 auto',
+                  }}
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
           {/* Right column: ArgumentInput and ToneSelector */}
           <div style={{ flex: 1, minWidth: '320px', maxWidth: '520px' }}>
@@ -2153,46 +2238,76 @@ function AppContent() {
             exit={{ scale: 0.7, opacity: 0 }}
             transition={{ duration: 0.5, type: 'spring' }}
             style={{
-              background: 'linear-gradient(135deg, #fffbe6 0%, #e0ffe6 100%)',
-              color: '#3caa3c',
-              borderRadius: '32px',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+              background: 'rgba(255, 255, 255, 0.92)',
+              backdropFilter: 'blur(18px)',
+              WebkitBackdropFilter: 'blur(18px)',
+              color: '#3c2c00',
+              borderRadius: '36px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.18), 0 0 0 4px #ffcc8055',
               minWidth: '320px',
               maxWidth: '90vw',
               textAlign: 'center',
-              padding: '40px 36px',
+              padding: '48px 40px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '18px',
+              gap: '22px',
               position: 'relative',
+              border: '2.5px solid #ffb300',
+              overflow: 'hidden',
             }}
           >
+            {/* White overlay for extra clarity */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'rgba(255,255,255,0.55)',
+              zIndex: 0,
+              pointerEvents: 'none',
+            }} />
             <Confetti
               width={window.innerWidth}
               height={window.innerHeight}
               recycle={false}
               numberOfPieces={120}
               colors={[DUOLINGO_COLORS.green, DUOLINGO_COLORS.blue, DUOLINGO_COLORS.orange, DUOLINGO_COLORS.purple]}
-              style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none' }}
+              style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none', zIndex: 1 }}
             />
-            <span className="material-icons" style={{ fontSize: 64, color: '#ffb300', marginBottom: 8, filter: 'drop-shadow(0 2px 8px #ffd70088)' }}>emoji_events</span>
-            <h2 style={{ fontWeight: 800, fontSize: '2rem', margin: 0 }}>Daily Reward!</h2>
-            <div style={{ fontSize: '1.3rem', color: '#ff9c1a', marginBottom: '8px', fontWeight: 700 }}>{chestReward}</div>
+            <span className="material-icons" style={{ fontSize: 72, color: '#ffb300', marginBottom: 8, filter: 'drop-shadow(0 2px 8px #ffd70088)', zIndex: 2 }}>emoji_events</span>
+            <h2 style={{ fontWeight: 900, fontSize: '2.2rem', margin: 0, color: '#ffb300', textShadow: '0 2px 8px #fff, 0 1px 2px #0008', zIndex: 2 }}>Daily Reward!</h2>
+            {/* Reward text - highly visible pill */}
+            <div style={{
+              display: 'inline-block',
+              fontSize: '2.1rem',
+              color: '#fff',
+              background: 'linear-gradient(90deg, #ffb300 0%, #ffec80 100%)',
+              padding: '12px 36px',
+              borderRadius: '32px',
+              fontWeight: 900,
+              marginBottom: '12px',
+              boxShadow: '0 2px 12px #ffb30055, 0 0 0 2px #fff8',
+              border: '2.5px solid #ffb300',
+              textShadow: '0 2px 8px #000b, 0 1px 2px #fff8',
+              letterSpacing: '0.03em',
+              zIndex: 2,
+              position: 'relative',
+            }}>{chestReward}</div>
             <button
               onClick={() => setShowChestReward(false)}
               style={{
                 marginTop: '12px',
-                padding: '10px 28px',
-                borderRadius: '18px',
+                padding: '14px 36px',
+                borderRadius: '22px',
                 background: '#58cc02',
                 color: '#fff',
                 border: 'none',
-                fontWeight: 700,
-                fontSize: '1rem',
+                fontWeight: 800,
+                fontSize: '1.15rem',
                 cursor: 'pointer',
                 boxShadow: '0 2px 8px #58cc0222',
                 transition: 'all 0.2s',
+                zIndex: 2,
+                textShadow: '0 1px 2px #0008',
               }}
             >
               Thanks!
@@ -2418,7 +2533,6 @@ function AppContent() {
       {/* Progression Map Modal */}
       {showProgressionMap && (
         <ProgressionMap
-          skillTree={SKILL_TREE}
           onClose={() => setShowProgressionMap(false)}
         />
       )}
@@ -2644,14 +2758,40 @@ function AppContent() {
           </div>
         </div>
       )}
+      {/* Add global age validation error UI */}
+      {ageError && (
+        <div style={{
+          color: '#ff4d4f',
+          background: '#fff2f0',
+          border: '1px solid #ffccc7',
+          borderRadius: '12px',
+          padding: '1rem',
+          margin: '1rem auto',
+          maxWidth: 400,
+          fontWeight: 600,
+          fontSize: '1rem',
+          textAlign: 'center',
+          zIndex: 10000
+        }}>
+          <span className="material-icons" style={{ fontSize: '1.1rem', verticalAlign: 'middle', marginRight: 6 }}>error_outline</span>
+          {ageError}
+        </div>
+      )}
     </div>
   );
 }
 
 function App() {
+  const navigate = useNavigate();
   return (
     <UserProvider>
-      <AppContent />
+      <Routes>
+        <Route path="/signin" element={<LoginPage />} />
+        <Route path="/settings" element={<SettingsPage onClose={() => { navigate('/'); }} />} />
+        <Route path="/" element={
+          <AppContent />
+        } />
+      </Routes>
     </UserProvider>
   );
 }

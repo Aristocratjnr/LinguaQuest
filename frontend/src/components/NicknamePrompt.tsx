@@ -9,7 +9,14 @@ const MAX_LENGTH = 16;
 const MIN_LENGTH = 3;
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
 
-const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) => void }> = ({ onConfirm }) => {
+const langMap: Record<string, string> = {
+  twi: 'ak',
+  gaa: 'gaa',
+  ewe: 'ee',
+  en: 'en',
+};
+
+const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) => void, language?: string }> = ({ onConfirm, language = 'en' }) => {
   const [nickname, setNickname] = useState('');
   const [avatar, setAvatar] = useState<string | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -20,7 +27,10 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
   const [feedback, setFeedback] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const { addActivity } = useActivityFeed();
-  const { createUser } = useUser();
+  const { createUser, user, loginUser } = useUser();
+  const [loggedOut, setLoggedOut] = useState(false);
+  const [loginNickname, setLoginNickname] = useState('');
+  const [loginError, setLoginError] = useState('');
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -167,14 +177,104 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
     return '#64748b'; // slate
   };
 
+  if (user) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <div style={{ color: '#58cc02', fontWeight: 700, fontSize: '1.2rem', marginBottom: 16 }}>
+          You already have a profile as <span style={{ color: '#1cb0f6' }}>{user.nickname}</span>.
+        </div>
+        <div style={{ color: '#6c757d', marginBottom: 24 }}>
+          Please log out before creating a new profile.
+        </div>
+        <button
+          onClick={() => { setLoggedOut(true); }}
+          style={{
+            background: '#1cb0f6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '12px',
+            padding: '12px 32px',
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            boxShadow: '0 4px 0 #58cc0222',
+            transition: 'all 0.2s',
+          }}
+        >
+          Log Out
+        </button>
+      </div>
+    );
+  }
+  if (loggedOut) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <div style={{ color: '#ff6b6b', fontWeight: 700, fontSize: '1.1rem', marginBottom: 16 }}>
+          You have logged out.
+        </div>
+        <div style={{ color: '#6c757d', marginBottom: 24 }}>
+          You can log in with an existing profile below.
+        </div>
+        <input
+          type="text"
+          value={loginNickname}
+          onChange={e => setLoginNickname(e.target.value)}
+          placeholder="Enter your nickname"
+          style={{
+            padding: '0.75rem',
+            borderRadius: '8px',
+            border: '1.5px solid #e5e5e5',
+            fontSize: '1rem',
+            marginBottom: 12,
+            width: '100%',
+            maxWidth: 320
+          }}
+        />
+        <button
+          onClick={async () => {
+            setLoginError('');
+            try {
+              await loginUser(loginNickname.trim());
+              setLoggedOut(false);
+            } catch (err: any) {
+              setLoginError('No such profile found. Please check your nickname.');
+            }
+          }}
+          style={{
+            background: '#58cc02',
+            color: 'white',
+            border: 'none',
+            borderRadius: '12px',
+            padding: '12px 32px',
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            boxShadow: '0 4px 0 #58cc0222',
+            transition: 'all 0.2s',
+            marginBottom: 12
+          }}
+        >
+          Log In
+        </button>
+        {loginError && <div style={{ color: '#ff6b6b', marginTop: 8 }}>{loginError}</div>}
+        <div style={{ color: '#6c757d', marginTop: 24, fontSize: '0.95rem' }}>
+          You cannot create a new profile until you reload the app.
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div  style={{
+    <div className="nickname-prompt-container" style={{
       minHeight: '100vh',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       padding: '1rem',
-      background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))'
+      background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))',
+      width: '100vw',
+      boxSizing: 'border-box',
+      overflow: 'auto'
     }}>
       <motion.div 
         className="nickname-card"
@@ -185,7 +285,11 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           borderRadius: '1rem',
           overflow: 'hidden',
           boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-          color: 'inherit'
+          color: 'inherit',
+          margin: '0 auto',
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: 'auto',
         }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -214,6 +318,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
             transition={{ type: 'spring', stiffness: 400 }}
           >
             <motion.div
+              className="nickname-avatar-upload"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={triggerFileInput}
@@ -229,26 +334,29 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                 overflow: 'hidden',
                 cursor: 'pointer',
                 border: '3px solid white',
-                position: 'relative'
+                position: 'relative',
+                transition: 'width 0.2s, height 0.2s',
               }}
             >
               {avatarPreview ? (
                 <img 
                   src={avatarPreview} 
                   alt="Profile preview" 
+                  className="nickname-avatar-img"
                   style={{
                     width: '100%',
                     height: '100%',
-                    objectFit: 'cover'
+                    objectFit: 'cover',
+                    display: 'block',
                   }}
                 />
               ) : (
                 <>
-                  <span className="material-icons" style={{ 
+                  <span className="material-icons nickname-avatar-icon" style={{ 
                     fontSize: '2.5rem',
                     opacity: 0.8
                   }}>add_a_photo</span>
-                  <div style={{
+                  <div className="nickname-avatar-add-text" style={{
                     position: 'absolute',
                     bottom: 0,
                     left: 0,
@@ -256,7 +364,9 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                     background: 'rgba(0,0,0,0.5)',
                     color: 'white',
                     fontSize: '0.75rem',
-                    padding: '0.25rem'
+                    padding: '0.25rem',
+                    textAlign: 'center',
+                    width: '100%',
                   }}>
                     Add Photo
                   </div>
@@ -331,6 +441,9 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                 onKeyPress={handleKeyPress}
                 maxLength={MAX_LENGTH}
                 placeholder="e.g. langmaster123"
+                lang={langMap[language] || 'en'}
+                inputMode="text"
+                spellCheck={language === 'en'}
                 style={{
                   flex: 1,
                   padding: '0.75rem',
@@ -338,7 +451,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                   background: 'transparent',
                   outline: 'none',
                   fontSize: '1rem',
-                  fontFamily: '"JetBrains Mono", monospace',
+                  fontFamily: 'Noto Sans, Arial Unicode MS, system-ui, monospace',
                   color: 'var(--text-dark, #222)'
                 }}
               />
@@ -432,7 +545,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           
           <motion.button
             onClick={handleConfirm}
-            disabled={!valid || submitting}
+            disabled={submitting || !valid || !!user}
             whileHover={valid ? { scale: 1.02 } : {}}
             whileTap={valid ? { scale: 0.98 } : {}}
             style={{
@@ -529,6 +642,30 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           -webkit-font-feature-settings: 'liga';
           -webkit-font-smoothing: antialiased;
         }
+        .nickname-prompt-container {
+          width: 100vw;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%));
+          padding: 1rem;
+          box-sizing: border-box;
+          overflow: auto;
+        }
+        .nickname-card {
+          width: 100%;
+          max-width: 28rem;
+          background: var(--duo-card, #fff);
+          border-radius: 1rem;
+          overflow: hidden;
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          color: inherit;
+          margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          min-height: auto;
+        }
         .dark .nickname-prompt-container, body.dark .nickname-prompt-container {
           color: var(--text-light, #e0e7ff) !important;
         }
@@ -541,6 +678,74 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         }
         .dark .nickname-card p, body.dark .nickname-card p {
           color: var(--text-light, #e0e7ff) !important;
+        }
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+          .nickname-prompt-container {
+            padding: 0.25rem !important;
+            min-height: 100vh !important;
+            width: 100vw !important;
+            box-sizing: border-box;
+            overflow: auto;
+          }
+          .nickname-card {
+            max-width: 100vw !important;
+            width: 100vw !important;
+            border-radius: 0.5rem !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+            min-height: 100vh;
+            margin: 0 !important;
+          }
+          .nickname-card h2 {
+            font-size: 1.1rem !important;
+          }
+          .nickname-card p {
+            font-size: 0.85rem !important;
+          }
+          .nickname-card input {
+            font-size: 0.95rem !important;
+            padding: 0.6rem !important;
+          }
+          .nickname-card button, .nickname-card .motion-button {
+            font-size: 0.95rem !important;
+            padding: 0.7rem !important;
+          }
+          .nickname-card .material-icons {
+            font-size: 1.7rem !important;
+          }
+          .nickname-card [style*='width: 6rem'],
+          .nickname-avatar-upload {
+            width: 3.5rem !important;
+            height: 3.5rem !important;
+            min-width: 3.5rem !important;
+            min-height: 3.5rem !important;
+            max-width: 22vw !important;
+            max-height: 22vw !important;
+          }
+          .nickname-avatar-img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+          }
+          .nickname-avatar-icon {
+            font-size: 1.5rem !important;
+          }
+          .nickname-avatar-add-text {
+            font-size: 0.7rem !important;
+            padding: 0.18rem !important;
+          }
+          .nickname-card [style*='padding: 1rem 1.25rem'] {
+            padding: 0.7rem 0.5rem !important;
+          }
+          .nickname-card [style*='padding: 1rem'] {
+            padding: 0.7rem !important;
+          }
+          .nickname-card [style*='margin-bottom: 1.5rem'] {
+            margin-bottom: 1rem !important;
+          }
+          .nickname-card [style*='margin-top: 0.5rem'] {
+            margin-top: 0.3rem !important;
+          }
         }
       `}</style>
     </div>

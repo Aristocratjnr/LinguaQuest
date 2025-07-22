@@ -119,11 +119,14 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
         style={{
           width: '100%',
           maxWidth: '32rem',
-          background: 'var(--duo-card, #fff)',
+          background: 'rgba(255, 255, 255, 0.25)', // glassy background
           borderRadius: '1.25rem',
           overflow: 'hidden',
           boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-          color: 'inherit'
+          color: 'inherit',
+          backdropFilter: 'blur(16px) saturate(180%)', // glassy blur
+          WebkitBackdropFilter: 'blur(16px) saturate(180%)', // Safari support
+          border: '1px solid rgba(255, 255, 255, 0.35)', // subtle border
         }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

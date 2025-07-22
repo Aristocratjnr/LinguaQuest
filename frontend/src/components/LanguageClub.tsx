@@ -1,5 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import defaultAvatar from '../assets/images/avatar.jpg';
+import boyAvatar from '../assets/images/boy.png';
+import womanAvatar from '../assets/images/woman.jpg';
 
 interface ClubMember {
   nickname: string;
@@ -158,34 +161,39 @@ const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose })
             Club Leaderboard
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {sortedMembers.map((m, idx) => (
-              <motion.div
-                key={m.nickname}
-                initial={{ x: 40, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: idx * 0.08, type: 'spring', stiffness: 120, damping: 18 }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 14,
-                  background: idx === 0 ? 'linear-gradient(90deg, #1cb0f6 0%, #58cc02 100%)' : 'linear-gradient(90deg, #f0f4f8 0%, #e3f2fd 100%)',
-                  color: idx === 0 ? '#fff' : '#1cb0f6',
-                  borderRadius: 16,
-                  padding: '10px 18px',
-                  fontWeight: idx === 0 ? 900 : 700,
-                  fontSize: '1.08rem',
-                  boxShadow: idx === 0 ? '0 2px 8px #1cb0f655' : 'none',
-                  border: idx === 0 ? '2px solid #1cb0f6' : '2px solid #e3f2fd',
-                  position: 'relative',
-                }}
-              >
-                <span style={{ fontWeight: 300, fontSize: '1.15rem', minWidth: 24, textAlign: 'center', fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{idx + 1}</span>
-                <img src={m.avatar || mascotImg} alt="avatar" style={{ width: 36, height: 36, borderRadius: '50%', border: '2.5px solid #1cb0f6', objectFit: 'cover', background: '#fff', boxShadow: '0 2px 8px #1cb0f622' }} />
-                <span style={{ flex: 1, fontWeight: 300, fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{m.nickname}</span>
-                <span style={{ fontWeight: 300, fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{m.xp} XP</span>
-                {idx === 0 && <span className="material-icons" style={{ color: '#ffd700', fontSize: 22, marginLeft: 6 }}>emoji_events</span>}
-              </motion.div>
-            ))}
+            {sortedMembers.map((m, idx) => {
+              // Assign avatars in round-robin order if member.avatar is not set
+              const fallbackAvatars = [defaultAvatar, boyAvatar, womanAvatar];
+              const assignedAvatar = m.avatar || fallbackAvatars[idx % fallbackAvatars.length] || mascotImg;
+              return (
+                <motion.div
+                  key={m.nickname}
+                  initial={{ x: 40, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: idx * 0.08, type: 'spring', stiffness: 120, damping: 18 }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 14,
+                    background: idx === 0 ? 'linear-gradient(90deg, #1cb0f6 0%, #58cc02 100%)' : 'linear-gradient(90deg, #f0f4f8 0%, #e3f2fd 100%)',
+                    color: idx === 0 ? '#fff' : '#1cb0f6',
+                    borderRadius: 16,
+                    padding: '10px 18px',
+                    fontWeight: idx === 0 ? 900 : 700,
+                    fontSize: '1.08rem',
+                    boxShadow: idx === 0 ? '0 2px 8px #1cb0f655' : 'none',
+                    border: idx === 0 ? '2px solid #1cb0f6' : '2px solid #e3f2fd',
+                    position: 'relative',
+                  }}
+                >
+                  <span style={{ fontWeight: 300, fontSize: '1.15rem', minWidth: 24, textAlign: 'center', fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{idx + 1}</span>
+                  <img src={assignedAvatar} alt="avatar" style={{ width: 36, height: 36, borderRadius: '50%', border: '2.5px solid #1cb0f6', objectFit: 'cover', background: '#fff', boxShadow: '0 2px 8px #1cb0f622' }} />
+                  <span style={{ flex: 1, fontWeight: 300, fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{m.nickname}</span>
+                  <span style={{ fontWeight: 300, fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{m.xp} XP</span>
+                  {idx === 0 && <span className="material-icons" style={{ color: '#ffd700', fontSize: 22, marginLeft: 6 }}>emoji_events</span>}
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </motion.div>

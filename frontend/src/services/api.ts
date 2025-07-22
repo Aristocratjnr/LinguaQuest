@@ -117,6 +117,13 @@ export interface Badge {
   description?: string;
 }
 
+export interface ProgressionStage {
+  id: string;
+  label: string;
+  unlocked: boolean;
+  children?: ProgressionStage[];
+}
+
 export interface UserStats {
   total_score: number;
   games_played: number;
@@ -241,6 +248,15 @@ export const gameApi = {
 };
 
 // Engagement API
+// Progression API
+export const progressionApi = {
+  // Get user progression stages
+  getProgression: async (nickname: string): Promise<ProgressionStage[]> => {
+    const response = await api.get(`/progression/${nickname}`);
+    return response.data;
+  },
+};
+
 export const engagementApi = {
   // Get user streak
   getStreak: async (nickname: string): Promise<{ streak: number }> => {
