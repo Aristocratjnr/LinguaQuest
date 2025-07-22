@@ -114,6 +114,13 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const inputBg = isDark ? 'rgba(24, 28, 42, 0.5)' : 'rgba(255, 255, 255, 0.5)';
   const inputText = isDark ? '#e0e7ff' : '#22223b';
 
+  const langMap: Record<string, string> = {
+    twi: 'ak',
+    gaa: 'gaa',
+    ewe: 'ee',
+    en: 'en',
+  };
+
   return (
     <div className={`container-fluid d-flex align-items-center justify-content-center min-vh-100${isDark ? ' dark' : ''}`}
          style={{ 
@@ -258,6 +265,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                   onChange={handleNicknameChange}
                   maxLength={16}
                   placeholder="Enter your nickname"
+                  lang={langMap[language] || 'en'}
                   style={{ 
                     fontFamily: "'JetBrains Mono', monospace", 
                     fontSize: 'clamp(0.9rem, 3.5vw, 1rem)', 

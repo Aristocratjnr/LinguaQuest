@@ -9,7 +9,14 @@ const MAX_LENGTH = 16;
 const MIN_LENGTH = 3;
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
 
-const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) => void }> = ({ onConfirm }) => {
+const langMap: Record<string, string> = {
+  twi: 'ak',
+  gaa: 'gaa',
+  ewe: 'ee',
+  en: 'en',
+};
+
+const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) => void, language?: string }> = ({ onConfirm, language = 'en' }) => {
   const [nickname, setNickname] = useState('');
   const [avatar, setAvatar] = useState<string | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -168,13 +175,16 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
   };
 
   return (
-    <div  style={{
+    <div className="nickname-prompt-container" style={{
       minHeight: '100vh',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       padding: '1rem',
-      background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))'
+      background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))',
+      width: '100vw',
+      boxSizing: 'border-box',
+      overflow: 'auto'
     }}>
       <motion.div 
         className="nickname-card"
@@ -185,7 +195,11 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           borderRadius: '1rem',
           overflow: 'hidden',
           boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-          color: 'inherit'
+          color: 'inherit',
+          margin: '0 auto',
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: 'auto',
         }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -214,6 +228,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
             transition={{ type: 'spring', stiffness: 400 }}
           >
             <motion.div
+              className="nickname-avatar-upload"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={triggerFileInput}
@@ -229,26 +244,29 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                 overflow: 'hidden',
                 cursor: 'pointer',
                 border: '3px solid white',
-                position: 'relative'
+                position: 'relative',
+                transition: 'width 0.2s, height 0.2s',
               }}
             >
               {avatarPreview ? (
                 <img 
                   src={avatarPreview} 
                   alt="Profile preview" 
+                  className="nickname-avatar-img"
                   style={{
                     width: '100%',
                     height: '100%',
-                    objectFit: 'cover'
+                    objectFit: 'cover',
+                    display: 'block',
                   }}
                 />
               ) : (
                 <>
-                  <span className="material-icons" style={{ 
+                  <span className="material-icons nickname-avatar-icon" style={{ 
                     fontSize: '2.5rem',
                     opacity: 0.8
                   }}>add_a_photo</span>
-                  <div style={{
+                  <div className="nickname-avatar-add-text" style={{
                     position: 'absolute',
                     bottom: 0,
                     left: 0,
@@ -256,7 +274,9 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                     background: 'rgba(0,0,0,0.5)',
                     color: 'white',
                     fontSize: '0.75rem',
-                    padding: '0.25rem'
+                    padding: '0.25rem',
+                    textAlign: 'center',
+                    width: '100%',
                   }}>
                     Add Photo
                   </div>
@@ -331,6 +351,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                 onKeyPress={handleKeyPress}
                 maxLength={MAX_LENGTH}
                 placeholder="e.g. langmaster123"
+                lang={langMap[language] || 'en'}
                 style={{
                   flex: 1,
                   padding: '0.75rem',
@@ -529,6 +550,30 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           -webkit-font-feature-settings: 'liga';
           -webkit-font-smoothing: antialiased;
         }
+        .nickname-prompt-container {
+          width: 100vw;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%));
+          padding: 1rem;
+          box-sizing: border-box;
+          overflow: auto;
+        }
+        .nickname-card {
+          width: 100%;
+          max-width: 28rem;
+          background: var(--duo-card, #fff);
+          border-radius: 1rem;
+          overflow: hidden;
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+          color: inherit;
+          margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          min-height: auto;
+        }
         .dark .nickname-prompt-container, body.dark .nickname-prompt-container {
           color: var(--text-light, #e0e7ff) !important;
         }
@@ -541,6 +586,74 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         }
         .dark .nickname-card p, body.dark .nickname-card p {
           color: var(--text-light, #e0e7ff) !important;
+        }
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+          .nickname-prompt-container {
+            padding: 0.25rem !important;
+            min-height: 100vh !important;
+            width: 100vw !important;
+            box-sizing: border-box;
+            overflow: auto;
+          }
+          .nickname-card {
+            max-width: 100vw !important;
+            width: 100vw !important;
+            border-radius: 0.5rem !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+            min-height: 100vh;
+            margin: 0 !important;
+          }
+          .nickname-card h2 {
+            font-size: 1.1rem !important;
+          }
+          .nickname-card p {
+            font-size: 0.85rem !important;
+          }
+          .nickname-card input {
+            font-size: 0.95rem !important;
+            padding: 0.6rem !important;
+          }
+          .nickname-card button, .nickname-card .motion-button {
+            font-size: 0.95rem !important;
+            padding: 0.7rem !important;
+          }
+          .nickname-card .material-icons {
+            font-size: 1.7rem !important;
+          }
+          .nickname-card [style*='width: 6rem'],
+          .nickname-avatar-upload {
+            width: 3.5rem !important;
+            height: 3.5rem !important;
+            min-width: 3.5rem !important;
+            min-height: 3.5rem !important;
+            max-width: 22vw !important;
+            max-height: 22vw !important;
+          }
+          .nickname-avatar-img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+          }
+          .nickname-avatar-icon {
+            font-size: 1.5rem !important;
+          }
+          .nickname-avatar-add-text {
+            font-size: 0.7rem !important;
+            padding: 0.18rem !important;
+          }
+          .nickname-card [style*='padding: 1rem 1.25rem'] {
+            padding: 0.7rem 0.5rem !important;
+          }
+          .nickname-card [style*='padding: 1rem'] {
+            padding: 0.7rem !important;
+          }
+          .nickname-card [style*='margin-bottom: 1.5rem'] {
+            margin-bottom: 1rem !important;
+          }
+          .nickname-card [style*='margin-top: 0.5rem'] {
+            margin-top: 0.3rem !important;
+          }
         }
       `}</style>
     </div>

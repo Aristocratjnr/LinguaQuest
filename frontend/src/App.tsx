@@ -192,6 +192,8 @@ function AppContent() {
     groupProgress: 760,
     challenge: 'Earn 1000 XP as a club this week!'
   };
+  // Add responsive styles and global age validation error UI
+  const [ageError, setAgeError] = useState<string | null>(null);
 
   // Apply theme class to body
   useEffect(() => {
@@ -590,6 +592,11 @@ function AppContent() {
 
   // Handle age confirm
   const handleLogin = (age: number) => {
+    if (isNaN(age) || age < 13 || age > 120) {
+      setAgeError('Please enter a valid age between 13 and 120.');
+      return;
+    }
+    setAgeError(null);
     setShowLogin(false);
     setShowEngagement(true);
     // You can store the age if needed
@@ -2731,6 +2738,25 @@ function AppContent() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+      {/* Add global age validation error UI */}
+      {ageError && (
+        <div style={{
+          color: '#ff4d4f',
+          background: '#fff2f0',
+          border: '1px solid #ffccc7',
+          borderRadius: '12px',
+          padding: '1rem',
+          margin: '1rem auto',
+          maxWidth: 400,
+          fontWeight: 600,
+          fontSize: '1rem',
+          textAlign: 'center',
+          zIndex: 10000
+        }}>
+          <span className="material-icons" style={{ fontSize: '1.1rem', verticalAlign: 'middle', marginRight: 6 }}>error_outline</span>
+          {ageError}
         </div>
       )}
     </div>

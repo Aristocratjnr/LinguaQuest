@@ -264,6 +264,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
                   placeholder="Search players..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
+                  lang={langMap[language] || 'en'}
                   onFocus={e => {
                     e.target.style.borderColor = '#58cc02';
                     e.target.style.boxShadow = '0 2px 8px rgba(88, 204, 2, 0.10)';

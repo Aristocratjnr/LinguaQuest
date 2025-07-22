@@ -269,6 +269,47 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
           -webkit-font-feature-settings: 'liga';
           -webkit-font-smoothing: antialiased;
         }
+        /* Responsive styles */
+        @media (max-width: 600px) {
+          .avatar-picker-container {
+            padding: 0.25rem !important;
+            min-height: 100vh !important;
+          }
+          .avatar-picker-card {
+            max-width: 100vw !important;
+            border-radius: 0.5rem !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+          }
+          .avatar-picker-card h2 {
+            font-size: 1.1rem !important;
+          }
+          .avatar-picker-card p {
+            font-size: 0.8rem !important;
+          }
+          .avatar-picker-card [style*='padding: 1.5rem'] {
+            padding: 0.75rem !important;
+          }
+          .avatar-picker-card [style*='padding: 1rem'] {
+            padding: 0.5rem !important;
+          }
+          .avatar-picker-card [style*='padding: 0.875rem'] {
+            padding: 0.7rem !important;
+          }
+          .avatar-picker-card [style*='grid-template-columns'] {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 0.5rem !important;
+          }
+          .avatar-picker-card img {
+            min-width: 60px !important;
+            min-height: 60px !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+          }
+          .avatar-picker-card button, .avatar-picker-card [role='button'] {
+            font-size: 0.95rem !important;
+            padding: 0.7rem !important;
+          }
+        }
       `}</style>
       <style>{`
         .dark .avatar-picker-container, body.dark .avatar-picker-container {

@@ -13,6 +13,19 @@ type ArgumentInputProps = {
   enableVoice?: boolean;
 };
 
+const langMap: Record<string, string> = {
+  twi: 'ak',
+  gaa: 'gaa',
+  ewe: 'ee',
+  en: 'en',
+};
+const languageLabelMap: Record<string, string> = {
+  twi: 'Twi',
+  gaa: 'Ga',
+  ewe: 'Ewe',
+  en: 'English',
+};
+
 const ArgumentInput: React.FC<ArgumentInputProps> = ({ 
   userArgument, 
   onChange, 
@@ -87,7 +100,7 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
           fontSize: '0.85rem'
         }}>
           <i className="material-icons me-1" style={{ fontSize: '1rem' }}>translate</i>
-          English
+          {languageLabelMap[language] || 'English'}
         </span>
       </div>
 
@@ -99,6 +112,7 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
           rows={3}
           className="form-control"
           disabled={loading || disabled}
+          lang={langMap[language] || 'en'}
           style={{ 
             minHeight: 120, 
             resize: 'vertical',
