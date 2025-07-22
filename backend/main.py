@@ -416,7 +416,11 @@ def evaluate_argument(req: EvaluateRequest):
             elif dominant_tone == 'confrontational':
                 feedback.append("Consider a more respectful tone.")
         
-        return EvaluateResponse(persuaded=persuaded, feedback=" ".join(feedback), score=score)
+        # Clamp score between 0 and 100
+        score = max(0, min(100, score))
+        # Normalize to 0-10 scale for frontend display
+        normalized_score = round(score / 10)
+        return EvaluateResponse(persuaded=persuaded, feedback=" ".join(feedback), score=normalized_score)
     except Exception as e:
         print(f"Evaluation error: {e}")
         return EvaluateResponse(persuaded=False, feedback="Evaluation error.", score=0)

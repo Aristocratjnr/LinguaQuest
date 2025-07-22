@@ -113,6 +113,8 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
           className="form-control"
           disabled={loading || disabled}
           lang={langMap[language] || 'en'}
+          inputMode="text"
+          spellCheck={language === 'en'}
           style={{ 
             minHeight: 120, 
             resize: 'vertical',
@@ -125,7 +127,8 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
             fontSize: '1rem',
             lineHeight: 1.5,
             boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-            transition: 'all 0.2s ease'
+            transition: 'all 0.2s ease',
+            fontFamily: 'Noto Sans, Arial Unicode MS, system-ui, sans-serif',
           }}
           placeholder="Type your argument here..."
         />

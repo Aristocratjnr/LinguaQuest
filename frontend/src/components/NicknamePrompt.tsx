@@ -27,7 +27,10 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
   const [feedback, setFeedback] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const { addActivity } = useActivityFeed();
-  const { createUser } = useUser();
+  const { createUser, user, loginUser } = useUser();
+  const [loggedOut, setLoggedOut] = useState(false);
+  const [loginNickname, setLoginNickname] = useState('');
+  const [loginError, setLoginError] = useState('');
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -173,6 +176,93 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
     if (ratio > 0.7) return '#f59e0b'; // amber
     return '#64748b'; // slate
   };
+
+  if (user) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <div style={{ color: '#58cc02', fontWeight: 700, fontSize: '1.2rem', marginBottom: 16 }}>
+          You already have a profile as <span style={{ color: '#1cb0f6' }}>{user.nickname}</span>.
+        </div>
+        <div style={{ color: '#6c757d', marginBottom: 24 }}>
+          Please log out before creating a new profile.
+        </div>
+        <button
+          onClick={() => { setLoggedOut(true); }}
+          style={{
+            background: '#1cb0f6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '12px',
+            padding: '12px 32px',
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            boxShadow: '0 4px 0 #58cc0222',
+            transition: 'all 0.2s',
+          }}
+        >
+          Log Out
+        </button>
+      </div>
+    );
+  }
+  if (loggedOut) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <div style={{ color: '#ff6b6b', fontWeight: 700, fontSize: '1.1rem', marginBottom: 16 }}>
+          You have logged out.
+        </div>
+        <div style={{ color: '#6c757d', marginBottom: 24 }}>
+          You can log in with an existing profile below.
+        </div>
+        <input
+          type="text"
+          value={loginNickname}
+          onChange={e => setLoginNickname(e.target.value)}
+          placeholder="Enter your nickname"
+          style={{
+            padding: '0.75rem',
+            borderRadius: '8px',
+            border: '1.5px solid #e5e5e5',
+            fontSize: '1rem',
+            marginBottom: 12,
+            width: '100%',
+            maxWidth: 320
+          }}
+        />
+        <button
+          onClick={async () => {
+            setLoginError('');
+            try {
+              await loginUser(loginNickname.trim());
+              setLoggedOut(false);
+            } catch (err: any) {
+              setLoginError('No such profile found. Please check your nickname.');
+            }
+          }}
+          style={{
+            background: '#58cc02',
+            color: 'white',
+            border: 'none',
+            borderRadius: '12px',
+            padding: '12px 32px',
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            boxShadow: '0 4px 0 #58cc0222',
+            transition: 'all 0.2s',
+            marginBottom: 12
+          }}
+        >
+          Log In
+        </button>
+        {loginError && <div style={{ color: '#ff6b6b', marginTop: 8 }}>{loginError}</div>}
+        <div style={{ color: '#6c757d', marginTop: 24, fontSize: '0.95rem' }}>
+          You cannot create a new profile until you reload the app.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="nickname-prompt-container" style={{
@@ -352,6 +442,8 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                 maxLength={MAX_LENGTH}
                 placeholder="e.g. langmaster123"
                 lang={langMap[language] || 'en'}
+                inputMode="text"
+                spellCheck={language === 'en'}
                 style={{
                   flex: 1,
                   padding: '0.75rem',
@@ -359,7 +451,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                   background: 'transparent',
                   outline: 'none',
                   fontSize: '1rem',
-                  fontFamily: '"JetBrains Mono", monospace',
+                  fontFamily: 'Noto Sans, Arial Unicode MS, system-ui, monospace',
                   color: 'var(--text-dark, #222)'
                 }}
               />
@@ -453,7 +545,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           
           <motion.button
             onClick={handleConfirm}
-            disabled={!valid || submitting}
+            disabled={submitting || !valid || !!user}
             whileHover={valid ? { scale: 1.02 } : {}}
             whileTap={valid ? { scale: 0.98 } : {}}
             style={{

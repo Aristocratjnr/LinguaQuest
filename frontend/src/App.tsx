@@ -33,6 +33,8 @@ import chestOpen from './assets/images/chest-open.png';
 import LanguageSelector from './components/LanguageSelector';
 import ProgressionMap from './components/ProgressionMap';
 import LanguageClub from './components/LanguageClub';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import LoginPage from './components/LoginPage';
 
 // Duolingo color palette
 const DUOLINGO_COLORS = {
@@ -123,7 +125,7 @@ function AppContent() {
   const [showEngagement, setShowEngagement] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
-  const { user, userStats, submitScore, startGameSession, endGameSession, incrementStreak, resetStreak, awardBadge, refreshUserStats } = useUser();
+  const { user, userStats, submitScore, startGameSession, endGameSession, incrementStreak, resetStreak, awardBadge, refreshUserStats, loginUser } = useUser();
   const [showLogin, setShowLogin] = useState(false);
   const [showListeningModal, setShowListeningModal] = useState(false);
   // Add Duolingo streak and XP progress variables
@@ -194,6 +196,7 @@ function AppContent() {
   };
   // Add responsive styles and global age validation error UI
   const [ageError, setAgeError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   // Apply theme class to body
   useEffect(() => {
@@ -291,8 +294,10 @@ function AppContent() {
         scenario, // Include scenario for better context
       });
       
+      console.log('Evaluation API response score:', res.data.score);
       setFeedback(res.data.feedback);
       setScore(res.data.score);
+      console.log('Set score to:', res.data.score);
       
       // Real-time XP calculation based on persuasiveness
       const baseXp = Math.floor(res.data.score * 10); // Base XP from score
@@ -470,24 +475,6 @@ function AppContent() {
     };
   };
 
-  // Scenario will be loaded after category/difficulty selection
-  // useEffect(() => {
-  //   fetchScenario();
-  //   // eslint-disable-next-line
-  // }, []);
-
-  // Auto-advance to next round after success/fail
-  useEffect(() => {
-    if (roundResult === 'success' || roundResult === 'fail') {
-      const timeout = setTimeout(() => {
-        if (round < TOTAL_ROUNDS) {
-          nextRound();
-        }
-      }, 2000);
-      return () => clearTimeout(timeout);
-    }
-  }, [roundResult, round, TOTAL_ROUNDS]);
-
   // Track round wins and unique words
   useEffect(() => {
     if (roundResult === 'success') {
@@ -591,7 +578,7 @@ function AppContent() {
   };
 
   // Handle age confirm
-  const handleLogin = (age: number) => {
+  const handleLogin = async (age: number) => {
     if (isNaN(age) || age < 13 || age > 120) {
       setAgeError('Please enter a valid age between 13 and 120.');
       return;
@@ -600,6 +587,15 @@ function AppContent() {
     setShowLogin(false);
     setShowEngagement(true);
     // You can store the age if needed
+    // Record login in backend after nickname is set
+    if (nickname) {
+      try {
+        await loginUser(nickname);
+      } catch (err) {
+        // Optionally handle login error (e.g., show a message)
+        console.error('Failed to record login:', err);
+      }
+    }
   };
 
   // Handle engagement start
@@ -903,7 +899,7 @@ function AppContent() {
   }
 
   if (showSettingsPage) {
-    return <SettingsPage onClose={() => setShowSettingsPage(false)} />;
+    return <SettingsPage onClose={() => navigate('/')} />;
   }
 
  
@@ -1660,6 +1656,28 @@ function AppContent() {
                 </div>
               </div>
             </div>
+            {(roundResult === 'success' || roundResult === 'fail') && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                <button
+                  onClick={nextRound}
+                  style={{
+                    background: '#58cc02',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: '14px 36px',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 0 #3caa3c',
+                    transition: 'all 0.2s ease',
+                    margin: '0 auto',
+                  }}
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
           {/* Right column: ArgumentInput and ToneSelector */}
           <div style={{ flex: 1, minWidth: '320px', maxWidth: '520px' }}>
@@ -2764,9 +2782,16 @@ function AppContent() {
 }
 
 function App() {
+  const navigate = useNavigate();
   return (
     <UserProvider>
-      <AppContent />
+      <Routes>
+        <Route path="/signin" element={<LoginPage />} />
+        <Route path="/settings" element={<SettingsPage onClose={() => { navigate('/'); }} />} />
+        <Route path="/" element={
+          <AppContent />
+        } />
+      </Routes>
     </UserProvider>
   );
 }
