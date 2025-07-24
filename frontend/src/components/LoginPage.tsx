@@ -96,7 +96,7 @@ const LoginPage: React.FC = () => {
         .duo-login-bg {
           min-height: 100vh;
           width: 100vw;
-          background: linear-gradient(135deg, #58cc02 0%, #89e219 50%, #58cc02 100%);
+          background: linear-gradient(135deg, #ffffff, #ffffff); 
           display: flex;
           align-items: center;
           justify-content: center;
