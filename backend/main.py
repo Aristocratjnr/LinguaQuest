@@ -64,7 +64,31 @@ app.include_router(progression_tracking_router, prefix="/api/v1", tags=["progres
 app.include_router(language_club_router, prefix="/api/v1", tags=["language-club"])
 
 # Keep the old engagement router for backward compatibility
-app.include_router(engagement_router, tags=["engagement-legacy"])
+app.include_router(engagement_router, prefix="/api/engagement", tags=["engagement-legacy"])
+
+# Add root endpoint
+@app.get("/")
+def read_root():
+    """Root endpoint - API status"""
+    return {
+        "message": "LinguaQuest API is running!",
+        "version": "1.0.0",
+        "status": "active",
+        "endpoints": {
+            "docs": "/docs",
+            "api": "/api/v1",
+            "health": "/health"
+        }
+    }
+
+@app.get("/health")
+def health_check():
+    """Health check endpoint"""
+    return {
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "database": "connected"
+    }
 
 # Initialize enhanced NLP services
 sentiment_analyzer = EnhancedSentimentAnalyzer()
@@ -180,19 +204,25 @@ def get_scenario(req: ScenarioRequest):
         try:
             print(f"Attempting LibreTranslate translation to {req.language}...")
             translated = libre_translate(scenario_en, "en", req.language)
-            if translated and not translated.startswith("["):
+            if translated and not translated.startswith("[") and "INVALID TARGET LANGUAGE" not in translated.upper():
                 print(f"LibreTranslate translation successful: {translated}")
                 return ScenarioResponse(scenario=translated, language=req.language)
-            print("LibreTranslate translation returned invalid result")
+            print(f"LibreTranslate translation failed or unsupported: {translated}")
         except Exception as e:
             print(f"LibreTranslate translation failed: {e}")
         
-        # 5. If all translation attempts fail, return English with a message
-        print("All translation attempts failed - returning English with message")
-        return ScenarioResponse(
-            scenario=f"{scenario_en} [Translation not available for {req.language}]",
-            language="en"
-        )
+        # 5. If all translation attempts fail, return English with a helpful message
+        print(f"All translation attempts failed for language '{req.language}' - returning English with message")
+        if req.language in ['twi', 'gaa', 'ewe']:
+            return ScenarioResponse(
+                scenario=f"{scenario_en} [Note: Translation to {req.language.upper()} is not yet available. Playing in English.]",
+                language="en"
+            )
+        else:
+            return ScenarioResponse(
+                scenario=f"{scenario_en} [Translation to {req.language} not available]",
+                language="en"
+            )
         
     except Exception as e:
         print(f"Scenario generation error: {e}")
@@ -215,38 +245,56 @@ class TranslationResponse(BaseModel):
 
 # --- LibreTranslate Real-Time Translation ---
 def libre_translate(text, source, target):
+    # Map internal language codes to external service codes
+    external_source = EXTERNAL_LANG_MAP.get(source, source)
+    external_target = EXTERNAL_LANG_MAP.get(target, target)
+    
+    # Check if the target language is supported by external services
+    if target in ['twi', 'gaa', 'ewe'] and external_target in ['ak', 'gaa', 'ee']:
+        print(f"Warning: Language '{target}' may not be supported by external translation services")
+    
     urls = [
         "https://libretranslate.de/translate",
         "https://translate.argosopentech.com/translate"
     ]
     payload = {
         "q": text,
-        "source": source,
-        "target": target,
+        "source": external_source,
+        "target": external_target,
         "format": "text"
     }
     for url in urls:
         try:
             response = requests.post(url, data=payload, timeout=10)
-            print(f"LibreTranslate response from {url}: {response.text}")
+            print(f"LibreTranslate response from {url}: Status {response.status_code}")
             if response.status_code != 200:
+                print(f"LibreTranslate service error: {response.status_code}")
                 continue
             try:
-                return response.json().get("translatedText", "[Translation error]")
+                data = response.json()
+                translated_text = data.get("translatedText", "[Translation error]")
+                if translated_text and not translated_text.startswith("["):
+                    return translated_text
+                print(f"LibreTranslate returned invalid translation: {translated_text}")
             except Exception as e:
-                print(f"JSON decode error from {url}: {e}")
+                print(f"JSON decode error from {url}: {e} - Response might be HTML")
                 continue
         except Exception as e:
             print(f"Request error from {url}: {e}")
             continue
     # Fallback: MyMemory API
     try:
-        mm_url = f"https://api.mymemory.translated.net/get?q={quote(text)}&langpair={source}|{target}"
+        mm_url = f"https://api.mymemory.translated.net/get?q={quote(text)}&langpair={external_source}|{external_target}"
         mm_response = requests.get(mm_url, timeout=10)
         print(f"MyMemory response: {mm_response.text}")
         if mm_response.status_code == 200:
             data = mm_response.json()
-            return data.get("responseData", {}).get("translatedText", "[Translation error]")
+            translated_text = data.get("responseData", {}).get("translatedText", "[Translation error]")
+            # Check if translation failed due to unsupported language
+            if "INVALID TARGET LANGUAGE" in translated_text.upper() or "INVALID SOURCE LANGUAGE" in translated_text.upper():
+                print(f"Language pair {external_source}|{external_target} not supported by MyMemory")
+                return f"[Translation not available for {target}]"
+            return translated_text
     except Exception as e:
         print(f"MyMemory error: {e}")
     return "[Translation error: All translation services failed]"
@@ -265,7 +313,7 @@ except Exception as e:
     nllb_tokenizer = None
     nllb_model = None
 
-# Updated language code mapping for African languages
+# Updated language code mapping for African languages (NLLB)
 LANG_CODE_MAP = {
     'en': 'eng_Latn',
     'fr': 'fra_Latn',
@@ -282,16 +330,61 @@ LANG_CODE_MAP = {
     'ha': 'hau_Latn',  # Hausa
 }
 
+# Language code mapping for external translation services (LibreTranslate, MyMemory)
+EXTERNAL_LANG_MAP = {
+    'en': 'en',
+    'fr': 'fr',
+    'es': 'es',
+    'de': 'de',
+    'pt': 'pt',
+    'sw': 'sw',  # Swahili
+    'yo': 'yo',  # Yoruba
+    'ha': 'ha',  # Hausa
+    # African languages that may not be supported by external services
+    'twi': 'ak',  # Use Akan code, but may still not be supported
+    'ak': 'ak',   # Akan
+    'ewe': 'ee',  # Ewe (may not be supported)
+    'gaa': 'gaa', # Ga (likely not supported)
+}
+
 def nllb_translate(text, src_lang, tgt_lang):
+    if nllb_model is None or nllb_tokenizer is None:
+        raise Exception("NLLB model not available")
+    
     src_code = LANG_CODE_MAP.get(src_lang, 'eng_Latn')
     tgt_code = LANG_CODE_MAP.get(tgt_lang, 'eng_Latn')
-    inputs = nllb_tokenizer(text, return_tensors="pt")
-    with torch.no_grad():
-        translated_tokens = nllb_model.generate(
-            **inputs,
-            forced_bos_token_id=nllb_tokenizer.lang_code_to_id[tgt_code]
-        )
-    return nllb_tokenizer.decode(translated_tokens[0], skip_special_tokens=True)
+    
+    try:
+        # Encode the input text
+        inputs = nllb_tokenizer(text, return_tensors="pt")
+        
+        # Generate translation
+        with torch.no_grad():
+            # Use the newer API for setting the target language
+            translated_tokens = nllb_model.generate(
+                **inputs,
+                forced_bos_token_id=nllb_tokenizer.convert_tokens_to_ids(tgt_code),
+                max_length=512
+            )
+        
+        # Decode the translation
+        translation = nllb_tokenizer.decode(translated_tokens[0], skip_special_tokens=True)
+        return translation
+    except Exception as e:
+        print(f"NLLB translation error: {e}")
+        # Try alternative method for setting target language
+        try:
+            inputs = nllb_tokenizer(f"{tgt_code} {text}", return_tensors="pt")
+            with torch.no_grad():
+                translated_tokens = nllb_model.generate(**inputs, max_length=512)
+            translation = nllb_tokenizer.decode(translated_tokens[0], skip_special_tokens=True)
+            # Remove the language code prefix if present
+            if translation.startswith(tgt_code):
+                translation = translation[len(tgt_code):].strip()
+            return translation
+        except Exception as e2:
+            print(f"NLLB fallback translation error: {e2}")
+            raise Exception(f"NLLB translation failed: {e}")
 
 @app.post("/translate", response_model=TranslationResponse)
 def translate_text(req: TranslationRequest):
@@ -577,5 +670,3 @@ def analyze_sentiment_and_tone(req: SentimentRequest):
             tone_confidence=0.0,
             tone_scores={"polite": 0.0, "passionate": 0.0, "formal": 0.0, "casual": 0.0, "confrontational": 0.0}
         )
-
-app.include_router(engagement_router, prefix="/api/engagement")

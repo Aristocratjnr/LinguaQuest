@@ -29,6 +29,22 @@ TIPS = [
     'Collect badges for creative and high-scoring arguments.',
 ]
 
+# Categories and difficulties for game selection
+CATEGORIES = [
+    {"key": "food", "label": "Food", "icon": "restaurant"},
+    {"key": "environment", "label": "Environment", "icon": "eco"},
+    {"key": "technology", "label": "Technology", "icon": "devices"},
+    {"key": "culture", "label": "Culture", "icon": "diversity_3"},
+    {"key": "education", "label": "Education", "icon": "school"},
+    {"key": "health", "label": "Health", "icon": "health_and_safety"},
+]
+
+DIFFICULTIES = [
+    {"key": "easy", "label": "Easy"},
+    {"key": "medium", "label": "Medium"},
+    {"key": "hard", "label": "Hard"},
+]
+
 @router.get('/streak')
 def get_streak(nickname: str = Query(...), db: Session = Depends(get_db)):
     """Get user's current streak"""
@@ -153,4 +169,14 @@ def get_quotes():
 @router.get('/tips', response_model=List[str])
 def get_tips():
     """Get game tips"""
-    return TIPS 
+    return TIPS
+
+@router.get('/categories')
+def get_categories():
+    """Get available categories for game selection"""
+    return CATEGORIES
+
+@router.get('/difficulties')
+def get_difficulties():
+    """Get available difficulty levels for game selection"""
+    return DIFFICULTIES 

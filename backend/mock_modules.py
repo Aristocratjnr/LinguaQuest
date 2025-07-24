@@ -34,3 +34,24 @@ def get_quotes():
 @router.get("/tips")
 def get_tips():
     return ["Practice daily!", "Try speaking with native speakers."]
+
+@router.get("/categories")
+def get_categories():
+    """Get available categories for game selection"""
+    return [
+        {"key": "food", "label": "Food", "icon": "restaurant"},
+        {"key": "environment", "label": "Environment", "icon": "eco"},
+        {"key": "technology", "label": "Technology", "icon": "devices"},
+        {"key": "culture", "label": "Culture", "icon": "diversity_3"},
+        {"key": "education", "label": "Education", "icon": "school"},
+        {"key": "health", "label": "Health", "icon": "health_and_safety"},
+    ]
+
+@router.get("/difficulties")
+def get_difficulties():
+    """Get available difficulty levels for game selection"""
+    return [
+        {"key": "easy", "label": "Easy"},
+        {"key": "medium", "label": "Medium"},
+        {"key": "hard", "label": "Hard"},
+    ]
