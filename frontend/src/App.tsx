@@ -1579,6 +1579,7 @@ function AppContent() {
                     loading={loading}
                     onLanguageChange={handleScenarioLanguageChange}
                     languages={LANGUAGES}
+                    error={scenario === 'Error loading scenario.' ? 'Failed to load scenario from server' : undefined}
                   />
                 </div>
               </div>
@@ -1713,6 +1714,9 @@ function AppContent() {
                     onTranslate={handleTranslate}
                     translation={translation}
                     language={language}
+                    languages={LANGUAGES}
+                    enableVoice={true}
+                    maxLength={500}
                   />
                   <div style={{ marginTop: '24px' }}>
                     <ToneSelector

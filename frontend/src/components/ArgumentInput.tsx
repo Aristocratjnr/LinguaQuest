@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useActivityFeed } from './ActivityFeedContext';
 
@@ -10,21 +10,19 @@ type ArgumentInputProps = {
   onTranslate: () => void;
   translation: string;
   language: string;
+  languages: { code: string; label: string }[];
   enableVoice?: boolean;
+  maxLength?: number;
+  error?: string;
 };
 
-const langMap: Record<string, string> = {
-  twi: 'ak',
-  gaa: 'gaa',
-  ewe: 'ee',
-  en: 'en',
-};
-const languageLabelMap: Record<string, string> = {
-  twi: 'Twi',
-  gaa: 'Ga',
-  ewe: 'Ewe',
-  en: 'English',
-};
+// Language mapping for HTML lang attribute and speech recognition
+const LANGUAGE_CONFIG = {
+  twi: { htmlLang: 'ak', speechLang: 'en-US', label: 'Twi' },
+  gaa: { htmlLang: 'gaa', speechLang: 'en-US', label: 'Ga' },
+  ewe: { htmlLang: 'ee', speechLang: 'en-US', label: 'Ewe' },
+  en: { htmlLang: 'en', speechLang: 'en-US', label: 'English' },
+} as const;
 
 const ArgumentInput: React.FC<ArgumentInputProps> = ({ 
   userArgument, 
@@ -33,39 +31,78 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
   disabled, 
   onTranslate, 
   translation, 
-  language, 
-  enableVoice 
+  language,
+  languages,
+  enableVoice = false,
+  maxLength = 500,
+  error
 }) => {
   const [listening, setListening] = useState(false);
-  let recognition: any = null;
   const { addActivity } = useActivityFeed();
 
-  const handleVoiceInput = () => {
+  // Get current language configuration
+  const currentLanguageConfig = useMemo(() => 
+    LANGUAGE_CONFIG[language as keyof typeof LANGUAGE_CONFIG] || LANGUAGE_CONFIG.en, 
+    [language]
+  );
+
+  // Get language label from props or fallback to config
+  const languageLabel = useMemo(() => {
+    const langFromProps = languages.find(l => l.code === language);
+    return langFromProps?.label || currentLanguageConfig.label;
+  }, [languages, language, currentLanguageConfig]);
+
+  // Character count with validation
+  const isOverLimit = userArgument.length > maxLength;
+  const characterCountColor = isOverLimit ? '#dc3545' : 
+    userArgument.length > maxLength * 0.8 ? '#ffc107' : '#6c757d';
+
+  const handleVoiceInput = useCallback(() => {
+    if (!enableVoice) return;
+    
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
       alert('Speech recognition is not supported in this browser.');
       return;
     }
+    
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
+    const recognition = new SpeechRecognition();
+    
+    recognition.lang = currentLanguageConfig.speechLang;
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
+    recognition.continuous = false;
+    
     setListening(true);
     recognition.start();
+    
     recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
       onChange(transcript);
       setListening(false);
       addActivity({ type: 'action', message: 'Used voice input for argument' });
     };
-    recognition.onerror = () => setListening(false);
+    
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setListening(false);
+    };
+    
     recognition.onend = () => setListening(false);
-  };
+  }, [enableVoice, currentLanguageConfig.speechLang, onChange, addActivity]);
 
-  const handleTranslate = () => {
-    addActivity({ type: 'action', message: 'Submitted an argument.' });
-    onTranslate();
-  };
+  const handleTranslate = useCallback(() => {
+    if (userArgument.trim() && !isOverLimit) {
+      addActivity({ type: 'action', message: `Submitted an argument in ${languageLabel}` });
+      onTranslate();
+    }
+  }, [userArgument, isOverLimit, languageLabel, addActivity, onTranslate]);
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    // Allow typing but warn about limit
+    onChange(newValue);
+  }, [onChange]);
 
   return (
     <motion.div
@@ -100,7 +137,7 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
           fontSize: '0.85rem'
         }}>
           <i className="material-icons me-1" style={{ fontSize: '1rem' }}>translate</i>
-          {languageLabelMap[language] || 'English'}
+          {languageLabel}
         </span>
       </div>
 
@@ -108,11 +145,11 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
       <div className="position-relative mb-3">
         <textarea
           value={userArgument}
-          onChange={e => onChange(e.target.value)}
+          onChange={handleInputChange}
           rows={3}
           className="form-control"
           disabled={loading || disabled}
-          lang={langMap[language] || 'en'}
+          lang={currentLanguageConfig.htmlLang}
           inputMode="text"
           spellCheck={language === 'en'}
           style={{ 
@@ -130,8 +167,19 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
             transition: 'all 0.2s ease',
             fontFamily: 'Noto Sans, Arial Unicode MS, system-ui, sans-serif',
           }}
-          placeholder="Type your argument here..."
+          placeholder={`Type your argument here... (max ${maxLength} characters)`}
         />
+        {error && (
+          <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{
+            backgroundColor: 'rgba(248, 215, 218, 0.9)',
+            borderRadius: '12px'
+          }}>
+            <div className="text-center">
+              <i className="material-icons text-danger mb-2" style={{ fontSize: '2rem' }}>error_outline</i>
+              <p className="text-danger mb-0 small fw-bold">{error}</p>
+            </div>
+          </div>
+        )}
         <div className="position-absolute bottom-0 end-0 me-3 mb-2 d-flex gap-2">
           {enableVoice && (
             <motion.button
@@ -160,9 +208,16 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
           <div className="text-muted small d-flex align-items-center" style={{ 
             backgroundColor: 'rgba(255,255,255,0.7)',
             padding: '0.25rem 0.5rem',
-            borderRadius: '12px'
+            borderRadius: '12px',
+            color: characterCountColor,
+            fontWeight: isOverLimit ? 600 : 400
           }}>
-            {userArgument.length}/500
+            {userArgument.length}/{maxLength}
+            {isOverLimit && (
+              <i className="material-icons ms-1" style={{ fontSize: '0.9rem', color: '#dc3545' }}>
+                warning
+              </i>
+            )}
           </div>
         </div>
       </div>
@@ -171,23 +226,24 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
       <motion.button
         className="btn w-100 mb-3 py-3 d-flex align-items-center justify-content-center"
         onClick={handleTranslate}
-        disabled={loading || !userArgument || disabled}
+        disabled={loading || !userArgument.trim() || disabled || isOverLimit}
         style={{ 
-          backgroundColor: loading ? '#cccccc' : '#58a700',
+          backgroundColor: loading || isOverLimit ? '#cccccc' : '#58a700',
           color: 'white',
           border: 'none',
           borderRadius: '12px',
           fontWeight: 600,
           fontSize: '1rem',
-          boxShadow: loading ? 'none' : '0 4px 0 rgba(88, 167, 0, 0.2)',
+          boxShadow: loading || isOverLimit ? 'none' : '0 4px 0 rgba(88, 167, 0, 0.2)',
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          opacity: disabled ? 0.6 : 1
         }}
-        whileHover={!loading && !disabled ? { 
+        whileHover={!loading && !disabled && !isOverLimit ? { 
           y: -2,
           boxShadow: '0 6px 0 rgba(88, 167, 0, 0.2)'
         } : {}}
-        whileTap={!loading && !disabled ? { 
+        whileTap={!loading && !disabled && !isOverLimit ? { 
           y: 2,
           boxShadow: '0 2px 0 rgba(88, 167, 0, 0.2)'
         } : {}}
@@ -197,10 +253,15 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
             <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
             Translating...
           </>
+        ) : isOverLimit ? (
+          <>
+            <i className="material-icons align-middle me-2">warning</i>
+            Text too long (max {maxLength})
+          </>
         ) : (
           <>
             <i className="material-icons align-middle me-2">translate</i>
-            Translate to {language.toUpperCase()}
+            Translate to {languageLabel}
           </>
         )}
       </motion.button>
@@ -254,12 +315,19 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
           width: '20px',
           height: '20px',
           borderRadius: '50%',
-          backgroundColor: '#e8f5e9',
-          color: '#58a700'
+          backgroundColor: isOverLimit ? '#fee2e2' : '#e8f5e9',
+          color: isOverLimit ? '#dc3545' : '#58a700'
         }}>
-          <i className="material-icons" style={{ fontSize: '0.9rem' }}>info</i>
+          <i className="material-icons" style={{ fontSize: '0.9rem' }}>
+            {isOverLimit ? 'warning' : 'tips_and_updates'}
+          </i>
         </span>
-        Enter your argument in English, then translate it to practice
+        <span style={{ color: '#6c757d', fontSize: '0.92rem', fontWeight: 400 }}>
+          {isOverLimit 
+            ? `Please reduce your text to ${maxLength} characters or less`
+            : `Enter your argument in English, then translate to practice ${languageLabel}${enableVoice ? ' (voice input available)' : ''}`
+          }
+        </span>
       </div>
     </motion.div>
   );
