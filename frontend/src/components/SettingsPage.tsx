@@ -127,45 +127,32 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   };
 
   return (
-    <div className={`container-fluid d-flex align-items-center justify-content-center min-vh-100${isDark ? ' dark' : ''}`}
-         style={{ 
-           background: bgGradient,
-           padding: '1rem',
-           paddingTop: '2rem',
-           paddingBottom: '2rem',
-           backgroundSize: 'cover',
-           backgroundPosition: 'center',
-           // Add a subtle pattern overlay for depth
-           backgroundImage: isDark 
-             ? 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.03\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'1\'/%3E%3C/g%3E%3C/svg%3E")'
-             : 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'0.03\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'1\'/%3E%3C/g%3E%3C/svg%3E")'
-         }}>
-      <motion.div
-        className="card shadow-lg w-100"
-        style={{ 
-          maxWidth: 'min(95vw, 500px)',
-          width: '100%',
-          borderRadius: 20, 
-          fontFamily: "'JetBrains Mono', monospace", 
-          minHeight: 'auto',
-          background: glassBackground,
-          backdropFilter: glassBackdropFilter,
-          WebkitBackdropFilter: glassBackdropFilter, 
-          border: glassBorder,
-          boxShadow: glassBoxShadow,
-          color: inputText, 
-          margin: '0 auto',
-          // Add a subtle light reflection at the top
-          backgroundImage: isDark
-            ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 0%, transparent 40%)'
-            : 'linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 0%, transparent 40%)',
-          // Ensure consistent edge rounding
-          overflow: 'hidden'
-        }}
-        initial={{ opacity: 0, y: 32 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-      >
+    <motion.div
+      className="card shadow-lg w-100"
+      style={{ 
+        maxWidth: 'min(95vw, 500px)',
+        width: '100%',
+        borderRadius: 20, 
+        fontFamily: "'JetBrains Mono', monospace", 
+        minHeight: 'auto',
+        background: glassBackground,
+        backdropFilter: glassBackdropFilter,
+        WebkitBackdropFilter: glassBackdropFilter, 
+        border: glassBorder,
+        boxShadow: glassBoxShadow,
+        color: inputText, 
+        margin: '0 auto',
+        // Add a subtle light reflection at the top
+        backgroundImage: isDark
+          ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 0%, transparent 40%)'
+          : 'linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 0%, transparent 40%)',
+        // Ensure consistent edge rounding
+        overflow: 'hidden'
+      }}
+      initial={{ opacity: 0, y: 32 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+    >
         {/* --- HEADER --- */}
         <div className="card-header d-flex justify-content-between align-items-center border-bottom py-3 px-3 px-sm-4"
              style={{ 
@@ -200,7 +187,11 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           </div>
           <button 
             className={`btn btn-sm rounded-circle ms-2${isDark ? ' text-light' : ''}`} 
-            onClick={onClose} 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClose();
+            }} 
             style={{ 
               width: 40, 
               height: 40, 
@@ -659,7 +650,11 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             whileHover={{ scale: 1.03 }} 
             whileTap={{ scale: 0.97 }} 
             className={`btn btn-outline-primary px-4 w-100 w-sm-auto rounded-pill${isDark ? ' text-light' : ''}`} 
-            onClick={onClose} 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClose();
+            }} 
             style={{ 
               borderRadius: 16, 
               fontWeight: 600, 
@@ -676,7 +671,6 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           </motion.button>
         </div>
       </motion.div>
-    </div>
   );
 };
 

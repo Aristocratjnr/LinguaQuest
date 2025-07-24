@@ -15,7 +15,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
       title: "Welcome to LinguaQuest!",
       description: "Embark on a fun journey to master languages through interactive conversations",
       icon: "explore",
-      color: "#58CC02",
+      color: "#FFFFF",
       character: "👋"
     },
     {
@@ -72,137 +72,57 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
   };
 
   return (
-    <div
-      className="welcome-container"
-      style={{
-        minHeight: '100vh',
-        width: '100vw',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))',
-        backgroundAttachment: 'fixed',
-        padding: '1rem',
-        color: 'var(--text-dark, #222)',
-        boxSizing: 'border-box',
-        overflow: 'auto',
-      }}
-    >
-      {/* Animated background elements */}
-      <motion.div 
-        className="position-absolute top-0 start-0 w-100 h-100"
-        style={{ 
-          background: 'url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIwLjA1IiBjeD0iMjAiIGN5PSIyMCIgcj0iMTgiLz48L2c+PC9zdmc+")',
-          opacity: 0.3,
-          zIndex: 0
-        }}
-        animate={{ 
-          backgroundPosition: ['0% 0%', '100% 100%'] 
-        }}
-        transition={{ 
-          duration: 60,
-          repeat: Infinity,
-          repeatType: "reverse",
-          ease: "linear"
-        }}
-      />
+    <div className="duo-welcome-bg">
+      <div className="duo-bg-decorations">
+        <div className="decoration-orb orb-1"></div>
+        <div className="decoration-orb orb-2"></div>
+        <div className="decoration-orb orb-3"></div>
+        <div className="decoration-orb orb-4"></div>
+      </div>
       
       <motion.div 
-        className="welcome-card shadow-lg position-relative"
-        style={{ 
-          width: '100%',
-          borderRadius: '16px',
-          overflow: 'hidden',
-          fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-          border: 'none',
-          zIndex: 1,
-          backdropFilter: 'blur(4px)',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-          background: 'var(--duo-card, #fff)',
-          color: 'inherit',
-          margin: '0 auto',
-          maxWidth: '400px' // Added max-width for better control
-        }}
-        initial={{ opacity: 0, y: 32 }}
-        animate={{ opacity: 1, y: 0 }}
+        className="duo-welcome-card"
+        initial={{ opacity: 0, y: 40, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ 
-          duration: 0.6, 
-          ease: [0.16, 1, 0.3, 1],
+          type: 'spring', 
+          stiffness: 300, 
+          damping: 25,
           delay: 0.1
         }}
       >
         {/* Logo Header */}
-        <div className="card-header text-center py-3 border-bottom-0 d-flex flex-column align-items-center" 
-             style={{ 
-               background: 'transparent',
-             }}>
+        <div className="duo-welcome-header">
           <motion.div 
-            className="mb-2 p-2 rounded-circle d-flex align-items-center justify-content-center mx-auto" 
-            style={{ 
-              background: '#58cc02', 
-              width: '60px', 
-              height: '60px',
-              boxShadow: '0 4px 12px rgba(88, 204, 2, 0.3)'
-            }}
+            className="duo-logo-container"
             initial={{ scale: 0.8, rotate: -15 }}
             animate={{ 
               scale: 1, 
-              rotate: 0,
-              boxShadow: '0 6px 20px rgba(88, 204, 2, 0.4)'
+              rotate: 0
             }}
             transition={{ 
               type: 'spring', 
               stiffness: 400, 
-              damping: 10,
+              damping: 15,
               delay: 0.3
             }}
           >
-            <img 
-              src={logo} 
-              alt="LinguaQuest Logo" 
-              className="img-fluid" 
-              style={{ 
-                height: '36px', 
-                width: '36px', 
-                objectFit: 'contain',
-                filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.1))'
-              }} 
-            />
           </motion.div>
-          <motion.h1 
-            className="fw-bold mb-0" 
-            style={{ 
-              padding: '0.6rem',
-              background: '#ffffff',
-              textAlign: 'center',
-              color: 'var(--text-light, #e0e7ff)'
-            }}
-            initial={{ opacity: 0, y: -10 }}
+          
+          <motion.div
+            className="duo-welcome-text"
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.4, type: 'spring' }}
           >
-            LinguaQuest
-          </motion.h1>
-          <motion.p 
-            className="mt-1 mb-0" 
-            style={{ 
-              margin: '0.5rem 0 0',
-              opacity: 0.9,
-              fontSize: '0.875rem',
-              color: 'var(--text-dark, #222)'
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            Learn languages the fun way!
-          </motion.p>
+           
+          </motion.div>
         </div>
         
         {/* Slide Content */}
-        <div className="card-body p-0" style={{ background: 'transparent' }}>
+        <div className="duo-slide-container">
           {/* Slider */}
-          <div className="position-relative" style={{ minHeight: '240px', overflow: 'hidden' }}>
+          <div className="duo-slider-wrapper">
             <AnimatePresence custom={direction} initial={false}>
               <motion.div
                 key={currentSlide}
@@ -211,29 +131,24 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
                 initial="enter"
                 animate="center"
                 exit="exit"
-                className="p-3 p-sm-4 text-center d-flex flex-column align-items-center"
-                style={{ position: 'absolute', width: '100%' }}
+                className="duo-slide-content"
               >
                 <motion.div 
-                  className="mb-3 p-2 rounded-circle d-flex align-items-center justify-content-center mx-auto" 
+                  className="duo-slide-icon"
                   style={{ 
-                    background: `${slides[currentSlide].color}15`, 
-                    width: '80px', 
-                    height: '80px',
-                    fontSize: '2.5rem',
-                    border: `2px solid ${slides[currentSlide].color}30`,
-                    boxShadow: `0 4px 12px ${slides[currentSlide].color}20`
+                    background: `linear-gradient(135deg, ${slides[currentSlide].color}20, ${slides[currentSlide].color}10)`,
+                    border: `3px solid ${slides[currentSlide].color}30`,
+                    boxShadow: `0 8px 24px ${slides[currentSlide].color}20`
                   }}
                   initial={{ scale: 0.8, rotate: -15 }}
                   animate={{ 
                     scale: 1, 
-                    rotate: 0,
-                    boxShadow: `0 6px 20px ${slides[currentSlide].color}30`
+                    rotate: 0
                   }}
                   transition={{ 
                     type: 'spring',
                     stiffness: 400,
-                    damping: 10,
+                    damping: 15,
                     delay: 0.1
                   }}
                 >
@@ -241,36 +156,19 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
                 </motion.div>
                 
                 <motion.h2 
-                  style={{ 
-                    fontSize: '1.25rem', 
-                    fontWeight: 700, 
-                    color: 'var(--text-dark, #222)',
-                    marginBottom: '0.75rem',
-                    letterSpacing: '-0.01em',
-                    lineHeight: 1.3,
-                    padding: '0 0.5rem'
-                  }}
-                  initial={{ opacity: 0, y: 10 }}
+                  className="duo-slide-title"
+                  initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
+                  transition={{ delay: 0.2, type: 'spring' }}
                 >
                   {slides[currentSlide].title}
                 </motion.h2>
                 
                 <motion.p 
-                  style={{ 
-                    fontSize: '0.95rem', 
-                    color: 'var(--text-dark, #4b5563)',
-                    lineHeight: 1.5,
-                    maxWidth: '90%',
-                    letterSpacing: '0.01em',
-                    marginBottom: 0,
-                    fontWeight: 400,
-                    padding: '0 0.5rem'
-                  }}
-                  initial={{ opacity: 0, y: 10 }}
+                  className="duo-slide-description"
+                  initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
+                  transition={{ delay: 0.3, type: 'spring' }}
                 >
                   {slides[currentSlide].description}
                 </motion.p>
@@ -280,72 +178,37 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           
           {/* Get Started Button - Only show on the last slide */}
           {currentSlide === slides.length - 1 && (
-            <div className="px-3 pb-3">
+            <motion.div
+              className="duo-cta-section"
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
+            >
               <motion.button
-                className="btn btn-primary w-100 text-center d-flex align-items-center justify-content-center"
-                style={{ 
-                  background: '#58cc02',
-                  border: 'none',
-                  borderRadius: '12px',
-                  padding: '0.75rem',
-                  fontSize: '1rem',
-                  fontFamily: "'JetBrains Mono', monospace",
-                  fontWeight: 'bold',
-                  letterSpacing: '1px',
-                  boxShadow: '0 3px 0 #3caa3c',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  color: 'white',
-                  textTransform: 'uppercase'
-                }}
+                className="duo-get-started-btn"
                 onClick={onGetStarted}
                 whileHover={{ 
                   scale: 1.02, 
-                  boxShadow: '0 4px 0 #3caa3c',
-                  transition: { type: 'spring', stiffness: 400 }
+                  y: -2
                 }}
                 whileTap={{ scale: 0.98 }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, type: 'spring' }}
+                transition={{ type: 'spring', stiffness: 400 }}
               >
-                <span className="position-relative z-10">
-                  <i className="material-icons align-middle me-2" style={{ fontSize: '1rem' }}>
-                    arrow_forward
-                  </i>
-                  GET STARTED
-                </span>
-                <motion.span 
-                  className="position-absolute top-0 left-0 w-100 h-100"
-                  style={{
-                    background: 'linear-gradient(to right, rgba(255,255,255,0.1), rgba(255,255,255,0.3))',
-                    transform: 'translateX(-100%)'
-                  }}
-                  animate={{
-                    transform: ['translateX(-100%)', 'translateX(100%)']
-                  }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    repeatDelay: 1
-                  }}
-                />
+                <span className="btn-text">START YOUR QUEST</span>
+                <span className="material-icons">rocket_launch</span>
+                <div className="btn-shine"></div>
               </motion.button>
-            </div>
+            </motion.div>
           )}
           
           {/* Navigation Dots */}
-          <div className="d-flex justify-content-center pb-2">
+          <div className="duo-dots-container">
             {slides.map((slide, index) => (
               <motion.div
                 key={index}
-                className="mx-1 cursor-pointer"
+                className={`duo-nav-dot ${currentSlide === index ? 'active' : ''}`}
                 style={{ 
-                  width: currentSlide === index ? 20 : 6,
-                  height: 6,
-                  borderRadius: 3,
-                  background: currentSlide === index ? slide.color : '#d1d5db',
-                  cursor: 'pointer',
+                  background: currentSlide === index ? slide.color : '#d1d5db'
                 }}
                 onClick={() => {
                   setDirection(index > currentSlide ? 1 : -1);
@@ -353,83 +216,46 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
                 }}
                 whileHover={{ scale: 1.2 }}
                 whileTap={{ scale: 0.9 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 15 }}
               />
             ))}
           </div>
           
           {/* Navigation Buttons */}
-          <div className="d-flex flex-row justify-content-between align-items-center px-3 pb-3 gap-2">
+          <div className="duo-nav-buttons">
             <motion.button 
-              className="btn btn-outline-secondary btn-sm w-100 d-flex align-items-center justify-content-center"
-              style={{ 
-                borderRadius: '8px',
-                fontFamily: "'JetBrains Mono', monospace",
-                letterSpacing: '1px',
-                opacity: currentSlide === 0 ? 0 : 1,
-                pointerEvents: currentSlide === 0 ? 'none' : 'auto',
-                borderColor: '#d1d5db',
-                color: 'var(--text-dark, #4b5563)',
-                gap: '4px',
-                fontWeight: 'bold',
-                backgroundColor: 'rgba(255,255,255,0.7)',
-                padding: '0.375rem',
-                textTransform: 'uppercase'
-              }}
+              className={`duo-nav-btn prev ${currentSlide === 0 ? 'hidden' : ''}`}
               onClick={() => paginate(-1)}
               disabled={currentSlide === 0}
-              whileHover={{ backgroundColor: '#f3f4f6' }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={currentSlide !== 0 ? { scale: 1.02, y: -1 } : {}}
+              whileTap={currentSlide !== 0 ? { scale: 0.98 } : {}}
               transition={{ type: 'spring', stiffness: 300 }}
             >
-              <i className="material-icons" style={{ fontSize: '0.9rem' }}>arrow_back</i>
-              <span>PREV</span>
+              <span className="material-icons">arrow_back</span>
+              <span>BACK</span>
             </motion.button>
             
             {currentSlide < slides.length - 1 ? (
               <motion.button 
-                className="btn btn-primary btn-sm w-100 d-flex align-items-center justify-content-center"
-                style={{ 
-                  borderRadius: '8px',
-                  fontFamily: "'JetBrains Mono', monospace",
-                  letterSpacing: '1px',
-                  background: '#58cc02',
-                  border: 'none',
-                  gap: '4px',
-                  boxShadow: '0 3px 0 #3caa3c',
-                  color: 'var(--text-light, #e0e7ff)',
-                  fontWeight: 'bold',
-                  padding: '0.375rem',
-                  textTransform: 'uppercase'
-                }}
+                className="duo-nav-btn next"
                 onClick={() => paginate(1)}
-                whileHover={{ 
-                  scale: 1.02, 
-                  boxShadow: '0 4px 0 #3caa3c',
-                  transition: { type: 'spring', stiffness: 400 }
-                }}
+                whileHover={{ scale: 1.02, y: -1 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ type: 'spring', stiffness: 300 }}
               >
                 <span>NEXT</span>
-                <i className="material-icons" style={{ fontSize: '0.9rem' }}>arrow_forward</i>
+                <span className="material-icons">arrow_forward</span>
               </motion.button>
             ) : (
-              <div style={{ minWidth: '90px' }} /> // Spacer for alignment
+              <div className="nav-spacer" />
             )}
           </div>
         </div>
         
         {/* Footer */}
-        <div className="card-footer py-2 text-center border-top-0 d-flex flex-row justify-content-between align-items-center gap-2" 
-             style={{ 
-               background: 'transparent',
-               fontSize: '0.71rem',
-               color: 'var(--text-dark, #6b7280)',
-               borderTop: '1px solid rgba(0, 0, 0, 0.05)'
-             }}>
+        <div className="duo-welcome-footer">
           <motion.span 
-            style={{ letterSpacing: '0.01em', fontWeight: 500 }}
+            className="duo-copyright"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
@@ -437,21 +263,12 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
             © 2025 LinguaQuest
           </motion.span>
           <motion.button 
-            className="btn btn-sm p-0 text-primary"
-            style={{ 
-              fontSize: '0.71rem',
-              background: 'transparent',
-              border: 'none',
-              letterSpacing: '1px',
-              minWidth: 80,
-              fontWeight: 'bold',
-              textTransform: 'uppercase'
-            }}
+            className="duo-skip-btn"
             onClick={() => {
               setDirection(1);
               setCurrentSlide(slides.length - 1);
             }}
-            whileHover={{ color: '#58cc02' }}
+            whileHover={{ scale: 1.05, color: '#58cc02' }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300 }}
           >
@@ -459,25 +276,410 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           </motion.button>
         </div>
       </motion.div>
+
       <style>{`
-        .dark .welcome-container, body.dark .welcome-container {
-          color: var(--text-light, #e0e7ff) !important;
+        .duo-welcome-bg {
+          min-height: 100vh;
+          width: 100vw;
+          background: linear-gradient(135deg, #ffffff, #ffffff); 
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          overflow: hidden;
+          font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          padding: 20px;
         }
-        .dark .welcome-card, body.dark .welcome-card {
-          color: var(--text-light, #e0e7ff) !important;
-          background: var(--duo-card, #232946) !important;
+
+        .duo-bg-decorations {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 0;
         }
-        .dark .welcome-card h1, .dark .welcome-card h2, .dark .welcome-card p, .dark .welcome-card .btn, .dark .welcome-card .card-footer, body.dark .welcome-card h1, body.dark .welcome-card h2, body.dark .welcome-card p, body.dark .welcome-card .btn, body.dark .welcome-card .card-footer {
-          color: var(--text-light, #e0e7ff) !important;
+
+        .decoration-orb {
+          position: absolute;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 50%;
+          animation: orbFloat 12s ease-in-out infinite;
         }
-        .dark .welcome-card .btn-primary, body.dark .welcome-card .btn-primary {
-          background: var(--duo-green, #58cc02) !important;
-          color: var(--text-light, #e0e7ff) !important;
+
+        .orb-1 {
+          width: 150px;
+          height: 150px;
+          top: 10%;
+          left: 5%;
+          animation-delay: 0s;
         }
-        .dark .welcome-card .btn-outline-secondary, body.dark .welcome-card .btn-outline-secondary {
-          color: var(--text-light, #e0e7ff) !important;
-          border-color: #a5b4fc !important;
-          background: rgba(35,41,70,0.7) !important;
+
+        .orb-2 {
+          width: 100px;
+          height: 100px;
+          top: 60%;
+          right: 10%;
+          animation-delay: 3s;
+        }
+
+        .orb-3 {
+          width: 80px;
+          height: 80px;
+          top: 30%;
+          right: 20%;
+          animation-delay: 6s;
+        }
+
+        .orb-4 {
+          width: 120px;
+          height: 120px;
+          bottom: 10%;
+          left: 15%;
+          animation-delay: 9s;
+        }
+
+        .duo-welcome-card {
+          background: #ffffff;
+          border-radius: 24px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.1);
+          max-width: 440px;
+          width: 100%;
+          position: relative;
+          z-index: 1;
+          overflow: hidden;
+        }
+
+        
+
+        .duo-logo-container {
+          margin-bottom: 20px;
+          position: relative;
+          z-index: 2;
+        }
+
+        .duo-logo-circle {
+          width: 80px;
+          height: 80px;
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto;
+          backdrop-filter: blur(10px);
+          border: 3px solid rgba(255, 255, 255, 0.3);
+          animation: logoGlow 3s ease-in-out infinite;
+        }
+
+        .duo-logo-img {
+          width: 48px;
+          height: 48px;
+          object-fit: contain;
+          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .duo-welcome-text {
+          position: relative;
+          z-index: 2;
+        }
+
+        .duo-welcome-title {
+          font-size: 32px;
+          font-weight: 800;
+          margin: 0 0 8px 0;
+          letter-spacing: -0.5px;
+        }
+
+        .duo-welcome-tagline {
+          font-size: 16px;
+          margin: 0;
+          opacity: 0.9;
+          font-weight: 400;
+        }
+
+        .duo-slide-container {
+          padding: 32px;
+          background: #ffffff;
+        }
+
+        .duo-slider-wrapper {
+          position: relative;
+          min-height: 280px;
+          overflow: hidden;
+        }
+
+        .duo-slide-content {
+          position: absolute;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+        }
+
+        .duo-slide-icon {
+          width: 100px;
+          height: 100px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 48px;
+          margin-bottom: 24px;
+          animation: iconBounce 4s ease-in-out infinite;
+        }
+
+        .duo-slide-title {
+          font-size: 24px;
+          font-weight: 800;
+          margin: 0 0 16px 0;
+          color: #3c3c3c;
+          letter-spacing: -0.5px;
+          line-height: 1.2;
+        }
+
+        .duo-slide-description {
+          font-size: 16px;
+          color: #777;
+          margin: 0;
+          line-height: 1.5;
+          max-width: 90%;
+        }
+
+        .duo-cta-section {
+          margin-top: 24px;
+        }
+
+        .duo-get-started-btn {
+          width: 100%;
+          padding: 18px 24px;
+          background: linear-gradient(180deg, #58cc02 0%, #4eb600 100%);
+          border: none;
+          border-radius: 16px;
+          color: white;
+          font-size: 16px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          box-shadow: 0 6px 0 #46a302, 0 12px 32px rgba(88, 204, 2, 0.4);
+          transition: all 0.2s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .duo-get-started-btn:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 9px 0 #46a302, 0 18px 40px rgba(88, 204, 2, 0.5);
+        }
+
+        .duo-get-started-btn:active {
+          transform: translateY(3px);
+          box-shadow: 0 3px 0 #46a302, 0 6px 20px rgba(88, 204, 2, 0.3);
+        }
+
+        .btn-text {
+          position: relative;
+          z-index: 2;
+        }
+
+        .btn-shine {
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+          animation: shine 3s ease-in-out infinite;
+        }
+
+        .duo-dots-container {
+          display: flex;
+          justify-content: center;
+          gap: 8px;
+          margin: 24px 0 20px;
+        }
+
+        .duo-nav-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .duo-nav-dot.active {
+          width: 24px;
+          border-radius: 12px;
+        }
+
+        .duo-nav-buttons {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .duo-nav-btn {
+          flex: 1;
+          padding: 12px 16px;
+          border: 2px solid #e5e5e5;
+          border-radius: 12px;
+          background: #ffffff;
+          color: #777;
+          font-size: 14px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          transition: all 0.2s ease;
+        }
+
+        .duo-nav-btn.next {
+          background: linear-gradient(180deg, #58cc02 0%, #4eb600 100%);
+          border-color: #58cc02;
+          color: white;
+          box-shadow: 0 4px 0 #46a302;
+        }
+
+        .duo-nav-btn.next:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 5px 0 #46a302;
+        }
+
+        .duo-nav-btn.prev:hover {
+          border-color: #58cc02;
+          color: #58cc02;
+        }
+
+        .duo-nav-btn.hidden {
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        .nav-spacer {
+          flex: 1;
+        }
+
+        .duo-welcome-footer {
+          background: #f8fafc;
+          padding: 16px 32px;
+          border-top: 1px solid #e5e5e5;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .duo-copyright {
+          font-size: 12px;
+          color: #777;
+          font-weight: 500;
+        }
+
+        .duo-skip-btn {
+          background: transparent;
+          border: none;
+          color: #1cb0f6;
+          font-size: 12px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        @keyframes orbFloat {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-30px) rotate(180deg); }
+        }
+
+        @keyframes logoGlow {
+          0%, 100% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+          50% { box-shadow: 0 0 40px rgba(255, 255, 255, 0.5); }
+        }
+
+        @keyframes iconBounce {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+
+        @keyframes shine {
+          0% { left: -100%; }
+          50% { left: 100%; }
+          100% { left: 100%; }
+        }
+
+        @media (max-width: 480px) {
+          .duo-welcome-bg {
+            padding: 16px;
+          }
+          
+          .duo-welcome-card {
+            border-radius: 20px;
+          }
+          
+          .duo-welcome-header {
+            padding: 32px 24px 24px;
+          }
+          
+          .duo-slide-container {
+            padding: 24px;
+          }
+          
+          .duo-logo-circle {
+            width: 64px;
+            height: 64px;
+          }
+          
+          .duo-logo-img {
+            width: 36px;
+            height: 36px;
+          }
+          
+          .duo-welcome-title {
+            font-size: 28px;
+          }
+          
+          .duo-slide-icon {
+            width: 80px;
+            height: 80px;
+            font-size: 40px;
+          }
+          
+          .duo-slide-title {
+            font-size: 20px;
+          }
+          
+          .duo-slide-description {
+            font-size: 14px;
+          }
+          
+          .duo-welcome-footer {
+            padding: 16px 24px;
+          }
+        }
+
+        @media (max-width: 360px) {
+          .duo-welcome-header {
+            padding: 24px 16px 16px;
+          }
+          
+          .duo-slide-container {
+            padding: 16px;
+          }
+          
+          .duo-welcome-title {
+            font-size: 24px;
+          }
         }
       `}</style>
     </div>

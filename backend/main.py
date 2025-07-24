@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+import sys
+import io
+
+# Set default encoding to UTF-8 for Windows compatibility
+if sys.platform.startswith('win'):
+    import codecs
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.detach())
+
 from fastapi import FastAPI, Body, UploadFile, File
 from pydantic import BaseModel
 from transformers import MarianMTModel, MarianTokenizer
@@ -142,6 +152,7 @@ SCENARIOS_EWE = [
 @app.post("/scenario", response_model=ScenarioResponse)
 def get_scenario(req: ScenarioRequest):
     try:
+        # Use proper UTF-8 encoding for print statements
         print(f"Received scenario request: category={req.category}, difficulty={req.difficulty}, language={req.language}")
         
         # If language is English, return an English scenario directly
@@ -167,7 +178,8 @@ def get_scenario(req: ScenarioRequest):
             
         if available_scenarios:
             scenario = random.choice(available_scenarios)
-            print(f"Using pre-translated scenario: {scenario}")
+            # Use safe printing for Unicode characters
+            safe_print(f"Using pre-translated scenario: {scenario}")
             return ScenarioResponse(scenario=scenario, language=req.language)
         
         # Get a random English scenario to translate
@@ -212,7 +224,7 @@ def get_scenario(req: ScenarioRequest):
             print(f"LibreTranslate translation failed: {e}")
         
         # 5. If all translation attempts fail, return English with a helpful message
-        print(f"All translation attempts failed for language '{req.language}' - returning English with message")
+        safe_print(f"All translation attempts failed for language '{req.language}' - returning English with message")
         if req.language in ['twi', 'gaa', 'ewe']:
             return ScenarioResponse(
                 scenario=f"{scenario_en} [Note: Translation to {req.language.upper()} is not yet available. Playing in English.]",
@@ -225,14 +237,11 @@ def get_scenario(req: ScenarioRequest):
             )
         
     except Exception as e:
-        print(f"Scenario generation error: {e}")
+        safe_print(f"Scenario generation error: {e}")
         return ScenarioResponse(
             scenario="Error generating scenario.", 
             language="en"
         )
-    except Exception as e:
-        print(f"Scenario generation error: {e}")
-        return ScenarioResponse(scenario="Error generating scenario.", language="en")
 
 # --- Translation Endpoint ---
 class TranslationRequest(BaseModel):
@@ -670,3 +679,7 @@ def analyze_sentiment_and_tone(req: SentimentRequest):
             tone_confidence=0.0,
             tone_scores={"polite": 0.0, "passionate": 0.0, "formal": 0.0, "casual": 0.0, "confrontational": 0.0}
         )
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8001)

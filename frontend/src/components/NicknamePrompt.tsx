@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useActivityFeed } from './ActivityFeedContext';
 import { useUser } from '../context/UserContext';
 import { userApi } from '../services/api';
@@ -27,7 +28,8 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
   const [feedback, setFeedback] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const { addActivity } = useActivityFeed();
-  const { createUser, user, loginUser } = useUser();
+  const { createUser, user, loginUser, logout } = useUser();
+  const navigate = useNavigate();
   const [loggedOut, setLoggedOut] = useState(false);
   const [loginNickname, setLoginNickname] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -187,7 +189,14 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           Please log out before creating a new profile.
         </div>
         <button
-          onClick={() => { setLoggedOut(true); }}
+          onClick={() => { 
+            logout(); 
+            setLoggedOut(true);
+            // Navigate to signin page after logout
+            setTimeout(() => {
+              navigate('/signin');
+            }, 500);
+          }}
           style={{
             background: '#1cb0f6',
             color: 'white',
