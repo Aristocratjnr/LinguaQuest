@@ -16,6 +16,7 @@ const LoginPage: React.FC = () => {
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showContactInfo, setShowContactInfo] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async () => {
@@ -29,6 +30,10 @@ const LoginPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleContactAdmin = () => {
+    setShowContactInfo(true);
   };
 
   return (
@@ -89,8 +94,64 @@ const LoginPage: React.FC = () => {
         <div className="duo-login-footer">
           <span>Don't have a profile?</span>
           <br />
-          <span className="duo-login-link">Ask an admin to create one for you</span>
+          <span 
+            className="duo-login-link"
+            onClick={handleContactAdmin}
+          >
+            Ask an admin to create one for you
+          </span>
         </div>
+        
+        {/* Contact Info Modal */}
+        {showContactInfo && (
+          <div className="contact-modal-overlay" onClick={() => setShowContactInfo(false)}>
+            <div className="contact-modal" onClick={e => e.stopPropagation()}>
+              <div className="contact-modal-header">
+                <h3>Contact Administrator</h3>
+                <button 
+                  className="contact-modal-close"
+                  onClick={() => setShowContactInfo(false)}
+                >
+                  <span className="material-icons">close</span>
+                </button>
+              </div>
+              <div className="contact-modal-body">
+                <p>To create a new profile, please contact your administrator using one of these methods:</p>
+                <div className="contact-options">
+                  <div className="contact-option">
+                    <span className="material-icons">email</span>
+                    <div>
+                      <strong>Email</strong>
+                      <p>admin@linguaquest.com</p>
+                    </div>
+                  </div>
+                  <div className="contact-option">
+                    <span className="material-icons">school</span>
+                    <div>
+                      <strong>Ask your teacher</strong>
+                      <p>Contact your instructor or supervisor</p>
+                    </div>
+                  </div>
+                  <div className="contact-option">
+                    <span className="material-icons">support</span>
+                    <div>
+                      <strong>Support</strong>
+                      <p>Use the feedback option in the app</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="contact-modal-footer">
+                <button 
+                  className="contact-modal-btn"
+                  onClick={() => setShowContactInfo(false)}
+                >
+                  Got it
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       <style>{`
         .duo-login-bg {
@@ -340,6 +401,149 @@ const LoginPage: React.FC = () => {
           color: #0c8ce8;
         }
         
+        .contact-modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          animation: fadeIn 0.3s ease;
+        }
+        
+        .contact-modal {
+          background: white;
+          border-radius: 20px;
+          max-width: 480px;
+          width: calc(100vw - 40px);
+          max-height: 90vh;
+          overflow: hidden;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+          animation: modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .contact-modal-header {
+          padding: 24px 24px 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        
+        .contact-modal-header h3 {
+          margin: 0;
+          color: #3c3c3c;
+          font-size: 24px;
+          font-weight: 700;
+        }
+        
+        .contact-modal-close {
+          background: none;
+          border: none;
+          color: #777;
+          cursor: pointer;
+          padding: 8px;
+          border-radius: 50%;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .contact-modal-close:hover {
+          background: #f0f0f0;
+          color: #3c3c3c;
+        }
+        
+        .contact-modal-body {
+          padding: 24px;
+        }
+        
+        .contact-modal-body p {
+          color: #777;
+          margin: 0 0 24px 0;
+          line-height: 1.5;
+        }
+        
+        .contact-options {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        
+        .contact-option {
+          display: flex;
+          align-items: flex-start;
+          gap: 16px;
+          padding: 16px;
+          background: #f8f9fa;
+          border-radius: 12px;
+          transition: all 0.2s ease;
+        }
+        
+        .contact-option:hover {
+          background: #f0f2f5;
+          transform: translateY(-1px);
+        }
+        
+        .contact-option .material-icons {
+          color: #58cc02;
+          font-size: 28px;
+          margin-top: 2px;
+        }
+        
+        .contact-option div {
+          flex: 1;
+        }
+        
+        .contact-option strong {
+          color: #3c3c3c;
+          font-size: 16px;
+          font-weight: 600;
+          display: block;
+          margin-bottom: 4px;
+        }
+        
+        .contact-option p {
+          color: #777;
+          font-size: 14px;
+          margin: 0;
+          line-height: 1.4;
+        }
+        
+        .contact-modal-footer {
+          padding: 0 24px 24px;
+        }
+        
+        .contact-modal-btn {
+          width: 100%;
+          padding: 16px 24px;
+          background: linear-gradient(180deg, #58cc02 0%, #4eb600 100%);
+          border: none;
+          border-radius: 16px;
+          color: white;
+          font-size: 15px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 4px 0 #46a302;
+        }
+        
+        .contact-modal-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 0 #46a302, 0 8px 25px rgba(88, 204, 2, 0.3);
+        }
+        
+        .contact-modal-btn:active {
+          transform: translateY(1px);
+          box-shadow: 0 2px 0 #46a302;
+        }
+        
         .material-icons {
           font-family: 'Material Icons';
           font-weight: normal;
@@ -401,6 +605,22 @@ const LoginPage: React.FC = () => {
           75% { transform: translateX(5px); }
         }
         
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes modalSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        
         @media (max-width: 480px) {
           .duo-login-card {
             padding: 32px 24px 24px;
@@ -431,6 +651,61 @@ const LoginPage: React.FC = () => {
             font-size: 13px;
             padding: 10px 16px;
           }
+          
+          /* Mobile modal styles */
+          .contact-modal {
+            margin: 20px;
+            width: calc(100vw - 40px);
+            max-height: calc(100vh - 40px);
+            border-radius: 16px;
+          }
+          
+          .contact-modal-header {
+            padding: 20px 16px 0;
+          }
+          
+          .contact-modal-header h3 {
+            font-size: 20px;
+          }
+          
+          .contact-modal-body {
+            padding: 16px;
+          }
+          
+          .contact-modal-body p {
+            font-size: 14px;
+            margin-bottom: 16px;
+          }
+          
+          .contact-options {
+            gap: 12px;
+          }
+          
+          .contact-option {
+            padding: 12px;
+            gap: 12px;
+          }
+          
+          .contact-option .material-icons {
+            font-size: 24px;
+          }
+          
+          .contact-option strong {
+            font-size: 14px;
+          }
+          
+          .contact-option p {
+            font-size: 13px;
+          }
+          
+          .contact-modal-footer {
+            padding: 0 16px 16px;
+          }
+          
+          .contact-modal-btn {
+            padding: 14px 20px;
+            font-size: 14px;
+          }
         }
         
         @media (max-width: 360px) {
@@ -441,6 +716,65 @@ const LoginPage: React.FC = () => {
           
           .duo-login-title {
             font-size: 24px;
+          }
+          
+          /* Extra small mobile modal styles */
+          .contact-modal {
+            margin: 16px;
+            width: calc(100vw - 32px);
+            max-height: calc(100vh - 32px);
+            border-radius: 12px;
+          }
+          
+          .contact-modal-header {
+            padding: 16px 12px 0;
+          }
+          
+          .contact-modal-header h3 {
+            font-size: 18px;
+          }
+          
+          .contact-modal-close {
+            padding: 6px;
+          }
+          
+          .contact-modal-body {
+            padding: 12px;
+          }
+          
+          .contact-modal-body p {
+            font-size: 13px;
+            margin-bottom: 12px;
+          }
+          
+          .contact-options {
+            gap: 10px;
+          }
+          
+          .contact-option {
+            padding: 10px;
+            gap: 10px;
+          }
+          
+          .contact-option .material-icons {
+            font-size: 22px;
+          }
+          
+          .contact-option strong {
+            font-size: 13px;
+          }
+          
+          .contact-option p {
+            font-size: 12px;
+          }
+          
+          .contact-modal-footer {
+            padding: 0 12px 12px;
+          }
+          
+          .contact-modal-btn {
+            padding: 12px 16px;
+            font-size: 13px;
           }
         }
       `}</style>
