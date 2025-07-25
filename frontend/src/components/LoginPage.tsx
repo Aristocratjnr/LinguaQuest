@@ -506,17 +506,20 @@ const LoginPage: React.FC = () => {
           justify-content: center;
           z-index: 1000;
           animation: fadeIn 0.3s ease;
+          padding: 16px;
         }
         
         .contact-modal {
           background: white;
           border-radius: 20px;
           max-width: 480px;
-          width: calc(100vw - 40px);
+          width: 100%;
           max-height: 90vh;
-          overflow: hidden;
+          overflow: auto;
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
           animation: modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          display: flex;
+          flex-direction: column;
         }
         
         .contact-modal-header {
@@ -553,6 +556,8 @@ const LoginPage: React.FC = () => {
         
         .contact-modal-body {
           padding: 24px;
+          flex: 1;
+          overflow-y: auto;
         }
         
         .contact-modal-body p {
@@ -575,6 +580,7 @@ const LoginPage: React.FC = () => {
           background: #f8f9fa;
           border-radius: 12px;
           transition: all 0.2s ease;
+          margin-bottom: 2px;
         }
         
         .contact-option:hover {
@@ -747,10 +753,11 @@ const LoginPage: React.FC = () => {
           
           /* Mobile modal styles */
           .contact-modal {
-            margin: 20px;
-            width: calc(100vw - 40px);
-            max-height: calc(100vh - 40px);
+            width: 100%;
+            max-height: calc(100vh - 32px);
             border-radius: 16px;
+            display: flex;
+            flex-direction: column;
           }
           
           .contact-modal-header {
@@ -763,6 +770,8 @@ const LoginPage: React.FC = () => {
           
           .contact-modal-body {
             padding: 16px;
+            flex: 1;
+            overflow-y: auto;
           }
           
           .contact-modal-body p {

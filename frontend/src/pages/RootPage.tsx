@@ -26,10 +26,6 @@ const RootPage: React.FC = () => {
   const [category, setCategory] = useState('food');
   const [difficulty, setDifficulty] = useState('easy');
   const [ageError, setAgeError] = useState<string | null>(null);
-  
-  // States for Dashboard modals
-  const [showSettingsPage, setShowSettingsPage] = useState(false);
-  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   // Handle nickname confirm
   const handleNicknameConfirm = (name: string) => {
@@ -143,28 +139,9 @@ const RootPage: React.FC = () => {
         } />
         
         {/* Main Dashboard Route */}
-        <Route path="/dashboard" element={
-          <Dashboard 
-            setShowSettingsPage={setShowSettingsPage}
-            setShowLeaderboard={setShowLeaderboard}
-          />
-        } />
-        <Route path="/app" element={
-          <Dashboard 
-            setShowSettingsPage={setShowSettingsPage}
-            setShowLeaderboard={setShowLeaderboard}
-          />
-        } /> {/* Alias for backward compatibility */}
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/app" element={<Dashboard />} /> {/* Alias for backward compatibility */}
       </Routes>
-
-      {/* Global Modals */}
-      {showSettingsPage && (
-        <SettingsPage onClose={() => setShowSettingsPage(false)} />
-      )}
-      
-      {showLeaderboard && (
-        <Leaderboard onClose={() => setShowLeaderboard(false)} />
-      )}
     </>
   );
 };

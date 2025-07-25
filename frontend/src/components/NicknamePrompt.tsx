@@ -145,7 +145,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
       // Create user in database
       await createUser({
         nickname: trimmedNickname,
-        avatar_url: avatarPreview || undefined
+        avatar: avatarPreview || undefined
       });
 
       addActivity({ 
@@ -192,9 +192,9 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           onClick={() => { 
             logout(); 
             setLoggedOut(true);
-            // Navigate to signin page after logout
+            // Navigate to login page after logout
             setTimeout(() => {
-              navigate('/signin');
+              navigate('/login');
             }, 500);
           }}
           style={{

@@ -82,9 +82,13 @@ interface LeaderboardResponse { leaderboard: any[]; }
 function AppContent() {
   // Router setup
   const navigate = useNavigate();
-  const { user, userStats, submitScore, startGameSession, endGameSession, incrementStreak, resetStreak, awardBadge, refreshUserStats, loginUser } = useUser();
+  const { user, userStats, submitScore, startGameSession, endGameSession, incrementStreak, resetStreak, awardBadge, refreshUserStats, loginUser, createUser } = useUser();
 
-  const { theme, sound, nickname, avatar, setNickname, setAvatar } = useSettings();
+  const { theme, sound, nickname: tempNickname, avatar: tempAvatar, setNickname, setAvatar } = useSettings();
+  
+  // Use user data for nickname and avatar when logged in, fallback to temp values during onboarding
+  const nickname = user?.nickname || tempNickname || '';
+  const avatar = user?.avatar || tempAvatar;
   const [scenario, setScenario] = useState('');
   const [language, setLanguage] = useState('twi');
   const [aiStance, setAiStance] = useState('disagree');
@@ -133,7 +137,9 @@ function AppContent() {
   const DAILY_GOAL = 100;
   const streak = userStats?.current_streak ?? 0;
   const totalXp = userStats?.total_score ?? 0;
-  const dailyXp = totalXp % DAILY_GOAL;
+  // Use the higher value between database XP and displayed XP to account for real-time updates
+  const effectiveTotalXp = Math.max(totalXp, displayedXp);
+  const dailyXp = effectiveTotalXp % DAILY_GOAL;
   const dailyProgress = Math.min(1, dailyXp / DAILY_GOAL);
   // Add this state near other user stats
   const [hasStreakFreeze, setHasStreakFreeze] = useState(true); // For demo, always true. Replace with real logic if available.
@@ -186,7 +192,7 @@ function AppContent() {
   const CLUB = {
     name: 'Lingua Legends',
     members: [
-      { nickname: 'You', xp: 320, avatar: avatar || mascotImg },
+      { nickname: nickname || 'You', xp: 320, avatar: avatar || mascotImg },
       { nickname: 'Ama', xp: 280, avatar: undefined },
       { nickname: 'Kwame', xp: 210, avatar: undefined },
       { nickname: 'Esi', xp: 150, avatar: undefined },
@@ -210,6 +216,13 @@ function AppContent() {
       document.body.classList.remove('light');
     }
   }, [theme]);
+
+  // Initialize displayedXp with user's total score
+  useEffect(() => {
+    if (userStats?.total_score !== undefined && displayedXp === 0) {
+      setDisplayedXp(userStats.total_score);
+    }
+  }, [userStats?.total_score, displayedXp]);
 
   // Timer logic
   useEffect(() => {
@@ -237,6 +250,7 @@ function AppContent() {
       if (!difficulty) setDifficulty('easy');
       if (!language) setLanguage('twi');
       
+      // Always fetch scenario, even if server is offline (we have fallbacks)
       fetchScenario();
     }
   }, [user, scenario, loading, category, difficulty, language]);
@@ -263,7 +277,28 @@ function AppContent() {
       setTimerActive(true);
       setRoundResult('playing');
     } catch (e) {
-      setScenario('Error loading scenario.');
+      console.error('Failed to fetch scenario:', e);
+      // Provide fallback scenario when server is not available
+      const fallbackScenarios = {
+        food: "You want to convince your friend to try a new restaurant that serves traditional Twi cuisine.",
+        travel: "You need to persuade your family to visit Ghana for the holidays this year.",
+        education: "You want to convince your teacher to allow you to present your project in Twi.",
+        business: "You need to persuade a client to invest in your local business idea."
+      };
+      const fallbackScenario = fallbackScenarios[category as keyof typeof fallbackScenarios] || 
+        "You want to convince someone to learn the Twi language with you.";
+      
+      setScenario(fallbackScenario + " (Demo mode - server offline)");
+      setAiStance('disagree');
+      setUserArgument('');
+      setTranslation('');
+      setFeedback('');
+      setScore(null);
+      setAiResponse('');
+      setNewStance('');
+      setTimeLeft(ROUND_TIME);
+      setTimerActive(true);
+      setRoundResult('playing');
     }
     setLoading(false);
   };
@@ -291,7 +326,9 @@ function AppContent() {
       });
       setTranslation(res.data.translated_text);
     } catch (e) {
-      setTranslation('Translation error.');
+      console.error('Translation failed:', e);
+      // Provide fallback translation
+      setTranslation(`[Translation unavailable - server offline] ${userArgument}`);
     }
     setLoading(false);
   };
@@ -381,10 +418,22 @@ function AppContent() {
         }
       }
     } catch (e) {
-      setFeedback('Evaluation error.');
-      setScore(null);
-      // Play fail sound
-      playFail();
+      console.error('Evaluation failed:', e);
+      // Provide fallback evaluation when server is offline
+      const argumentLength = userArgument.length;
+      const mockScore = Math.min(9, Math.max(3, Math.floor(argumentLength / 10) + Math.floor(Math.random() * 3)));
+      const mockPersuaded = mockScore >= 7;
+      
+      setFeedback(`[Demo mode - server offline] Your argument shows ${mockScore >= 7 ? 'strong' : mockScore >= 5 ? 'moderate' : 'basic'} persuasive elements. ${mockPersuaded ? 'Well done!' : 'Try adding more compelling reasons.'}`);
+      setScore(mockScore);
+      
+      if (mockPersuaded) {
+        setRoundResult('success');
+        setTimerActive(false);
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 3000);
+        playSuccess();
+      }
     }
     setLoading(false);
   };
@@ -403,8 +452,18 @@ function AppContent() {
       setNewStance(res.data.new_stance);
       setAiStance(res.data.new_stance);
     } catch (e) {
-      setAiResponse('Dialogue error.');
-      setNewStance(aiStance);
+      console.error('Dialogue failed:', e);
+      // Provide fallback AI response when server is offline
+      const fallbackResponses = [
+        "I understand your point, but I still have some concerns about this approach.",
+        "That's an interesting perspective, though I'm not fully convinced yet.",
+        "You make a valid argument, but let me think about this more.",
+        "I can see the benefits you mentioned, but there might be some drawbacks to consider.",
+        "Your reasoning is sound, but I'd like to explore other options as well."
+      ];
+      const randomResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+      setAiResponse(`[Demo mode - server offline] ${randomResponse}`);
+      setNewStance(aiStance); // Keep the same stance in demo mode
     }
     setLoading(false);
   };
@@ -576,16 +635,16 @@ function AppContent() {
 
   // Handle nickname confirm
   const handleNicknameConfirm = (name: string) => {
+    // Store temporarily for user creation
     setNickname(name);
-    // localStorage.setItem('lq_nickname', name); // No longer needed, handled by context
     setShowNicknamePrompt(false);
     setShowAvatarPicker(true);
   };
 
   // Handle avatar confirm
   const handleAvatarConfirm = (avatarUrl: string) => {
+    // Store temporarily for user creation
     setAvatar(avatarUrl);
-    // localStorage.setItem('lq_avatar', avatarUrl); // No longer needed, handled by context
     setShowAvatarPicker(false);
     setShowLogin(true);
   };
@@ -598,16 +657,23 @@ function AppContent() {
     }
     setAgeError(null);
     setShowLogin(false);
-    setShowEngagement(true);
-    // You can store the age if needed
-    // Record login in backend after nickname is set
-    if (nickname) {
+    
+    // Create user account with the collected data
+    if (tempNickname && tempAvatar) {
       try {
-        await loginUser(nickname);
+        await createUser({
+          nickname: tempNickname,
+          avatar: tempAvatar
+        });
+        setShowEngagement(true);
       } catch (err) {
-        // Optionally handle login error (e.g., show a message)
-        console.error('Failed to record login:', err);
+        console.error('Failed to create user:', err);
+        // Handle user creation error (e.g., nickname already exists)
+        setAgeError('Failed to create account. Nickname might already exist.');
+        setShowLogin(true);
       }
+    } else {
+      setShowEngagement(true);
     }
   };
 
@@ -1564,7 +1630,7 @@ function AppContent() {
                     loading={loading}
                     onLanguageChange={handleScenarioLanguageChange}
                     languages={LANGUAGES}
-                    error={scenario === 'Error loading scenario.' ? 'Failed to load scenario from server' : undefined}
+                    error={scenario.includes('Error loading scenario.') ? 'Failed to load scenario from server' : undefined}
                   />
                 </div>
               </div>
@@ -2055,7 +2121,7 @@ function AppContent() {
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'rgba(0,0,0,0.5)',
+          background: '#808080',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -2066,19 +2132,13 @@ function AppContent() {
             width: '90%',
             maxWidth: '500px',
             maxHeight: '80vh',
-            overflow: 'hidden',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.15)'
+            overflow: 'auto',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+            backgroundColor: '#ffffff'
           }}>
-            <div style={{
-              padding: '16px',
-              borderBottom: `1px solid ${DUOLINGO_COLORS.gray}`,
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <h2 style={{ margin: 0, color: DUOLINGO_COLORS.green }}>Settings</h2>
+
               <button 
-                onClick={() => setShowSettingsPage(false)}
+
                 style={{
                   background: 'none',
                   border: 'none',
@@ -2087,12 +2147,8 @@ function AppContent() {
                   color: DUOLINGO_COLORS.darkGray
                 }}
               >
-                ×
               </button>
-            </div>
-            <div style={{ padding: '16px', maxHeight: '60vh', overflowY: 'auto' }}>
               <SettingsPage onClose={() => setShowSettingsPage(false)} />
-            </div>
           </div>
         </div>
       )}

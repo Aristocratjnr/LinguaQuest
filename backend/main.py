@@ -47,6 +47,14 @@ from progression_api import router as progression_router
 from progression_tracking import router as progression_tracking_router
 from language_club import router as language_club_router
 
+# Utility function for safe printing
+def safe_print(message: str):
+    """Safely print messages with UTF-8 encoding"""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        print(message.encode('utf-8', errors='replace').decode('utf-8'))
+
 app = FastAPI()
 
 # Add CORS middleware
