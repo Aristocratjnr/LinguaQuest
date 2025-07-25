@@ -680,6 +680,3 @@ def analyze_sentiment_and_tone(req: SentimentRequest):
             tone_scores={"polite": 0.0, "passionate": 0.0, "formal": 0.0, "casual": 0.0, "confrontational": 0.0}
         )
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8001)

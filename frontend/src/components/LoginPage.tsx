@@ -24,9 +24,38 @@ const LoginPage: React.FC = () => {
     setLoading(true);
     try {
       await loginUser(nickname.trim());
-      navigate('/');
+      // After successful login, navigate to the dashboard
+      navigate('/dashboard', { replace: true });
     } catch (err: any) {
-      setError('No such profile found. Please check your nickname.');
+      console.error('Login error details:', err);
+      if (err.message && err.message.includes('Network Error')) {
+        setError('Backend server is not running. Please start the server first.');
+      } else if (err.response && err.response.status === 404) {
+        setError('No profile found with that nickname. Please check spelling or ask an admin to create a profile.');
+      } else {
+        setError('Login failed. Please check if the backend server is running and try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleQuickPlay = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      await loginUser(nickname.trim());
+      // Skip category selection and go directly to the dashboard with default settings
+      navigate('/dashboard', { replace: true });
+    } catch (err: any) {
+      console.error('Login error details:', err);
+      if (err.message && err.message.includes('Network Error')) {
+        setError('Backend server is not running. Please start the server first.');
+      } else if (err.response && err.response.status === 404) {
+        setError('No profile found with that nickname. Please check spelling or ask an admin to create a profile.');
+      } else {
+        setError('Login failed. Please check if the backend server is running and try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -80,6 +109,30 @@ const LoginPage: React.FC = () => {
                 <>
                   <span>CONTINUE</span>
                   <span className="material-icons">arrow_forward</span>
+                </>
+              )}
+            </span>
+          </button>
+          
+          <div style={{ margin: '12px 0', textAlign: 'center', color: '#777', fontSize: '14px' }}>
+            or
+          </div>
+          
+          <button
+            onClick={handleQuickPlay}
+            disabled={loading || !nickname.trim()}
+            className={`duo-login-btn-secondary ${loading ? 'loading' : ''} ${!nickname.trim() ? 'disabled' : ''}`}
+          >
+            <span className="btn-content">
+              {loading ? (
+                <>
+                  <div className="spinner"></div>
+                  <span>Starting...</span>
+                </>
+              ) : (
+                <>
+                  <span className="material-icons">play_arrow</span>
+                  <span>QUICK PLAY</span>
                 </>
               )}
             </span>
@@ -349,6 +402,46 @@ const LoginPage: React.FC = () => {
         }
         
         .duo-login-btn.loading {
+          pointer-events: none;
+        }
+        
+        .duo-login-btn-secondary {
+          width: 100%;
+          padding: 14px 24px;
+          background: linear-gradient(180deg, #1cb0f6 0%, #0c8ce8 100%);
+          border: none;
+          border-radius: 16px;
+          color: white;
+          font-size: 14px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 3px 0 #0c8ce8, 0 6px 20px rgba(28, 176, 246, 0.25);
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .duo-login-btn-secondary:hover:not(.disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 5px 0 #0c8ce8, 0 10px 30px rgba(28, 176, 246, 0.35);
+        }
+        
+        .duo-login-btn-secondary:active:not(.disabled) {
+          transform: translateY(1px);
+          box-shadow: 0 2px 0 #0c8ce8, 0 4px 15px rgba(28, 176, 246, 0.2);
+        }
+        
+        .duo-login-btn-secondary.disabled {
+          background: #e5e5e5;
+          color: #afafaf;
+          cursor: not-allowed;
+          box-shadow: 0 3px 0 #d0d0d0;
+          transform: none;
+        }
+        
+        .duo-login-btn-secondary.loading {
           pointer-events: none;
         }
         

@@ -12,9 +12,18 @@ interface LeaderboardProps {
 }
 
 const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
-  const { theme } = useSettings();
+const { theme } = useSettings();
   const { user } = useUser();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const [language] = useState('en'); // Default to English
+
+  // Map language codes to BCP-47 language tags
+  const langMap: Record<string, string> = {
+    twi: 'tw',
+    gaa: 'gaa',
+    ewe: 'ee',
+    en: 'en'
+  };
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [sortBy, setSortBy] = useState<'score' | 'streak' | 'level'>('score');

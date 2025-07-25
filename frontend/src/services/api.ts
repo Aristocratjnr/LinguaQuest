@@ -40,22 +40,24 @@ api.interceptors.response.use(
 export interface User {
   id: number;
   nickname: string;
-  avatar_url?: string;
+  avatar?: string;
+  email?: string;
   created_at: string;
   last_login?: string;
-  total_score: number;
-  games_played: number;
-  current_streak: number;
-  highest_streak: number;
+  is_active: boolean;
+  preferences: Record<string, any>;
 }
 
 export interface UserCreate {
   nickname: string;
-  avatar_url?: string;
+  avatar?: string;
+  email?: string;
 }
 
 export interface UserUpdate {
-  avatar_url?: string;
+  avatar?: string;
+  email?: string;
+  preferences?: Record<string, any>;
   preferred_language?: string;
 }
 
@@ -127,12 +129,14 @@ export interface ProgressionStage {
 export interface UserStats {
   total_score: number;
   games_played: number;
-  average_score: number;
   highest_score: number;
   current_streak: number;
-  highest_streak: number;
+  longest_streak: number;
   total_rounds_played: number;
+  total_rounds_won: number;
   badges_count: number;
+  favorite_language: string;
+  win_rate: number;
 }
 
 export interface LeaderboardEntry {
