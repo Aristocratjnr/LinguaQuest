@@ -85,6 +85,80 @@ function AppContent() {
   const { user, userStats, submitScore, startGameSession, endGameSession, incrementStreak, resetStreak, awardBadge, refreshUserStats, loginUser, createUser } = useUser();
 
   const { theme, sound, nickname: tempNickname, avatar: tempAvatar, setNickname, setAvatar } = useSettings();
+
+  // Global font styles for the dashboard
+  const fontStyles = {
+    regular: { fontWeight: 300 }, // Thin text for regular content
+    bold: { fontWeight: 600 },    // Bold text for emphasis
+    heading: { fontWeight: 700 }  // Extra bold for headings
+  };
+
+  // Apply global font styles
+  useEffect(() => {
+    // 添加简单明了的全局样式
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+      /* 基础设置 */
+      body {
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* 所有普通文本使用细体，同时确保清晰可见 */
+      body, p, div, span, label, a, li, td, th, input, textarea, button {
+        font-weight: 300; /* 纯细体 */
+        color: rgba(0, 0, 0, 0.9); /* 增强对比度确保可见性 */
+      }
+
+      /* 标题和强调文本保持粗体 */
+      h1, h2, h3, h4, h5, h6, strong, b, .bold {
+        font-weight: 600;
+      }
+      h1, h2, h3, h4, h5, h6, strong, b, .bold, 
+      .btn-primary, .nav-link.active, [class*="heading"], 
+      [class*="title"], .navbar-brand {
+        font-weight: 600;
+      }
+
+      /* 确保按钮文本可见 */
+      button, .btn {
+        font-weight: 400; /* 按钮文本稍微加粗以确保可见性 */
+      }
+
+      /* 调整内联样式 */
+      [style*="font-weight:400"], [style*="font-weight: 400"],
+      [style*="fontWeight:400"], [style*="fontWeight: 400"],
+      [style*="fontWeight:normal"], [style*="fontWeight: normal"],
+      [style*="font-weight:normal"], [style*="font-weight: normal"] {
+        font-weight: 300 !important; /* 普通文本转为细体 */
+      }
+
+      /* 保留粗体样式 */
+      [style*="font-weight:700"], [style*="font-weight: 700"],
+      [style*="fontWeight:700"], [style*="fontWeight: 700"],
+      [style*="font-weight:600"], [style*="font-weight: 600"],
+      [style*="fontWeight:600"], [style*="fontWeight: 600"],
+      [style*="font-weight:bold"], [style*="font-weight: bold"],
+      [style*="fontWeight:bold"], [style*="fontWeight: bold"] {
+        font-weight: 600 !important; /* 保持粗体元素 */
+      }
+
+      /* 确保表单元素清晰可见 */
+      input, textarea, select {
+        font-weight: 400; /* 表单元素需要清晰可见 */
+      }
+
+      /* 小文本尺寸调整，确保可读性 */
+      small, .small {
+        font-weight: 400;
+        font-size: 0.875rem;
+      }
+    `;
+    document.head.appendChild(styleElement);
+
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
   
   // Use user data for nickname and avatar when logged in, fallback to temp values during onboarding
   const nickname = user?.nickname || tempNickname || '';
@@ -1263,7 +1337,7 @@ function AppContent() {
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
               <span style={{
                  fontFamily: 'JetBrains Mono, monospace',
-                 fontWeight: 400,
+                 ...fontStyles.regular, // 应用细体字重
                  color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
                  fontSize: 'clamp(0.7rem, 3vw, 13px)',
                  opacity: 0.7,
@@ -1273,7 +1347,7 @@ function AppContent() {
                  Welcome back
                </span>
                <span style={{
-                 fontWeight: 'bold',
+                 ...fontStyles.bold, // 应用粗体字重
                  color: theme === 'dark' ? '#e0e7ff' : DUOLINGO_COLORS.darkGray,
                  fontSize: 'clamp(0.8rem, 3vw, 14px)',
                  fontFamily: 'JetBrains Mono, monospace',
@@ -1318,7 +1392,7 @@ function AppContent() {
             border: '1px solid rgba(88,204,2,0.10)',
             fontFamily: 'JetBrains Mono, monospace',
             fontSize: '0.98rem',
-            fontWeight: 600,
+            ...fontStyles.bold, // 保持粗体
             color: '#3caa3c',
             gap: '10px',
             maxWidth: '420px', // smaller and responsive
@@ -1348,7 +1422,7 @@ function AppContent() {
               border: 'none',
               borderRadius: '12px',
               padding: '8px 18px',
-              fontWeight: 700,
+              ...fontStyles.heading, // 使用最粗的字体样式
               fontSize: '0.95rem',
               cursor: 'pointer',
               boxShadow: '0 2px 0 #3caa3c',
@@ -1894,13 +1968,13 @@ function AppContent() {
             {roundResult === 'success' && (
               <>
                 <span className="material-icons" style={{ fontSize: '40px' }}>check_circle</span>
-                <span style={{ fontSize: '1.3rem', fontWeight: 600 }}>Great job! +1 Point</span>
+                <span style={{ fontSize: '1.3rem', ...fontStyles.bold }}>Great job! +1 Point</span>
               </>
             )}
             {roundResult === 'gameover' && (
               <>
                 <span className="material-icons" style={{ fontSize: '40px' }}>emoji_events</span>
-                <span style={{ fontSize: '1.3rem', fontWeight: 600 }}>Game Complete!</span>
+                <span style={{ fontSize: '1.3rem', ...fontStyles.bold }}>Game Complete!</span>
               </>
             )}
           </div>
@@ -2033,7 +2107,7 @@ function AppContent() {
             <div style={{ textAlign: 'center' }}>
               <h3 style={{
                 fontSize: '24px',
-                fontWeight: 700,
+                ...fontStyles.heading, // 标题使用粗体
                 color: '#2d3748',
                 marginBottom: '8px',
                 fontFamily: 'JetBrains Mono, monospace'
@@ -2042,6 +2116,7 @@ function AppContent() {
               </h3>
               <p style={{
                 fontSize: '16px',
+                ...fontStyles.regular, // 正文使用细体
                 color: '#718096',
                 margin: 0,
                 fontFamily: 'JetBrains Mono, monospace'
@@ -2090,7 +2165,7 @@ function AppContent() {
                 border: '1px solid rgba(108, 122, 137, 0.2)',
                 color: '#6c757d',
                 fontSize: '14px',
-                fontWeight: 600,
+                ...fontStyles.regular, // 应用细体样式
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 fontFamily: 'JetBrains Mono, monospace',
