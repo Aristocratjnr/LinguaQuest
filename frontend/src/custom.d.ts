@@ -18,3 +18,6 @@ declare module "*.svg" {
   export default content;
 }
 
+// Global variables defined in Vite config
+declare const __BACKEND_URL__: string;
+

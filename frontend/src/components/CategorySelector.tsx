@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 import { useUser } from '../context/UserContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -72,8 +73,8 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
       
       try {
         const [catRes, diffRes] = await Promise.all([
-          axios.get('http://127.0.0.1:8000/api/engagement/categories'),
-          axios.get('http://127.0.0.1:8000/api/engagement/difficulties')
+          axios.get(`${API_BASE_URL}/api/engagement/categories`),
+          axios.get(`${API_BASE_URL}/api/engagement/difficulties`)
         ]);
         
         if (catRes.data && catRes.data.length > 0) {

@@ -1,7 +1,5 @@
 import axios from 'axios';
-
-// Configure axios base URL
-const API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
+import { API_BASE_URL } from '../config/api';
 
 // Create axios instance with default config
 const api = axios.create({
@@ -334,13 +332,13 @@ export const engagementApi = {
 export const legacyApi = {
   // Submit score (legacy endpoint)
   submitScore: async (scoreData: { name: string; score: number; date: string; avatar?: string }): Promise<any> => {
-    const response = await axios.post('http://127.0.0.1:8000/score', scoreData);
+    const response = await axios.post(`${API_BASE_URL}/score`, scoreData);
     return response.data;
   },
 
   // Get leaderboard (legacy endpoint)
   getLeaderboard: async (): Promise<{ leaderboard: any[] }> => {
-    const response = await axios.get('http://127.0.0.1:8000/leaderboard');
+    const response = await axios.get(`${API_BASE_URL}/leaderboard`);
     return response.data;
   },
 };

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import '../App.css';
+import { API_BASE_URL } from '../config/api';
 
 import Confetti from 'react-confetti';
 import successSfx from '../assets/sounds/sfx-success.mp3';
@@ -333,7 +334,7 @@ function AppContent() {
   const fetchScenario = async () => {
     setLoading(true);
     try {
-      const res = await axios.post<ScenarioResponse>('http://127.0.0.1:8000/scenario', { 
+      const res = await axios.post<ScenarioResponse>(`${API_BASE_URL}/scenario`, { 
         category, 
         difficulty,
         language: language // Pass current language to get scenario in that language
@@ -393,7 +394,7 @@ function AppContent() {
     if (!userArgument) return;
     setLoading(true);
     try {
-      const res = await axios.post<TranslationResponse>('http://127.0.0.1:8000/translate', {
+      const res = await axios.post<TranslationResponse>(`${API_BASE_URL}/translate`, {
         text: userArgument,
         src_lang: 'en',
         tgt_lang: language,
@@ -412,7 +413,7 @@ function AppContent() {
     if (!userArgument) return;
     setLoading(true);
     try {
-      const res = await axios.post<EvaluateResponse>('http://127.0.0.1:8000/evaluate', {
+      const res = await axios.post<EvaluateResponse>(`${API_BASE_URL}/evaluate`, {
         argument: userArgument,
         tone,
         scenario, // Include scenario for better context
@@ -436,7 +437,7 @@ function AppContent() {
         
         // Update level in real-time if it changed
         if (user) {
-          axios.patch(`http://127.0.0.1:8000/api/v1/level?nickname=${encodeURIComponent(user.nickname)}&level=${newLevel}`)
+          axios.patch(`${API_BASE_URL}/api/v1/level?nickname=${encodeURIComponent(user.nickname)}&level=${newLevel}`)
             .then(() => {
               // Update leaderboard with new level
               const leaderboardUpdate = {
@@ -516,7 +517,7 @@ function AppContent() {
   const handleDialogue = async () => {
     setLoading(true);
     try {
-      const res = await axios.post<DialogueResponse>('http://127.0.0.1:8000/dialogue', {
+      const res = await axios.post<DialogueResponse>(`${API_BASE_URL}/dialogue`, {
         scenario,
         user_argument: userArgument,
         ai_stance: aiStance,
@@ -741,7 +742,7 @@ function AppContent() {
       }
 
       // Test backend connectivity
-      const response = await fetch('http://127.0.0.1:8000/health', {
+      const response = await fetch(`${API_BASE_URL}/health`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         signal: AbortSignal.timeout(5000) // 5 second timeout
@@ -928,7 +929,7 @@ function AppContent() {
     // Animate transition and load scenario in background
     setTimeout(async () => {
       try {
-        const res = await axios.post<ScenarioResponse>('http://127.0.0.1:8000/scenario', { 
+        const res = await axios.post<ScenarioResponse>(`${API_BASE_URL}/scenario`, { 
           category: cat, 
           difficulty: diff,
           language: language // Pass current language to get scenario in that language
@@ -1029,7 +1030,7 @@ function AppContent() {
     // Fetch a new scenario in the selected language
       setLoading(true);
       try {
-      const res = await axios.post<ScenarioResponse>('http://127.0.0.1:8000/scenario', { 
+      const res = await axios.post<ScenarioResponse>(`${API_BASE_URL}/scenario`, { 
         category, 
         difficulty,
         language: newLang // Get scenario in the new language
@@ -1151,7 +1152,7 @@ function AppContent() {
         // Animate transition
         setTimeout(async () => {
           try {
-            const res = await axios.post<ScenarioResponse>('http://127.0.0.1:8000/scenario', { 
+            const res = await axios.post<ScenarioResponse>(`${API_BASE_URL}/scenario`, { 
               category: cat, 
               difficulty: diff,
               language: language // Pass current language to get scenario in that language
