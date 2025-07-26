@@ -30,7 +30,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "start-backend": "cd ../backend && concurrently \"npm run start-express\" \"npm run start-python\"",
-    "start": "concurrently \"npm run dev\" \"npm run start-backend\""
+    "start": "concurrently \"npm run dev\" \"npm run start-backend\"",
+    "postinstall": "npm install"
   },
   "eslintConfig": {
     "extends": [
@@ -59,6 +60,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^4.6.0",
     "autoprefixer": "^10.4.21",
+    "concurrently": "^7.6.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.11",
     "vite": "^7.0.4"
