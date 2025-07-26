@@ -11,6 +11,7 @@ import random
 import json
 import threading
 import tempfile
+import re
 from typing import Dict, Optional
 
 # Set default encoding to UTF-8 for Windows compatibility
@@ -19,12 +20,18 @@ if sys.platform.startswith('win'):
     sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
     sys.stderr = codecs.getwriter('utf-8')(sys.stderr.detach())
 
-from fastapi import FastAPI, Body, UploadFile, File, Query, Request
+from fastapi import FastAPI, Body, UploadFile, File, Query, Request, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import requests
 from urllib.parse import quote
+
+# Database imports
+from sqlalchemy.orm import Session
+from database import get_db
+from crud import get_user_by_nickname, create_user, update_user_last_login
+from models import UserCreate, UserResponse
 
 # Global variables for lazy-loaded models
 _nllb_model = None
@@ -127,6 +134,10 @@ def get_sentiment_analyzer():
     return _sentiment_analyzer
 
 # Models and responses
+class UserValidationResponse(BaseModel):
+    valid: bool
+    reason: str
+
 class ScenarioRequest(BaseModel):
     category: str = "general"
     difficulty: str = "medium"
@@ -195,6 +206,86 @@ def libre_translate(text, source, target):
         print(f"MyMemory translation error: {e}")
     
     return f"[Translation to {target} not available]"
+
+# User validation (simplified version without database)
+PROFANITY_LIST = {"badword", "admin", "root", "test", "guest", "anonymous"}
+
+@app.get("/users/validate", response_model=UserValidationResponse)
+def validate_username(nickname: str = Query(...), db: Session = Depends(get_db)):
+    """Validate username with database check"""
+    name = nickname.strip()
+    
+    # Length validation
+    if not (3 <= len(name) <= 16):
+        return UserValidationResponse(valid=False, reason="Nickname must be 3-16 characters.")
+    
+    # Character validation (only alphanumeric and underscores)
+    if not re.match(r'^[A-Za-z0-9_]+$', name):
+        return UserValidationResponse(valid=False, reason="Only letters, numbers, and underscores allowed.")
+    
+    # Profanity filter
+    if name.lower() in PROFANITY_LIST:
+        return UserValidationResponse(valid=False, reason="Nickname not allowed.")
+    
+    # Check if user already exists in database
+    try:
+        existing_user = get_user_by_nickname(db, name)
+        if existing_user:
+            return UserValidationResponse(valid=False, reason="Nickname already taken.")
+    except Exception as e:
+        print(f"Database error during validation: {e}")
+        # If database is unavailable, we'll still allow validation without uniqueness check
+        # This ensures the frontend doesn't break if there are database issues
+        pass
+    
+    return UserValidationResponse(valid=True, reason="Looks good!")
+
+@app.post("/users", response_model=UserResponse)
+def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
+    """Create a new user"""
+    # Validate nickname first
+    name = user.nickname.strip()
+    if not (3 <= len(name) <= 16):
+        raise HTTPException(status_code=400, detail="Nickname must be 3-16 characters.")
+    if not re.match(r'^[A-Za-z0-9_]+$', name):
+        raise HTTPException(status_code=400, detail="Only letters, numbers, and underscores allowed.")
+    if name.lower() in PROFANITY_LIST:
+        raise HTTPException(status_code=400, detail="Nickname not allowed.")
+    
+    # Check if user already exists
+    existing_user = get_user_by_nickname(db, name)
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User already exists.")
+    
+    # Create user
+    try:
+        db_user = create_user(db, user)
+        return db_user
+    except Exception as e:
+        print(f"User creation error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create user.")
+
+@app.get("/users/{nickname}", response_model=UserResponse)
+def get_user(nickname: str, db: Session = Depends(get_db)):
+    """Get user by nickname"""
+    user = get_user_by_nickname(db, nickname)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+    return user
+
+@app.post("/users/{nickname}/login")
+def user_login(nickname: str, db: Session = Depends(get_db)):
+    """Update user's last login time"""
+    user = get_user_by_nickname(db, nickname)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+    
+    try:
+        update_user_last_login(db, user.id)
+        return {"status": "success", "message": "Login recorded"}
+    except Exception as e:
+        print(f"Login update error: {e}")
+        return {"status": "error", "message": "Failed to record login"}
 
 @app.post("/scenario", response_model=ScenarioResponse)
 def get_scenario(req: ScenarioRequest):

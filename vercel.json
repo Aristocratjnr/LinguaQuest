@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd frontend && npm install && npm run build",
+  "buildCommand": "npm run build",
   "outputDirectory": "frontend/dist",
   "installCommand": "npm --version",
   "rewrites": [
@@ -42,6 +42,22 @@
     {
       "source": "/tts",
       "destination": "https://linguaquest.onrender.com/tts"
+    },
+    {
+      "source": "/users/validate",
+      "destination": "https://linguaquest.onrender.com/users/validate"
+    },
+    {
+      "source": "/users/(.*)",
+      "destination": "https://linguaquest.onrender.com/users/$1"
+    },
+    {
+      "source": "/users/validate",
+      "destination": "https://linguaquest.onrender.com/users/validate"
+    },
+    {
+      "source": "/users/(.*)",
+      "destination": "https://linguaquest.onrender.com/users/$1"
     }
   ]
 }
