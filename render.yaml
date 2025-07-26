@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: linguaquest-api
+    env: python
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && python start.py"
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    healthCheckPath: /health

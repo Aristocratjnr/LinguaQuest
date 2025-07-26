@@ -105,7 +105,9 @@ def health_check():
     return {
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
-        "database": "connected"
+        "database": "connected",
+        "port": os.environ.get("PORT", "not set"),
+        "message": "LinguaQuest API is running successfully"
     }
 
 # Initialize enhanced NLP services
@@ -687,4 +689,21 @@ def analyze_sentiment_and_tone(req: SentimentRequest):
             tone_confidence=0.0,
             tone_scores={"polite": 0.0, "passionate": 0.0, "formal": 0.0, "casual": 0.0, "confrontational": 0.0}
         )
+
+# Main block for running the application
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    print(f"🚀 Starting LinguaQuest API on port {port}")
+    print(f"📍 Host: 0.0.0.0")
+    print(f"🌐 Health check available at: http://0.0.0.0:{port}/health")
+    
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=port,
+        workers=1,
+        log_level="info",
+        reload=False
+    )
 
