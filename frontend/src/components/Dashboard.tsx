@@ -543,25 +543,72 @@ function AppContent() {
   };
 
   // Voice command logic
-  const handleVoiceCommand = () => {
+  const handleVoiceCommand = async () => {
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      alert('Speech recognition is not supported in this browser.');
+      setCmdError('Speech recognition is not supported in this browser. Please use the regular buttons instead.');
       return;
     }
+
+    // Check network connectivity first
+    if (!navigator.onLine) {
+      setCmdError('No internet connection detected. Voice recognition requires an internet connection.');
+      return;
+    }
+
+    // Check microphone permission first
+    try {
+      const permission = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      if (permission.state === 'denied') {
+        setCmdError('Microphone permission was denied. Please allow microphone access in your browser settings and try again.');
+        return;
+      }
+    } catch (e) {
+      // Fallback for browsers that don't support permissions API
+      console.log('Permissions API not supported, proceeding with speech recognition');
+    }
+
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.lang = voiceLang;
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
+    
+    // Set listening state
     setListeningCmd(true);
     setCmdError('');
     setShowListeningModal(true);
-    recognition.start();
+    
+    // Add a safety timeout to ensure button always becomes available again
+    const safetyTimeout = setTimeout(() => {
+      console.log('Speech recognition safety timeout triggered');
+      setListeningCmd(false);
+      setShowListeningModal(false);
+      if (recognition) {
+        try {
+          recognition.abort();
+        } catch (e) {
+          console.log('Error aborting recognition:', e);
+        }
+      }
+    }, 10000); // 10 second safety timeout
+    
+    try {
+      recognition.start();
+    } catch (error) {
+      clearTimeout(safetyTimeout);
+      setListeningCmd(false);
+      setShowListeningModal(false);
+      setCmdError('Failed to start voice recognition. Please check your microphone permissions.');
+      return;
+    }
+
     recognition.onresult = (event: any) => {
+      clearTimeout(safetyTimeout);
       const transcript = event.results[0][0].transcript.toLowerCase();
       setLastCmd(transcript);
       setListeningCmd(false);
       setShowListeningModal(false);
+      
       // Find matching command
       let found = false;
       for (const cmd of VOICE_COMMANDS) {
@@ -611,14 +658,113 @@ function AppContent() {
         }
       }
     };
-    recognition.onerror = () => {
+    
+    recognition.onerror = (event: any) => {
+      clearTimeout(safetyTimeout);
       setListeningCmd(false);
       setShowListeningModal(false);
+      
+      // Handle specific error types
+      switch (event.error) {
+        case 'not-allowed':
+          setCmdError('Microphone permission was denied. Please allow microphone access and try again.');
+          break;
+        case 'no-speech':
+          setCmdError('No speech was detected. Please try speaking more clearly or try again.');
+          break;
+        case 'audio-capture':
+          setCmdError('No microphone was found. Please ensure your microphone is connected.');
+          break;
+        case 'network':
+          setCmdError('Network error occurred. Voice recognition requires internet access. Please check your connection and try again.');
+          break;
+        case 'service-not-allowed':
+          setCmdError('Speech recognition service is not allowed. Please check your browser settings.');
+          break;
+        case 'bad-grammar':
+          setCmdError('Speech recognition grammar error. Please try again.');
+          break;
+        case 'language-not-supported':
+          setCmdError('The selected language is not supported. Please try English or change the voice language setting.');
+          break;
+        case 'aborted':
+          // Silent handling for aborted recognition (user stopped)
+          console.log('Speech recognition was aborted');
+          break;
+        default:
+          setCmdError(`Voice recognition failed: ${event.error}. Please try again or use the regular buttons.`);
+      }
     };
+    
     recognition.onend = () => {
+      clearTimeout(safetyTimeout);
       setListeningCmd(false);
       setShowListeningModal(false);
     };
+  };
+
+  // Test microphone permissions
+  const testMicrophonePermissions = async () => {
+    try {
+      // Try to get user media to test microphone access
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      // If successful, stop the stream immediately
+      stream.getTracks().forEach(track => track.stop());
+      
+      setCmdError('');
+      alert('✅ Microphone access is working! You can now use voice commands.');
+      return true;
+    } catch (error: any) {
+      console.error('Microphone test failed:', error);
+      
+      if (error.name === 'NotAllowedError') {
+        setCmdError('Microphone permission was denied. Please allow microphone access in your browser settings and try again.');
+      } else if (error.name === 'NotFoundError') {
+        setCmdError('No microphone was found. Please ensure your microphone is connected and try again.');
+      } else if (error.name === 'NotSupportedError') {
+        setCmdError('Microphone access is not supported in this browser.');
+      } else {
+        setCmdError('Failed to access microphone. Please check your browser settings and try again.');
+      }
+      return false;
+    }
+  };
+
+  // Test network connectivity and backend connection
+  const testNetworkConnection = async () => {
+    try {
+      // Check general internet connectivity
+      if (!navigator.onLine) {
+        setCmdError('No internet connection detected. Please check your network connection and try again.');
+        return false;
+      }
+
+      // Test backend connectivity
+      const response = await fetch('http://127.0.0.1:8000/health', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(5000) // 5 second timeout
+      });
+
+      if (response.ok) {
+        setCmdError('');
+        alert('✅ Network connection is working! Backend server is accessible.');
+        return true;
+      } else {
+        setCmdError('Backend server is not responding. Please ensure the server is running on port 8000.');
+        return false;
+      }
+    } catch (error: any) {
+      console.error('Network test failed:', error);
+      
+      if (error.name === 'AbortError') {
+        setCmdError('Network connection is too slow or backend server is not responding. Please check your connection.');
+      } else {
+        setCmdError('Cannot connect to backend server. Please ensure the server is running and try again.');
+      }
+      return false;
+    }
   };
 
   // Track round wins and unique words
@@ -1896,10 +2042,23 @@ function AppContent() {
           >
             <span className="material-icons" style={{ fontSize: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>autorenew</span>
           </motion.button>
-          {/* Microphone Button - unchanged */}
+          {/* Microphone Button - Enhanced */}
           <motion.button
-            whileHover={{ scale: 1.08 }}
-            whileTap={{ scale: 0.97 }}
+            whileHover={{ scale: listeningCmd ? 1 : 1.08 }}
+            whileTap={{ scale: listeningCmd ? 1 : 0.97 }}
+            animate={listeningCmd ? { 
+              scale: [1, 1.1, 1],
+              boxShadow: [
+                `0 4px 0 #d18616`,
+                `0 6px 0 #d18616, 0 0 0 4px rgba(255, 156, 26, 0.2)`,
+                `0 4px 0 #d18616`
+              ]
+            } : {}}
+            transition={listeningCmd ? { 
+              duration: 1.5, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            } : { duration: 0.2 }}
             style={{
               width: 56,
               height: 56,
@@ -1910,30 +2069,174 @@ function AppContent() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: 'pointer',
+              cursor: listeningCmd ? 'not-allowed' : 'pointer',
               boxShadow: `0 4px 0 ${listeningCmd ? '#d18616' : '#0d8ecf'}`,
               fontSize: 28,
               transition: 'all 0.2s',
+              opacity: listeningCmd ? 0.8 : 1,
+              position: 'relative',
+              overflow: 'visible'
             }}
             onClick={handleVoiceCommand}
             disabled={listeningCmd}
-            title="Voice Command"
+            title={
+              listeningCmd 
+                ? "Listening for voice command... (10s timeout)"
+                : cmdError.includes('Microphone')
+                  ? "Microphone access needed - Click to try again"
+                  : "Click to use voice commands (requires microphone access)"
+            }
             aria-label="Voice Command"
           >
-            <span style={{ fontSize: '20px' }}>{listeningCmd ? '🎤' : '🎤'}</span>
+            <span style={{ 
+              fontSize: '20px',
+              transform: listeningCmd ? 'scale(1.1)' : 'scale(1)',
+              transition: 'transform 0.2s'
+            }}>
+              {listeningCmd ? '🔴' : '🎤'}
+            </span>
+            
+            {/* Pulse effect when listening */}
+            {listeningCmd && (
+              <motion.div
+                initial={{ scale: 1, opacity: 0.6 }}
+                animate={{ scale: 1.8, opacity: 0 }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  borderRadius: '50%',
+                  border: '2px solid #ff9c1a',
+                  pointerEvents: 'none'
+                }}
+              />
+            )}
           </motion.button>
         </div>
 
         {/* Show voice command error if any */}
         {cmdError && (
-          <div style={{
-            marginTop: '8px',
-            color: DUOLINGO_COLORS.red,
-            fontSize: '14px',
-            textAlign: 'center'
-          }}>
-            {cmdError}
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            style={{
+              marginTop: '12px',
+              padding: '12px 16px',
+              background: 'rgba(255, 107, 107, 0.1)',
+              border: `1px solid ${DUOLINGO_COLORS.red}`,
+              borderRadius: '12px',
+              color: DUOLINGO_COLORS.red,
+              fontSize: '14px',
+              textAlign: 'center',
+              maxWidth: '600px',
+              margin: '12px auto 0 auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px',
+              alignItems: 'center'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span className="material-icons" style={{ fontSize: '18px' }}>warning</span>
+              <span>{cmdError}</span>
+            </div>
+            
+            {cmdError.includes('Network') && (
+              <div style={{ 
+                fontSize: '12px', 
+                color: DUOLINGO_COLORS.darkGray,
+                marginTop: '4px',
+                textAlign: 'center'
+              }}>
+                <div>To fix network issues:</div>
+                <div style={{ marginTop: '4px', fontWeight: 'bold' }}>
+                  1. Check your internet connection<br/>
+                  2. Ensure the backend server is running<br/>
+                  3. Try refreshing the page<br/>
+                  4. Check if any firewall is blocking the connection
+                </div>
+              </div>
+            )}
+
+            {cmdError.includes('Microphone permission') && (
+              <div style={{ 
+                fontSize: '12px', 
+                color: DUOLINGO_COLORS.darkGray,
+                marginTop: '4px',
+                textAlign: 'center'
+              }}>
+                <div>To enable microphone access:</div>
+                <div style={{ marginTop: '4px', fontWeight: 'bold' }}>
+                  1. Click the 🔒 or 🛡️ icon in your browser's address bar<br/>
+                  2. Change microphone permission to "Allow"<br/>
+                  3. Refresh the page and try again
+                </div>
+              </div>
+            )}
+            
+            <div style={{ display: 'flex', gap: '8px', marginTop: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
+              {cmdError.includes('Network') && (
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={testNetworkConnection}
+                  style={{
+                    background: DUOLINGO_COLORS.green,
+                    border: 'none',
+                    color: 'white',
+                    borderRadius: '8px',
+                    padding: '6px 12px',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Test Network
+                </motion.button>
+              )}
+
+              {cmdError.includes('Microphone') && (
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={testMicrophonePermissions}
+                  style={{
+                    background: DUOLINGO_COLORS.blue,
+                    border: 'none',
+                    color: 'white',
+                    borderRadius: '8px',
+                    padding: '6px 12px',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Test Microphone
+                </motion.button>
+              )}
+              
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setCmdError('')}
+                style={{
+                  background: 'transparent',
+                  border: `1px solid ${DUOLINGO_COLORS.red}`,
+                  color: DUOLINGO_COLORS.red,
+                  borderRadius: '8px',
+                  padding: '6px 12px',
+                  fontSize: '12px',
+                  cursor: 'pointer'
+                }}
+              >
+                Dismiss
+              </motion.button>
+            </div>
+          </motion.div>
         )}
       </main>
 
@@ -2155,8 +2458,18 @@ function AppContent() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => {
+                // Abort speech recognition if it's running
+                if (window.currentSpeechRecognition) {
+                  try {
+                    window.currentSpeechRecognition.abort();
+                  } catch (e) {
+                    console.log('Error aborting recognition:', e);
+                  }
+                  window.currentSpeechRecognition = null;
+                }
                 setShowListeningModal(false);
                 setListeningCmd(false);
+                setCmdError('Voice command cancelled.');
               }}
               style={{
                 padding: '12px 24px',

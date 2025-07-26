@@ -60,6 +60,8 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
   const handleVoiceInput = useCallback(() => {
     if (!enableVoice) return;
     
+    console.log('Voice input clicked');
+    
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
       alert('Speech recognition is not supported in this browser.');
       return;
@@ -73,11 +75,16 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
     recognition.maxAlternatives = 1;
     recognition.continuous = false;
     
+    console.log('Starting speech recognition with language:', currentLanguageConfig.speechLang);
+    
     setListening(true);
+    
     recognition.start();
     
     recognition.onresult = (event: any) => {
+      console.log('Speech recognition result:', event);
       const transcript = event.results[0][0].transcript;
+      console.log('Transcript:', transcript);
       onChange(transcript);
       setListening(false);
       addActivity({ type: 'action', message: 'Used voice input for argument' });
@@ -86,9 +93,34 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
     recognition.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error);
       setListening(false);
+      
+      // Provide user feedback for common errors
+      switch(event.error) {
+        case 'no-speech':
+          alert('No speech was detected. Please try again.');
+          break;
+        case 'audio-capture':
+          alert('No microphone was found. Please check your microphone connection.');
+          break;
+        case 'not-allowed':
+          alert('Microphone permission was denied. Please allow microphone access and try again.');
+          break;
+        case 'network':
+          alert('Network error occurred. Please check your internet connection.');
+          break;
+        default:
+          alert(`Speech recognition error: ${event.error}`);
+      }
     };
     
-    recognition.onend = () => setListening(false);
+    recognition.onend = () => {
+      console.log('Speech recognition ended');
+      setListening(false);
+    };
+    
+    recognition.onstart = () => {
+      console.log('Speech recognition started');
+    };
   }, [enableVoice, currentLanguageConfig.speechLang, onChange, addActivity]);
 
   const handleTranslate = useCallback(() => {
@@ -141,6 +173,34 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
         </span>
       </div>
 
+      {/* Listening Status */}
+      {listening && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          className="mb-3 p-3 rounded-3 text-center"
+          style={{
+            background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+            border: '2px solid #dc3545',
+            color: '#dc3545'
+          }}
+        >
+          <div className="d-flex align-items-center justify-content-center gap-2">
+            <motion.i 
+              className="material-icons"
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 1, repeat: Infinity }}
+              style={{ color: '#dc3545' }}
+            >
+              mic
+            </motion.i>
+            <strong>Listening...</strong>
+          </div>
+          <small className="d-block mt-1">Speak clearly into your microphone</small>
+        </motion.div>
+      )}
+
       {/* Input Area */}
       <div className="position-relative mb-3">
         <textarea
@@ -184,19 +244,39 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
           {enableVoice && (
             <motion.button
               type="button"
-              className={`btn ${listening ? 'btn-success' : 'btn-outline-secondary'} p-2 d-flex align-items-center justify-content-center`}
+              className={`btn ${listening ? 'btn-danger' : 'btn-outline-secondary'} p-2 d-flex align-items-center justify-content-center`}
               style={{ 
                 width: 40, 
                 height: 40, 
                 borderRadius: '50%',
-                border: 'none'
+                border: 'none',
+                position: 'relative',
+                boxShadow: listening ? '0 0 20px rgba(220,53,69,0.5)' : 'none'
               }}
               onClick={handleVoiceInput}
-              disabled={loading || disabled || listening}
-              title="Speak your argument"
+              disabled={loading || disabled}
+              title={listening ? "Listening... Click to stop" : "Click to speak your argument"}
               whileTap={{ scale: 0.85 }}
-              whileHover={{ backgroundColor: listening ? '#28a745' : '#f1f1f1' }}
+              whileHover={{ backgroundColor: listening ? '#dc3545' : '#f1f1f1' }}
+              animate={listening ? { scale: [1, 1.1, 1] } : { scale: 1 }}
+              transition={listening ? { duration: 1, repeat: Infinity, ease: "easeInOut" } : {}}
             >
+              {listening && (
+                <motion.div
+                  style={{
+                    position: 'absolute',
+                    top: -8,
+                    left: -8,
+                    right: -8,
+                    bottom: -8,
+                    borderRadius: '50%',
+                    border: '2px solid #dc3545',
+                    opacity: 0.6
+                  }}
+                  animate={{ scale: [1, 1.4], opacity: [0.6, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
+                />
+              )}
               <i className="material-icons" style={{ 
                 fontSize: '1.1rem',
                 color: listening ? 'white' : '#58a700'

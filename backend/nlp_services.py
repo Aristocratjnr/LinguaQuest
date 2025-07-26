@@ -3,6 +3,7 @@ from transformers import (
     AutoTokenizer, 
     AutoModelForSequenceClassification,
     AutoModelForSeq2SeqLM,
+    AutoModelForCausalLM,
     pipeline,
     WhisperProcessor,
     WhisperForConditionalGeneration
@@ -219,7 +220,7 @@ class ConversationalAI:
         # Load DialoGPT model
         self.model_name = "microsoft/DialoGPT-medium"
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)
+        self.model = AutoModelForCausalLM.from_pretrained(self.model_name)
         
         # Add special tokens for conversation management
         self.tokenizer.pad_token = self.tokenizer.eos_token
