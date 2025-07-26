@@ -74,10 +74,10 @@ SCENARIOS_TWI = [
 def read_root():
     """Root endpoint - API status"""
     return {
-        "message": "LinguaQuest API is running! (Memory Optimized)",
+        "message": "LinguaQuest backend API is running",
         "version": "1.0.0-optimized",
         "status": "active",
-        "memory_usage": "optimized for Render free tier",
+        "batmanAristocrat": "trying to save the world",
         "endpoints": {
             "docs": "/docs",
             "api": "/api/v1",
