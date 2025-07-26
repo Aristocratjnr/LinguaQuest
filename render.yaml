@@ -2,7 +2,7 @@ services:
   - type: web
     name: linguaquest-api
     env: python
-    buildCommand: "cd backend && pip install -r requirements.txt"
+    buildCommand: "cd backend && pip install -r requirements-optimized.txt"
     startCommand: "cd backend && python start.py"
     plan: free
     envVars:

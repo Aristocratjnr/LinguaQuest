@@ -153,6 +153,24 @@ class EvaluateResponse(BaseModel):
     feedback: str
     score: int
 
+class DialogueRequest(BaseModel):
+    scenario: str
+    user_argument: str
+    ai_stance: str = "disagree"
+
+class DialogueResponse(BaseModel):
+    ai_response: str
+    new_stance: str
+    reasoning: str
+
+class SentimentRequest(BaseModel):
+    text: str
+
+class SentimentResponse(BaseModel):
+    sentiment: str
+    confidence: float
+    details: dict
+
 # Language mappings (simplified)
 EXTERNAL_LANG_MAP = {
     'en': 'en', 'fr': 'fr', 'es': 'es', 'de': 'de', 'pt': 'pt',
@@ -275,6 +293,144 @@ def evaluate_argument(req: EvaluateRequest):
     except Exception as e:
         print(f"Evaluation error: {e}")
         return EvaluateResponse(persuaded=False, feedback="Evaluation error.", score=0)
+
+@app.post("/dialogue", response_model=DialogueResponse)
+def dialogue_endpoint(req: DialogueRequest):
+    """Simple dialogue endpoint for AI conversation"""
+    try:
+        # Simple response based on stance
+        responses = {
+            "disagree": "I understand your point, but I have some concerns about this approach.",
+            "neutral": "That's an interesting perspective. Let me consider this further.",
+            "agree": "You make a compelling argument. I'm starting to see your point."
+        }
+        
+        # Simple stance progression
+        new_stance = req.ai_stance
+        if len(req.user_argument) > 50:  # If argument is substantial
+            if req.ai_stance == "disagree":
+                new_stance = "neutral"
+            elif req.ai_stance == "neutral":
+                new_stance = "agree"
+        
+        return DialogueResponse(
+            ai_response=responses.get(req.ai_stance, "I understand your perspective."),
+            new_stance=new_stance,
+            reasoning="Simple rule-based response"
+        )
+    except Exception as e:
+        print(f"Dialogue error: {e}")
+        return DialogueResponse(
+            ai_response="I'm having trouble responding right now.",
+            new_stance=req.ai_stance,
+            reasoning="Error in dialogue processing"
+        )
+
+@app.post("/sentiment", response_model=SentimentResponse)
+def analyze_sentiment(req: SentimentRequest):
+    """Analyze sentiment of text using lightweight VADER"""
+    try:
+        sentiment_analyzer = get_sentiment_analyzer()
+        if sentiment_analyzer:
+            scores = sentiment_analyzer.polarity_scores(req.text)
+            
+            # Determine overall sentiment
+            compound = scores['compound']
+            if compound >= 0.05:
+                sentiment = "positive"
+            elif compound <= -0.05:
+                sentiment = "negative"
+            else:
+                sentiment = "neutral"
+            
+            confidence = abs(compound)
+            
+            return SentimentResponse(
+                sentiment=sentiment,
+                confidence=confidence,
+                details=scores
+            )
+        else:
+            return SentimentResponse(
+                sentiment="neutral",
+                confidence=0.0,
+                details={"error": "Sentiment analyzer not available"}
+            )
+    except Exception as e:
+        print(f"Sentiment analysis error: {e}")
+        return SentimentResponse(
+            sentiment="neutral",
+            confidence=0.0,
+            details={"error": str(e)}
+        )
+
+# API v1 endpoints for frontend compatibility
+@app.get("/api/v1/streak")
+def get_streak(nickname: str):
+    """Get user's current streak (simplified)"""
+    return {"streak": 1}
+
+@app.get("/api/v1/level")
+def get_level(nickname: str):
+    """Get user's current level (simplified)"""
+    return {"level": 1}
+
+@app.patch("/api/v1/streak")
+def reset_streak(nickname: str, streak: int):
+    """Reset user's streak (simplified)"""
+    return {"streak": streak}
+
+@app.patch("/api/v1/level")
+def reset_level(nickname: str, level: int):
+    """Reset user's level (simplified)"""
+    return {"level": level}
+
+@app.post("/api/v1/streak/increment")
+def increment_streak(nickname: str):
+    """Increment user's streak (simplified)"""
+    return {"streak": 2}
+
+@app.get("/api/v1/leaderboard")
+def get_leaderboard_v1():
+    """Get leaderboard data (API v1 compatible)"""
+    leaderboard_data = get_leaderboard()
+    return {"leaderboard": leaderboard_data.leaderboard}
+
+@app.post("/api/v1/leaderboard")
+def submit_leaderboard_v1(entry: dict):
+    """Submit to leaderboard (API v1 compatible)"""
+    score_entry = ScoreEntry(
+        name=entry.get("name", "Anonymous"),
+        score=entry.get("score", 0),
+        date=entry.get("date", datetime.now().isoformat())
+    )
+    return submit_score(score_entry)
+
+# Engagement API endpoints
+@app.get("/api/engagement/categories")
+def get_engagement_categories():
+    """Get available categories for scenarios"""
+    return {
+        "categories": [
+            {"key": "general", "label": "General Discussion"},
+            {"key": "technology", "label": "Technology"},
+            {"key": "education", "label": "Education"},
+            {"key": "environment", "label": "Environment"},
+            {"key": "social", "label": "Social Issues"},
+            {"key": "business", "label": "Business"}
+        ]
+    }
+
+@app.get("/api/engagement/difficulties")
+def get_engagement_difficulties():
+    """Get available difficulty levels"""
+    return {
+        "difficulties": [
+            {"key": "easy", "label": "Easy"},
+            {"key": "medium", "label": "Medium"},
+            {"key": "hard", "label": "Hard"}
+        ]
+    }
 
 @app.get("/tts")
 def tts(text: str = Query(...), lang: str = Query("en")):

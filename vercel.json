@@ -38,6 +38,10 @@
     {
       "source": "/health",
       "destination": "https://linguaquest.onrender.com/health"
+    },
+    {
+      "source": "/tts",
+      "destination": "https://linguaquest.onrender.com/tts"
     }
   ]
 }
