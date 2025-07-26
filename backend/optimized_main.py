@@ -29,7 +29,7 @@ from urllib.parse import quote
 
 # Database imports
 from sqlalchemy.orm import Session
-from database import get_db
+from database import get_db, engine, Base
 from crud import get_user_by_nickname, create_user, update_user_last_login
 from models import UserCreate, UserResponse
 
@@ -236,7 +236,8 @@ def validate_username(nickname: str = Query(...), db: Session = Depends(get_db))
         print(f"Database error during validation: {e}")
         # If database is unavailable, we'll still allow validation without uniqueness check
         # This ensures the frontend doesn't break if there are database issues
-        pass
+        print("⚠️ Continuing validation without database check")
+        return UserValidationResponse(valid=True, reason="Validation completed (database unavailable)")
     
     return UserValidationResponse(valid=True, reason="Looks good!")
 
@@ -576,10 +577,19 @@ def get_leaderboard():
 # Startup event
 @app.on_event("startup")
 async def startup_event():
-    """Lightweight startup - only initialize essential components"""
+    """Initialize database and essential components"""
     print("🚀 LinguaQuest Optimized API starting up...")
     print("💾 Memory optimization: ON")
     print("🤖 ML models: Lazy loading enabled")
+    
+    # Initialize database tables
+    try:
+        print("🗄️ Creating database tables...")
+        Base.metadata.create_all(bind=engine)
+        print("✅ Database tables created successfully")
+    except Exception as e:
+        print(f"⚠️ Database initialization warning: {e}")
+        print("🔄 Continuing without database (will affect user validation)")
 
 if __name__ == "__main__":
     import uvicorn

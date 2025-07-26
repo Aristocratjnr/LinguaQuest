@@ -5,6 +5,7 @@ This version removes heavy ML models to ensure deployment works
 """
 import os
 import sys
+import re
 from datetime import datetime
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -50,6 +51,33 @@ class EvaluateResponse(BaseModel):
     feedback: str
     score: int
 
+class UserValidationResponse(BaseModel):
+    valid: bool
+    reason: str
+
+# Profanity list for username validation
+PROFANITY_LIST = {"badword", "admin", "root", "test", "guest", "anonymous"}
+
+@app.get("/users/validate", response_model=UserValidationResponse)
+def validate_username(nickname: str = Query(...)):
+    """Validate username - minimal version without database"""
+    name = nickname.strip()
+    
+    # Length validation
+    if not (3 <= len(name) <= 16):
+        return UserValidationResponse(valid=False, reason="Nickname must be 3-16 characters.")
+    
+    # Character validation (only alphanumeric and underscores)
+    if not re.match(r'^[A-Za-z0-9_]+$', name):
+        return UserValidationResponse(valid=False, reason="Only letters, numbers, and underscores allowed.")
+    
+    # Profanity filter
+    if name.lower() in PROFANITY_LIST:
+        return UserValidationResponse(valid=False, reason="Nickname not allowed.")
+    
+    # In minimal version, we accept all valid names (no database check)
+    return UserValidationResponse(valid=True, reason="Looks good!")
+
 @app.get("/")
 def read_root():
     """Root endpoint - API status"""
@@ -62,7 +90,8 @@ def read_root():
             "docs": "/docs",
             "health": "/health",
             "scenario": "/scenario",
-            "evaluate": "/evaluate"
+            "evaluate": "/evaluate",
+            "users/validate": "/users/validate"
         }
     }
 

@@ -6,3 +6,5 @@ requests==2.31.0
 python-dotenv==1.0.0
 vaderSentiment==3.3.2
 gTTS==2.5.4
+SQLAlchemy==2.0.41
+alembic==1.16.4
