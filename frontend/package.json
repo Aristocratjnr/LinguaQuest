@@ -30,8 +30,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "start-backend": "cd ../backend && concurrently \"npm run start-express\" \"npm run start-python\"",
-    "start": "concurrently \"npm run dev\" \"npm run start-backend\"",
-    "postinstall": "npm install"
+    "start": "concurrently \"npm run dev\" \"npm run start-backend\""
   },
   "eslintConfig": {
     "extends": [
