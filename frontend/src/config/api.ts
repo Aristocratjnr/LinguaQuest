@@ -18,8 +18,8 @@ export const getApiBaseUrl = (): string => {
   
   // Check if we're in production (Vercel deployment)
   if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
-    // Use the Render backend URL - you'll need to replace this with the actual Render URL
-    apiUrl = 'https://linguaquest-api.onrender.com';
+    // Use the Render backend URL
+    apiUrl = 'https://linguaquest.onrender.com';
     console.log('[API Config] Using production URL (Vercel detected):', apiUrl);
     return apiUrl;
   }
