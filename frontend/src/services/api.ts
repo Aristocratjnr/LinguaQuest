@@ -180,7 +180,7 @@ export const userApi = {
 
   // Get user activity history
   getActivities: async (nickname: string, limit: number = 50): Promise<Activity[]> => {
-    const response = await api.get(`/users/${nickname}/activities?limit=${limit}`);
+    const response = await axios.get(getApiUrl(`users/${nickname}/activities?limit=${limit}`));
     return response.data;
   },
 
@@ -197,10 +197,7 @@ export const userApi = {
 export const gameApi = {
   // Submit score
   submitScore: async (nickname: string, scoreData: ScoreCreate): Promise<Score> => {
-    const response = await axios.get(getApiUrl(`scores?nickname=${encodeURIComponent(nickname)}`), {
-      method: 'POST',
-      data: scoreData
-    });
+    const response = await axios.post(getApiUrl(`scores?nickname=${encodeURIComponent(nickname)}`), scoreData);
     return response.data;
   },
 
@@ -233,19 +230,19 @@ export const gameApi = {
 export const engagementApi = {
   // Increment user streak
   incrementStreak: async (nickname: string): Promise<Streak> => {
-    const response = await api.post(`/streak/${nickname}/increment`);
+    const response = await axios.post(getApiUrl(`streak/${nickname}/increment`));
     return response.data;
   },
 
   // Reset user streak
   resetStreak: async (nickname: string): Promise<Streak> => {
-    const response = await api.post(`/streak/${nickname}/reset`);
+    const response = await axios.post(getApiUrl(`streak/${nickname}/reset`));
     return response.data;
   },
 
   // Award badge to user
   awardBadge: async (nickname: string, badgeType: string, badgeName: string, badgeDescription?: string): Promise<Badge> => {
-    const response = await api.post(`/badges/${nickname}`, {
+    const response = await axios.post(getApiUrl(`badges/${nickname}`), {
       type: badgeType,
       name: badgeName,
       description: badgeDescription
@@ -301,13 +298,13 @@ export const storage = {
 export const progressionApi = {
   // Get user progression
   getProgression: async (nickname: string): Promise<ProgressionStage[]> => {
-    const response = await api.get(`/progression/${nickname}`);
+    const response = await axios.get(getApiUrl(`progression/${nickname}`));
     return response.data;
   },
 
   // Update progression stage
   updateProgression: async (nickname: string, stageId: string, unlocked: boolean): Promise<ProgressionStage> => {
-    const response = await api.post(`/progression/${nickname}/${stageId}`, { unlocked });
+    const response = await axios.post(getApiUrl(`progression/${nickname}/${stageId}`), { unlocked });
     return response.data;
   },
 };
