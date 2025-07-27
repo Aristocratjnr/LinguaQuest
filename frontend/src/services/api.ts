@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_BASE_URL, getApiUrl } from '../config/api';
+import { API_BASE_URL } from '../config/api';
 
 // Create axios instance with default config
 const api = axios.create({
@@ -186,7 +186,8 @@ export const userApi = {
 
   // Validate username
   validateUsername: async (nickname: string): Promise<{ valid: boolean; reason: string }> => {
-    const response = await axios.get(getApiUrl('users/validate'), {
+    const url = getApiUrl('users/validate');
+    const response = await axios.get(url, {
       params: { nickname }
     });
     return response.data;
