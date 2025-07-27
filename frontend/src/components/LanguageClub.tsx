@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import defaultAvatar from '../assets/images/avatar.jpg';
-import boyAvatar from '../assets/images/boy.png';
+import boyAvatar from '../assets/images/boy.jpg';
 import womanAvatar from '../assets/images/woman.jpg';
 
 interface ClubMember {
@@ -205,9 +205,142 @@ const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose })
           scrollbar-width: none;
           -ms-overflow-style: none;
         }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+          .language-club-modal {
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            padding: 0;
+            max-width: 100vw;
+            max-height: 100vh;
+            min-width: 100vw;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+          }
+          
+          .language-club-modal > div {
+            width: 100%;
+          }
+          
+          .language-club-modal h2 {
+            font-size: 1.5rem;
+            margin-top: 1rem;
+            text-align: center;
+          }
+          
+          .language-club-modal p {
+            font-size: 1rem;
+            line-height: 1.5;
+            text-align: center;
+            margin: 0.5rem 0 1.5rem;
+          }
+          
+          .language-club-modal h3 {
+            font-size: 1.25rem;
+            text-align: center;
+          }
+          
+          /* Adjust padding for mobile */
+          .language-club-modal > div[style*="padding: '1.5rem'"] {
+            padding: 1.25rem !important;
+          }
+          
+          /* Adjust progress bar */
+          .language-club-modal > div[style*="height: 24px"] {
+            height: 32px !important;
+            border-radius: 20px !important;
+          }
+          
+          /* Adjust leaderboard items */
+          .language-club-modal > div[style*="display: 'flex'"][style*="flexDirection: 'column'"] > div {
+            padding: 12px 16px !important;
+            border-radius: 16px !important;
+            font-size: 1.1rem !important;
+          }
+          
+          /* Adjust avatar sizes */
+          .language-club-modal img[style*="width: 36"] {
+            width: 48px !important;
+            height: 48px !important;
+            min-width: 48px !important;
+            min-height: 48px !important;
+          }
+          
+          /* Adjust close button */
+          .language-club-modal button[title="Close"] {
+            width: 48px !important;
+            height: 48px !important;
+            min-width: 48px !important;
+            min-height: 48px !important;
+            top: 12px !important;
+            right: 12px !important;
+          }
+          
+          /* Adjust mascot image */
+          .language-club-modal img[alt="mascot"] {
+            width: 2.5rem !important;
+            height: 2.5rem !important;
+          }
+          
+          /* Adjust material icons */
+          .language-club-modal .material-icons {
+            font-size: 2rem !important;
+          }
+          
+          /* Adjust progress text */
+          .language-club-modal > div[style*="position: 'relative'"][style*="zIndex: 2"] {
+            font-size: 1.25rem !important;
+          }
+        }
+        
+        /* Extra small devices (phones, less than 360px) */
+        @media (max-width: 360px) {
+          .language-club-modal h2 {
+            font-size: 1.3rem;
+          }
+          
+          .language-club-modal p {
+            font-size: 0.95rem;
+          }
+          
+          .language-club-modal h3 {
+            font-size: 1.15rem;
+          }
+          
+          .language-club-modal > div[style*="display: 'flex'"][style*="flexDirection: 'column'"] > div {
+            padding: 10px 14px !important;
+            font-size: 1rem !important;
+          }
+          
+          .language-club-modal img[style*="width: 48"] {
+            width: 40px !important;
+            height: 40px !important;
+            min-width: 40px !important;
+            min-height: 40px !important;
+          }
+          
+          .language-club-modal .material-icons {
+            font-size: 1.8rem !important;
+          }
+        }
+        
+        /* Landscape orientation adjustments */
+        @media (max-width: 600px) and (orientation: landscape) {
+          .language-club-modal {
+            width: 95vw;
+            height: 90vh;
+            border-radius: 32px;
+            margin: 2.5vh auto;
+            padding: 20px 16px 16px 16px;
+          }
+        }
       `}</style>
     </div>
   );
 };
 
-export default LanguageClub; 
+export default LanguageClub;

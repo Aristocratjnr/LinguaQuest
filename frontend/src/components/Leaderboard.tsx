@@ -12,9 +12,18 @@ interface LeaderboardProps {
 }
 
 const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
-  const { theme } = useSettings();
+const { theme } = useSettings();
   const { user } = useUser();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const [language] = useState('en'); // Default to English
+
+  // Map language codes to BCP-47 language tags
+  const langMap: Record<string, string> = {
+    twi: 'tw',
+    gaa: 'gaa',
+    ewe: 'ee',
+    en: 'en'
+  };
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [sortBy, setSortBy] = useState<'score' | 'streak' | 'level'>('score');
@@ -110,8 +119,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
             background: 'linear-gradient(135deg, #fffbe6 0%, #ffe082 100%)',
             borderRadius: 32,
             boxShadow: '0 0 0 4px #ffe08255, 0 16px 48px #ffb30033, 0 2px 8px #ffb30022',
-            minWidth: 320,
-            maxWidth: 600,
+            minWidth: 300,
+            maxWidth: 650,
             width: '95vw',
             minHeight: 120,
             maxHeight: '70vh',
@@ -237,9 +246,9 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
                 : 'rgba(88, 204, 2, 0.02)',
               marginBottom: 10,
             }}>
-              <div className="flex flex-col sm:flex-row gap-3 justify-between items-center">
+              <div style={{display: "flex", flexDirection: "column", gap: "12px", width: "100%"}} className="sm:flex-row sm:items-center sm:justify-between">
                 {/* Search Input */}
-                <div className="relative w-full sm:w-80">
+                <div className="relative w-full sm:max-w-[320px]" style={{width: "100%"}}>
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <i className="material-icons" style={{ 
                       color: theme === 'dark' ? '#a0aec0' : '#718096',
@@ -249,7 +258,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
                 <input
                   type="text"
                   style={{
-                    width: '80%',
+                    width: '100%',
                     padding: '6px 10px 6px 36px',
                     border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)'}`,
                     borderRadius: '10px',
@@ -277,7 +286,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
               </div>
                 
                 {/* Sort Controls */}
-                <div className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="flex items-center gap-2 w-full sm:w-auto" style={{display: "flex", alignItems: "center", gap: "8px", width: "100%", justifyContent: "space-between"}}>
                   <div style={{ 
                     color: theme === 'dark' ? '#a0aec0' : '#718096',
                     fontSize: '13px',
@@ -454,8 +463,9 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
                         style={{
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '16px',
-                          padding: '20px',
+                          gap: 'clamp(8px, 3vw, 16px)',
+                          padding: 'clamp(12px, 4vw, 20px)',
+                          flexWrap: 'nowrap',
                           borderRadius: '20px',
                           background: isCurrentUser 
                             ? 'linear-gradient(135deg, #d7f7c8 0%, #58cc02 100%)' 
@@ -507,8 +517,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
                         <div style={{ flexShrink: 0, position: 'relative' }}>
                           <div
                             style={{
-                              width: '48px',
-                              height: '48px',
+                              width: 'clamp(36px, 6vw, 48px)',
+                              height: 'clamp(36px, 6vw, 48px)',
                               borderRadius: '50%',
                               background: `linear-gradient(135deg, ${getRankColor(entry.rank - 1)} 0%, ${getRankColor(entry.rank - 1)}dd 100%)`,
                               display: 'flex',
@@ -530,8 +540,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
                           src={(entry as any).avatar_url || entry.avatar || defaultAvatar}
                           alt="avatar"
                           style={{
-                            width: '56px',
-                            height: '56px',
+                            width: 'clamp(45px, 7vw, 56px)',
+                            height: 'clamp(45px, 7vw, 56px)',
                             borderRadius: '50%',
                             border: `3px solid ${getRankColor(entry.rank - 1)}`,
                             objectFit: 'cover',
@@ -565,7 +575,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
                               </span>
                             )}
                           </h3>
-                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', maxWidth: '100%' }}>
                             <span style={{
                               fontSize: '12px',
                               padding: '4px 8px',
@@ -614,7 +624,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
                         </div>
                         
                         {/* Score and Stats */}
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px', marginLeft: 'auto' }}>
                           <div style={{ 
                             fontWeight: 700, 
                             fontSize: 'clamp(1.2rem, 3vw, 20px)',
@@ -653,6 +663,8 @@ const Leaderboard: React.FC<LeaderboardProps> = ({ onClose, modal = true }) => {
               justifyContent: 'space-between',
               alignItems: 'center',
               padding: 'clamp(12px, 3vw, 32px)',
+              flexWrap: 'wrap',
+              gap: '12px',
               borderTop: theme === 'dark' 
                 ? '1px solid rgba(255,255,255,0.1)' 
                 : '1px solid rgba(88, 204, 2, 0.1)',

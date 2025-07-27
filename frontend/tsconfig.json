@@ -14,8 +14,16 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["node", "react", "react-dom"]
+    "types": ["node", "react", "react-dom"],
+    "typeRoots": ["./node_modules/@types", "./src"]
   },
-  "include": ["src", "tailwind.config.js", "vite.config.js"],
+  "include": [
+    "src/**/*",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.d.ts",
+    "tailwind.config.js",
+    "vite.config.js"
+  ],
   "exclude": ["node_modules", "build", "dist"]
 } 

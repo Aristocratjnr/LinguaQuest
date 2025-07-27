@@ -1,44 +1,52 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 3000,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      },
-      '/scenario': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '/translate': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '/evaluate': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '/dialogue': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '/score': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '/leaderboard': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '/sentiment': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
+export default defineConfig(({ mode }) => {
+  const isDev = mode === 'development';
+  const backendUrl = isDev ? 'http://localhost:8000' : 'https://linguaquest.onrender.com';
+  
+  return {
+    plugins: [react()],
+    define: {
+      __BACKEND_URL__: JSON.stringify(backendUrl),
+    },
+    server: {
+      port: 3000,
+      proxy: isDev ? {
+        '/api': {
+          target: backendUrl,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '')
+        },
+        '/scenario': {
+          target: backendUrl,
+          changeOrigin: true,
+        },
+        '/translate': {
+          target: backendUrl,
+          changeOrigin: true,
+        },
+        '/evaluate': {
+          target: backendUrl,
+          changeOrigin: true,
+        },
+        '/dialogue': {
+          target: backendUrl,
+          changeOrigin: true,
+        },
+        '/score': {
+          target: backendUrl,
+          changeOrigin: true,
+        },
+        '/leaderboard': {
+          target: backendUrl,
+          changeOrigin: true,
+        },
+        '/sentiment': {
+          target: backendUrl,
+          changeOrigin: true,
+        },
+      } : {}
     }
-  }
+  };
 });

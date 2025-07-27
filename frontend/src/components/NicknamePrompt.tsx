@@ -1,8 +1,10 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useActivityFeed } from './ActivityFeedContext';
 import { useUser } from '../context/UserContext';
 import { userApi } from '../services/api';
+import { API_BASE_URL } from '../config/api';
 import LogicFlowStepper from './LogicFlowStepper';
 
 const MAX_LENGTH = 16;
@@ -27,7 +29,8 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
   const [feedback, setFeedback] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const { addActivity } = useActivityFeed();
-  const { createUser, user, loginUser } = useUser();
+  const { createUser, user, loginUser, logout } = useUser();
+  const navigate = useNavigate();
   const [loggedOut, setLoggedOut] = useState(false);
   const [loginNickname, setLoginNickname] = useState('');
   const [loginError, setLoginError] = useState('');
@@ -45,7 +48,10 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
   // Validate nickname with backend
   const validateNickname = useCallback(async (name: string) => {
     try {
+      console.log('Validating nickname:', name);
+      console.log('API Base URL:', API_BASE_URL);
       const res = await userApi.validateUsername(name);
+      console.log('Validation response:', res);
       
       if (res.valid) {
         setValid(true);
@@ -56,10 +62,22 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         setFeedback('');
         setError(res.reason || 'Nickname not available');
       }
-    } catch {
+    } catch (error: any) {
+      console.error('Validation error:', error);
       setValid(false);
       setFeedback('');
-      setError('Could not validate nickname');
+      
+      // More specific error messages
+      if (error?.response) {
+        // Server responded with error status
+        setError(`Server error: ${error.response.status} - ${error.response.data?.detail || error.response.statusText}`);
+      } else if (error?.request) {
+        // Network error
+        setError('Network error: Could not reach server');
+      } else {
+        // Other error
+        setError(`Error: ${error?.message || 'Could not validate nickname'}`);
+      }
     } finally {
       setChecking(false);
     }
@@ -143,7 +161,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
       // Create user in database
       await createUser({
         nickname: trimmedNickname,
-        avatar_url: avatarPreview || undefined
+        avatar: avatarPreview || undefined
       });
 
       addActivity({ 
@@ -187,7 +205,14 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           Please log out before creating a new profile.
         </div>
         <button
-          onClick={() => { setLoggedOut(true); }}
+          onClick={() => { 
+            logout(); 
+            setLoggedOut(true);
+            // Navigate to login page after logout
+            setTimeout(() => {
+              navigate('/login');
+            }, 500);
+          }}
           style={{
             background: '#1cb0f6',
             color: 'white',
@@ -682,69 +707,154 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         /* Mobile responsiveness */
         @media (max-width: 600px) {
           .nickname-prompt-container {
-            padding: 0.25rem !important;
-            min-height: 100vh !important;
-            width: 100vw !important;
-            box-sizing: border-box;
-            overflow: auto;
+            padding: 0;
+            min-height: 100vh;
           }
           .nickname-card {
-            max-width: 100vw !important;
-            width: 100vw !important;
-            border-radius: 0.5rem !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+            width: 100vw;
+            max-width: 100vw;
             min-height: 100vh;
-            margin: 0 !important;
+            margin: 0;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
           }
           .nickname-card h2 {
-            font-size: 1.1rem !important;
+            font-size: 24px;
+            margin-top: 8px;
+            text-align: center;
           }
           .nickname-card p {
-            font-size: 0.85rem !important;
+            font-size: 16px;
+            line-height: 1.5;
+            text-align: center;
+            margin: 8px 0 24px;
           }
           .nickname-card input {
-            font-size: 0.95rem !important;
-            padding: 0.6rem !important;
+            font-size: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 12px;
+            min-height: 48px;
+            width: 100%;
+            box-sizing: border-box;
           }
           .nickname-card button, .nickname-card .motion-button {
-            font-size: 0.95rem !important;
-            padding: 0.7rem !important;
+            font-size: 16px;
+            padding: 16px;
+            margin-top: 8px;
+            border-radius: 12px;
+            min-height: 48px;
+            width: 100%;
+            box-sizing: border-box;
           }
           .nickname-card .material-icons {
-            font-size: 1.7rem !important;
+            font-size: 32px;
           }
           .nickname-card [style*='width: 6rem'],
           .nickname-avatar-upload {
-            width: 3.5rem !important;
-            height: 3.5rem !important;
-            min-width: 3.5rem !important;
-            min-height: 3.5rem !important;
-            max-width: 22vw !important;
-            max-height: 22vw !important;
+            width: 72px;
+            height: 72px;
+            min-width: 72px;
+            min-height: 72px;
+            max-width: 30vw;
+            max-height: 30vw;
+            margin: 0 auto 24px;
+            border-radius: 50%;
           }
           .nickname-avatar-img {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: cover !important;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
           }
           .nickname-avatar-icon {
-            font-size: 1.5rem !important;
+            font-size: 32px;
           }
           .nickname-avatar-add-text {
-            font-size: 0.7rem !important;
-            padding: 0.18rem !important;
+            font-size: 14px;
+            padding: 4px;
+          }
+          /* Character counter adjustments */
+          .character-count {
+            font-size: 14px;
+            margin-top: 4px;
+            text-align: right;
+          }
+          /* Error message adjustments */
+          .error-message {
+            font-size: 14px;
+            padding: 12px;
+            margin-top: 16px;
+            border-radius: 8px;
+          }
+          /* Feedback message adjustments */
+          .feedback-message {
+            font-size: 14px;
+            padding: 12px;
+            margin-top: 16px;
+            border-radius: 8px;
+          }
+          /* Input container adjustments */
+          .nickname-input-container {
+            margin-bottom: 24px;
+          }
+          /* Avatar container adjustments */
+          .nickname-avatar-container {
+            margin-bottom: 24px;
+          }
+          /* Stepper adjustments */
+          .logic-flow-stepper {
+            margin: 0 0 24px;
+          }
+        }
+        
+        /* Extra small devices (phones, less than 360px) */
+        @media (max-width: 360px) {
+          .nickname-card h2 {
+            font-size: 20px;
+            font-size: 1.3rem;
+          }
+          .nickname-card p {
+            font-size: 0.95rem;
+          }
+          .nickname-card input {
+            font-size: 1rem;
+            padding: 0.9rem;
+          }
+          .nickname-card button, .nickname-card .motion-button {
+            font-size: 1rem;
+            padding: 1rem;
           }
           .nickname-card [style*='padding: 1rem 1.25rem'] {
-            padding: 0.7rem 0.5rem !important;
+            padding: 1rem;
           }
           .nickname-card [style*='padding: 1rem'] {
-            padding: 0.7rem !important;
+            padding: 1rem;
           }
-          .nickname-card [style*='margin-bottom: 1.5rem'] {
-            margin-bottom: 1rem !important;
+          .nickname-card [style*='width: 6rem'],
+          .nickname-avatar-upload {
+            width: 5rem;
+            height: 5rem;
+            min-width: 5rem;
+            min-height: 5rem;
           }
-          .nickname-card [style*='margin-top: 0.5rem'] {
-            margin-top: 0.3rem !important;
+        }
+        
+        /* Landscape orientation adjustments */
+        @media (max-width: 600px) and (orientation: landscape) {
+          .nickname-prompt-container {
+            min-height: auto;
+            padding: 1rem;
+          }
+          .nickname-card {
+            min-height: auto;
+            margin: 1rem auto;
+            max-width: 90vw;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
           }
         }
       `}</style>

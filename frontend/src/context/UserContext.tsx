@@ -61,6 +61,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
           const userData = await userApi.getUser(nickname);
           setUser(userData);
           
+          // Update localStorage with current user data
+          if (userData.avatar) {
+            storage.setAvatar(userData.avatar);
+          }
+          
           // Record login
           await userApi.login(nickname);
           
@@ -91,8 +96,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       
       // Save to localStorage
       storage.setNickname(newUser.nickname);
-      if (userData.avatar_url) {
-        storage.setAvatar(userData.avatar_url);
+      if (userData.avatar) {
+        storage.setAvatar(userData.avatar);
       }
       
       // Load user stats
@@ -118,6 +123,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       
       // Save to localStorage
       storage.setNickname(nickname);
+      if (userData.avatar) {
+        storage.setAvatar(userData.avatar);
+      }
       
       // Load user stats
       await refreshUserStats();
@@ -140,8 +148,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       setUser(updatedUser);
       
       // Update localStorage if avatar changed
-      if (userData.avatar_url) {
-        storage.setAvatar(userData.avatar_url);
+      if (userData.avatar) {
+        storage.setAvatar(userData.avatar);
       }
     } catch (err: any) {
       setError(err.message || 'Failed to update user');
@@ -154,8 +162,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const logout = () => {
     setUser(null);
     setUserStats(null);
-    storage.setNickname('');
-    storage.setAvatar('');
+    // Don't clear nickname and avatar - these are user preferences that should persist
+    // storage.setNickname('');
+    // storage.setAvatar('');
     storage.clearSession();
   };
 

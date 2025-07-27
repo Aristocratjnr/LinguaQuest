@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import avatar1 from '../assets/images/boy.png';
+import avatar1 from '../assets/images/boy.jpg';
 import avatar2 from '../assets/images/woman.jpg';
 import avatar3 from '../assets/images/programmer.jpg';
 import avatar4 from '../assets/images/avatar.jpg';
@@ -121,15 +121,15 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
                   borderRadius: '50%',
                   overflow: 'hidden',
                   aspectRatio: '1/1',
-                  border: selected === avatar ? '3px solid #58cc02' : '3px solid #e2e8f0',
-                  transition: 'all 0.2s',
+                  border: selected === avatar ? '4px solid #58cc02' : '3px solid #e2e8f0',
+                  transition: 'all 0.3s ease',
                   boxShadow: selected === avatar ? 
-                    '0 10px 15px -3px rgba(88, 204, 2, 0.3), 0 4px 6px -2px rgba(88, 204, 2, 0.1)' : 
-                    '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+                    '0 12px 20px -4px rgba(88, 204, 2, 0.4), 0 4px 8px -2px rgba(88, 204, 2, 0.2)' : 
+                    '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
                 }}
                 whileHover={{ 
                   scale: 1.05,
-                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+                  boxShadow: '0 12px 20px -4px rgba(0, 0, 0, 0.15), 0 4px 8px -2px rgba(0, 0, 0, 0.08)'
                 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -153,16 +153,17 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
                       background: '#58cc02',
                       color: 'white',
                       borderRadius: '50%',
-                      width: '1.5rem',
-                      height: '1.5rem',
+                      width: '1.75rem',
+                      height: '1.75rem',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)'
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
                     }}
                   >
                     <span className="material-icons" style={{ 
-                      fontSize: '1rem'
+                      fontSize: '1.25rem',
+                      fontWeight: 'bold'
                     }}>check</span>
                   </motion.div>
                 )}
@@ -269,51 +270,111 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
           -webkit-font-feature-settings: 'liga';
           -webkit-font-smoothing: antialiased;
         }
-        /* Responsive styles */
+        /* Mobile responsiveness */
         @media (max-width: 600px) {
           .avatar-picker-container {
-            padding: 0.25rem !important;
-            min-height: 100vh !important;
-          }
+            padding: 0;
+            min-height: 100vh;
+            width: 100vw;
+            box-sizing: border-box;
+           /* Mobile devices (max-width: 600px) */
+        @media (max-width: 600px) {
           .avatar-picker-card {
-            max-width: 100vw !important;
-            border-radius: 0.5rem !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+            max-width: 100vw;
+            width: 100vw;
+            border-radius: 0;
+            box-shadow: none;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 24px 16px;
           }
           .avatar-picker-card h2 {
-            font-size: 1.1rem !important;
+            font-size: 24px;
+            margin-top: 8px;
+            text-align: center;
           }
           .avatar-picker-card p {
-            font-size: 0.8rem !important;
+            font-size: 16px;
+            line-height: 1.5;
+            text-align: center;
+            margin: 8px 0 24px;
           }
           .avatar-picker-card [style*='padding: 1.5rem'] {
-            padding: 0.75rem !important;
-          }
-          .avatar-picker-card [style*='padding: 1rem'] {
-            padding: 0.5rem !important;
-          }
-          .avatar-picker-card [style*='padding: 0.875rem'] {
-            padding: 0.7rem !important;
+            padding: 24px 16px;
           }
           .avatar-picker-card [style*='grid-template-columns'] {
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 0.5rem !important;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
           }
           .avatar-picker-card img {
-            min-width: 60px !important;
-            min-height: 60px !important;
-            max-width: 100% !important;
-            max-height: 100% !important;
+            min-width: 72px;
+            min-height: 72px;
+            width: 72px;
+            height: 72px;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+            border: 3px solid transparent;
+            transition: all 0.2s ease;
+            border-radius: 50%;
+          }
+          .avatar-picker-card img:hover {
+            transform: scale(1.05);
           }
           .avatar-picker-card button, .avatar-picker-card [role='button'] {
-            font-size: 0.95rem !important;
-            padding: 0.7rem !important;
+            font-size: 16px;
+            padding: 16px;
+            margin-top: 8px;
+            border-radius: 12px;
+            min-height: 48px;
+            width: 100%;
+            box-sizing: border-box;
+          }
+          /* Material icons adjustments */
+          .avatar-picker-card .material-icons {
+            font-size: 32px;
+          }
+          /* Stepper adjustments */
+          .logic-flow-stepper {
+            margin: 0 0 24px;
+          }
+        }
+        
+        /* Extra small devices (phones, less than 360px) */
+        @media (max-width: 360px) {
+{{ ... }}
+            padding: 14px;
+          }
+        }
+        
+        /* Landscape orientation adjustments */
+        /* Mobile devices (max-width: 600px) */
+        @media (max-width: 600px) {
+          .avatar-picker-container {
+            padding: 0;
+            min-height: 100vh;
+          }
+          .avatar-picker-card {
+            width: 100vw;
+            max-width: 100vw;
+            min-height: 100vh;
+            margin: 0;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+          }
+        }padding: 24px;
           }
         }
       `}</style>
       <style>{`
         .dark .avatar-picker-container, body.dark .avatar-picker-container {
-          color: var(--text-light, #e0e7ff) !important;
+{{ ... }}
         }
         .dark .avatar-picker-card, body.dark .avatar-picker-card {
           color: var(--text-light, #e0e7ff) !important;
