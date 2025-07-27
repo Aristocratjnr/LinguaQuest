@@ -5,7 +5,7 @@ export const getApiBaseUrl = (): string => {
     return (globalThis as any).__BACKEND_URL__;
   }
   // Fallback for development
-  return 'http://127.0.0.1:8000';
+  return 'http://127.0.0.1:8001';
 };
 
 // Export the base URL for use in components

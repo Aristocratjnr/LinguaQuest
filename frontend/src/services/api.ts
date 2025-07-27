@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, getApiUrl } from '../config/api';
 
 // Create axios instance with default config
 const api = axios.create({
@@ -156,25 +156,25 @@ export interface LeaderboardEntry {
 export const userApi = {
   // Create new user
   createUser: async (userData: UserCreate): Promise<User> => {
-    const response = await axios.post(`${API_BASE_URL}/users`, userData);
+    const response = await axios.post(getApiUrl('users'), userData);
     return response.data;
   },
 
   // Get user by nickname
   getUser: async (nickname: string): Promise<User> => {
-    const response = await axios.get(`${API_BASE_URL}/users/${nickname}`);
+    const response = await axios.get(getApiUrl(`users/${nickname}`));
     return response.data;
   },
 
   // Update user profile
   updateUser: async (nickname: string, userData: UserUpdate): Promise<User> => {
-    const response = await axios.put(`${API_BASE_URL}/users/${nickname}`, userData);
+    const response = await axios.put(getApiUrl(`users/${nickname}`), userData);
     return response.data;
   },
 
   // Record user login
   login: async (nickname: string): Promise<{ success: boolean; message: string }> => {
-    const response = await axios.post(`${API_BASE_URL}/users/${nickname}/login`);
+    const response = await axios.post(getApiUrl(`users/${nickname}/login`));
     return response.data;
   },
 
@@ -186,8 +186,9 @@ export const userApi = {
 
   // Validate username
   validateUsername: async (nickname: string): Promise<{ valid: boolean; reason: string }> => {
-    // Use direct path for user validation (optimized backend has this at root level)
-    const response = await axios.get(`${API_BASE_URL}/users/validate?nickname=${encodeURIComponent(nickname)}`);
+    const response = await axios.get(getApiUrl('users/validate'), {
+      params: { nickname }
+    });
     return response.data;
   },
 };
@@ -196,31 +197,34 @@ export const userApi = {
 export const gameApi = {
   // Submit score
   submitScore: async (nickname: string, scoreData: ScoreCreate): Promise<Score> => {
-    const response = await api.post(`/scores?nickname=${encodeURIComponent(nickname)}`, scoreData);
+    const response = await axios.get(getApiUrl(`scores?nickname=${encodeURIComponent(nickname)}`), {
+      method: 'POST',
+      data: scoreData
+    });
     return response.data;
   },
 
   // Start game session
   startSession: async (nickname: string, sessionData: GameSessionCreate): Promise<GameSession> => {
-    const response = await api.post(`/sessions?nickname=${encodeURIComponent(nickname)}`, sessionData);
+    const response = await axios.post(getApiUrl(`sessions?nickname=${encodeURIComponent(nickname)}`), sessionData);
     return response.data;
   },
 
   // End game session
   endSession: async (sessionId: string, sessionData: GameSessionUpdate): Promise<GameSession> => {
-    const response = await api.put(`/sessions/${sessionId}`, sessionData);
+    const response = await axios.put(getApiUrl(`sessions/${sessionId}`), sessionData);
     return response.data;
   },
 
   // Get user stats
   getUserStats: async (nickname: string): Promise<UserStats> => {
-    const response = await api.get(`/stats/${nickname}`);
+    const response = await axios.get(getApiUrl(`stats/${nickname}`));
     return response.data;
   },
 
   // Get leaderboard
   getLeaderboard: async (limit: number = 10, offset: number = 0, sortBy: string = 'total_score', sortDir: string = 'desc'): Promise<LeaderboardEntry[]> => {
-    const response = await api.get(`/leaderboard?limit=${limit}&offset=${offset}&sort_by=${sortBy}&sort_dir=${sortDir}`);
+    const response = await axios.get(getApiUrl(`leaderboard?limit=${limit}&offset=${offset}&sort_by=${sortBy}&sort_dir=${sortDir}`));
     return response.data;
   },
 };
