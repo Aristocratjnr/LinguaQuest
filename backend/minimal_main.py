@@ -6,6 +6,8 @@ This version removes heavy ML models to ensure deployment works
 import os
 import sys
 import re
+import gc
+import signal
 from datetime import datetime
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -97,13 +99,31 @@ def read_root():
 
 @app.get("/health")
 def health_check():
-    """Health check endpoint"""
-    return {
-        "status": "healthy",
-        "timestamp": datetime.now().isoformat(),
-        "port": os.environ.get("PORT", "not set"),
-        "message": "LinguaQuest Minimal API is running successfully"
-    }
+    """Enhanced health check endpoint with memory monitoring"""
+    try:
+        # Force garbage collection to clean up memory
+        gc.collect()
+        
+        # Get basic system info
+        import resource
+        memory_usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        
+        return {
+            "status": "healthy",
+            "timestamp": datetime.now().isoformat(),
+            "port": os.environ.get("PORT", "not set"),
+            "memory_usage_kb": memory_usage,
+            "python_version": sys.version,
+            "pid": os.getpid(),
+            "message": "LinguaQuest Minimal API is running successfully"
+        }
+    except Exception as e:
+        return {
+            "status": "degraded",
+            "timestamp": datetime.now().isoformat(),
+            "error": str(e),
+            "message": "Health check encountered issues"
+        }
 
 @app.post("/scenario", response_model=ScenarioResponse)
 def get_scenario(req: ScenarioRequest):
@@ -119,6 +139,10 @@ def get_scenario(req: ScenarioRequest):
 def evaluate_argument(req: EvaluateRequest):
     """Simple argument evaluation"""
     try:
+        # Periodic memory cleanup on heavy endpoints
+        if random.randint(1, 10) == 1:  # 10% chance to run GC
+            gc.collect()
+            
         # Simple scoring based on length and basic keywords
         score = min(10, len(req.argument.split()) // 2)
         
@@ -163,16 +187,44 @@ def get_engagement_difficulties():
         {"key": "hard", "label": "Hard"}
     ]
 
+# Startup and shutdown events
+@app.on_event("startup")
+async def startup_event():
+    """Application startup - initialize resources"""
+    print("🚀 LinguaQuest Minimal API starting up...")
+    print("💾 Memory optimization: Enabled")
+    print("🔧 Garbage collection: Active")
+    # Force initial garbage collection
+    gc.collect()
+
+@app.on_event("shutdown") 
+async def shutdown_event():
+    """Application shutdown - cleanup resources"""
+    print("🛑 LinguaQuest Minimal API shutting down...")
+    print("🧹 Cleaning up resources...")
+    # Force garbage collection on shutdown
+    gc.collect()
+    print("✅ Shutdown complete")
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     print(f"🚀 Starting LinguaQuest Minimal API on port {port}")
     print(f"📍 Host: 0.0.0.0")
     print(f"🌐 Health check: http://0.0.0.0:{port}/health")
     
+    # Enhanced uvicorn configuration for Render stability
     uvicorn.run(
         "minimal_main:app",
         host="0.0.0.0",
         port=port,
         workers=1,
-        log_level="info"
+        log_level="info",
+        access_log=True,
+        loop="auto",
+        http="auto",
+        ws="auto",
+        lifespan="on",
+        use_colors=False,  # Better for Render logs
+        server_header=False,  # Reduce overhead
+        date_header=False     # Reduce overhead
     )
