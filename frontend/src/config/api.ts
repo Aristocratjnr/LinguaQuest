@@ -6,7 +6,7 @@ export const getApiBaseUrl = (): string => {
   }
   
   // Fallback for development
-  return 'http://localhost:8000';
+  return 'http://127.0.0.1:8002';
 };
 
 // Check if we're in production (using the optimized backend)
@@ -22,8 +22,11 @@ export const getApiUrl = (endpoint: string): string => {
   const baseUrl = getApiBaseUrl();
   
   // FastAPI server endpoints (development and production)
-  if (endpoint.startsWith('users/')) {
-    // Map to FastAPI server endpoints under /api/v1
+  // All these endpoints use /api/v1 prefix in the FastAPI backend
+  const v1Endpoints = ['users', 'scores', 'sessions', 'stats', 'leaderboard', 'streak', 'badges', 'progression'];
+  const needsV1Prefix = v1Endpoints.some(v1Endpoint => endpoint.startsWith(v1Endpoint));
+  
+  if (needsV1Prefix) {
     return `${baseUrl}/api/v1/${endpoint}`;
   } else {
     return `${baseUrl}/${endpoint}`;

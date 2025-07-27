@@ -156,56 +156,37 @@ export interface LeaderboardEntry {
 export const userApi = {
   // Create new user
   createUser: async (userData: UserCreate): Promise<User> => {
-    const baseUrl = getApiBaseUrl();
-    const url = `${baseUrl}/api/engagement/user`;
-    const response = await axios.post(url, userData);
+    const response = await axios.post(getApiUrl('users'), userData);
     return response.data;
   },
 
   // Get user by nickname
   getUser: async (nickname: string): Promise<User> => {
-    const baseUrl = getApiBaseUrl();
-    const url = `${baseUrl}/api/engagement/user`;
-    const response = await axios.get(url, {
-      params: { nickname }
-    });
+    const response = await axios.get(getApiUrl(`users/${nickname}`));
     return response.data;
   },
 
-  // Update user profile (not available in Express server, using placeholder)
+  // Update user profile
   updateUser: async (nickname: string, userData: UserUpdate): Promise<User> => {
-    // This endpoint doesn't exist in the Express server
-    // Returning a mock response for now
-    return {
-      id: 1,
-      nickname,
-      ...userData,
-      created_at: new Date().toISOString(),
-      is_active: true,
-      preferences: {}
-    } as User;
+    const response = await axios.put(getApiUrl(`users/${nickname}`), userData);
+    return response.data;
   },
 
-  // Record user login (not available in Express server, using placeholder)
+  // Record user login
   login: async (nickname: string): Promise<{ success: boolean; message: string }> => {
-    // This endpoint doesn't exist in the Express server
-    // Returning a mock response for now
-    return { success: true, message: 'Login recorded' };
+    const response = await axios.post(getApiUrl(`users/${nickname}/login`));
+    return response.data;
   },
 
-  // Get user activity history (not available in Express server, using placeholder)
+  // Get user activity history
   getActivities: async (nickname: string, limit: number = 50): Promise<Activity[]> => {
-    // This endpoint doesn't exist in the Express server
-    // Returning an empty array for now
-    return [];
+    const response = await axios.get(getApiUrl(`users/${nickname}/activities?limit=${limit}`));
+    return response.data;
   },
 
   // Validate username
   validateUsername: async (nickname: string): Promise<{ valid: boolean; reason: string }> => {
-    // Use the correct endpoint for the Express server
-    const baseUrl = getApiBaseUrl();
-    const url = `${baseUrl}/api/engagement/validate_username`;
-    const response = await axios.get(url, {
+    const response = await axios.get(getApiUrl('users/validate'), {
       params: { nickname }
     });
     return response.data;
@@ -214,99 +195,89 @@ export const userApi = {
 
 // Game API
 export const gameApi = {
-  // Submit score (not available in Express server, using placeholder)
+  // Submit score
   submitScore: async (nickname: string, scoreData: ScoreCreate): Promise<Score> => {
-    // This endpoint doesn't exist in the Express server
-    // Returning a mock response for now
-    return {
-      id: 1,
-      user_id: 1,
-      score: scoreData.score,
-      game_session_id: scoreData.game_session_id,
-      created_at: new Date().toISOString()
-    } as Score;
+    const response = await axios.post(getApiUrl(`scores?nickname=${encodeURIComponent(nickname)}`), scoreData);
+    return response.data;
   },
 
-  // Start game session (not available in Express server, using placeholder)
+  // Start game session
   startSession: async (nickname: string, sessionData: GameSessionCreate): Promise<GameSession> => {
-    // This endpoint doesn't exist in the Express server
-    // Returning a mock response for now
-    return {
-      id: 1,
-      user_id: 1,
-      session_id: sessionData.session_id || 'session-1',
-      start_time: new Date().toISOString(),
-      total_score: 0,
-      rounds_played: 0,
-      status: 'active'
-    } as GameSession;
+    const response = await axios.post(getApiUrl(`sessions?nickname=${encodeURIComponent(nickname)}`), sessionData);
+    return response.data;
   },
 
-  // End game session (not available in Express server, using placeholder)
+  // End game session
   endSession: async (sessionId: string, sessionData: GameSessionUpdate): Promise<GameSession> => {
-    // This endpoint doesn't exist in the Express server
-    // Returning a mock response for now
-    return {
-      id: 1,
-      user_id: 1,
-      session_id: sessionId,
-      start_time: new Date().toISOString(),
-      end_time: new Date().toISOString(),
-      total_score: sessionData.total_score || 0,
-      rounds_played: sessionData.rounds_played || 0,
-      status: sessionData.status || 'completed'
-    } as GameSession;
+    const response = await axios.put(getApiUrl(`sessions/${sessionId}`), sessionData);
+    return response.data;
   },
 
   // Get user stats
   getUserStats: async (nickname: string): Promise<UserStats> => {
-    // This endpoint doesn't exist in the Express server
-    // Returning a mock response for now
-    return {
-      total_score: 0,
-      games_played: 0,
-      highest_score: 0,
-      current_streak: 0,
-      longest_streak: 0,
-      total_rounds_played: 0,
-      total_rounds_won: 0,
-      badges_count: 0,
-      favorite_language: 'en',
-      win_rate: 0
-    } as UserStats;
+    const response = await axios.get(getApiUrl(`stats/${nickname}`));
+    return response.data;
   },
 
   // Get leaderboard
   getLeaderboard: async (limit: number = 10, offset: number = 0, sortBy: string = 'total_score', sortDir: string = 'desc'): Promise<LeaderboardEntry[]> => {
-    const baseUrl = getApiBaseUrl();
-    const url = `${baseUrl}/api/engagement/leaderboard`;
-    const response = await axios.get(url);
+    const response = await axios.get(getApiUrl(`leaderboard?limit=${limit}&offset=${offset}&sort_by=${sortBy}&sort_dir=${sortDir}`));
     return response.data;
   },
 };
 
 // Engagement API
 export const engagementApi = {
+  // Get user streak
+  getStreak: async (nickname: string): Promise<{ streak: number }> => {
+    const response = await axios.get(getApiUrl('streak'), { params: { nickname } });
+    return response.data;
+  },
+
+  // Get user level
+  getLevel: async (nickname: string): Promise<{ level: number }> => {
+    const response = await axios.get(getApiUrl('level'), { params: { nickname } });
+    return response.data;
+  },
+
+  // Update streak
+  updateStreak: async (nickname: string, streak: number): Promise<{ streak: number }> => {
+    const response = await axios.patch(`${getApiUrl('streak')}?nickname=${encodeURIComponent(nickname)}&streak=${streak}`);
+    return response.data;
+  },
+
+  // Update level
+  updateLevel: async (nickname: string, level: number): Promise<{ level: number }> => {
+    const response = await axios.patch(`${getApiUrl('level')}?nickname=${encodeURIComponent(nickname)}&level=${level}`);
+    return response.data;
+  },
+
   // Increment user streak
   incrementStreak: async (nickname: string): Promise<Streak> => {
-    const baseUrl = getApiBaseUrl();
-    const url = `${baseUrl}/api/engagement/update`;
-    const response = await axios.post(url, { nickname, streak: 1 });
+    const response = await axios.post(getApiUrl(`streak/increment`), null, { params: { nickname } });
     return response.data;
   },
 
   // Reset user streak
   resetStreak: async (nickname: string): Promise<Streak> => {
-    // This endpoint doesn't exist in the Express server
-    // Returning a mock response for now
-    return { current_streak: 0, highest_streak: 0, last_activity_date: new Date().toISOString() };
+    const response = await axios.post(getApiUrl(`streak/reset`), null, { params: { nickname } });
+    return response.data;
+  },
+
+  // Get user badges
+  getBadges: async (nickname: string): Promise<{ badges: Badge[] }> => {
+    const response = await axios.get(getApiUrl(`badges/${nickname}`));
+    return response.data;
   },
 
   // Award badge to user
   awardBadge: async (nickname: string, badgeType: string, badgeName: string, badgeDescription?: string): Promise<Badge> => {
-    // This endpoint doesn't exist in the Express server
-    // Returning a mock response for now
-    return { type: badgeType, name: badgeName, description: badgeDescription };
+    const response = await axios.post(getApiUrl(`badges/${nickname}`), {
+      type: badgeType,
+      name: badgeName,
+      description: badgeDescription
+    });
+    return response.data;
   },
 };
 
@@ -357,20 +328,14 @@ export const storage = {
 export const progressionApi = {
   // Get user progression
   getProgression: async (nickname: string): Promise<ProgressionStage[]> => {
-    // This endpoint doesn't exist in the Express server
-    // Returning a mock response for now
-    return [
-      { id: '1', label: 'Beginner', unlocked: true },
-      { id: '2', label: 'Intermediate', unlocked: false },
-      { id: '3', label: 'Advanced', unlocked: false }
-    ] as ProgressionStage[];
+    const response = await axios.get(getApiUrl(`progression/${nickname}`));
+    return response.data;
   },
 
   // Update progression stage
   updateProgression: async (nickname: string, stageId: string, unlocked: boolean): Promise<ProgressionStage> => {
-    // This endpoint doesn't exist in the Express server
-    // Returning a mock response for now
-    return { id: stageId, label: 'Stage', unlocked } as ProgressionStage;
+    const response = await axios.post(getApiUrl(`progression/${nickname}/${stageId}`), { unlocked });
+    return response.data;
   },
 };
 

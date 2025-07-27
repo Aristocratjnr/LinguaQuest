@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useSettings } from '../context/SettingsContext';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, getApiUrl } from '../config/api';
 import avatar1 from '../assets/images/boy.jpg';
 import avatar2 from '../assets/images/woman.jpg';
 import avatar3 from '../assets/images/programmer.jpg';
@@ -51,8 +51,8 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     setLoading(true);
     setError(null);
     Promise.all([
-      axios.get(`${API_BASE_URL}/streak`, { params: { nickname } }),
-      axios.get(`${API_BASE_URL}/level`, { params: { nickname } })
+      axios.get(getApiUrl('streak'), { params: { nickname } }),
+      axios.get(getApiUrl('level'), { params: { nickname } })
     ])
       .then(([streakRes, levelRes]) => {
         setStreak(streakRes.data.streak);
@@ -65,7 +65,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const handleResetStreak = async () => {
     setResetting(true);
     try {
-      const res = await axios.patch(`${API_BASE_URL}/streak?nickname=${encodeURIComponent(nickname)}&streak=1`);
+      const res = await axios.patch(`${getApiUrl('streak')}?nickname=${encodeURIComponent(nickname)}&streak=1`);
       setStreak(res.data.streak);
       toast.success('Streak reset to 1.');
     } catch {
@@ -77,7 +77,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const handleResetLevel = async () => {
     setResetting(true);
     try {
-      const res = await axios.patch(`${API_BASE_URL}/level?nickname=${encodeURIComponent(nickname)}&level=1`);
+      const res = await axios.patch(`${getApiUrl('level')}?nickname=${encodeURIComponent(nickname)}&level=1`);
       setLevel(res.data.level);
       toast.success('Level reset to 1.');
     } catch {
