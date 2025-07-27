@@ -566,25 +566,30 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
 
         @media (max-width: 480px) {
           .duo-age-bg {
-            padding: 16px;
+            padding: 0;
           }
           
           .duo-age-card {
-            border-radius: 20px;
+            border-radius: 0;
+            width: 100vw;
+            max-width: 100vw;
+            min-height: 100vh;
+            margin: 0;
+            padding: 24px 16px;
           }
           
           .duo-age-header {
-            padding: 32px 24px 24px;
+            padding: 24px 16px 16px;
           }
           
           .duo-age-form {
-            padding: 0 24px 24px;
+            padding: 0 16px 16px;
           }
           
           .duo-avatar-img,
           .duo-default-avatar {
-            width: 64px;
-            height: 64px;
+            width: 72px;
+            height: 72px;
           }
           
           .duo-default-avatar .material-icons {
@@ -593,11 +598,37 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
           
           .duo-age-title {
             font-size: 24px;
+            margin-top: 8px;
+          }
+          
+          .duo-age-subtitle {
+            font-size: 16px;
+            margin-bottom: 24px;
           }
           
           .duo-age-input {
             font-size: 16px;
-            padding: 14px 14px 14px 48px;
+            padding: 16px 16px 16px 48px;
+            border-radius: 12px;
+            min-height: 48px;
+          }
+          
+          .duo-input-label {
+            font-size: 16px;
+            margin-bottom: 8px;
+          }
+          
+          .duo-continue-btn {
+            font-size: 16px;
+            padding: 16px;
+            border-radius: 12px;
+            min-height: 48px;
+            margin-top: 8px;
+          }
+          
+          /* Stepper adjustments */
+          .logic-flow-stepper {
+            margin: 0 0 24px;
           }
         }
 
@@ -612,6 +643,24 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
           
           .duo-age-title {
             font-size: 20px;
+          }
+          
+          .duo-age-subtitle {
+            font-size: 14px;
+          }
+          
+          .duo-age-input {
+            font-size: 14px;
+            padding: 14px 14px 14px 44px;
+          }
+          
+          .duo-input-label {
+            font-size: 14px;
+          }
+          
+          .duo-continue-btn {
+            font-size: 14px;
+            padding: 14px;
           }
         }
       `}</style>

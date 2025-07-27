@@ -277,8 +277,8 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
             min-height: 100vh;
             width: 100vw;
             box-sizing: border-box;
-            overflow: auto;
-          }
+           /* Mobile devices (max-width: 600px) */
+        @media (max-width: 600px) {
           .avatar-picker-card {
             max-width: 100vw;
             width: 100vw;
@@ -288,115 +288,93 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
             margin: 0;
             display: flex;
             flex-direction: column;
+            padding: 24px 16px;
           }
           .avatar-picker-card h2 {
-            font-size: 1.5rem;
-            margin-top: 1rem;
+            font-size: 24px;
+            margin-top: 8px;
             text-align: center;
           }
           .avatar-picker-card p {
-            font-size: 1rem;
+            font-size: 16px;
             line-height: 1.5;
             text-align: center;
-            margin: 0.5rem 0 1.5rem;
+            margin: 8px 0 24px;
           }
           .avatar-picker-card [style*='padding: 1.5rem'] {
-            padding: 1.25rem;
-          }
-          .avatar-picker-card [style*='padding: 1rem'] {
-            padding: 1.25rem;
-          }
-          .avatar-picker-card [style*='padding: 0.875rem'] {
-            padding: 1rem;
+            padding: 24px 16px;
           }
           .avatar-picker-card [style*='grid-template-columns'] {
             grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
+            gap: 24px;
+            margin-bottom: 24px;
           }
           .avatar-picker-card img {
-            min-width: 100px;
-            min-height: 100px;
-            width: 100px;
-            height: 100px;
+            min-width: 72px;
+            min-height: 72px;
+            width: 72px;
+            height: 72px;
             max-width: 100%;
             max-height: 100%;
             object-fit: cover;
             border: 3px solid transparent;
             transition: all 0.2s ease;
+            border-radius: 50%;
           }
           .avatar-picker-card img:hover {
             transform: scale(1.05);
           }
           .avatar-picker-card button, .avatar-picker-card [role='button'] {
-            font-size: 1.1rem;
-            padding: 1.1rem;
-            margin-top: 1rem;
-            border-radius: 0.75rem;
+            font-size: 16px;
+            padding: 16px;
+            margin-top: 8px;
+            border-radius: 12px;
             min-height: 48px;
             width: 100%;
             box-sizing: border-box;
           }
-          /* Avatar container adjustments */
-          .avatar-picker-card [style*='margin-bottom: 1.5rem'] {
-            margin-bottom: 1.5rem;
-          }
           /* Material icons adjustments */
           .avatar-picker-card .material-icons {
-            font-size: 2rem;
+            font-size: 32px;
+          }
+          /* Stepper adjustments */
+          .logic-flow-stepper {
+            margin: 0 0 24px;
           }
         }
         
         /* Extra small devices (phones, less than 360px) */
         @media (max-width: 360px) {
-          .avatar-picker-card h2 {
-            font-size: 1.3rem;
-          }
-          .avatar-picker-card p {
-            font-size: 0.95rem;
-          }
-          .avatar-picker-card [style*='padding: 1.5rem'] {
-            padding: 1rem;
-          }
-          .avatar-picker-card [style*='padding: 1rem'] {
-            padding: 1rem;
-          }
-          .avatar-picker-card [style*='padding: 0.875rem'] {
-            padding: 0.9rem;
-          }
-          .avatar-picker-card [style*='grid-template-columns'] {
-            gap: 1.25rem;
-          }
-          .avatar-picker-card img {
-            min-width: 85px;
-            min-height: 85px;
-            width: 85px;
-            height: 85px;
-          }
-          .avatar-picker-card button, .avatar-picker-card [role='button'] {
-            font-size: 1rem;
-            padding: 1rem;
+{{ ... }}
+            padding: 14px;
           }
         }
         
         /* Landscape orientation adjustments */
-        @media (max-width: 600px) and (orientation: landscape) {
+        /* Mobile devices (max-width: 600px) */
+        @media (max-width: 600px) {
           .avatar-picker-container {
-            min-height: auto;
-            padding: 1rem;
+            padding: 0;
+            min-height: 100vh;
           }
           .avatar-picker-card {
-            min-height: auto;
-            margin: 1rem auto;
-            max-width: 90vw;
-            border-radius: 1rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            width: 100vw;
+            max-width: 100vw;
+            min-height: 100vh;
+            margin: 0;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+          }
+        }padding: 24px;
           }
         }
       `}</style>
       <style>{`
         .dark .avatar-picker-container, body.dark .avatar-picker-container {
-          color: var(--text-light, #e0e7ff) !important;
+{{ ... }}
         }
         .dark .avatar-picker-card, body.dark .avatar-picker-card {
           color: var(--text-light, #e0e7ff) !important;

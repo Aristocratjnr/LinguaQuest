@@ -709,117 +709,112 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           .nickname-prompt-container {
             padding: 0;
             min-height: 100vh;
-            width: 100vw;
-            box-sizing: border-box;
-            overflow: auto;
           }
           .nickname-card {
-            max-width: 100vw;
             width: 100vw;
-            border-radius: 0;
-            box-shadow: none;
+            max-width: 100vw;
             min-height: 100vh;
             margin: 0;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 24px 16px;
             display: flex;
             flex-direction: column;
           }
           .nickname-card h2 {
-            font-size: 1.5rem;
-            margin-top: 1rem;
+            font-size: 24px;
+            margin-top: 8px;
             text-align: center;
           }
           .nickname-card p {
-            font-size: 1rem;
+            font-size: 16px;
             line-height: 1.5;
             text-align: center;
-            margin: 0.5rem 0 1.5rem;
+            margin: 8px 0 24px;
           }
           .nickname-card input {
-            font-size: 1.1rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-radius: 0.75rem;
+            font-size: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 12px;
             min-height: 48px;
             width: 100%;
             box-sizing: border-box;
           }
           .nickname-card button, .nickname-card .motion-button {
-            font-size: 1.1rem;
-            padding: 1.1rem;
-            margin-top: 1rem;
-            border-radius: 0.75rem;
+            font-size: 16px;
+            padding: 16px;
+            margin-top: 8px;
+            border-radius: 12px;
             min-height: 48px;
             width: 100%;
             box-sizing: border-box;
           }
           .nickname-card .material-icons {
-            font-size: 2rem;
+            font-size: 32px;
           }
           .nickname-card [style*='width: 6rem'],
           .nickname-avatar-upload {
-            width: 6rem;
-            height: 6rem;
-            min-width: 6rem;
-            min-height: 6rem;
+            width: 72px;
+            height: 72px;
+            min-width: 72px;
+            min-height: 72px;
             max-width: 30vw;
             max-height: 30vw;
-            margin: 0 auto 1.5rem;
+            margin: 0 auto 24px;
+            border-radius: 50%;
           }
           .nickname-avatar-img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 50%;
           }
           .nickname-avatar-icon {
-            font-size: 2.5rem;
+            font-size: 32px;
           }
           .nickname-avatar-add-text {
-            font-size: 0.9rem;
-            padding: 0.3rem;
-          }
-          .nickname-card [style*='padding: 1rem 1.25rem'] {
-            padding: 1.25rem;
-          }
-          .nickname-card [style*='padding: 1rem'] {
-            padding: 1.25rem;
-          }
-          .nickname-card [style*='margin-bottom: 1.5rem'] {
-            margin-bottom: 1.25rem;
-          }
-          .nickname-card [style*='margin-top: 0.5rem'] {
-            margin-top: 0.75rem;
+            font-size: 14px;
+            padding: 4px;
           }
           /* Character counter adjustments */
           .character-count {
-            font-size: 0.9rem;
-            margin-top: 0.25rem;
+            font-size: 14px;
+            margin-top: 4px;
             text-align: right;
           }
           /* Error message adjustments */
           .error-message {
-            font-size: 0.95rem;
-            padding: 0.75rem;
-            margin-top: 0.5rem;
+            font-size: 14px;
+            padding: 12px;
+            margin-top: 16px;
+            border-radius: 8px;
           }
           /* Feedback message adjustments */
           .feedback-message {
-            font-size: 0.95rem;
-            padding: 0.75rem;
-            margin-top: 0.5rem;
+            font-size: 14px;
+            padding: 12px;
+            margin-top: 16px;
+            border-radius: 8px;
           }
           /* Input container adjustments */
           .nickname-input-container {
-            margin-bottom: 1.5rem;
+            margin-bottom: 24px;
           }
           /* Avatar container adjustments */
           .nickname-avatar-container {
-            margin-bottom: 1.5rem;
+            margin-bottom: 24px;
+          }
+          /* Stepper adjustments */
+          .logic-flow-stepper {
+            margin: 0 0 24px;
           }
         }
         
         /* Extra small devices (phones, less than 360px) */
         @media (max-width: 360px) {
           .nickname-card h2 {
+            font-size: 20px;
             font-size: 1.3rem;
           }
           .nickname-card p {
