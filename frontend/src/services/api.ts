@@ -270,6 +270,15 @@ export const storage = {
     localStorage.setItem('linguaquest_avatar', avatar);
   },
 
+  // Language storage
+  getLanguage: (): string => {
+    return localStorage.getItem('linguaquest_language') || '';
+  },
+  
+  setLanguage: (language: string): void => {
+    localStorage.setItem('linguaquest_language', language);
+  },
+
   // Session storage
   getSessionId: (): string => {
     return sessionStorage.getItem('linguaquest_session_id') || '';
