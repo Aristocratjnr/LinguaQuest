@@ -502,27 +502,23 @@ def submit_leaderboard_v1(entry: dict):
 @app.get("/api/engagement/categories")
 def get_engagement_categories():
     """Get available categories for scenarios"""
-    return {
-        "categories": [
-            {"key": "general", "label": "General Discussion"},
-            {"key": "technology", "label": "Technology"},
-            {"key": "education", "label": "Education"},
-            {"key": "environment", "label": "Environment"},
-            {"key": "social", "label": "Social Issues"},
-            {"key": "business", "label": "Business"}
-        ]
-    }
+    return [
+        {"key": "general", "label": "General Discussion"},
+        {"key": "technology", "label": "Technology"},
+        {"key": "education", "label": "Education"},
+        {"key": "environment", "label": "Environment"},
+        {"key": "social", "label": "Social Issues"},
+        {"key": "business", "label": "Business"}
+    ]
 
 @app.get("/api/engagement/difficulties")
 def get_engagement_difficulties():
     """Get available difficulty levels"""
-    return {
-        "difficulties": [
-            {"key": "easy", "label": "Easy"},
-            {"key": "medium", "label": "Medium"},
-            {"key": "hard", "label": "Hard"}
-        ]
-    }
+    return [
+        {"key": "easy", "label": "Easy"},
+        {"key": "medium", "label": "Medium"},
+        {"key": "hard", "label": "Hard"}
+    ]
 
 @app.get("/tts")
 def tts(text: str = Query(...), lang: str = Query("en")):

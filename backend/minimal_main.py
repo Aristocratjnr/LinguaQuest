@@ -141,6 +141,28 @@ def evaluate_argument(req: EvaluateRequest):
         print(f"Evaluation error: {e}")
         return EvaluateResponse(persuaded=False, feedback="Evaluation error.", score=0)
 
+# Engagement API endpoints
+@app.get("/api/engagement/categories")
+def get_engagement_categories():
+    """Get available categories for scenarios"""
+    return [
+        {"key": "general", "label": "General Discussion"},
+        {"key": "technology", "label": "Technology"},
+        {"key": "education", "label": "Education"},
+        {"key": "environment", "label": "Environment"},
+        {"key": "social", "label": "Social Issues"},
+        {"key": "business", "label": "Business"}
+    ]
+
+@app.get("/api/engagement/difficulties")
+def get_engagement_difficulties():
+    """Get available difficulty levels"""
+    return [
+        {"key": "easy", "label": "Easy"},
+        {"key": "medium", "label": "Medium"},
+        {"key": "hard", "label": "Hard"}
+    ]
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     print(f"🚀 Starting LinguaQuest Minimal API on port {port}")
