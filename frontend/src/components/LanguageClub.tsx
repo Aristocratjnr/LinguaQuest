@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import defaultAvatar from '../assets/images/avatar.jpg';
-import boyAvatar from '../assets/images/boy.png';
+import boyAvatar from '../assets/images/boy.jpg';
 import womanAvatar from '../assets/images/woman.jpg';
 
 interface ClubMember {
