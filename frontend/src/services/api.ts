@@ -253,14 +253,14 @@ export const engagementApi = {
   },
 
   // Increment user streak
-  incrementStreak: async (nickname: string): Promise<Streak> => {
-    const response = await axios.post(getApiUrl(`streak/increment`), null, { params: { nickname } });
+  incrementStreak: async (nickname: string): Promise<{ streak: number }> => {
+    const response = await axios.post(`${getApiUrl('streak/increment')}?nickname=${encodeURIComponent(nickname)}`);
     return response.data;
   },
 
   // Reset user streak
-  resetStreak: async (nickname: string): Promise<Streak> => {
-    const response = await axios.post(getApiUrl(`streak/reset`), null, { params: { nickname } });
+  resetStreak: async (nickname: string): Promise<{ streak: number }> => {
+    const response = await axios.post(`${getApiUrl('streak/reset')}?nickname=${encodeURIComponent(nickname)}`);
     return response.data;
   },
 
@@ -272,11 +272,9 @@ export const engagementApi = {
 
   // Award badge to user
   awardBadge: async (nickname: string, badgeType: string, badgeName: string, badgeDescription?: string): Promise<Badge> => {
-    const response = await axios.post(getApiUrl(`badges/${nickname}`), {
-      type: badgeType,
-      name: badgeName,
-      description: badgeDescription
-    });
+    const url = `${getApiUrl(`badges/${nickname}`)}?badge_type=${encodeURIComponent(badgeType)}&badge_name=${encodeURIComponent(badgeName)}`;
+    const finalUrl = badgeDescription ? `${url}&badge_description=${encodeURIComponent(badgeDescription)}` : url;
+    const response = await axios.post(finalUrl);
     return response.data;
   },
 };
