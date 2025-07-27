@@ -712,7 +712,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
           .duo-icon-container {
             width: 56px;
             height: 56px;
-            margin-bottom: 16px;
+            margin: 16px auto;
           }
           
           .duo-icon-container .material-icons {
@@ -721,25 +721,25 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
           
           .duo-lang-title {
             font-size: 24px;
-            margin-bottom: 8px;
+            margin: 0 0 8px;
           }
           
           .duo-lang-subtitle {
             font-size: 14px;
+            margin: 0;
           }
           
           .duo-lang-body {
             padding: 16px;
-          }
-          
-          .duo-lang-content {
-            gap: 16px;
+            flex: 1;
           }
           
           .duo-lang-option {
             padding: 16px;
-            border-radius: 16px;
-            min-height: 80px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
           }
           
           .duo-flag-container {
@@ -749,12 +749,13 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
           }
           
           .duo-flag-img {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
           }
           
           .duo-lang-text {
             flex: 1;
+            margin-right: 12px;
           }
           
           .duo-lang-name {
@@ -763,35 +764,40 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
           }
           
           .duo-lang-desc {
-            font-size: 14px;
-            line-height: 1.4;
+            font-size: 13px;
           }
           
-          .duo-lang-footer {
-            padding: 16px;
-          }
-          
-          .duo-back-btn {
-            padding: 16px;
-            font-size: 16px;
-            min-height: 48px; /* Touch target size */
-            border-radius: 12px;
-          }
-          
-          /* Tick button adjustments */
+          /* Improved tick button positioning for mobile */
           .duo-tick-btn {
             width: 48px;
             height: 48px;
             min-width: 48px;
-            min-height: 48px; /* Touch target size */
-            border-radius: 50%;
+            min-height: 48px;
             font-size: 24px;
-            margin-left: 12px;
+            border-radius: 50%;
+            position: relative;
+            flex-shrink: 0;
+            margin-left: auto; /* Push to the right */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
           }
           
-          /* Confirmation modal adjustments */
+          .duo-tick-btn:hover {
+            transform: scale(1.05);
+          }
+          
+          .duo-tick-btn:active {
+            transform: scale(0.95);
+          }
+          
+          /* Modal adjustments for mobile */
           .duo-modal-overlay {
-            padding: 16px;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
           }
           
           .duo-modal {
@@ -800,14 +806,18 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
             max-height: 100vh;
             border-radius: 0;
             margin: 0;
+            display: flex;
+            flex-direction: column;
           }
           
           .duo-modal-header {
-            padding: 24px 16px 0;
+            padding: 24px 16px 16px;
+            text-align: center;
           }
           
           .duo-modal-title {
-            font-size: 22px;
+            font-size: 24px;
+            margin: 0 0 8px;
           }
           
           .duo-modal-body {
@@ -820,16 +830,23 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
             padding: 16px;
             border-radius: 12px;
             gap: 12px;
+            display: flex;
+            align-items: center;
           }
           
           .duo-modal-flag {
-            width: 48px;
-            height: 48px;
+            width: 56px;
+            height: 56px;
             border-radius: 10px;
           }
           
+          .duo-modal-lang-text {
+            flex: 1;
+          }
+          
           .duo-modal-lang-name {
-            font-size: 16px;
+            font-size: 18px;
+            margin-bottom: 4px;
           }
           
           .duo-modal-native {
@@ -838,6 +855,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
           
           .duo-modal-lang-desc {
             font-size: 13px;
+            margin-top: 8px;
           }
           
           .duo-modal-note {
@@ -845,7 +863,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
             border-radius: 10px;
             font-size: 13px;
             gap: 8px;
-            margin-bottom: 20px;
+            margin: 16px 0;
           }
           
           .duo-continue-btn {
@@ -854,6 +872,17 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
             border-radius: 12px;
             min-height: 48px; /* Touch target size */
             box-shadow: 0 4px 0 #46a302;
+            margin: 16px;
+            width: calc(100% - 32px);
+          }
+          
+          /* Back button adjustments */
+          .duo-back-btn {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            min-height: 48px;
+            font-size: 24px;
           }
         }
         
