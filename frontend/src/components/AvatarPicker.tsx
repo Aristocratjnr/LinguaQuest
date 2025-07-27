@@ -121,15 +121,15 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
                   borderRadius: '50%',
                   overflow: 'hidden',
                   aspectRatio: '1/1',
-                  border: selected === avatar ? '3px solid #58cc02' : '3px solid #e2e8f0',
-                  transition: 'all 0.2s',
+                  border: selected === avatar ? '4px solid #58cc02' : '3px solid #e2e8f0',
+                  transition: 'all 0.3s ease',
                   boxShadow: selected === avatar ? 
-                    '0 10px 15px -3px rgba(88, 204, 2, 0.3), 0 4px 6px -2px rgba(88, 204, 2, 0.1)' : 
-                    '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+                    '0 12px 20px -4px rgba(88, 204, 2, 0.4), 0 4px 8px -2px rgba(88, 204, 2, 0.2)' : 
+                    '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
                 }}
                 whileHover={{ 
                   scale: 1.05,
-                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+                  boxShadow: '0 12px 20px -4px rgba(0, 0, 0, 0.15), 0 4px 8px -2px rgba(0, 0, 0, 0.08)'
                 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -153,16 +153,17 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
                       background: '#58cc02',
                       color: 'white',
                       borderRadius: '50%',
-                      width: '1.5rem',
-                      height: '1.5rem',
+                      width: '1.75rem',
+                      height: '1.75rem',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)'
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
                     }}
                   >
                     <span className="material-icons" style={{ 
-                      fontSize: '1rem'
+                      fontSize: '1.25rem',
+                      fontWeight: 'bold'
                     }}>check</span>
                   </motion.div>
                 )}
@@ -310,13 +311,22 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
           }
           .avatar-picker-card [style*='grid-template-columns'] {
             grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
           }
           .avatar-picker-card img {
-            min-width: 80px;
-            min-height: 80px;
+            min-width: 100px;
+            min-height: 100px;
+            width: 100px;
+            height: 100px;
             max-width: 100%;
             max-height: 100%;
+            object-fit: cover;
+            border: 3px solid transparent;
+            transition: all 0.2s ease;
+          }
+          .avatar-picker-card img:hover {
+            transform: scale(1.05);
           }
           .avatar-picker-card button, .avatar-picker-card [role='button'] {
             font-size: 1.1rem;
@@ -354,9 +364,14 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
           .avatar-picker-card [style*='padding: 0.875rem'] {
             padding: 0.9rem;
           }
+          .avatar-picker-card [style*='grid-template-columns'] {
+            gap: 1.25rem;
+          }
           .avatar-picker-card img {
-            min-width: 70px;
-            min-height: 70px;
+            min-width: 85px;
+            min-height: 85px;
+            width: 85px;
+            height: 85px;
           }
           .avatar-picker-card button, .avatar-picker-card [role='button'] {
             font-size: 1rem;
