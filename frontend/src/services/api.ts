@@ -188,8 +188,127 @@ export const userApi = {
   validateUsername: async (nickname: string): Promise<{ valid: boolean; reason: string }> => {
     // Use direct path for user validation (optimized backend has this at root level)
     const response = await axios.get(`${API_BASE_URL}/users/validate?nickname=${encodeURIComponent(nickname)}`);
-
-
     return response.data;
   },
+};
+
+// Game API
+export const gameApi = {
+  // Submit score
+  submitScore: async (nickname: string, scoreData: ScoreCreate): Promise<Score> => {
+    const response = await api.post(`/scores?nickname=${encodeURIComponent(nickname)}`, scoreData);
+    return response.data;
+  },
+
+  // Start game session
+  startSession: async (nickname: string, sessionData: GameSessionCreate): Promise<GameSession> => {
+    const response = await api.post(`/sessions?nickname=${encodeURIComponent(nickname)}`, sessionData);
+    return response.data;
+  },
+
+  // End game session
+  endSession: async (sessionId: string, sessionData: GameSessionUpdate): Promise<GameSession> => {
+    const response = await api.put(`/sessions/${sessionId}`, sessionData);
+    return response.data;
+  },
+
+  // Get user stats
+  getUserStats: async (nickname: string): Promise<UserStats> => {
+    const response = await api.get(`/stats/${nickname}`);
+    return response.data;
+  },
+
+  // Get leaderboard
+  getLeaderboard: async (limit: number = 10, offset: number = 0, sortBy: string = 'total_score', sortDir: string = 'desc'): Promise<LeaderboardEntry[]> => {
+    const response = await api.get(`/leaderboard?limit=${limit}&offset=${offset}&sort_by=${sortBy}&sort_dir=${sortDir}`);
+    return response.data;
+  },
+};
+
+// Engagement API
+export const engagementApi = {
+  // Increment user streak
+  incrementStreak: async (nickname: string): Promise<Streak> => {
+    const response = await api.post(`/streak/${nickname}/increment`);
+    return response.data;
+  },
+
+  // Reset user streak
+  resetStreak: async (nickname: string): Promise<Streak> => {
+    const response = await api.post(`/streak/${nickname}/reset`);
+    return response.data;
+  },
+
+  // Award badge to user
+  awardBadge: async (nickname: string, badgeType: string, badgeName: string, badgeDescription?: string): Promise<Badge> => {
+    const response = await api.post(`/badges/${nickname}`, {
+      type: badgeType,
+      name: badgeName,
+      description: badgeDescription
+    });
+    return response.data;
+  },
+};
+
+// Storage utility
+export const storage = {
+  // Nickname storage
+  getNickname: (): string => {
+    return localStorage.getItem('linguaquest_nickname') || '';
+  },
+  
+  setNickname: (nickname: string): void => {
+    localStorage.setItem('linguaquest_nickname', nickname);
+  },
+
+  // Avatar storage
+  getAvatar: (): string => {
+    return localStorage.getItem('linguaquest_avatar') || '';
+  },
+  
+  setAvatar: (avatar: string): void => {
+    localStorage.setItem('linguaquest_avatar', avatar);
+  },
+
+  // Session storage
+  getSessionId: (): string => {
+    return sessionStorage.getItem('linguaquest_session_id') || '';
+  },
+  
+  setSessionId: (sessionId: string): void => {
+    sessionStorage.setItem('linguaquest_session_id', sessionId);
+  },
+  
+  clearSession: (): void => {
+    sessionStorage.removeItem('linguaquest_session_id');
+  },
+};
+
+// Progression API
+export const progressionApi = {
+  // Get user progression
+  getProgression: async (nickname: string): Promise<ProgressionStage[]> => {
+    const response = await api.get(`/progression/${nickname}`);
+    return response.data;
+  },
+
+  // Update progression stage
+  updateProgression: async (nickname: string, stageId: string, unlocked: boolean): Promise<ProgressionStage> => {
+    const response = await api.post(`/progression/${nickname}/${stageId}`, { unlocked });
+    return response.data;
+  },
+};
+
+// Error handling utility
+export const handleApiError = (error: any): string => {
+  if (error.response) {
+    // Server responded with error status
+    return error.response.data?.message || error.response.data?.detail || `Server error: ${error.response.status}`;
+  } else if (error.request) {
+    // Request was made but no response
+    return 'No response from server. Please check your connection.';
+  } else {
+    // Something else happened
+    return error.message || 'An unexpected error occurred';
+  }
 };

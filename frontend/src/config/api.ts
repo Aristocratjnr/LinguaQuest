@@ -1,13 +1,11 @@
 // API Configuration
 export const getApiBaseUrl = (): string => {
   // In production (Vercel), use the production backend
-  if (typeof __BACKEND_URL__ !== 'undefined') {
-    return __BACKEND_URL__;
+  if (typeof (globalThis as any).__BACKEND_URL__ !== 'undefined') {
+    return (globalThis as any).__BACKEND_URL__;
   }
   // Fallback for development
   return 'http://127.0.0.1:8000';
-
-
 };
 
 // Export the base URL for use in components
@@ -28,7 +26,4 @@ export const getApiUrl = (endpoint: string): string => {
   } else {
     return `${baseUrl}/${endpoint}`;
   }
-
-
-
 };
