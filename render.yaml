@@ -1,11 +1,15 @@
 services:
   - type: web
     name: linguaquest-api
-    env: python
+    runtime: python  
+    plan: free
     buildCommand: "cd backend && pip install -r requirements-optimized.txt"
     startCommand: "cd backend && python start.py"
-    plan: free
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
+      - key: DATABASE_URL
+        value: sqlite:///./linguaquest.db
+      - key: CORS_ORIGINS
+        value: "*"
     healthCheckPath: /health

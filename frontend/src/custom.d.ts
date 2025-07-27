@@ -1,22 +1,4 @@
-declare module '*.mp3' {
-  const src: string;
-  export default src;
-} 
-
-declare module "*.png" {
-  const value: string;
-  export default value;
-}
-
-declare module "*.jpg" {
-  const value: string;
-  export default value;
-}
-
-declare module "*.svg" {
-  const content: string;
-  export default content;
-}
+/// <reference types="node" />
 
 // Global variables defined in Vite config
 declare const __BACKEND_URL__: string;
@@ -73,7 +55,7 @@ declare var webkitSpeechRecognition: {
   new(): SpeechRecognition;
 };
 
-// Extend Window interface
+// Extend Window interface with proper module augmentation
 declare global {
   interface Window {
     SpeechRecognition?: typeof SpeechRecognition;
@@ -81,4 +63,6 @@ declare global {
     currentSpeechRecognition?: SpeechRecognition | null;
   }
 }
+
+export {};
 
