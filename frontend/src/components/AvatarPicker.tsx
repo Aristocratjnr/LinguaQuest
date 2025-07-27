@@ -269,45 +269,113 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
           -webkit-font-feature-settings: 'liga';
           -webkit-font-smoothing: antialiased;
         }
-        /* Responsive styles */
+        /* Mobile responsiveness */
         @media (max-width: 600px) {
           .avatar-picker-container {
-            padding: 0.25rem !important;
-            min-height: 100vh !important;
+            padding: 0;
+            min-height: 100vh;
+            width: 100vw;
+            box-sizing: border-box;
+            overflow: auto;
           }
           .avatar-picker-card {
-            max-width: 100vw !important;
-            border-radius: 0.5rem !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+            max-width: 100vw;
+            width: 100vw;
+            border-radius: 0;
+            box-shadow: none;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
           }
           .avatar-picker-card h2 {
-            font-size: 1.1rem !important;
+            font-size: 1.5rem;
+            margin-top: 1rem;
+            text-align: center;
           }
           .avatar-picker-card p {
-            font-size: 0.8rem !important;
+            font-size: 1rem;
+            line-height: 1.5;
+            text-align: center;
+            margin: 0.5rem 0 1.5rem;
           }
           .avatar-picker-card [style*='padding: 1.5rem'] {
-            padding: 0.75rem !important;
+            padding: 1.25rem;
           }
           .avatar-picker-card [style*='padding: 1rem'] {
-            padding: 0.5rem !important;
+            padding: 1.25rem;
           }
           .avatar-picker-card [style*='padding: 0.875rem'] {
-            padding: 0.7rem !important;
+            padding: 1rem;
           }
           .avatar-picker-card [style*='grid-template-columns'] {
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 0.5rem !important;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
           }
           .avatar-picker-card img {
-            min-width: 60px !important;
-            min-height: 60px !important;
-            max-width: 100% !important;
-            max-height: 100% !important;
+            min-width: 80px;
+            min-height: 80px;
+            max-width: 100%;
+            max-height: 100%;
           }
           .avatar-picker-card button, .avatar-picker-card [role='button'] {
-            font-size: 0.95rem !important;
-            padding: 0.7rem !important;
+            font-size: 1.1rem;
+            padding: 1.1rem;
+            margin-top: 1rem;
+            border-radius: 0.75rem;
+            min-height: 48px;
+            width: 100%;
+            box-sizing: border-box;
+          }
+          /* Avatar container adjustments */
+          .avatar-picker-card [style*='margin-bottom: 1.5rem'] {
+            margin-bottom: 1.5rem;
+          }
+          /* Material icons adjustments */
+          .avatar-picker-card .material-icons {
+            font-size: 2rem;
+          }
+        }
+        
+        /* Extra small devices (phones, less than 360px) */
+        @media (max-width: 360px) {
+          .avatar-picker-card h2 {
+            font-size: 1.3rem;
+          }
+          .avatar-picker-card p {
+            font-size: 0.95rem;
+          }
+          .avatar-picker-card [style*='padding: 1.5rem'] {
+            padding: 1rem;
+          }
+          .avatar-picker-card [style*='padding: 1rem'] {
+            padding: 1rem;
+          }
+          .avatar-picker-card [style*='padding: 0.875rem'] {
+            padding: 0.9rem;
+          }
+          .avatar-picker-card img {
+            min-width: 70px;
+            min-height: 70px;
+          }
+          .avatar-picker-card button, .avatar-picker-card [role='button'] {
+            font-size: 1rem;
+            padding: 1rem;
+          }
+        }
+        
+        /* Landscape orientation adjustments */
+        @media (max-width: 600px) and (orientation: landscape) {
+          .avatar-picker-container {
+            min-height: auto;
+            padding: 1rem;
+          }
+          .avatar-picker-card {
+            min-height: auto;
+            margin: 1rem auto;
+            max-width: 90vw;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
           }
         }
       `}</style>
