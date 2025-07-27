@@ -707,132 +707,159 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         /* Mobile responsiveness */
         @media (max-width: 600px) {
           .nickname-prompt-container {
-            padding: 0 !important;
-            min-height: 100vh !important;
-            width: 100vw !important;
+            padding: 0;
+            min-height: 100vh;
+            width: 100vw;
             box-sizing: border-box;
             overflow: auto;
           }
           .nickname-card {
-            max-width: 100vw !important;
-            width: 100vw !important;
-            border-radius: 0 !important;
-            box-shadow: none !important;
+            max-width: 100vw;
+            width: 100vw;
+            border-radius: 0;
+            box-shadow: none;
             min-height: 100vh;
-            margin: 0 !important;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
           }
           .nickname-card h2 {
-            font-size: 1.25rem !important;
-            margin-top: 0.5rem !important;
+            font-size: 1.5rem;
+            margin-top: 1rem;
+            text-align: center;
           }
           .nickname-card p {
-            font-size: 0.9rem !important;
-            line-height: 1.4 !important;
+            font-size: 1rem;
+            line-height: 1.5;
+            text-align: center;
+            margin: 0.5rem 0 1.5rem;
           }
           .nickname-card input {
-            font-size: 1rem !important;
-            padding: 0.75rem !important;
-            margin-bottom: 0.5rem !important;
-            border-radius: 0.5rem !important;
-            min-height: 44px !important; /* Touch target size */
+            font-size: 1.1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0.75rem;
+            min-height: 48px;
+            width: 100%;
+            box-sizing: border-box;
           }
           .nickname-card button, .nickname-card .motion-button {
-            font-size: 1rem !important;
-            padding: 0.85rem !important;
-            margin-top: 0.5rem !important;
-            border-radius: 0.5rem !important;
-            min-height: 44px !important; /* Touch target size */
+            font-size: 1.1rem;
+            padding: 1.1rem;
+            margin-top: 1rem;
+            border-radius: 0.75rem;
+            min-height: 48px;
+            width: 100%;
+            box-sizing: border-box;
           }
           .nickname-card .material-icons {
-            font-size: 1.8rem !important;
+            font-size: 2rem;
           }
           .nickname-card [style*='width: 6rem'],
           .nickname-avatar-upload {
-            width: 4rem !important;
-            height: 4rem !important;
-            min-width: 4rem !important;
-            min-height: 4rem !important;
-            max-width: 25vw !important;
-            max-height: 25vw !important;
-            margin: 0 auto 1rem !important;
+            width: 6rem;
+            height: 6rem;
+            min-width: 6rem;
+            min-height: 6rem;
+            max-width: 30vw;
+            max-height: 30vw;
+            margin: 0 auto 1.5rem;
           }
           .nickname-avatar-img {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: cover !important;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
           }
           .nickname-avatar-icon {
-            font-size: 1.8rem !important;
+            font-size: 2.5rem;
           }
           .nickname-avatar-add-text {
-            font-size: 0.75rem !important;
-            padding: 0.2rem !important;
+            font-size: 0.9rem;
+            padding: 0.3rem;
           }
           .nickname-card [style*='padding: 1rem 1.25rem'] {
-            padding: 1rem 1rem !important;
+            padding: 1.25rem;
           }
           .nickname-card [style*='padding: 1rem'] {
-            padding: 1rem !important;
+            padding: 1.25rem;
           }
           .nickname-card [style*='margin-bottom: 1.5rem'] {
-            margin-bottom: 1rem !important;
+            margin-bottom: 1.25rem;
           }
           .nickname-card [style*='margin-top: 0.5rem'] {
-            margin-top: 0.5rem !important;
+            margin-top: 0.75rem;
           }
           /* Character counter adjustments */
           .character-count {
-            font-size: 0.8rem !important;
-            margin-top: 0.25rem !important;
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+            text-align: right;
           }
           /* Error message adjustments */
           .error-message {
-            font-size: 0.85rem !important;
-            padding: 0.5rem !important;
+            font-size: 0.95rem;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
           }
           /* Feedback message adjustments */
           .feedback-message {
-            font-size: 0.85rem !important;
-            padding: 0.5rem !important;
+            font-size: 0.95rem;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+          }
+          /* Input container adjustments */
+          .nickname-input-container {
+            margin-bottom: 1.5rem;
+          }
+          /* Avatar container adjustments */
+          .nickname-avatar-container {
+            margin-bottom: 1.5rem;
           }
         }
         
         /* Extra small devices (phones, less than 360px) */
         @media (max-width: 360px) {
           .nickname-card h2 {
-            font-size: 1.1rem !important;
+            font-size: 1.3rem;
           }
           .nickname-card p {
-            font-size: 0.85rem !important;
+            font-size: 0.95rem;
           }
           .nickname-card input {
-            font-size: 0.95rem !important;
-            padding: 0.65rem !important;
+            font-size: 1rem;
+            padding: 0.9rem;
           }
           .nickname-card button, .nickname-card .motion-button {
-            font-size: 0.95rem !important;
-            padding: 0.75rem !important;
+            font-size: 1rem;
+            padding: 1rem;
           }
           .nickname-card [style*='padding: 1rem 1.25rem'] {
-            padding: 0.8rem 0.8rem !important;
+            padding: 1rem;
           }
           .nickname-card [style*='padding: 1rem'] {
-            padding: 0.8rem !important;
+            padding: 1rem;
+          }
+          .nickname-card [style*='width: 6rem'],
+          .nickname-avatar-upload {
+            width: 5rem;
+            height: 5rem;
+            min-width: 5rem;
+            min-height: 5rem;
           }
         }
         
         /* Landscape orientation adjustments */
         @media (max-width: 600px) and (orientation: landscape) {
           .nickname-prompt-container {
-            min-height: auto !important;
-            padding: 1rem !important;
+            min-height: auto;
+            padding: 1rem;
           }
           .nickname-card {
             min-height: auto;
-            margin: 1rem auto !important;
-            max-width: 90vw !important;
-            border-radius: 0.5rem !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+            margin: 1rem auto;
+            max-width: 90vw;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
           }
         }
       `}</style>
