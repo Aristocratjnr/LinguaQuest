@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, getApiUrl } from '../config/api';
 
 // Create axios instance with default config
 const api = axios.create({
@@ -186,8 +186,10 @@ export const userApi = {
 
   // Validate username
   validateUsername: async (nickname: string): Promise<{ valid: boolean; reason: string }> => {
-    // Use direct path for user validation (optimized backend has this at root level)
-    const response = await axios.get(`${API_BASE_URL}/users/validate?nickname=${encodeURIComponent(nickname)}`);
+    const url = getApiUrl('users/validate');
+    const response = await axios.get(url, {
+      params: { nickname }
+    });
     return response.data;
   },
 };
