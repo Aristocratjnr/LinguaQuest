@@ -68,7 +68,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ round, totalRounds }) => {
         overflow: 'visible',
         width: '100%',
         minWidth: 0,
-        maxWidth: '420px', // wider progress line
+        maxWidth: '100%', // responsive width
         margin: '0 auto', // center the line
       }}>
         <motion.div 
@@ -94,12 +94,13 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ round, totalRounds }) => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: 'clamp(0.5em, 2vw, 1.2em)',
+        gap: 'clamp(0.3em, 1.5vw, 1em)',
         position: 'relative',
-        height: '2.5em',
+        height: 'auto',
         marginTop: '1.2em',
         width: '100%',
         minWidth: 0,
+        flexWrap: 'wrap',
       }}>
         {Array.from({ length: totalRounds }).map((_, i) => {
           const isCompleted = i < round;

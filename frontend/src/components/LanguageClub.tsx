@@ -1,5 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import defaultAvatar from '../assets/images/avatar.jpg';
+import boyAvatar from '../assets/images/boy.jpg';
+import womanAvatar from '../assets/images/woman.jpg';
 
 interface ClubMember {
   nickname: string;
@@ -158,34 +161,39 @@ const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose })
             Club Leaderboard
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {sortedMembers.map((m, idx) => (
-              <motion.div
-                key={m.nickname}
-                initial={{ x: 40, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: idx * 0.08, type: 'spring', stiffness: 120, damping: 18 }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 14,
-                  background: idx === 0 ? 'linear-gradient(90deg, #1cb0f6 0%, #58cc02 100%)' : 'linear-gradient(90deg, #f0f4f8 0%, #e3f2fd 100%)',
-                  color: idx === 0 ? '#fff' : '#1cb0f6',
-                  borderRadius: 16,
-                  padding: '10px 18px',
-                  fontWeight: idx === 0 ? 900 : 700,
-                  fontSize: '1.08rem',
-                  boxShadow: idx === 0 ? '0 2px 8px #1cb0f655' : 'none',
-                  border: idx === 0 ? '2px solid #1cb0f6' : '2px solid #e3f2fd',
-                  position: 'relative',
-                }}
-              >
-                <span style={{ fontWeight: 300, fontSize: '1.15rem', minWidth: 24, textAlign: 'center', fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{idx + 1}</span>
-                <img src={m.avatar || mascotImg} alt="avatar" style={{ width: 36, height: 36, borderRadius: '50%', border: '2.5px solid #1cb0f6', objectFit: 'cover', background: '#fff', boxShadow: '0 2px 8px #1cb0f622' }} />
-                <span style={{ flex: 1, fontWeight: 300, fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{m.nickname}</span>
-                <span style={{ fontWeight: 300, fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{m.xp} XP</span>
-                {idx === 0 && <span className="material-icons" style={{ color: '#ffd700', fontSize: 22, marginLeft: 6 }}>emoji_events</span>}
-              </motion.div>
-            ))}
+            {sortedMembers.map((m, idx) => {
+              // Assign avatars in round-robin order if member.avatar is not set
+              const fallbackAvatars = [defaultAvatar, boyAvatar, womanAvatar];
+              const assignedAvatar = m.avatar || fallbackAvatars[idx % fallbackAvatars.length] || mascotImg;
+              return (
+                <motion.div
+                  key={m.nickname}
+                  initial={{ x: 40, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: idx * 0.08, type: 'spring', stiffness: 120, damping: 18 }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 14,
+                    background: idx === 0 ? 'linear-gradient(90deg, #1cb0f6 0%, #58cc02 100%)' : 'linear-gradient(90deg, #f0f4f8 0%, #e3f2fd 100%)',
+                    color: idx === 0 ? '#fff' : '#1cb0f6',
+                    borderRadius: 16,
+                    padding: '10px 18px',
+                    fontWeight: idx === 0 ? 900 : 700,
+                    fontSize: '1.08rem',
+                    boxShadow: idx === 0 ? '0 2px 8px #1cb0f655' : 'none',
+                    border: idx === 0 ? '2px solid #1cb0f6' : '2px solid #e3f2fd',
+                    position: 'relative',
+                  }}
+                >
+                  <span style={{ fontWeight: 300, fontSize: '1.15rem', minWidth: 24, textAlign: 'center', fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{idx + 1}</span>
+                  <img src={assignedAvatar} alt="avatar" style={{ width: 36, height: 36, borderRadius: '50%', border: '2.5px solid #1cb0f6', objectFit: 'cover', background: '#fff', boxShadow: '0 2px 8px #1cb0f622' }} />
+                  <span style={{ flex: 1, fontWeight: 300, fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{m.nickname}</span>
+                  <span style={{ fontWeight: 300, fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{m.xp} XP</span>
+                  {idx === 0 && <span className="material-icons" style={{ color: '#ffd700', fontSize: 22, marginLeft: 6 }}>emoji_events</span>}
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </motion.div>
@@ -197,9 +205,142 @@ const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose })
           scrollbar-width: none;
           -ms-overflow-style: none;
         }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+          .language-club-modal {
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            padding: 0;
+            max-width: 100vw;
+            max-height: 100vh;
+            min-width: 100vw;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+          }
+          
+          .language-club-modal > div {
+            width: 100%;
+          }
+          
+          .language-club-modal h2 {
+            font-size: 1.5rem;
+            margin-top: 1rem;
+            text-align: center;
+          }
+          
+          .language-club-modal p {
+            font-size: 1rem;
+            line-height: 1.5;
+            text-align: center;
+            margin: 0.5rem 0 1.5rem;
+          }
+          
+          .language-club-modal h3 {
+            font-size: 1.25rem;
+            text-align: center;
+          }
+          
+          /* Adjust padding for mobile */
+          .language-club-modal > div[style*="padding: '1.5rem'"] {
+            padding: 1.25rem !important;
+          }
+          
+          /* Adjust progress bar */
+          .language-club-modal > div[style*="height: 24px"] {
+            height: 32px !important;
+            border-radius: 20px !important;
+          }
+          
+          /* Adjust leaderboard items */
+          .language-club-modal > div[style*="display: 'flex'"][style*="flexDirection: 'column'"] > div {
+            padding: 12px 16px !important;
+            border-radius: 16px !important;
+            font-size: 1.1rem !important;
+          }
+          
+          /* Adjust avatar sizes */
+          .language-club-modal img[style*="width: 36"] {
+            width: 48px !important;
+            height: 48px !important;
+            min-width: 48px !important;
+            min-height: 48px !important;
+          }
+          
+          /* Adjust close button */
+          .language-club-modal button[title="Close"] {
+            width: 48px !important;
+            height: 48px !important;
+            min-width: 48px !important;
+            min-height: 48px !important;
+            top: 12px !important;
+            right: 12px !important;
+          }
+          
+          /* Adjust mascot image */
+          .language-club-modal img[alt="mascot"] {
+            width: 2.5rem !important;
+            height: 2.5rem !important;
+          }
+          
+          /* Adjust material icons */
+          .language-club-modal .material-icons {
+            font-size: 2rem !important;
+          }
+          
+          /* Adjust progress text */
+          .language-club-modal > div[style*="position: 'relative'"][style*="zIndex: 2"] {
+            font-size: 1.25rem !important;
+          }
+        }
+        
+        /* Extra small devices (phones, less than 360px) */
+        @media (max-width: 360px) {
+          .language-club-modal h2 {
+            font-size: 1.3rem;
+          }
+          
+          .language-club-modal p {
+            font-size: 0.95rem;
+          }
+          
+          .language-club-modal h3 {
+            font-size: 1.15rem;
+          }
+          
+          .language-club-modal > div[style*="display: 'flex'"][style*="flexDirection: 'column'"] > div {
+            padding: 10px 14px !important;
+            font-size: 1rem !important;
+          }
+          
+          .language-club-modal img[style*="width: 48"] {
+            width: 40px !important;
+            height: 40px !important;
+            min-width: 40px !important;
+            min-height: 40px !important;
+          }
+          
+          .language-club-modal .material-icons {
+            font-size: 1.8rem !important;
+          }
+        }
+        
+        /* Landscape orientation adjustments */
+        @media (max-width: 600px) and (orientation: landscape) {
+          .language-club-modal {
+            width: 95vw;
+            height: 90vh;
+            border-radius: 32px;
+            margin: 2.5vh auto;
+            padding: 20px 16px 16px 16px;
+          }
+        }
       `}</style>
     </div>
   );
 };
 
-export default LanguageClub; 
+export default LanguageClub;

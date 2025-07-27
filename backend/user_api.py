@@ -14,6 +14,24 @@ router = APIRouter()
 # Profanity list for username validation
 PROFANITY_LIST = {"badword", "admin", "root", "test", "guest", "anonymous"}
 
+@router.get("/users/validate")
+def validate_username(nickname: str = Query(...), db: Session = Depends(get_db)):
+    """Validate username (for frontend validation)"""
+    name = nickname.strip()
+    if not (3 <= len(name) <= 16):
+        return {"valid": False, "reason": "Nickname must be 3-16 characters."}
+    if not re.match(r'^[A-Za-z0-9_]+$', name):
+        return {"valid": False, "reason": "Only letters, numbers, and underscores allowed."}
+    if name.lower() in PROFANITY_LIST:
+        return {"valid": False, "reason": "Nickname not allowed."}
+    
+    # Check if user already exists in database
+    existing_user = get_user_by_nickname(db, name)
+    if existing_user:
+        return {"valid": False, "reason": "Nickname already taken."}
+    
+    return {"valid": True, "reason": "Looks good!"}
+
 @router.post("/users", response_model=UserResponse)
 def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
     """Create a new user"""
@@ -88,16 +106,4 @@ def get_user_activity_history(nickname: str, limit: int = Query(50, ge=1, le=100
         raise HTTPException(status_code=404, detail="User not found.")
     
     activities = get_user_activities(db, user.id, limit)
-    return activities
-
-@router.get("/users/validate")
-def validate_username(nickname: str = Query(...)):
-    """Validate username (for frontend validation)"""
-    name = nickname.strip()
-    if not (3 <= len(name) <= 16):
-        return {"valid": False, "reason": "Nickname must be 3-16 characters."}
-    if not re.match(r'^[A-Za-z0-9_]+$', name):
-        return {"valid": False, "reason": "Only letters, numbers, and underscores allowed."}
-    if name.lower() in PROFANITY_LIST:
-        return {"valid": False, "reason": "Nickname not allowed."}
-    return {"valid": True, "reason": "Looks good!"} 
+    return activities 

@@ -1,6 +1,5 @@
 import React, { ReactNode, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Language as LanguageIcon, School as SchoolIcon, Translate as TranslateIcon } from '@mui/icons-material';
 import { useUser } from '../context/UserContext';
 import { storage, userApi } from '../services/api';
 import ghanaFlag from '../assets/images/ghana.png';
@@ -104,354 +103,892 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
   const selectedLangObj = LANGUAGES.find(l => l.code === selectedLanguage);
 
   return (
-    <div className="language-selector-container" style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))',
-      padding: '1rem',
-      fontFamily: '"JetBrains Mono", monospace',
-      color: 'var(--text-dark, #222)'
-    }}>
+    <div className="duo-lang-bg">
+      <div className="duo-decorations">
+        <div className="decoration-circle circle-1"></div>
+        <div className="decoration-circle circle-2"></div>
+        <div className="decoration-circle circle-3"></div>
+      </div>
       <motion.div
-        className="language-selector-card"
-        style={{
-          width: '100%',
-          maxWidth: '32rem',
-          background: 'var(--duo-card, #fff)',
-          borderRadius: '1.25rem',
-          overflow: 'hidden',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-          color: 'inherit'
-        }}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        className="duo-lang-card"
+        initial={{ opacity: 0, y: 40, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       >
         {/* Header */}
-        <div style={{
-          padding: '1.5rem',
-          background: ' #ffffff',
-          textAlign: 'center',
-          color: 'var(--text-light, #e0e7ff)'
-        }}>
+        <div className="duo-lang-header">
           <motion.div
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 400 }}
+            className="duo-header-content"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 400 }}
           >
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '3rem',
-              height: '3rem',
-              borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.2)',
-              marginBottom: '0.75rem'
-            }}>
-              <span className="material-icons" style={{ fontSize: '1.5rem', color: '#1cb0f6' }}>language</span>
+            <div className="duo-icon-container">
+              <span className="material-icons">language</span>
             </div>
-            <h2 style={{
-              margin: 0,
-              fontSize: '1.5rem',
-              fontWeight: 700,
-              letterSpacing: '-0.025em',
-              color: 'var(--text-light, #e0e7ff)'
-            }}>
-              Choose Your Language
-            </h2>
-            <p style={{
-              margin: '0.5rem 0 0',
-              opacity: 0.9,
-              fontSize: '0.875rem',
-              color: 'var(--text-dark, #222)'
-            }}>
-              Select the language you want to learn
+            <h1 className="duo-lang-title">Choose your language</h1>
+            <p className="duo-lang-subtitle">
+              Pick the language you want to master
             </p>
           </motion.div>
         </div>
         {/* Body */}
-        <div style={{ padding: '1.5rem' }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr',
-            gap: '1rem',
-            marginBottom: '1.5rem'
-          }}>
+        <div className="duo-lang-body">
+          <div className="duo-languages-grid">
             {LANGUAGES.map((lang, index) => (
               <motion.div
                 key={lang.code}
+                className={`duo-language-card ${selectedLanguage === lang.code ? 'selected' : ''}`}
                 onClick={() => handleLanguageClick(lang.code)}
-                style={{
-                  position: 'relative',
-                  cursor: 'pointer',
-                  borderRadius: '1rem',
-                  overflow: 'hidden',
-                  border: selectedLanguage === lang.code ? '3px solid #58cc02' : '3px solid #e2e8f0',
-                  background: selectedLanguage === lang.code ? '#f7faf3' : '#fff',
-                  transition: 'all 0.2s',
-                  boxShadow: selectedLanguage === lang.code ?
-                    '0 10px 15px -3px rgba(88, 204, 2, 0.3), 0 4px 6px -2px rgba(88, 204, 2, 0.1)' :
-                    '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
-                }}
-                whileHover={{
-                  scale: 1.02,
-                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
-                }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 * index, type: 'spring', stiffness: 300 }}
+                whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <div className="card-body d-flex align-items-center gap-3 p-3">
-                  <div
-                    style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '12px',
-                      background: '#f0f9ff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '1.5rem',
-                      boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
-                    }}
-                  >
+                <div className="duo-lang-content">
+                  <div className="duo-flag-container">
                     <img
                       src={lang.flagImg}
                       alt={`${lang.label} flag`}
-                      style={{
-                        width: '32px',
-                        height: '32px',
-                        objectFit: 'cover',
-                        borderRadius: '8px',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
-                      }}
+                      className="duo-flag-img"
                     />
                   </div>
-                  <div className="flex-grow-1">
-                    <h3 style={{
-                      fontSize: '1.1rem',
-                      fontWeight: 600,
-                      marginBottom: '0.25rem',
-                      color: '#1a1a1a'
-                    }}>
+                  <div className="duo-lang-info">
+                    <h3 className="duo-lang-name">
                       {lang.label}
-                      <span style={{
-                        marginLeft: '0.5rem',
-                        fontSize: '0.9rem',
-                        color: '#6b7280',
-                        fontWeight: 400
-                      }}>
-                        ({lang.nativeName})
-                      </span>
+                      <span className="duo-native-name">({lang.nativeName})</span>
                     </h3>
-                    <p style={{
-                      fontSize: '0.9rem',
-                      color: '#6b7280',
-                      marginBottom: 0,
-                      lineHeight: 1.4
-                    }}>
-                      {lang.description}
-                    </p>
+                    <p className="duo-lang-desc">{lang.description}</p>
                   </div>
                   {selectedLanguage === lang.code && (
                     <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      style={{
-                        position: 'absolute',
-                        top: '0.75rem',
-                        right: '0.75rem',
-                        background: '#58cc02',
-                        color: 'white',
-                        borderRadius: '50%',
-                        width: '1.5rem',
-                        height: '1.5rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)'
-                      }}
+                      className="duo-check-badge"
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 15 }}
                     >
-                      <span className="material-icons" style={{ fontSize: '1rem' }}>check</span>
+                      <span className="material-icons">check</span>
                     </motion.div>
                   )}
                 </div>
               </motion.div>
             ))}
           </div>
+
           {isConfirming && !showContinueModal && (
             <motion.button
+              className={`duo-confirm-btn ${selectedLanguage ? 'active' : 'disabled'}`}
               onClick={handleConfirm}
               disabled={!selectedLanguage}
-              whileHover={selectedLanguage ? { scale: 1.02 } : {}}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              whileHover={selectedLanguage ? { scale: 1.02, y: -2 } : {}}
               whileTap={selectedLanguage ? { scale: 0.98 } : {}}
-              style={{
-                width: '100%',
-                padding: '0.875rem',
-                borderRadius: '0.5rem',
-                border: 'none',
-                background: selectedLanguage ? 'var(--duo-green, #58cc02)' : '#e2e8f0',
-                color: selectedLanguage ? 'var(--text-light, #e0e7ff)' : '#94a3b8',
-                fontSize: '1rem',
-                fontWeight: 600,
-                cursor: selectedLanguage ? 'pointer' : 'not-allowed',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: selectedLanguage ? '0 4px 0 #3caa3c' : 'none',
-                transition: 'all 0.2s'
-              }}
             >
-              <span className="material-icons" style={{ fontSize: '1.25rem', marginRight: '0.5rem' }}>check_circle</span>
-              Confirm Selection
+              <span className="material-icons">check_circle</span>
+              <span>Confirm Selection</span>
             </motion.button>
           )}
         </div>
         {/* Footer */}
-        <div style={{
-          padding: '1rem',
-          background: '#f8fafc',
-          borderTop: '1px solid #e2e8f0',
-          textAlign: 'center',
-          fontSize: '0.75rem',
-          color: 'var(--text-dark, #64748b)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span className="material-icons" style={{
-              fontSize: '1rem',
-              marginRight: '0.25rem',
-              color: '#64748b'
-            }}>info</span>
-            You can change your language later in settings
+        <div className="duo-lang-footer">
+          <div className="duo-footer-content">
+            <span className="material-icons">info</span>
+            <span>You can change your language later in settings</span>
           </div>
         </div>
       </motion.div>
+
       {/* Continue Modal */}
       <AnimatePresence>
         {showContinueModal && selectedLangObj && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              width: '100vw',
-              height: '100vh',
-              background: 'rgba(0,0,0,0.25)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 1000,
-              padding: '1rem', // for mobile spacing
-            }}
+            className="duo-modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
             <motion.div
-              style={{
-                background: '#fff',
-                borderRadius: '1.25rem',
-                boxShadow: '0 10px 32px rgba(0,0,0,0.18)',
-                padding: '1.25rem 1rem',
-                minWidth: '0',
-                width: '100%',
-                maxWidth: '340px', // smaller modal
-                textAlign: 'center',
-                position: 'relative',
-                margin: '0 auto',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                fontFamily: '"JetBrains Mono", "Fira Mono", "Menlo", monospace',
-              }}
-              initial={{ y: 40, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 40, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              className="duo-continue-modal"
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
             >
-              {/* Material Icon at the top */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '2.5rem',
-                height: '2.5rem',
-                borderRadius: '50%',
-                background: '#e0f2fe',
-                margin: '0 auto 0.75rem auto',
-              }}>
-                <span className="material-icons" style={{ fontSize: '1.5rem', color: '#1cb0f6' }}>translate</span>
+              <div className="duo-modal-header">
+                <div className="duo-modal-icon">
+                  <span className="material-icons">translate</span>
+                </div>
+                <h2 className="duo-modal-title">Perfect choice!</h2>
               </div>
-              <div style={{ marginBottom: '1.25rem', width: '100%' }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '0.75rem',
-                  gap: '0.75rem',
-                  width: '100%',
-                }}>
+
+              <div className="duo-modal-body">
+                <div className="duo-selected-lang">
                   <img
                     src={selectedLangObj.flagImg}
                     alt={`${selectedLangObj.label} flag`}
-                    style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '10px',
-                      boxShadow: '0 2px 6px rgba(0,0,0,0.08)'
-                    }}
+                    className="duo-modal-flag"
                   />
-                  <div style={{ textAlign: 'left', flex: 1 }}>
-                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 400, lineHeight: 1.2, fontFamily: 'inherit', letterSpacing: '0.01em' }}>{selectedLangObj.label} <span style={{ fontWeight: 300, color: '#6b7280', fontSize: '0.95rem', fontFamily: 'inherit' }}>({selectedLangObj.nativeName})</span></h3>
-                    <p style={{ margin: 0, color: '#6b7280', fontSize: '0.85rem', lineHeight: 1.3, fontWeight: 300, fontFamily: 'inherit' }}>{selectedLangObj.description}</p>
+                  <div className="duo-modal-lang-info">
+                    <h3 className="duo-modal-lang-name">
+                      {selectedLangObj.label}
+                      <span className="duo-modal-native">({selectedLangObj.nativeName})</span>
+                    </h3>
+                    <p className="duo-modal-lang-desc">{selectedLangObj.description}</p>
                   </div>
                 </div>
-                <div style={{
-                  background: '#f8fafc',
-                  borderRadius: '0.75rem',
-                  padding: '0.75rem',
-                  color: '#64748b',
-                  fontSize: '0.92rem',
-                  marginBottom: '0.75rem',
-                  lineHeight: 1.3,
-                  fontWeight: 300,
-                  fontFamily: 'inherit',
-                }}>
-                  You can come back and reselect the language.
+
+                <div className="duo-modal-note">
+                  <span className="material-icons">lightbulb</span>
+                  <span>Don't worry! You can always change your language preference later.</span>
                 </div>
+
                 <motion.button
+                  className="duo-continue-btn"
                   onClick={handleContinue}
-                  style={{
-                    width: '100%',
-                    padding: '0.7rem',
-                    borderRadius: '0.5rem',
-                    border: 'none',
-                    background: 'var(--duo-green, #58cc02)',
-                    color: 'var(--text-light, #e0e7ff)',
-                    fontSize: '1rem',
-                    fontWeight: 400,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 4px 0 #3caa3c',
-                    transition: 'all 0.2s',
-                    marginTop: '0.25rem',
-                    fontFamily: 'inherit',
-                  }}
-                  whileHover={{ scale: 1.02 }}
+                  whileHover={{ scale: 1.02, y: -1 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <span className="material-icons" style={{ fontSize: '1.15rem', marginRight: '0.45rem', color: '#fff' }}>check_circle</span>
-                  Continue
+                  <span>START LEARNING</span>
+                  <span className="material-icons">arrow_forward</span>
                 </motion.button>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <style>{`
+        .duo-lang-bg {
+          min-height: 100vh;
+          width: 100vw;
+        background: linear-gradient(135deg, #ffffff, #ffffff); 
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          overflow: hidden;
+          font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          padding: 20px;
+        }
+
+        .duo-decorations {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 0;
+        }
+
+        .decoration-circle {
+          position: absolute;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.05);
+          animation: float 6s ease-in-out infinite;
+        }
+
+        .circle-1 {
+          width: 200px;
+          height: 200px;
+          top: 10%;
+          left: -5%;
+          animation-delay: 0s;
+        }
+
+        .circle-2 {
+          width: 150px;
+          height: 150px;
+          top: 60%;
+          right: -3%;
+          animation-delay: 2s;
+        }
+
+        .circle-3 {
+          width: 100px;
+          height: 100px;
+          top: 30%;
+          right: 15%;
+          animation-delay: 4s;
+        }
+
+        .duo-lang-card {
+          background: #ffffff;
+          border-radius: 24px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.1);
+          max-width: 500px;
+          width: 100%;
+          position: relative;
+          z-index: 1;
+          overflow: hidden;
+        }
+
+        .duo-lang-header {
+         background: linear-gradient(135deg, #ffffff, #f8f8f8); 
+          padding: 40px 32px 32px;
+          text-align: center;
+          color: white;
+          position: relative;
+        }
+
+        .duo-lang-header::before {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 20px;
+          background: #ffffff;
+          border-radius: 20px 20px 0 0;
+        }
+
+        .duo-header-content {
+          position: relative;
+          z-index: 2;
+        }
+
+        .duo-icon-container {
+          width: 64px;
+          height: 64px;
+          background: #444444;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 16px;
+          backdrop-filter: blur(10px);
+        }
+
+        .duo-icon-container .material-icons {
+          font-size: 32px;
+          color: white;
+        }
+
+        .duo-lang-title {
+          font-size: 28px;
+          font-weight: 800;
+          margin: 0 0 8px 0;
+          letter-spacing: -0.5px;
+        }
+
+        .duo-lang-subtitle {
+          font-size: 16px;
+          font-weight: 400;
+          margin: 0;
+          opacity: 0.9;
+          color: #555555
+        }
+
+        .duo-lang-body {
+          padding: 32px;
+        }
+
+        .duo-languages-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          margin-bottom: 24px;
+        }
+
+        .duo-language-card {
+          background: #ffffff;
+          border: 3px solid #e5e5e5;
+          border-radius: 20px;
+          padding: 20px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .duo-language-card:hover {
+          border-color: #58cc02;
+          box-shadow: 0 8px 25px rgba(88, 204, 2, 0.15);
+        }
+
+        .duo-language-card.selected {
+          border-color: #58cc02;
+          background: linear-gradient(135deg, #f7faf3, #ffffff);
+          box-shadow: 0 8px 25px rgba(88, 204, 2, 0.2);
+        }
+
+        .duo-lang-content {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+
+        .duo-flag-container {
+          width: 56px;
+          height: 56px;
+          background: #f8fafc;
+          border-radius: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          flex-shrink: 0;
+        }
+
+        .duo-flag-img {
+          width: 40px;
+          height: 40px;
+          object-fit: cover;
+          border-radius: 12px;
+        }
+
+        .duo-lang-info {
+          flex: 1;
+        }
+
+        .duo-lang-name {
+          font-size: 18px;
+          font-weight: 700;
+          margin: 0 0 4px 0;
+          color: #3c3c3c;
+        }
+
+        .duo-native-name {
+          font-size: 14px;
+          font-weight: 400;
+          color: #777;
+          margin-left: 8px;
+        }
+
+        .duo-lang-desc {
+          font-size: 14px;
+          color: #777;
+          margin: 0;
+          line-height: 1.4;
+        }
+
+        .duo-check-badge {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          width: 32px;
+          height: 32px;
+          background: #58cc02;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          box-shadow: 0 4px 12px rgba(88, 204, 2, 0.3);
+        }
+
+        .duo-check-badge .material-icons {
+          font-size: 20px;
+        }
+
+        .duo-confirm-btn {
+          width: 100%;
+          padding: 16px 24px;
+          background: linear-gradient(180deg, #58cc02 0%, #4eb600 100%);
+          border: none;
+          border-radius: 16px;
+          color: white;
+          font-size: 16px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          box-shadow: 0 4px 0 #46a302, 0 8px 25px rgba(88, 204, 2, 0.3);
+          transition: all 0.2s ease;
+        }
+
+        .duo-confirm-btn.active:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 0 #46a302, 0 12px 35px rgba(88, 204, 2, 0.4);
+        }
+
+        .duo-confirm-btn.active:active {
+          transform: translateY(2px);
+          box-shadow: 0 2px 0 #46a302, 0 4px 15px rgba(88, 204, 2, 0.2);
+        }
+
+        .duo-confirm-btn.disabled {
+          background: #e5e5e5;
+          color: #afafaf;
+          cursor: not-allowed;
+          box-shadow: 0 4px 0 #d0d0d0;
+        }
+
+        .duo-lang-footer {
+          background: #f8fafc;
+          padding: 16px 32px;
+          border-top: 1px solid #e5e5e5;
+        }
+
+        .duo-footer-content {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          font-size: 14px;
+          color: #777;
+        }
+
+        .duo-footer-content .material-icons {
+          font-size: 18px;
+        }
+
+        .duo-modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(0, 0, 0, 0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          padding: 20px;
+        }
+
+        .duo-continue-modal {
+          background: #ffffff;
+          border-radius: 24px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+          max-width: 400px;
+          width: 100%;
+          overflow: hidden;
+        }
+
+        .duo-modal-header {
+         background: #444444
+          padding: 32px 24px 24px;
+          text-align: center;
+          color: black;
+        }
+
+        .duo-modal-icon {
+          width: 56px;
+          height: 56px;
+          background: linear-gradient(135deg, #ffffff, #808080);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 16px;
+        }
+
+        .duo-modal-icon .material-icons {
+          font-size: 28px;
+        }
+
+        .duo-modal-title {
+          font-size: 24px;
+          font-weight: 800;
+          margin: 0;
+        }
+
+        .duo-modal-body {
+          padding: 24px;
+        }
+
+        .duo-selected-lang {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          margin-bottom: 20px;
+          padding: 16px;
+          background: #f8fafc;
+          border-radius: 16px;
+        }
+
+        .duo-modal-flag {
+          width: 48px;
+          height: 48px;
+          object-fit: cover;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .duo-modal-lang-info {
+          flex: 1;
+        }
+
+        .duo-modal-lang-name {
+          font-size: 18px;
+          font-weight: 700;
+          margin: 0 0 4px 0;
+          color: #3c3c3c;
+        }
+
+        .duo-modal-native {
+          font-size: 14px;
+          font-weight: 400;
+          color: #777;
+          margin-left: 8px;
+        }
+
+        .duo-modal-lang-desc {
+          font-size: 14px;
+          color: #777;
+          margin: 0;
+          line-height: 1.4;
+        }
+
+        .duo-modal-note {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 12px 16px;
+          background: #fff7ed;
+          border-radius: 12px;
+          font-size: 14px;
+          color: #92400e;
+          margin-bottom: 24px;
+        }
+
+        .duo-modal-note .material-icons {
+          font-size: 18px;
+          color: #f59e0b;
+        }
+
+        .duo-continue-btn {
+          width: 100%;
+          padding: 16px 24px;
+          background: linear-gradient(180deg, #58cc02 0%, #4eb600 100%);
+          border: none;
+          border-radius: 16px;
+          color: white;
+          font-size: 16px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          box-shadow: 0 4px 0 #46a302, 0 8px 25px rgba(88, 204, 2, 0.3);
+          transition: all 0.2s ease;
+        }
+
+        .duo-continue-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 0 #46a302, 0 12px 35px rgba(88, 204, 2, 0.4);
+        }
+
+        .duo-continue-btn:active {
+          transform: translateY(2px);
+          box-shadow: 0 2px 0 #46a302, 0 4px 15px rgba(88, 204, 2, 0.2);
+        }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        @media (max-width: 600px) {
+          .duo-lang-bg {
+            padding: 0;
+            min-height: 100vh;
+          }
+          
+          .duo-lang-card {
+            width: 100vw;
+            min-height: 100vh;
+            border-radius: 0;
+            margin: 0;
+            box-shadow: none;
+            border: none;
+          }
+          
+          .duo-lang-header {
+            padding: 24px 16px 16px;
+          }
+          
+          .duo-icon-container {
+            width: 56px;
+            height: 56px;
+            margin: 16px auto;
+          }
+          
+          .duo-icon-container .material-icons {
+            font-size: 28px;
+          }
+          
+          .duo-lang-title {
+            font-size: 24px;
+            margin: 0 0 8px;
+          }
+          
+          .duo-lang-subtitle {
+            font-size: 14px;
+            margin: 0;
+          }
+          
+          .duo-lang-body {
+            padding: 16px;
+            flex: 1;
+          }
+          
+          .duo-lang-option {
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+          }
+          
+          .duo-flag-container {
+            width: 56px;
+            height: 56px;
+            min-width: 56px;
+          }
+          
+          .duo-flag-img {
+            width: 36px;
+            height: 36px;
+          }
+          
+          .duo-lang-text {
+            flex: 1;
+            margin-right: 12px;
+          }
+          
+          .duo-lang-name {
+            font-size: 18px;
+            margin-bottom: 4px;
+          }
+          
+          .duo-lang-desc {
+            font-size: 13px;
+          }
+          
+          /* Improved tick button positioning for mobile */
+          .duo-tick-btn {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            min-height: 48px;
+            font-size: 24px;
+            border-radius: 50%;
+            position: relative;
+            flex-shrink: 0;
+            margin-left: auto; /* Push to the right */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+          }
+          
+          .duo-tick-btn:hover {
+            transform: scale(1.05);
+          }
+          
+          .duo-tick-btn:active {
+            transform: scale(0.95);
+          }
+          
+          /* Modal adjustments for mobile */
+          .duo-modal-overlay {
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+          }
+          
+          .duo-modal {
+            width: 100vw;
+            height: 100vh;
+            max-height: 100vh;
+            border-radius: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+          }
+          
+          .duo-modal-header {
+            padding: 24px 16px 16px;
+            text-align: center;
+          }
+          
+          .duo-modal-title {
+            font-size: 24px;
+            margin: 0 0 8px;
+          }
+          
+          .duo-modal-body {
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+          }
+          
+          .duo-selected-lang {
+            padding: 16px;
+            border-radius: 12px;
+            gap: 12px;
+            display: flex;
+            align-items: center;
+          }
+          
+          .duo-modal-flag {
+            width: 56px;
+            height: 56px;
+            border-radius: 10px;
+          }
+          
+          .duo-modal-lang-text {
+            flex: 1;
+          }
+          
+          .duo-modal-lang-name {
+            font-size: 18px;
+            margin-bottom: 4px;
+          }
+          
+          .duo-modal-native {
+            font-size: 13px;
+          }
+          
+          .duo-modal-lang-desc {
+            font-size: 13px;
+            margin-top: 8px;
+          }
+          
+          .duo-modal-note {
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            gap: 8px;
+            margin: 16px 0;
+          }
+          
+          .duo-continue-btn {
+            padding: 16px;
+            font-size: 16px;
+            border-radius: 12px;
+            min-height: 48px; /* Touch target size */
+            box-shadow: 0 4px 0 #46a302;
+            margin: 16px;
+            width: calc(100% - 32px);
+          }
+          
+          /* Back button adjustments */
+          .duo-back-btn {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            min-height: 48px;
+            font-size: 24px;
+          }
+        }
+        
+        /* Extra small devices (phones, less than 360px) */
+        @media (max-width: 360px) {
+          .duo-lang-header {
+            padding: 20px 12px 12px;
+          }
+          
+          .duo-icon-container {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 12px;
+          }
+          
+          .duo-icon-container .material-icons {
+            font-size: 24px;
+          }
+          
+          .duo-lang-title {
+            font-size: 20px;
+          }
+          
+          .duo-lang-body {
+            padding: 12px;
+          }
+          
+          .duo-lang-option {
+            padding: 12px;
+          }
+          
+          .duo-flag-container {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+          }
+          
+          .duo-flag-img {
+            width: 32px;
+            height: 32px;
+          }
+          
+          .duo-lang-name {
+            font-size: 16px;
+          }
+          
+          .duo-lang-desc {
+            font-size: 12px;
+          }
+          
+          /* Tick button adjustments for extra small screens */
+          .duo-tick-btn {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            min-height: 44px;
+            font-size: 20px;
+          }
+          
+          .duo-modal-header {
+            padding: 20px 12px 0;
+          }
+          
+          .duo-modal-title {
+            font-size: 20px;
+          }
+          
+          .duo-modal-body {
+            padding: 12px;
+          }
+          
+          .duo-selected-lang {
+            padding: 12px;
+            gap: 10px;
+          }
+          
+          .duo-modal-flag {
+            width: 40px;
+            height: 40px;
+          }
+          
+          .duo-modal-lang-name {
+            font-size: 15px;
+          }
+          
+          .duo-modal-native {
+            font-size: 12px;
+          }
+          
+          .duo-modal-lang-desc {
+            font-size: 12px;
+          }
+          
+          .duo-modal-note {
+            padding: 10px;
+            font-size: 12px;
+            gap: 6px;
+            margin-bottom: 16px;
+          }
+          
+          .duo-continue-btn {
+            padding: 14px;
+            font-size: 15px;
+          }
+        }
+      `}</style>
     </div>
   );
 };

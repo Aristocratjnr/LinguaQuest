@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useSettings } from '../context/SettingsContext';
-import avatar1 from '../assets/images/boy.png';
+import { API_BASE_URL, getApiUrl } from '../config/api';
+import avatar1 from '../assets/images/boy.jpg';
 import avatar2 from '../assets/images/woman.jpg';
 import avatar3 from '../assets/images/programmer.jpg';
 import avatar4 from '../assets/images/avatar.jpg';
@@ -9,6 +10,8 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useUser } from '../context/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 const AVATARS = [avatar1, avatar2, avatar3, avatar4];
 const LANGUAGES = [
@@ -23,20 +26,33 @@ const THEMES = [
 ];
 
 const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const { nickname, setNickname, avatar, setAvatar, language, setLanguage, theme, setTheme, sound, setSound } = useSettings();
+  const { language, setLanguage, theme, setTheme, sound, setSound } = useSettings();
+  const { user, updateUser, logout } = useUser();
+  
+  // Use user data for nickname and avatar, fallback to settings context
+  const nickname = user?.nickname || '';
+  const avatar = user?.avatar || AVATARS[0];
+  
+  // Use user preferences for language and theme when logged in, fallback to settings context
+  const currentLanguage = user?.preferences?.language || language;
+  const currentTheme = user?.preferences?.theme || theme;
+  
   // Engagement state
   const [streak, setStreak] = useState<number | null>(null);
   const [level, setLevel] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [resetting, setResetting] = useState(false);
+  const [loggedOut, setLoggedOut] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
     setError(null);
     Promise.all([
-      axios.get(`http://127.0.0.1:8000/api/v1/streak`, { params: { nickname } }),
-      axios.get(`http://127.0.0.1:8000/api/v1/level`, { params: { nickname } })
+      axios.get(getApiUrl('streak'), { params: { nickname } }),
+      axios.get(getApiUrl('level'), { params: { nickname } })
     ])
       .then(([streakRes, levelRes]) => {
         setStreak(streakRes.data.streak);
@@ -49,7 +65,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const handleResetStreak = async () => {
     setResetting(true);
     try {
-      const res = await axios.patch(`http://127.0.0.1:8000/api/v1/streak?nickname=${encodeURIComponent(nickname)}&streak=1`);
+      const res = await axios.patch(`${getApiUrl('streak')}?nickname=${encodeURIComponent(nickname)}&streak=1`);
       setStreak(res.data.streak);
       toast.success('Streak reset to 1.');
     } catch {
@@ -61,7 +77,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const handleResetLevel = async () => {
     setResetting(true);
     try {
-      const res = await axios.patch(`http://127.0.0.1:8000/api/v1/level?nickname=${encodeURIComponent(nickname)}&level=1`);
+      const res = await axios.patch(`${getApiUrl('level')}?nickname=${encodeURIComponent(nickname)}&level=1`);
       setLevel(res.data.level);
       toast.success('Level reset to 1.');
     } catch {
@@ -73,98 +89,121 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   // Real-time update handlers
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNickname(e.target.value);
+    // Nickname cannot be changed once set - it's the user identifier
+    // This input should be disabled for logged-in users
   };
-  const handleAvatarChange = (a: string) => {
-    setAvatar(a);
+  
+  const handleAvatarChange = async (a: string) => {
+    if (user) {
+      try {
+        await updateUser({ avatar: a });
+        toast.success('Avatar updated!');
+      } catch (error) {
+        toast.error('Failed to update avatar');
+      }
+    }
   };
-  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLanguage(e.target.value);
+  const handleLanguageChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newLanguage = e.target.value;
+    if (user) {
+      try {
+        await updateUser({ 
+          preferred_language: newLanguage,
+          preferences: { 
+            ...user.preferences, 
+            language: newLanguage 
+          }
+        });
+        toast.success('Language preference updated!');
+      } catch (error) {
+        toast.error('Failed to update language preference');
+      }
+    } else {
+      // For non-logged in users, use settings context
+      setLanguage(newLanguage);
+    }
   };
-  const handleThemeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTheme(e.target.value);
+  
+  const handleThemeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newTheme = e.target.value;
+    if (user) {
+      try {
+        await updateUser({ 
+          preferences: { 
+            ...user.preferences, 
+            theme: newTheme 
+          }
+        });
+        toast.success('Theme preference updated!');
+      } catch (error) {
+        toast.error('Failed to update theme preference');
+      }
+    } else {
+      // For non-logged in users, use settings context
+      setTheme(newTheme);
+    }
   };
   const handleSoundToggle = () => {
     setSound(!sound);
   };
 
   // Theme-aware styles
-  const isDark = theme === 'dark';
+  const isDark = currentTheme === 'dark';
   const bgGradient = isDark
     ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
     : 'linear-gradient(135deg, #f5f7fa 0%, #e4e9f3 100%)';
   
-  // Glassmorphism styles
-  const glassBackground = isDark 
-    ? 'rgba(35, 41, 70, 0.35)'
-    : 'rgba(255, 255, 255, 0.25)';
-  const glassBackdropFilter = 'blur(16px)';
-  const glassBorder = isDark
-    ? '1px solid rgba(255, 255, 255, 0.08)'
-    : '1px solid rgba(255, 255, 255, 0.4)';
-  const glassBoxShadow = isDark
-    ? '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
-    : '0 8px 32px rgba(31, 38, 135, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.6)';
+  const cardBackground = isDark ? '#232946' : '#ffffff';
+const cardBorder = isDark ? '1px solid #44476a' : '1px solid #d1d5db';
+const cardBoxShadow = isDark 
+  ? '0 4px 16px rgba(0, 0, 0, 0.2)' 
+  : '0 4px 16px rgba(0, 0, 0, 0.08)';
   
-  const cardHeaderBg = 'transparent';
-  const cardFooterBg = 'transparent';
+
   const textColor = isDark ? '#e0e7ff' : '#4f46e5';
   const labelColor = isDark ? '#a5b4fc' : '#4f46e5';
-  const borderColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.3)';
-  const inputBg = isDark ? 'rgba(24, 28, 42, 0.5)' : 'rgba(255, 255, 255, 0.5)';
+  const borderColor = isDark ? '#44476a' : '#d1d5db';
+  const inputBg = isDark ? '#1e2538' : '#ffffff';
   const inputText = isDark ? '#e0e7ff' : '#22223b';
 
+  const langMap: Record<string, string> = {
+    twi: 'ak',
+    gaa: 'gaa',
+    ewe: 'ee',
+    en: 'en',
+  };
+
   return (
-    <div className={`container-fluid d-flex align-items-center justify-content-center min-vh-100${isDark ? ' dark' : ''}`}
-         style={{ 
-           background: bgGradient,
-           padding: '1rem',
-           paddingTop: '2rem',
-           paddingBottom: '2rem',
-           backgroundSize: 'cover',
-           backgroundPosition: 'center',
-           // Add a subtle pattern overlay for depth
-           backgroundImage: isDark 
-             ? 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.03\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'1\'/%3E%3C/g%3E%3C/svg%3E")'
-             : 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'0.03\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'1\'/%3E%3C/g%3E%3C/svg%3E")'
-         }}>
-      <motion.div
-        className="card shadow-lg w-100"
-        style={{ 
-          maxWidth: 'min(95vw, 500px)',
-          width: '100%',
-          borderRadius: 20, 
-          fontFamily: "'JetBrains Mono', monospace", 
-          minHeight: 'auto',
-          background: glassBackground,
-          backdropFilter: glassBackdropFilter,
-          WebkitBackdropFilter: glassBackdropFilter, 
-          border: glassBorder,
-          boxShadow: glassBoxShadow,
-          color: inputText, 
-          margin: '0 auto',
-          // Add a subtle light reflection at the top
-          backgroundImage: isDark
-            ? 'linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 0%, transparent 40%)'
-            : 'linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 0%, transparent 40%)',
-          // Ensure consistent edge rounding
-          overflow: 'hidden'
-        }}
-        initial={{ opacity: 0, y: 32 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-      >
+    <motion.div
+      className="card shadow-lg w-100"
+      style={{ 
+        maxWidth: 'min(95vw, 500px)',
+        width: '100%',
+        borderRadius: 20, 
+        fontFamily: "'JetBrains Mono', monospace", 
+        minHeight: 'auto',
+       background: cardBackground,
+      border: cardBorder,
+       boxShadow: cardBoxShadow,
+        color: inputText, 
+        margin: '0 auto',
+        // Ensure consistent edge rounding
+        overflow: 'hidden'
+      }}
+      initial={{ opacity: 0, y: 32 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+    >
         {/* --- HEADER --- */}
         <div className="card-header d-flex justify-content-between align-items-center border-bottom py-3 px-3 px-sm-4"
              style={{ 
-               background: 'transparent', 
-               borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(255, 255, 255, 0.3)'
+               background: isDark ? '#1e2538' : '#f8f9fa',
+               borderBottom: isDark ? '1px solid #44476a' : '1px solid #d1d5db'
              }}>
           <div className="d-flex align-items-center gap-2 flex-wrap">
             <span className="d-flex align-items-center justify-content-center me-2" style={{
               width: 36, height: 36, borderRadius: 12,
-              backgroundColor: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(232, 245, 233, 0.6)',
-              backdropFilter: 'blur(4px)',
+              backgroundColor: isDark ? '#232946' : '#e8f5e9',
               color: '#58a700', 
               boxShadow: '0 2px 8px rgba(88,167,0,0.07)'
             }}>
@@ -174,8 +213,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               Settings
             </h2>
             <span className="badge px-3 py-1 d-flex align-items-center ms-2" style={{
-              backgroundColor: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(232, 245, 233, 0.6)',
-              backdropFilter: 'blur(4px)',
+              backgroundColor: isDark ? '#232946' : '#e8f5e9',
               color: '#58a700', 
               borderRadius: '12px', 
               fontWeight: 600, 
@@ -188,7 +226,11 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           </div>
           <button 
             className={`btn btn-sm rounded-circle ms-2${isDark ? ' text-light' : ''}`} 
-            onClick={onClose} 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClose();
+            }} 
             style={{ 
               width: 40, 
               height: 40, 
@@ -196,8 +238,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               alignItems: 'center', 
               justifyContent: 'center', 
               border: 'none', 
-              background: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(248, 249, 250, 0.6)',
-              backdropFilter: 'blur(4px)',
+              background: isDark ? '#232946' : '#f8f9fa',
               minWidth: '40px',
               minHeight: '40px'
             }}
@@ -213,8 +254,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 width: 28, 
                 height: 28, 
                 borderRadius: 8, 
-                backgroundColor: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(232, 245, 233, 0.6)',
-                backdropFilter: 'blur(4px)',
+                backgroundColor: isDark ? '#232946' : '#e8f5e9',
                 color: '#58a700' 
               }}>
                 <i className="material-icons" style={{ fontSize: '1.1rem' }}>face</i>
@@ -257,20 +297,25 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                   value={nickname}
                   onChange={handleNicknameChange}
                   maxLength={16}
-                  placeholder="Enter your nickname"
+                  placeholder={user ? "Nickname cannot be changed" : "Enter your nickname"}
+                  disabled={!!user}
+                  lang={langMap[currentLanguage] || 'en'}
+                  inputMode="text"
+                  spellCheck={currentLanguage === 'en'}
                   style={{ 
-                    fontFamily: "'JetBrains Mono', monospace", 
+                    fontFamily: "Noto Sans, Arial Unicode MS, system-ui, 'JetBrains Mono', monospace", 
                     fontSize: 'clamp(0.9rem, 3.5vw, 1rem)', 
-                    background: isDark ? 'rgba(35, 41, 70, 0.7)' : 'rgba(245, 247, 250, 0.85)',
+                    background: isDark ? '#1e2538' : '#ffffff',
                     color: inputText, 
                     border: isDark ? '1.5px solid #44476a' : '1.5px solid #d1d5db',
                     boxShadow: isDark
-                      ? '0 2px 8px rgba(35,41,70,0.18)'
-                      : '0 2px 8px rgba(88,204,2,0.08)',
+                      ? '0 2px 8px rgba(0,0,0,0.1)'
+                      : '0 2px 8px rgba(0,0,0,0.05)',
                     borderRadius: '12px',
                     padding: '0.75rem 1rem',
                     minHeight: '44px',
-                    backdropFilter: 'blur(4px)'
+                    opacity: user ? 0.7 : 1,
+                    cursor: user ? 'not-allowed' : 'text'
                   }}
                 />
                 { /* Theme-aware placeholder color for nickname input */ }
@@ -292,8 +337,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 width: 28, 
                 height: 28, 
                 borderRadius: 8, 
-                backgroundColor: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(232, 245, 233, 0.6)',
-                backdropFilter: 'blur(4px)',
+                backgroundColor: isDark ? '#232946' : '#e8f5e9',
                 color: '#58a700' 
               }}>
                 <i className="material-icons" style={{ fontSize: '1.1rem' }}>tune</i>
@@ -307,14 +351,14 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                   borderRadius: '12px',
                   overflow: 'hidden',
                   border: isDark ? '1.5px solid #44476a' : '1.5px solid #d1d5db',
-                  background: isDark ? 'rgba(35, 41, 70, 0.7)' : 'rgba(245, 247, 250, 0.85)',
+                  background: isDark ? '#1e2538' : '#ffffff',
                   boxShadow: isDark
-                    ? '0 2px 8px rgba(35,41,70,0.18)'
-                    : '0 2px 8px rgba(88,204,2,0.08)',
+                    ? '0 2px 8px rgba(0,0,0,0.1)'
+                    : '0 2px 8px rgba(0,0,0,0.05)',
                 }}>
                   <select 
                     className="form-select" 
-                    value={language} 
+                    value={currentLanguage} 
                     onChange={handleLanguageChange} 
                     style={{ 
                       fontFamily: "'JetBrains Mono', monospace", 
@@ -328,9 +372,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                       WebkitAppearance: 'none',
                       MozAppearance: 'none',
                       appearance: 'none',
-                      backdropFilter: 'blur(8px)',
-                      WebkitBackdropFilter: 'blur(8px)',
-                      boxShadow: isDark ? 'inset 0 1px 3px rgba(0, 0, 0, 0.1)' : 'inset 0 1px 3px rgba(255, 255, 255, 0.3)',
+                      boxShadow: 'none',
                       transition: 'all 0.3s ease',
                       border: 'none', // Remove border from select, handled by parent
                     }}
@@ -344,7 +386,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                     right: '1rem',
                     transform: 'translateY(-50%)',
                     pointerEvents: 'none',
-                    color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.5)'
+                    color: isDark ? '#a5b4fc' : '#6c757d'
                   }}>
                     <i className="material-icons" style={{ fontSize: '1.4rem' }}>expand_more</i>
                   </div>
@@ -356,14 +398,14 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                   borderRadius: '12px',
                   overflow: 'hidden',
                   border: isDark ? '1.5px solid #44476a' : '1.5px solid #d1d5db',
-                  background: isDark ? 'rgba(35, 41, 70, 0.7)' : 'rgba(245, 247, 250, 0.85)',
+                  background: isDark ? '#1e2538' : '#ffffff',
                   boxShadow: isDark
-                    ? '0 2px 8px rgba(35,41,70,0.18)'
-                    : '0 2px 8px rgba(88,204,2,0.08)',
+                    ? '0 2px 8px rgba(0,0,0,0.1)'
+                    : '0 2px 8px rgba(0,0,0,0.05)',
                 }}>
                   <select 
                     className="form-select" 
-                    value={theme} 
+                    value={currentTheme} 
                     onChange={handleThemeChange} 
                     style={{ 
                       fontFamily: "'JetBrains Mono', monospace", 
@@ -377,9 +419,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                       WebkitAppearance: 'none',
                       MozAppearance: 'none',
                       appearance: 'none',
-                      backdropFilter: 'blur(8px)',
-                      WebkitBackdropFilter: 'blur(8px)',
-                      boxShadow: isDark ? 'inset 0 1px 3px rgba(0, 0, 0, 0.1)' : 'inset 0 1px 3px rgba(255, 255, 255, 0.3)',
+                      boxShadow: 'none',
                       transition: 'all 0.3s ease',
                       border: 'none', // Remove border from select, handled by parent
                     }}
@@ -393,7 +433,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                     right: '1rem',
                     transform: 'translateY(-50%)',
                     pointerEvents: 'none',
-                    color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.5)'
+                    color: isDark ? '#a5b4fc' : '#6c757d'
                   }}>
                     <i className="material-icons" style={{ fontSize: '1.4rem' }}>expand_more</i>
                   </div>
@@ -409,8 +449,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 width: 28, 
                 height: 28, 
                 borderRadius: 8, 
-                backgroundColor: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(232, 245, 233, 0.6)',
-                backdropFilter: 'blur(4px)',
+                backgroundColor: isDark ? '#232946' : '#e8f5e9',
                 color: '#58a700' 
               }}>
                 <i className="material-icons" style={{ fontSize: '1.1rem' }}>volume_up</i>
@@ -455,8 +494,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 width: 28, 
                 height: 28, 
                 borderRadius: 8, 
-                backgroundColor: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(232, 245, 233, 0.6)',
-                backdropFilter: 'blur(4px)',
+                backgroundColor: isDark ? '#232946' : '#e8f5e9',
                 color: '#58a700' 
               }}>
                 <i className="material-icons" style={{ fontSize: '1.1rem' }}>visibility</i>
@@ -489,10 +527,10 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               </div>
               <div className="d-flex flex-column align-items-start">
                 <span className="text-muted small" style={{ fontSize: 'clamp(0.75rem, 3vw, 0.85rem)' }}>
-                  Language: <b>{LANGUAGES.find(l => l.code === language)?.label}</b>
+                  Language: <b>{LANGUAGES.find(l => l.code === currentLanguage)?.label}</b>
                 </span>
                 <span className="text-muted small" style={{ fontSize: 'clamp(0.75rem, 3vw, 0.85rem)' }}>
-                  Theme: <b>{THEMES.find(t => t.code === theme)?.label}</b>
+                  Theme: <b>{THEMES.find(t => t.code === currentTheme)?.label}</b>
                 </span>
                 <span className="text-muted small" style={{ fontSize: 'clamp(0.75rem, 3vw, 0.85rem)' }}>
                   Sound: <b>{sound ? 'On' : 'Off'}</b>
@@ -507,8 +545,7 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
               width: 28, 
               height: 28, 
               borderRadius: 8, 
-              backgroundColor: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(232, 245, 233, 0.6)',
-              backdropFilter: 'blur(4px)',
+              backgroundColor: isDark ? '#232946' : '#e8f5e9',
               color: '#58a700' 
             }}>
               <i className="material-icons" style={{ fontSize: '1.1rem' }}>emoji_events</i>
@@ -584,6 +621,66 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </div>
           )}
         </div>
+        {user && !loggedOut && (
+  <div style={{ 
+    marginTop: 32, 
+    textAlign: 'center', 
+    borderTop: isDark ? '1px solid #44476a' : '1px solid #e5e5e5', 
+    paddingTop: 24 
+  }}>
+    <motion.button
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={() => {
+        if (window.confirm('Are you sure you want to log out?')) {
+          try {
+            logout();
+            setLoggedOut(true);
+            toast.success('Successfully logged out!');
+            // Use setTimeout to allow users to see the logout message before redirecting
+            setTimeout(() => navigate('/login'), 1500);
+          } catch (err) {
+            toast.error('Failed to log out. Please try again.');
+          }
+        }
+      }}
+      style={{
+        background: '#ff6b6b',
+        color: 'white',
+        border: 'none',
+        borderRadius: '12px',
+        padding: '12px 36px',
+        fontSize: '1rem',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+        boxShadow: isDark ? '0 4px 0 rgba(255, 107, 107, 0.3)' : '0 4px 0 rgba(255, 107, 107, 0.2)',
+        transition: 'all 0.2s',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin: '0 auto',
+      }}
+    >
+      <i className="material-icons me-2" style={{ fontSize: '1.2rem' }}>logout</i>
+      Log Out
+    </motion.button>
+  </div>
+)}
+{loggedOut && (
+  <div style={{ 
+    marginTop: 32, 
+    textAlign: 'center', 
+    color: '#ff6b6b', 
+    fontWeight: 700,
+    padding: '16px',
+    background: isDark ? 'rgba(255, 107, 107, 0.1)' : 'rgba(255, 107, 107, 0.05)',
+    borderRadius: '12px'
+  }}>
+    <i className="material-icons mb-2" style={{ fontSize: '2rem', color: '#ff6b6b' }}>check_circle</i>
+    <div>You have successfully logged out.</div>
+    <div style={{ fontSize: '0.9rem', marginTop: '6px', opacity: 0.8 }}>Redirecting to log in...</div>
+  </div>
+)}
         <ToastContainer position="top-center" autoClose={2500} hideProgressBar newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover aria-label="Notification Toasts" />
         <div className="text-muted small mt-4 d-flex align-items-center justify-content-center gap-2 text-center px-3" style={{ 
           color: isDark ? '#a5b4fc' : '#6c757d', 
@@ -594,41 +691,42 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             width: 24, 
             height: 24, 
             borderRadius: '50%', 
-            backgroundColor: isDark ? 'rgba(35, 41, 70, 0.6)' : 'rgba(232, 245, 233, 0.6)',
-            backdropFilter: 'blur(4px)',
+            backgroundColor: isDark ? '#232946' : '#e8f5e9',
             color: '#58a700' 
           }}>
             <i className="material-icons" style={{ fontSize: '1.1rem' }}>info</i>
           </span>
           Your settings are saved automatically. Need help? Contact support or check the FAQ.
         </div>
-        <div className="card-footer py-3 text-center border-top" style={{ 
-          background: 'transparent', 
-          fontSize: 'clamp(0.8rem, 3.5vw, 0.9rem)', 
-          borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.3)'
-        }}>
+        <div className="card-header d-flex justify-content-between align-items-center border-bottom py-3 px-3 px-sm-4"
+          style={{
+            background: isDark ? '#1e2538' : '#f8f9fa',
+            borderBottom: isDark ? '1px solid #44476a' : '1px solid #d1d5db'
+          }}>
           <motion.button 
             whileHover={{ scale: 1.03 }} 
             whileTap={{ scale: 0.97 }} 
             className={`btn btn-outline-primary px-4 w-100 w-sm-auto rounded-pill${isDark ? ' text-light' : ''}`} 
-            onClick={onClose} 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClose();
+            }} 
             style={{ 
               borderRadius: 16, 
               fontWeight: 600, 
               letterSpacing: '.01em',
               minHeight: '44px',
               fontSize: 'clamp(0.85rem, 3.5vw, 0.9rem)',
-              background: isDark ? 'rgba(79, 70, 229, 0.1)' : 'rgba(79, 70, 229, 0.05)',
-              backdropFilter: 'blur(4px)',
-              border: isDark ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(79, 70, 229, 0.3)'
-            }}
-          >
+              background: isDark ? '#4f46e5' : '#4f46e5',
+              color: '#ffffff',
+              border: isDark ? '1px solid #4f46e5' : '1px solid #4f46e5'
+            }}>
             <i className="material-icons align-middle me-2">arrow_back</i>
             Back
           </motion.button>
         </div>
       </motion.div>
-    </div>
   );
 };
 

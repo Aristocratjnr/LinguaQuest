@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
+import { useUser } from '../context/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 // Define proper types for your data
 interface Category {
@@ -15,6 +18,8 @@ interface Difficulty {
 }
 
 const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: string) => void }> = ({ onConfirm }) => {
+  const { user } = useUser();
+  const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
   const [difficulties, setDifficulties] = useState<Difficulty[]>([]);
   const [category, setCategory] = useState<string>('');
@@ -68,8 +73,8 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
       
       try {
         const [catRes, diffRes] = await Promise.all([
-          axios.get('http://127.0.0.1:8000/api/engagement/categories'),
-          axios.get('http://127.0.0.1:8000/api/engagement/difficulties')
+          axios.get(`${API_BASE_URL}/api/engagement/categories`),
+          axios.get(`${API_BASE_URL}/api/engagement/difficulties`)
         ]);
         
         if (catRes.data && catRes.data.length > 0) {
@@ -87,7 +92,22 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
         }
       } catch (err) {
         console.error("Failed to fetch data:", err);
-        setError("Failed to load game options. Please try again later.");
+        // Fallback to default categories if API fails
+        const defaultCategories = [
+          { key: 'food', label: 'Food', icon: 'restaurant' },
+          { key: 'technology', label: 'Technology', icon: 'computer' },
+          { key: 'culture', label: 'Culture', icon: 'public' }
+        ];
+        const defaultDifficulties = [
+          { key: 'easy', label: 'Easy' },
+          { key: 'medium', label: 'Medium' },
+          { key: 'hard', label: 'Hard' }
+        ];
+        setCategories(defaultCategories);
+        setDifficulties(defaultDifficulties);
+        setCategory(defaultCategories[0].key);
+        setDifficulty(defaultDifficulties[0].key);
+        setError(null); // Clear error since we have fallback data
       } finally {
         setLoading(false);
       }
@@ -96,12 +116,47 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
     fetchData();
   }, []);
 
+  // Check if user is logged in
+  useEffect(() => {
+    if (!user) {
+      console.log('CategorySelector: No user found, redirecting to login');
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
   const handleConfirm = () => {
+    console.log('CategorySelector handleConfirm called with:', category, difficulty);
+    console.log('CategorySelector current user:', user);
+    
     if (!category || !difficulty) {
       setError("Please select both a category and difficulty");
       return;
     }
-    onConfirm(category, difficulty);
+    
+    console.log('About to call onConfirm with:', category, difficulty);
+    
+    // If user is not logged in, redirect to login
+    if (!user) {
+      console.log('No user found, redirecting to login');
+      navigate('/login');
+      return;
+    }
+    
+    try {
+      onConfirm(category, difficulty);
+      console.log('onConfirm called successfully');
+      
+      // Fallback navigation in case onConfirm doesn't navigate
+      setTimeout(() => {
+        console.log('Fallback: Navigating to /app after 1 second');
+        navigate('/app');
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Error calling onConfirm:', error);
+      // Direct navigation as fallback
+      navigate('/app');
+    }
   };
 
   if (loading) {

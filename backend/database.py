@@ -37,6 +37,7 @@ class User(Base):
     scores = relationship("UserScore", back_populates="user")
     streaks = relationship("UserStreak", back_populates="user")
     badges = relationship("UserBadge", back_populates="user")
+    progression_stages = relationship("UserProgressionStage", back_populates="user")
 
 class UserActivity(Base):
     __tablename__ = "user_activities"
@@ -91,6 +92,22 @@ class UserBadge(Base):
     
     # Relationships
     user = relationship("User", back_populates="badges")
+
+class UserProgressionStage(Base):
+    __tablename__ = "user_progression_stages"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    stage_id = Column(String, nullable=False)  # Unique identifier for the stage
+    stage_type = Column(String, nullable=False)  # 'main' or 'sub'
+    label = Column(String, nullable=False)
+    unlocked = Column(Boolean, default=False)
+    parent_stage_id = Column(String, nullable=True)  # For sub-stages, references parent stage_id
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    user = relationship("User", back_populates="progression_stages")
 
 class GameSession(Base):
     __tablename__ = "game_sessions"

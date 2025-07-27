@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import avatar1 from '../assets/images/boy.png';
+import avatar1 from '../assets/images/boy.jpg';
 import avatar2 from '../assets/images/woman.jpg';
 import avatar3 from '../assets/images/programmer.jpg';
 import avatar4 from '../assets/images/avatar.jpg';

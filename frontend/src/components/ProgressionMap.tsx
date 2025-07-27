@@ -1,15 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-interface SkillNode {
-  id: string;
-  label: string;
-  unlocked: boolean;
-  children?: SkillNode[];
-}
+import { progressionApi, storage, handleApiError, ProgressionStage } from '../services/api';
 
 interface ProgressionMapProps {
-  skillTree: SkillNode[];
   onClose: () => void;
 }
 
@@ -20,64 +13,95 @@ const nodeColors = {
   childLocked: '#e0e0e0',
 };
 
-const ProgressionMap: React.FC<ProgressionMapProps> = ({ skillTree, onClose }) => {
-  const [selectedNode, setSelectedNode] = useState<SkillNode | null>(null);
+const ProgressionMap: React.FC<ProgressionMapProps> = ({ onClose }) => {
+  const [skillTree, setSkillTree] = useState<ProgressionStage[]>([]);
+  const [selectedNode, setSelectedNode] = useState<ProgressionStage | null>(null);
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProgression = async () => {
+      try {
+        const nickname = storage.getNickname();
+        if (!nickname) {
+          setError('User not logged in');
+          setLoading(false);
+          return;
+        }
+
+        const data = await progressionApi.getProgression(nickname);
+        setSkillTree(data);
+        setError('');
+      } catch (err) {
+        setError(handleApiError(err));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProgression();
+
+    // Set up polling for real-time updates
+    const pollInterval = setInterval(fetchProgression, 30000); // Poll every 30 seconds
+
+    return () => clearInterval(pollInterval);
+  }, []);
 
   // Count unlocked nodes
   const totalNodes = skillTree.reduce((acc, cat) => acc + (cat.children ? cat.children.length : 0), skillTree.length);
   const unlockedNodes = skillTree.reduce((acc, cat) => acc + (cat.children ? cat.children.filter(c => c.unlocked).length : 0) + (cat.unlocked ? 1 : 0), 0);
 
   // Render a single node (category or child)
-  const renderNode = (node: SkillNode, isChild = false) => {
-    const color = node.unlocked
-      ? isChild ? nodeColors.childUnlocked : nodeColors.unlocked
-      : isChild ? nodeColors.childLocked : nodeColors.locked;
-    const icon = node.unlocked
-      ? isChild ? 'star' : 'check_circle'
-      : 'lock';
-    return (
-      <motion.div
-        key={node.id}
-        whileHover={{ scale: 1.08, boxShadow: node.unlocked ? '0 4px 16px #58cc0255' : '0 2px 8px #bdbdbd55' }}
-        whileTap={{ scale: 0.97 }}
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 200, damping: 18 }}
+const renderNode = (node: ProgressionStage, isChild = false) => {
+  const color = node.unlocked
+    ? isChild ? nodeColors.childUnlocked : nodeColors.unlocked
+    : isChild ? nodeColors.childLocked : nodeColors.locked;
+  const icon = node.unlocked
+    ? isChild ? 'star' : 'check_circle'
+    : 'lock';
+  return (
+    <motion.div
+      key={node.id}
+      whileHover={{ scale: 1.08, boxShadow: node.unlocked ? '0 4px 16px #58cc0255' : '0 2px 8px #bdbdbd55' }}
+      whileTap={{ scale: 0.97 }}
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: 'spring', stiffness: 200, damping: 18 }}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 6,
+        background: node.unlocked
+          ? isChild
+            ? 'linear-gradient(135deg, #e0ffe6 0%, #d7f7c8 100%)'
+            : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)'
+          : '#f0f0f0',
+        borderRadius: 18,
+        padding: isChild ? '12px 18px' : '18px 24px',
+        boxShadow: node.unlocked ? '0 2px 8px #58cc0222' : 'none',
+        border: `2px solid ${color}`,
+        minWidth: isChild ? 70 : 110,
+        cursor: 'pointer',
+        position: 'relative',
+      }}
+      onClick={() => setSelectedNode(node)}
+      title={node.unlocked ? 'Click for details' : 'Locked'}
+    >
+      <span
+        className="material-icons"
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 6,
-          background: node.unlocked
-            ? isChild
-              ? 'linear-gradient(135deg, #e0ffe6 0%, #d7f7c8 100%)'
-              : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)'
-            : '#f0f0f0',
-          borderRadius: 18,
-          padding: isChild ? '12px 18px' : '18px 24px',
-          boxShadow: node.unlocked ? '0 2px 8px #58cc0222' : 'none',
-          border: `2px solid ${color}`,
-          minWidth: isChild ? 70 : 110,
-          cursor: 'pointer',
-          position: 'relative',
+          color: !node.unlocked ? '#FFD700' : color,
+          fontSize: isChild ? 26 : 32,
+          filter: node.unlocked ? 'drop-shadow(0 2px 8px #58cc0255)' : 'none',
         }}
-        onClick={() => setSelectedNode(node)}
-        title={node.unlocked ? 'Click for details' : 'Locked'}
       >
-        <span
-          className="material-icons"
-          style={{
-            color: !node.unlocked ? '#FFD700' : color,
-            fontSize: isChild ? 26 : 32,
-            filter: node.unlocked ? 'drop-shadow(0 2px 8px #58cc0255)' : 'none',
-          }}
-        >
-          {icon}
-        </span>
-        <span style={{ fontSize: isChild ? '1.05rem' : '1.15rem', color, fontFamily: 'Fira Mono, Menlo, Consolas, monospace', fontWeight: 300 }}>{node.label}</span>
-      </motion.div>
-    );
-  };
+        {icon}
+      </span>
+      <span style={{ fontSize: isChild ? '1.05rem' : '1.15rem', color, fontFamily: 'Fira Mono, Menlo, Consolas, monospace', fontWeight: 300 }}>{node.label}</span>
+    </motion.div>
+  );
+};
 
   return (
     <>
@@ -146,10 +170,22 @@ const ProgressionMap: React.FC<ProgressionMapProps> = ({ skillTree, onClose }) =
           >
             <span className="material-icons">close</span>
           </button>
-          <h2 style={{ color: '#58cc02', marginBottom: 8, fontSize: '2rem', letterSpacing: '.01em', fontFamily: 'Fira Mono, Menlo, Consolas, monospace', fontWeight: 300 }}>
+<h2 style={{ color: '#58cc02', marginBottom: 8, fontSize: '2rem', letterSpacing: '.01em', fontFamily: 'Fira Mono, Menlo, Consolas, monospace', fontWeight: 300 }}>
             <span className="material-icons" style={{ verticalAlign: 'middle', fontSize: 32, marginRight: 8 }}>account_tree</span>
             Progression Map
           </h2>
+          {loading && (
+            <div style={{ color: '#58cc02', marginBottom: 18, textAlign: 'center' }}>
+              <span className="material-icons" style={{ fontSize: 24, verticalAlign: 'middle', marginRight: 8 }}>hourglass_top</span>
+              Loading...
+            </div>
+          )}
+          {error && (
+            <div style={{ color: '#ff4b4b', marginBottom: 18, textAlign: 'center' }}>
+              <span className="material-icons" style={{ fontSize: 24, verticalAlign: 'middle', marginRight: 8 }}>error</span>
+              {error}
+            </div>
+          )}
           <div style={{ color: '#3caa3c', marginBottom: 18, fontSize: '1.1rem', fontFamily: 'Fira Mono, Menlo, Consolas, monospace', fontWeight: 300 }}>
             {unlockedNodes} / {totalNodes} skills unlocked
           </div>
