@@ -156,25 +156,25 @@ export interface LeaderboardEntry {
 export const userApi = {
   // Create new user
   createUser: async (userData: UserCreate): Promise<User> => {
-    const response = await api.post('/users', userData);
+    const response = await axios.post(`${API_BASE_URL}/users`, userData);
     return response.data;
   },
 
   // Get user by nickname
   getUser: async (nickname: string): Promise<User> => {
-    const response = await api.get(`/users/${nickname}`);
+    const response = await axios.get(`${API_BASE_URL}/users/${nickname}`);
     return response.data;
   },
 
   // Update user profile
   updateUser: async (nickname: string, userData: UserUpdate): Promise<User> => {
-    const response = await api.put(`/users/${nickname}`, userData);
+    const response = await axios.put(`${API_BASE_URL}/users/${nickname}`, userData);
     return response.data;
   },
 
   // Record user login
   login: async (nickname: string): Promise<{ success: boolean; message: string }> => {
-    const response = await api.post(`/users/${nickname}/login`);
+    const response = await axios.post(`${API_BASE_URL}/users/${nickname}/login`);
     return response.data;
   },
 
@@ -186,7 +186,8 @@ export const userApi = {
 
   // Validate username
   validateUsername: async (nickname: string): Promise<{ valid: boolean; reason: string }> => {
-    const response = await api.get(`/users/validate?nickname=${encodeURIComponent(nickname)}`);
+    // Use direct path for user validation (optimized backend has this at root level)
+    const response = await axios.get(`${API_BASE_URL}/users/validate?nickname=${encodeURIComponent(nickname)}`);
     return response.data;
   },
 };

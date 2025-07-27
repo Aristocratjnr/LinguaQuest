@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useActivityFeed } from './ActivityFeedContext';
 import { useUser } from '../context/UserContext';
 import { userApi } from '../services/api';
+import { API_BASE_URL } from '../config/api';
 import LogicFlowStepper from './LogicFlowStepper';
 
 const MAX_LENGTH = 16;
@@ -47,7 +48,10 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
   // Validate nickname with backend
   const validateNickname = useCallback(async (name: string) => {
     try {
+      console.log('Validating nickname:', name);
+      console.log('API Base URL:', API_BASE_URL);
       const res = await userApi.validateUsername(name);
+      console.log('Validation response:', res);
       
       if (res.valid) {
         setValid(true);
@@ -58,10 +62,22 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         setFeedback('');
         setError(res.reason || 'Nickname not available');
       }
-    } catch {
+    } catch (error: any) {
+      console.error('Validation error:', error);
       setValid(false);
       setFeedback('');
-      setError('Could not validate nickname');
+      
+      // More specific error messages
+      if (error?.response) {
+        // Server responded with error status
+        setError(`Server error: ${error.response.status} - ${error.response.data?.detail || error.response.statusText}`);
+      } else if (error?.request) {
+        // Network error
+        setError('Network error: Could not reach server');
+      } else {
+        // Other error
+        setError(`Error: ${error?.message || 'Could not validate nickname'}`);
+      }
     } finally {
       setChecking(false);
     }

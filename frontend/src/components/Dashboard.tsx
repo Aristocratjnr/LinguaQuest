@@ -437,7 +437,7 @@ function AppContent() {
         
         // Update level in real-time if it changed
         if (user) {
-          axios.patch(`${API_BASE_URL}/api/v1/level?nickname=${encodeURIComponent(user.nickname)}&level=${newLevel}`)
+          axios.patch(`${API_BASE_URL}/level?nickname=${encodeURIComponent(user.nickname)}&level=${newLevel}`)
             .then(() => {
               // Update leaderboard with new level
               const leaderboardUpdate = {
@@ -445,7 +445,7 @@ function AppContent() {
                 total_score: newXp,
                 level: newLevel
               };
-              return axios.post('/api/v1/leaderboard', leaderboardUpdate);
+              return axios.post(`${API_BASE_URL.replace('/api/v1', '')}/score`, leaderboardUpdate);
             })
             .catch(error => console.error('Failed to update level/leaderboard:', error));
         }
@@ -481,7 +481,7 @@ function AppContent() {
           };
           
           // Update leaderboard
-          await axios.post('/api/v1/leaderboard', leaderboardUpdate)
+          await axios.post(`${API_BASE_URL.replace('/api/v1', '')}/score`, leaderboardUpdate)
             .catch(error => console.error('Failed to update leaderboard:', error));
           
           // Show confetti for successful persuasion
