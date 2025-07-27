@@ -707,7 +707,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         /* Mobile responsiveness */
         @media (max-width: 600px) {
           .nickname-prompt-container {
-            padding: 0.25rem !important;
+            padding: 0 !important;
             min-height: 100vh !important;
             width: 100vw !important;
             box-sizing: border-box;
@@ -716,11 +716,89 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           .nickname-card {
             max-width: 100vw !important;
             width: 100vw !important;
-            border-radius: 0.5rem !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
             min-height: 100vh;
             margin: 0 !important;
           }
+          .nickname-card h2 {
+            font-size: 1.25rem !important;
+            margin-top: 0.5rem !important;
+          }
+          .nickname-card p {
+            font-size: 0.9rem !important;
+            line-height: 1.4 !important;
+          }
+          .nickname-card input {
+            font-size: 1rem !important;
+            padding: 0.75rem !important;
+            margin-bottom: 0.5rem !important;
+            border-radius: 0.5rem !important;
+            min-height: 44px !important; /* Touch target size */
+          }
+          .nickname-card button, .nickname-card .motion-button {
+            font-size: 1rem !important;
+            padding: 0.85rem !important;
+            margin-top: 0.5rem !important;
+            border-radius: 0.5rem !important;
+            min-height: 44px !important; /* Touch target size */
+          }
+          .nickname-card .material-icons {
+            font-size: 1.8rem !important;
+          }
+          .nickname-card [style*='width: 6rem'],
+          .nickname-avatar-upload {
+            width: 4rem !important;
+            height: 4rem !important;
+            min-width: 4rem !important;
+            min-height: 4rem !important;
+            max-width: 25vw !important;
+            max-height: 25vw !important;
+            margin: 0 auto 1rem !important;
+          }
+          .nickname-avatar-img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+          }
+          .nickname-avatar-icon {
+            font-size: 1.8rem !important;
+          }
+          .nickname-avatar-add-text {
+            font-size: 0.75rem !important;
+            padding: 0.2rem !important;
+          }
+          .nickname-card [style*='padding: 1rem 1.25rem'] {
+            padding: 1rem 1rem !important;
+          }
+          .nickname-card [style*='padding: 1rem'] {
+            padding: 1rem !important;
+          }
+          .nickname-card [style*='margin-bottom: 1.5rem'] {
+            margin-bottom: 1rem !important;
+          }
+          .nickname-card [style*='margin-top: 0.5rem'] {
+            margin-top: 0.5rem !important;
+          }
+          /* Character counter adjustments */
+          .character-count {
+            font-size: 0.8rem !important;
+            margin-top: 0.25rem !important;
+          }
+          /* Error message adjustments */
+          .error-message {
+            font-size: 0.85rem !important;
+            padding: 0.5rem !important;
+          }
+          /* Feedback message adjustments */
+          .feedback-message {
+            font-size: 0.85rem !important;
+            padding: 0.5rem !important;
+          }
+        }
+        
+        /* Extra small devices (phones, less than 360px) */
+        @media (max-width: 360px) {
           .nickname-card h2 {
             font-size: 1.1rem !important;
           }
@@ -729,47 +807,32 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           }
           .nickname-card input {
             font-size: 0.95rem !important;
-            padding: 0.6rem !important;
+            padding: 0.65rem !important;
           }
           .nickname-card button, .nickname-card .motion-button {
             font-size: 0.95rem !important;
-            padding: 0.7rem !important;
-          }
-          .nickname-card .material-icons {
-            font-size: 1.7rem !important;
-          }
-          .nickname-card [style*='width: 6rem'],
-          .nickname-avatar-upload {
-            width: 3.5rem !important;
-            height: 3.5rem !important;
-            min-width: 3.5rem !important;
-            min-height: 3.5rem !important;
-            max-width: 22vw !important;
-            max-height: 22vw !important;
-          }
-          .nickname-avatar-img {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: cover !important;
-          }
-          .nickname-avatar-icon {
-            font-size: 1.5rem !important;
-          }
-          .nickname-avatar-add-text {
-            font-size: 0.7rem !important;
-            padding: 0.18rem !important;
+            padding: 0.75rem !important;
           }
           .nickname-card [style*='padding: 1rem 1.25rem'] {
-            padding: 0.7rem 0.5rem !important;
+            padding: 0.8rem 0.8rem !important;
           }
           .nickname-card [style*='padding: 1rem'] {
-            padding: 0.7rem !important;
+            padding: 0.8rem !important;
           }
-          .nickname-card [style*='margin-bottom: 1.5rem'] {
-            margin-bottom: 1rem !important;
+        }
+        
+        /* Landscape orientation adjustments */
+        @media (max-width: 600px) and (orientation: landscape) {
+          .nickname-prompt-container {
+            min-height: auto !important;
+            padding: 1rem !important;
           }
-          .nickname-card [style*='margin-top: 0.5rem'] {
-            margin-top: 0.3rem !important;
+          .nickname-card {
+            min-height: auto;
+            margin: 1rem auto !important;
+            max-width: 90vw !important;
+            border-radius: 0.5rem !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
           }
         }
       `}</style>

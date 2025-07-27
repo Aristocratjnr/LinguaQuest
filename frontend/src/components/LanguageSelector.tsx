@@ -692,28 +692,203 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
 
         @media (max-width: 600px) {
           .duo-lang-bg {
-            padding: 16px;
+            padding: 0;
+            min-height: 100vh;
+          }
+          
+          .duo-lang-card {
+            width: 100vw;
+            min-height: 100vh;
+            border-radius: 0;
+            margin: 0;
+            box-shadow: none;
+            border: none;
           }
           
           .duo-lang-header {
-            padding: 32px 24px 24px;
+            padding: 24px 16px 16px;
+          }
+          
+          .duo-icon-container {
+            width: 56px;
+            height: 56px;
+            margin-bottom: 16px;
+          }
+          
+          .duo-icon-container .material-icons {
+            font-size: 28px;
+          }
+          
+          .duo-lang-title {
+            font-size: 24px;
+            margin-bottom: 8px;
+          }
+          
+          .duo-lang-subtitle {
+            font-size: 14px;
           }
           
           .duo-lang-body {
-            padding: 24px;
-          }
-          
-          .duo-lang-footer {
-            padding: 16px 24px;
+            padding: 16px;
           }
           
           .duo-lang-content {
+            gap: 16px;
+          }
+          
+          .duo-lang-option {
+            padding: 16px;
+            border-radius: 16px;
+            min-height: 80px;
+          }
+          
+          .duo-flag-container {
+            width: 56px;
+            height: 56px;
+            min-width: 56px;
+          }
+          
+          .duo-flag-img {
+            width: 40px;
+            height: 40px;
+          }
+          
+          .duo-lang-text {
+            flex: 1;
+          }
+          
+          .duo-lang-name {
+            font-size: 18px;
+            margin-bottom: 4px;
+          }
+          
+          .duo-lang-desc {
+            font-size: 14px;
+            line-height: 1.4;
+          }
+          
+          .duo-lang-footer {
+            padding: 16px;
+          }
+          
+          .duo-back-btn {
+            padding: 16px;
+            font-size: 16px;
+            min-height: 48px; /* Touch target size */
+            border-radius: 12px;
+          }
+          
+          /* Tick button adjustments */
+          .duo-tick-btn {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            min-height: 48px; /* Touch target size */
+            border-radius: 50%;
+            font-size: 24px;
+            margin-left: 12px;
+          }
+          
+          /* Confirmation modal adjustments */
+          .duo-modal-overlay {
+            padding: 16px;
+          }
+          
+          .duo-modal {
+            width: 100vw;
+            height: 100vh;
+            max-height: 100vh;
+            border-radius: 0;
+            margin: 0;
+          }
+          
+          .duo-modal-header {
+            padding: 24px 16px 0;
+          }
+          
+          .duo-modal-title {
+            font-size: 22px;
+          }
+          
+          .duo-modal-body {
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+          }
+          
+          .duo-selected-lang {
+            padding: 16px;
+            border-radius: 12px;
             gap: 12px;
+          }
+          
+          .duo-modal-flag {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+          }
+          
+          .duo-modal-lang-name {
+            font-size: 16px;
+          }
+          
+          .duo-modal-native {
+            font-size: 13px;
+          }
+          
+          .duo-modal-lang-desc {
+            font-size: 13px;
+          }
+          
+          .duo-modal-note {
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            gap: 8px;
+            margin-bottom: 20px;
+          }
+          
+          .duo-continue-btn {
+            padding: 16px;
+            font-size: 16px;
+            border-radius: 12px;
+            min-height: 48px; /* Touch target size */
+            box-shadow: 0 4px 0 #46a302;
+          }
+        }
+        
+        /* Extra small devices (phones, less than 360px) */
+        @media (max-width: 360px) {
+          .duo-lang-header {
+            padding: 20px 12px 12px;
+          }
+          
+          .duo-icon-container {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 12px;
+          }
+          
+          .duo-icon-container .material-icons {
+            font-size: 24px;
+          }
+          
+          .duo-lang-title {
+            font-size: 20px;
+          }
+          
+          .duo-lang-body {
+            padding: 12px;
+          }
+          
+          .duo-lang-option {
+            padding: 12px;
           }
           
           .duo-flag-container {
             width: 48px;
             height: 48px;
+            min-width: 48px;
           }
           
           .duo-flag-img {
@@ -726,7 +901,62 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
           }
           
           .duo-lang-desc {
-            font-size: 13px;
+            font-size: 12px;
+          }
+          
+          /* Tick button adjustments for extra small screens */
+          .duo-tick-btn {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            min-height: 44px;
+            font-size: 20px;
+          }
+          
+          .duo-modal-header {
+            padding: 20px 12px 0;
+          }
+          
+          .duo-modal-title {
+            font-size: 20px;
+          }
+          
+          .duo-modal-body {
+            padding: 12px;
+          }
+          
+          .duo-selected-lang {
+            padding: 12px;
+            gap: 10px;
+          }
+          
+          .duo-modal-flag {
+            width: 40px;
+            height: 40px;
+          }
+          
+          .duo-modal-lang-name {
+            font-size: 15px;
+          }
+          
+          .duo-modal-native {
+            font-size: 12px;
+          }
+          
+          .duo-modal-lang-desc {
+            font-size: 12px;
+          }
+          
+          .duo-modal-note {
+            padding: 10px;
+            font-size: 12px;
+            gap: 6px;
+            margin-bottom: 16px;
+          }
+          
+          .duo-continue-btn {
+            padding: 14px;
+            font-size: 15px;
           }
         }
       `}</style>

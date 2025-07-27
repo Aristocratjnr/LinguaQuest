@@ -721,25 +721,46 @@ const LoginPage: React.FC = () => {
         }
         
         @media (max-width: 480px) {
+          .duo-login-bg {
+            padding: 0;
+            min-height: 100vh;
+          }
+          
           .duo-login-card {
-            padding: 32px 24px 24px;
-            border-radius: 20px;
-            margin: 20px;
+            padding: 24px 16px;
+            border-radius: 0;
+            margin: 0;
+            width: 100vw;
+            min-height: 100vh;
+            box-shadow: none;
+            border: none;
           }
           
           .duo-login-logo {
-            width: 64px;
-            height: 64px;
+            width: 72px;
+            height: 72px;
           }
           
           .duo-login-title {
-            font-size: 28px;
+            font-size: 24px;
+            margin-top: 8px;
+          }
+          
+          .duo-login-subtitle {
+            font-size: 14px;
+            margin-bottom: 24px;
+          }
+          
+          .duo-input-wrapper {
+            margin-bottom: 16px;
           }
           
           .duo-login-input,
           .duo-login-btn {
             font-size: 16px;
-            padding: 14px 16px;
+            padding: 16px;
+            min-height: 48px; /* Touch target size */
+            border-radius: 12px;
           }
           
           .duo-login-input {
@@ -747,15 +768,40 @@ const LoginPage: React.FC = () => {
           }
           
           .duo-mascot-speech-bubble {
-            font-size: 13px;
-            padding: 10px 16px;
+            font-size: 12px;
+            padding: 8px 12px;
+            max-width: 160px;
+          }
+          
+          .speech-text {
+            font-size: 12px;
+          }
+          
+          .duo-login-btn {
+            margin-top: 8px;
+          }
+          
+          .quick-play-btn {
+            font-size: 14px;
+            padding: 14px;
+            margin-top: 12px;
+            min-height: 48px; /* Touch target size */
+          }
+          
+          .contact-admin-btn {
+            font-size: 14px;
+            padding: 14px;
+            margin-top: 16px;
+            min-height: 48px; /* Touch target size */
           }
           
           /* Mobile modal styles */
           .contact-modal {
-            width: 100%;
-            max-height: calc(100vh - 32px);
-            border-radius: 16px;
+            width: 100vw;
+            height: 100vh;
+            max-height: 100vh;
+            border-radius: 0;
+            margin: 0;
             display: flex;
             flex-direction: column;
           }
@@ -765,7 +811,12 @@ const LoginPage: React.FC = () => {
           }
           
           .contact-modal-header h3 {
-            font-size: 20px;
+            font-size: 22px;
+          }
+          
+          .contact-modal-close {
+            padding: 8px;
+            font-size: 24px;
           }
           
           .contact-modal-body {
@@ -775,29 +826,32 @@ const LoginPage: React.FC = () => {
           }
           
           .contact-modal-body p {
-            font-size: 14px;
+            font-size: 15px;
             margin-bottom: 16px;
+            line-height: 1.5;
           }
           
           .contact-options {
-            gap: 12px;
+            gap: 16px;
           }
           
           .contact-option {
-            padding: 12px;
-            gap: 12px;
+            padding: 16px;
+            gap: 16px;
+            border-radius: 12px;
           }
           
           .contact-option .material-icons {
-            font-size: 24px;
+            font-size: 28px;
           }
           
           .contact-option strong {
-            font-size: 14px;
+            font-size: 16px;
           }
           
           .contact-option p {
-            font-size: 13px;
+            font-size: 14px;
+            margin-top: 4px;
           }
           
           .contact-modal-footer {
@@ -805,78 +859,18 @@ const LoginPage: React.FC = () => {
           }
           
           .contact-modal-btn {
-            padding: 14px 20px;
-            font-size: 14px;
-          }
-        }
-        
-        @media (max-width: 360px) {
-          .duo-login-card {
-            padding: 24px 16px 16px;
-            margin: 16px;
-          }
-          
-          .duo-login-title {
-            font-size: 24px;
-          }
-          
-          /* Extra small mobile modal styles */
-          .contact-modal {
-            margin: 16px;
-            width: calc(100vw - 32px);
-            max-height: calc(100vh - 32px);
+            padding: 16px;
+            font-size: 16px;
             border-radius: 12px;
+            min-height: 48px; /* Touch target size */
           }
           
-          .contact-modal-header {
-            padding: 16px 12px 0;
-          }
-          
-          .contact-modal-header h3 {
-            font-size: 18px;
-          }
-          
-          .contact-modal-close {
-            padding: 6px;
-          }
-          
-          .contact-modal-body {
+          /* Error message adjustments */
+          .error-message {
+            font-size: 14px;
             padding: 12px;
-          }
-          
-          .contact-modal-body p {
-            font-size: 13px;
-            margin-bottom: 12px;
-          }
-          
-          .contact-options {
-            gap: 10px;
-          }
-          
-          .contact-option {
-            padding: 10px;
-            gap: 10px;
-          }
-          
-          .contact-option .material-icons {
-            font-size: 22px;
-          }
-          
-          .contact-option strong {
-            font-size: 13px;
-          }
-          
-          .contact-option p {
-            font-size: 12px;
-          }
-          
-          .contact-modal-footer {
-            padding: 0 12px 12px;
-          }
-          
-          .contact-modal-btn {
-            padding: 12px 16px;
-            font-size: 13px;
+            margin-top: 16px;
+            border-radius: 8px;
           }
         }
       `}</style>
