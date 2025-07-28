@@ -26,8 +26,27 @@ interface LanguageClubProps {
 }
 
 const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose }) => {
-  const sortedMembers = [...club.members].sort((a, b) => b.xp - a.xp);
-  const progressPercent = Math.min(100, (club.groupProgress / club.groupGoal) * 100);
+  // Add fallback data in case club is null or incomplete
+  const fallbackClub: ClubData = {
+    name: "Language Club",
+    members: [
+      { nickname: "Player1", xp: 1000, avatar: defaultAvatar },
+      { nickname: "Player2", xp: 800, avatar: boyAvatar },
+      { nickname: "Player3", xp: 600, avatar: womanAvatar }
+    ],
+    groupGoal: 4000,
+    groupProgress: 2400,
+    challenge: "Learn together and have fun!"
+  };
+
+  // Use provided club data or fallback
+  const safeClub = club || fallbackClub;
+  
+  // Ensure members array exists
+  const safeMembers = safeClub.members || fallbackClub.members;
+  
+  const sortedMembers = [...safeMembers].sort((a, b) => b.xp - a.xp);
+  const progressPercent = Math.min(100, (safeClub.groupProgress / safeClub.groupGoal) * 100);
 
   return (
     <div style={{
@@ -119,7 +138,7 @@ const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose })
               color: 'var(--text-light, #1cb0f6)',
               fontFamily: "Fira Mono, Menlo, Consolas, monospace"
             }}>
-              {club.name}
+              {safeClub.name}
             </h2>
             <p style={{
               margin: '0.5rem 0 0',
@@ -129,7 +148,7 @@ const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose })
               fontWeight: 300,
               fontFamily: "Fira Mono, Menlo, Consolas, monospace"
             }}>
-              {club.challenge}
+              {safeClub.challenge}
             </p>
           </motion.div>
         </div>
@@ -152,7 +171,7 @@ const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose })
           />
           <div style={{ position: 'relative', zIndex: 2, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1cb0f6', fontSize: '1.15rem', letterSpacing: '.01em', fontFamily: "Fira Mono, Menlo, Consolas, monospace", fontWeight: 300 }}>
             <span className="material-icons" style={{ fontSize: 22, verticalAlign: 'middle', marginRight: 6, color: '#1cb0f6' }}>military_tech</span>
-            {club.groupProgress} / {club.groupGoal} XP
+            {safeClub.groupProgress} / {safeClub.groupGoal} XP
           </div>
         </div>
         {/* Club Leaderboard */}

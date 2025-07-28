@@ -400,51 +400,52 @@ def get_scenario_v1(req: ScenarioRequest):
         print(f"Scenario error: {e}")
         return ScenarioResponse(scenario="Error generating scenario.", language="en")
 
-@app.get("/api/v1/clubs/{language}", response_model=ClubResponse)
-def get_club(language: str):
-    """Get language club information"""
-    try:
-        # Mock club data based on language
-        clubs_data = {
-            "twi": {
-                "id": "twi_club",
-                "name": "Twi Learning Club",
-                "description": "Learn Twi with fellow language enthusiasts",
-                "language": "twi",
-                "member_count": 142,
-                "level_requirement": 1,
-                "created_at": "2024-01-15T00:00:00Z"
-            },
-            "gaa": {
-                "id": "gaa_club", 
-                "name": "Gaa Language Club",
-                "description": "Master Gaa language with native speakers",
-                "language": "gaa",
-                "member_count": 87,
-                "level_requirement": 1,
-                "created_at": "2024-02-01T00:00:00Z"
-            },
-            "ewe": {
-                "id": "ewe_club",
-                "name": "Ewe Learning Circle", 
-                "description": "Connect with Ewe language learners",
-                "language": "ewe",
-                "member_count": 96,
-                "level_requirement": 1,
-                "created_at": "2024-01-20T00:00:00Z"
-            }
-        }
-        
-        if language in clubs_data:
-            return ClubResponse(**clubs_data[language])
-        else:
-            raise HTTPException(status_code=404, detail=f"Club for language '{language}' not found")
-            
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"Club fetch error: {e}")
-        raise HTTPException(status_code=500, detail="Failed to fetch club information")
+# Clubs endpoint - commented out to avoid conflicts with the correct endpoint below
+# @app.get("/api/v1/clubs/{language}", response_model=ClubResponse)
+# def get_club(language: str):
+#     """Get language club information"""
+#     try:
+#         # Mock club data based on language
+#         clubs_data = {
+#             "twi": {
+#                 "id": "twi_club",
+#                 "name": "Twi Learning Club",
+#                 "description": "Learn Twi with fellow language enthusiasts",
+#                 "language": "twi",
+#                 "member_count": 142,
+#                 "level_requirement": 1,
+#                 "created_at": "2024-01-15T00:00:00Z"
+#             },
+#             "gaa": {
+#                 "id": "gaa_club", 
+#                 "name": "Gaa Language Club",
+#                 "description": "Master Gaa language with native speakers",
+#                 "language": "gaa",
+#                 "member_count": 87,
+#                 "level_requirement": 1,
+#                 "created_at": "2024-02-01T00:00:00Z"
+#             },
+#             "ewe": {
+#                 "id": "ewe_club",
+#                 "name": "Ewe Learning Circle", 
+#                 "description": "Connect with Ewe language learners",
+#                 "language": "ewe",
+#                 "member_count": 96,
+#                 "level_requirement": 1,
+#                 "created_at": "2024-01-20T00:00:00Z"
+#             }
+#         }
+#         
+#         if language in clubs_data:
+#             return ClubResponse(**clubs_data[language])
+#         else:
+#             raise HTTPException(status_code=404, detail=f"Club for language '{language}' not found")
+#             
+#     except HTTPException:
+#         raise
+#     except Exception as e:
+#         print(f"Club fetch error: {e}")
+#         raise HTTPException(status_code=500, detail="Failed to fetch club information")
 
 @app.post("/api/v1/translate", response_model=TranslationResponse)
 def translate_text(req: TranslationRequest):
@@ -965,19 +966,82 @@ def award_badge(nickname: str, badge_type: str, badge_name: str, badge_descripti
 
 # Clubs endpoint  
 @app.get("/api/v1/clubs/{language_code}")
-def get_club(language_code: str):
-    """Get language club data"""
-    return {
-        "name": f"{language_code.title()} Language Club",
-        "members": [
-            {"nickname": "Alice", "xp": 1250, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=alice"},
-            {"nickname": "Bob", "xp": 1100, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=bob"},
-            {"nickname": "Charlie", "xp": 950, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=charlie"}
-        ],
-        "groupGoal": 5000,
-        "groupProgress": 3300,
-        "challenge": f"Master {language_code.title()} conversations this week!"
-    }
+def get_club_data(language_code: str):
+    """Get language club data with members, progress, and challenges"""
+    try:
+        # Enhanced club data with more variety
+        club_data = {
+            "twi": {
+                "name": "Twi Language Club",
+                "members": [
+                    {"nickname": "Akwasi", "xp": 1450, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=akwasi"},
+                    {"nickname": "Ama", "xp": 1320, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=ama"},
+                    {"nickname": "Kwame", "xp": 1180, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=kwame"},
+                    {"nickname": "Abena", "xp": 980, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=abena"},
+                    {"nickname": "Kofi", "xp": 750, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=kofi"}
+                ],
+                "groupGoal": 6000,
+                "groupProgress": 4230,
+                "challenge": "Master Twi greetings and family terms this week!"
+            },
+            "gaa": {
+                "name": "Ga Language Club",
+                "members": [
+                    {"nickname": "Tetteh", "xp": 1380, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=tetteh"},
+                    {"nickname": "Adjoa", "xp": 1250, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=adjoa"},
+                    {"nickname": "Nii", "xp": 1100, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=nii"},
+                    {"nickname": "Akeley", "xp": 950, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=akeley"}
+                ],
+                "groupGoal": 5500,
+                "groupProgress": 3850,
+                "challenge": "Learn Ga counting and market expressions!"
+            },
+            "ewe": {
+                "name": "Ewe Language Circle",
+                "members": [
+                    {"nickname": "Komi", "xp": 1520, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=komi"},
+                    {"nickname": "Esi", "xp": 1340, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=esi"},
+                    {"nickname": "Selorm", "xp": 1150, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=selorm"},
+                    {"nickname": "Dela", "xp": 890, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=dela"},
+                    {"nickname": "Mawuli", "xp": 720, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=mawuli"}
+                ],
+                "groupGoal": 5800,
+                "groupProgress": 4100,
+                "challenge": "Practice Ewe storytelling and proverbs!"
+            }
+        }
+        
+        # Get club data or use default
+        if language_code in club_data:
+            return club_data[language_code]
+        else:
+            # Return default club data for any language
+            return {
+                "name": f"{language_code.title()} Language Club",
+                "members": [
+                    {"nickname": "Alice", "xp": 1250, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=alice"},
+                    {"nickname": "Bob", "xp": 1100, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=bob"},
+                    {"nickname": "Charlie", "xp": 950, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=charlie"},
+                    {"nickname": "Diana", "xp": 800, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=diana"}
+                ],
+                "groupGoal": 5000,
+                "groupProgress": 3300,
+                "challenge": f"Master {language_code.title()} conversations this week!"
+            }
+    except Exception as e:
+        print(f"Club fetch error for {language_code}: {e}")
+        # Return fallback data even on error
+        return {
+            "name": f"{language_code.title()} Language Club",
+            "members": [
+                {"nickname": "Player1", "xp": 1000, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=player1"},
+                {"nickname": "Player2", "xp": 800, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=player2"},
+                {"nickname": "Player3", "xp": 600, "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=player3"}
+            ],
+            "groupGoal": 4000,
+            "groupProgress": 2400,
+            "challenge": f"Learn {language_code.title()} together!"
+        }
 
 # Startup event
 @app.on_event("startup")
