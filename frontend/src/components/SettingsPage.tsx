@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useSettings } from '../context/SettingsContext';
 import { API_BASE_URL, getApiUrl } from '../config/api';
+import { engagementApi } from '../services/api';
 import avatar1 from '../assets/images/boy.jpg';
 import avatar2 from '../assets/images/woman.jpg';
 import avatar3 from '../assets/images/programmer.jpg';
@@ -51,12 +52,12 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     setLoading(true);
     setError(null);
     Promise.all([
-      axios.get(getApiUrl('streak'), { params: { nickname } }),
-      axios.get(getApiUrl('level'), { params: { nickname } })
+      engagementApi.getStreak(nickname),
+      engagementApi.getLevel(nickname)
     ])
       .then(([streakRes, levelRes]) => {
-        setStreak(streakRes.data.streak);
-        setLevel(levelRes.data.level);
+        setStreak(streakRes.streak);
+        setLevel(levelRes.level);
       })
       .catch(() => setError('Failed to load engagement stats.'))
       .finally(() => setLoading(false));
@@ -65,8 +66,8 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const handleResetStreak = async () => {
     setResetting(true);
     try {
-      const res = await axios.patch(`${getApiUrl('streak')}?nickname=${encodeURIComponent(nickname)}&streak=1`);
-      setStreak(res.data.streak);
+      const res = await engagementApi.resetStreak(nickname);
+      setStreak(res.streak);
       toast.success('Streak reset to 1.');
     } catch {
       toast.error('Failed to reset streak.');
@@ -77,8 +78,8 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const handleResetLevel = async () => {
     setResetting(true);
     try {
-      const res = await axios.patch(`${getApiUrl('level')}?nickname=${encodeURIComponent(nickname)}&level=1`);
-      setLevel(res.data.level);
+      const res = await engagementApi.updateLevel(nickname, 1);
+      setLevel(res.level);
       toast.success('Level reset to 1.');
     } catch {
       toast.error('Failed to reset level.');

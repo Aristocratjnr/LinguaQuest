@@ -30,6 +30,7 @@ import Age from './Age';
 import mascotImg from '../assets/images/logo.png'; // Use logo as mascot, or replace with mascot image
 
 import LanguageSelector from './LanguageSelector';
+import { clubApi, ClubData } from '../services/api';
 import ProgressionMap from './ProgressionMap';
 import LanguageClub from './LanguageClub';
 import { Routes, Route, useNavigate } from 'react-router-dom';
@@ -263,19 +264,16 @@ function AppContent() {
   ];
   // Language Club/Group Challenges state
   const [showClubModal, setShowClubModal] = useState(false);
-  // Example club data (replace with real data later)
-  const CLUB = {
-    name: 'Lingua Legends',
-    members: [
-      { nickname: nickname || 'You', xp: 320, avatar: avatar || mascotImg },
-      { nickname: 'Ama', xp: 280, avatar: undefined },
-      { nickname: 'Kwame', xp: 210, avatar: undefined },
-      { nickname: 'Esi', xp: 150, avatar: undefined },
-    ],
-    groupGoal: 1000,
-    groupProgress: 760,
-    challenge: 'Earn 1000 XP as a club this week!'
-  };
+  const [club, setClub] = useState<ClubData | null>(null);
+
+  // Fetch club data when user nickname is available
+  useEffect(() => {
+    if (language) {
+      clubApi.getClub(language)
+        .then(setClub)
+        .catch(err => console.error('Failed to fetch club data', err));
+    }
+  }, [language]);
   // Add responsive styles and global age validation error UI
   const [ageError, setAgeError] = useState<string | null>(null);
   // Apply theme class to body
@@ -331,13 +329,18 @@ function AppContent() {
   }, [user, scenario, loading, category, difficulty, language]);
 
   // Fetch scenario
-  const fetchScenario = async () => {
+  const fetchScenario = async (curRound: any = round) => {
+    // If triggered by click event, curRound will be an event object; normalize it to current round
+    if (typeof curRound !== 'number') {
+      curRound = round;
+    }
     setLoading(true);
     try {
       const res = await axios.post<ScenarioResponse>(`${API_BASE_URL}/scenario`, { 
         category, 
         difficulty,
-        language: language // Pass current language to get scenario in that language
+        language: language, // Pass current language to get scenario in that language
+        round: curRound
       });
       setScenario(res.data.scenario);
       setLanguage(res.data.language || language);
@@ -381,8 +384,9 @@ function AppContent() {
   // Next round logic
   const nextRound = async () => {
     if (round < TOTAL_ROUNDS) {
-      setRound(r => r + 1);
-      await fetchScenario();
+      const newRound = round + 1;
+      setRound(newRound);
+      await fetchScenario(newRound);
     } else {
       setRoundResult('gameover');
       setTimerActive(false);
@@ -543,6 +547,32 @@ function AppContent() {
     setLoading(false);
   };
 
+  // Test microphone access
+  const testMicrophone = async () => {
+    try {
+      setCmdError('Testing microphone access...');
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      // Test successful
+      setCmdError('✅ Microphone access granted! Voice commands should work now.');
+      
+      // Stop the stream
+      stream.getTracks().forEach(track => track.stop());
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setCmdError(''), 3000);
+    } catch (error: any) {
+      console.error('Microphone test error:', error);
+      if (error.name === 'NotAllowedError') {
+        setCmdError('❌ Microphone permission denied. Please allow microphone access and try again.');
+      } else if (error.name === 'NotFoundError') {
+        setCmdError('❌ No microphone found. Please connect a microphone and try again.');
+      } else {
+        setCmdError(`❌ Microphone test failed: ${error.message || error.name}`);
+      }
+    }
+  };
+
   // Voice command logic
   const handleVoiceCommand = async () => {
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
@@ -556,16 +586,35 @@ function AppContent() {
       return;
     }
 
-    // Check microphone permission first
+    // Enhanced microphone permission checking
     try {
-      const permission = await navigator.permissions.query({ name: 'microphone' as PermissionName });
-      if (permission.state === 'denied') {
-        setCmdError('Microphone permission was denied. Please allow microphone access in your browser settings and try again.');
+      // First try to get user media access to trigger permission prompt
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach(track => track.stop()); // Stop the stream immediately
+      
+      // Also check permission state if available
+      if ('permissions' in navigator) {
+        const permission = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+        if (permission.state === 'denied') {
+          setCmdError('Microphone permission was denied. Please allow microphone access in your browser settings and try again.\n\nTo enable microphone access:\n1. Click the 🔒 or 🛡️ icon in your browser\'s address bar\n2. Change microphone permission to "Allow"\n3. Refresh the page and try again');
+          return;
+        }
+      }
+    } catch (error: any) {
+      console.error('Microphone access error:', error);
+      if (error.name === 'NotAllowedError') {
+        setCmdError('Microphone permission was denied. Please allow microphone access in your browser settings and try again.\n\nTo enable microphone access:\n1. Click the 🔒 or 🛡️ icon in your browser\'s address bar\n2. Change microphone permission to "Allow"\n3. Refresh the page and try again');
+        return;
+      } else if (error.name === 'NotFoundError') {
+        setCmdError('No microphone was found. Please ensure your microphone is connected and try again.');
+        return;
+      } else if (error.name === 'NotSupportedError') {
+        setCmdError('Microphone access is not supported by this browser. Please use the regular buttons instead.');
+        return;
+      } else {
+        setCmdError('Failed to access microphone. Please check your microphone settings and try again.');
         return;
       }
-    } catch (e) {
-      // Fallback for browsers that don't support permissions API
-      console.log('Permissions API not supported, proceeding with speech recognition');
     }
 
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -668,7 +717,7 @@ function AppContent() {
       // Handle specific error types
       switch (event.error) {
         case 'not-allowed':
-          setCmdError('Microphone permission was denied. Please allow microphone access and try again.');
+          setCmdError('Microphone permission was denied. Please allow microphone access and try again.\n\nTo enable microphone access:\n1. Click the 🔒 or 🛡️ icon in your browser\'s address bar\n2. Change microphone permission to "Allow"\n3. Refresh the page and try again');
           break;
         case 'no-speech':
           setCmdError('No speech was detected. Please try speaking more clearly or try again.');
@@ -2141,9 +2190,11 @@ function AppContent() {
               alignItems: 'center'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
               <span className="material-icons" style={{ fontSize: '18px' }}>warning</span>
-              <span>{cmdError}</span>
+              <div style={{ whiteSpace: 'pre-line', textAlign: 'left' }}>
+                {cmdError}
+              </div>
             </div>
             
             {cmdError.includes('Network') && (
@@ -2163,19 +2214,53 @@ function AppContent() {
               </div>
             )}
 
-            {cmdError.includes('Microphone permission') && (
+            {cmdError.includes('Microphone') && (
               <div style={{ 
                 fontSize: '12px', 
                 color: DUOLINGO_COLORS.darkGray,
                 marginTop: '4px',
-                textAlign: 'center'
+                textAlign: 'center',
+                background: '#f8f9fa',
+                padding: '12px',
+                borderRadius: '8px',
+                border: '1px solid #e1e5e9'
               }}>
-                <div>To enable microphone access:</div>
-                <div style={{ marginTop: '4px', fontWeight: 'bold' }}>
-                  1. Click the 🔒 or 🛡️ icon in your browser's address bar<br/>
-                  2. Change microphone permission to "Allow"<br/>
-                  3. Refresh the page and try again
+                <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>🎤 Microphone Access Required</div>
+                <div style={{ marginBottom: '8px' }}>
+                  Voice commands need microphone access to work properly.
                 </div>
+                <div style={{ marginBottom: '4px', fontWeight: 'bold' }}>To enable microphone access:</div>
+                <div style={{ textAlign: 'left', marginLeft: '16px' }}>
+                  <strong>Chrome/Edge:</strong><br/>
+                  • Click the 🔒 icon next to the URL<br/>
+                  • Set Microphone to "Allow"<br/>
+                  • Refresh the page<br/><br/>
+                  
+                  <strong>Firefox:</strong><br/>
+                  • Click the 🛡️ icon in the address bar<br/>
+                  • Go to Permissions → Use the Microphone<br/>
+                  • Change to "Allow"<br/><br/>
+                  
+                  <strong>Safari:</strong><br/>
+                  • Safari menu → Preferences → Websites<br/>
+                  • Click "Microphone" → Allow for this site
+                </div>
+                <button
+                  onClick={testMicrophone}
+                  style={{
+                    marginTop: '12px',
+                    padding: '8px 16px',
+                    background: DUOLINGO_COLORS.blue,
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '12px',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  🎤 Test Microphone Access
+                </button>
               </div>
             )}
             
@@ -2883,7 +2968,12 @@ function AppContent() {
         </button>
         {/* Club/Group Challenges Button */}
         <button
-          onClick={() => setShowClubModal(true)}
+          onClick={() => {
+            if (!club && language) {
+              clubApi.getClub(language).then(setClub).catch(err => console.error('Failed to fetch club data', err));
+            }
+            setShowClubModal(true);
+          }}
           style={{
             background: 'linear-gradient(135deg, #e3f2fd 0%, #b3e5fc 100%)',
             color: '#1cb0f6',
@@ -2958,11 +3048,15 @@ function AppContent() {
       </div>
       {/* Club/Group Challenges Modal */}
       {showClubModal && (
-        <LanguageClub
-          club={CLUB}
-          mascotImg={mascotImg}
-          onClose={() => setShowClubModal(false)}
-        />
+        club ? (
+          <LanguageClub
+            club={club}
+            mascotImg={mascotImg}
+            onClose={() => setShowClubModal(false)}
+          />
+        ) : (
+          <div style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'rgba(0,0,0,0.6)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:4000,color:'#fff',fontSize:'1.25rem'}}>Loading club data...</div>
+        )
       )}
       {/* Progression Map Modal */}
       {showProgressionMap && (
