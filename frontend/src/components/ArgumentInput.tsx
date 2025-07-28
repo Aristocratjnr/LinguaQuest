@@ -2,7 +2,13 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useActivityFeed } from './ActivityFeedContext';
 
-type ArgumentInputProps = {
+interface LanguageConfig {
+  htmlLang: string;
+  speechLang: string;
+  label: string;
+}
+
+interface ArgumentInputProps {
   userArgument: string;
   onChange: (val: string) => void;
   loading: boolean;
@@ -14,7 +20,7 @@ type ArgumentInputProps = {
   enableVoice?: boolean;
   maxLength?: number;
   error?: string;
-};
+}
 
 // Language mapping for HTML lang attribute and speech recognition
 const LANGUAGE_CONFIG = {
@@ -24,19 +30,20 @@ const LANGUAGE_CONFIG = {
   en: { htmlLang: 'en', speechLang: 'en-US', label: 'English' },
 } as const;
 
-const ArgumentInput: React.FC<ArgumentInputProps> = ({ 
-  userArgument, 
-  onChange, 
-  loading, 
-  disabled, 
-  onTranslate, 
-  translation, 
+const ArgumentInput: React.FC<ArgumentInputProps> = ({
+  userArgument,
+  onChange,
+  loading,
+  disabled,
+  onTranslate,
+  translation,
   language,
   languages,
   enableVoice = false,
   maxLength = 500,
-  error
+  error,
 }) => {
+  const [isOverLimit, setIsOverLimit] = useState(false);
   const [listening, setListening] = useState(false);
   const { addActivity } = useActivityFeed();
 
@@ -47,70 +54,69 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
   );
 
   // Get language label from props or fallback to config
-  const languageLabel = useMemo(() => {
-    const langFromProps = languages.find(l => l.code === language);
-    return langFromProps?.label || currentLanguageConfig.label;
-  }, [languages, language, currentLanguageConfig]);
+  const languageLabel = useMemo(() => 
+    languages.find(lang => lang.code === language)?.label || language,
+    [language, languages]
+  );
 
-  // Character count with validation
-  const isOverLimit = userArgument.length > maxLength;
+  // Calculate character count and limit
   const characterCountColor = isOverLimit ? '#dc3545' : 
     userArgument.length > maxLength * 0.8 ? '#ffc107' : '#6c757d';
 
+  // Handle voice input
   const handleVoiceInput = useCallback(() => {
     if (!enableVoice) return;
     
-    console.log('Voice input clicked');
+    // Check if running in a secure context (HTTPS or localhost)
+    const isSecureContext = window.isSecureContext || 
+                          window.location.hostname === 'localhost' || 
+                          window.location.hostname === '127.0.0.1';
     
-    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      alert('Speech recognition is not supported in this browser.');
+    if (!isSecureContext) {
+      alert('Speech recognition requires a secure context (HTTPS). Please use HTTPS to access this feature.');
       return;
     }
     
+    // Check if speech recognition is available
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
+    if (!SpeechRecognition) {
+      alert('Speech recognition is not supported in this browser. Try using Chrome, Edge, or Safari.');
+      return;
+    }
     
+    const recognition = new SpeechRecognition();
     recognition.lang = currentLanguageConfig.speechLang;
     recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
     recognition.continuous = false;
     
-    console.log('Starting speech recognition with language:', currentLanguageConfig.speechLang);
-    
-    setListening(true);
-    
-    recognition.start();
-    
+    // Set up event handlers
     recognition.onresult = (event: any) => {
-      console.log('Speech recognition result:', event);
       const transcript = event.results[0][0].transcript;
-      console.log('Transcript:', transcript);
       onChange(transcript);
-      setListening(false);
-      addActivity({ type: 'action', message: 'Used voice input for argument' });
+      addActivity?.({ type: 'action', message: 'Used voice input for argument' });
     };
     
     recognition.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error);
-      setListening(false);
+      let errorMessage = 'Error with speech recognition. Please try again.';
       
-      // Provide user feedback for common errors
       switch(event.error) {
+        case 'not-allowed':
+          errorMessage = 'Microphone access was denied. Please allow microphone access in your browser settings.';
+          break;
         case 'no-speech':
-          alert('No speech was detected. Please try again.');
+          errorMessage = 'No speech was detected. Please try again.';
           break;
         case 'audio-capture':
-          alert('No microphone was found. Please check your microphone connection.');
-          break;
-        case 'not-allowed':
-          alert('Microphone permission was denied. Please allow microphone access and try again.');
+          errorMessage = 'No microphone was found. Please ensure a microphone is connected.';
           break;
         case 'network':
-          alert('Network error occurred. Please check your internet connection.');
+          errorMessage = 'Network error occurred during speech recognition. Please check your connection.';
           break;
-        default:
-          alert(`Speech recognition error: ${event.error}`);
       }
+      
+      alert(errorMessage);
+      setListening(false);
     };
     
     recognition.onend = () => {
@@ -118,23 +124,34 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
       setListening(false);
     };
     
-    recognition.onstart = () => {
-      console.log('Speech recognition started');
-    };
+    // Start recognition
+    try {
+      recognition.start();
+      setListening(true);
+      console.log('Starting speech recognition with language:', currentLanguageConfig.speechLang);
+    } catch (error) {
+      console.error('Error starting speech recognition:', error);
+      alert('Error starting speech recognition. Please try again.');
+      setListening(false);
+    }
   }, [enableVoice, currentLanguageConfig.speechLang, onChange, addActivity]);
 
+  // Handle translation
   const handleTranslate = useCallback(() => {
     if (userArgument.trim() && !isOverLimit) {
-      addActivity({ type: 'action', message: `Submitted an argument in ${languageLabel}` });
+      addActivity?.({ type: 'action', message: `Submitted an argument in ${languageLabel}` });
       onTranslate();
+    } else if (isOverLimit && addActivity) {
+      addActivity({ type: 'system', message: `Argument too long (max ${maxLength} characters)` });
     }
-  }, [userArgument, isOverLimit, languageLabel, addActivity, onTranslate]);
+  }, [userArgument, isOverLimit, addActivity, languageLabel, onTranslate, maxLength]);
 
+  // Handle input changes
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newValue = e.target.value;
-    // Allow typing but warn about limit
-    onChange(newValue);
-  }, [onChange]);
+    const value = e.target.value;
+    onChange(value);
+    setIsOverLimit(value.length > maxLength);
+  }, [onChange, maxLength]);
 
   return (
     <motion.div
@@ -210,7 +227,6 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
           className="form-control"
           disabled={loading || disabled}
           lang={currentLanguageConfig.htmlLang}
-          inputMode="text"
           spellCheck={language === 'en'}
           style={{ 
             minHeight: 120, 
@@ -218,7 +234,7 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
             background: 'rgba(255,255,255,0.45)',
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
-            border: '2px solid #e9ecef',
+            border: `2px solid ${error ? '#dc3545' : isOverLimit ? '#ffc107' : '#e9ecef'}`,
             borderRadius: '12px',
             padding: '1rem',
             fontSize: '1rem',
@@ -229,6 +245,7 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
           }}
           placeholder={`Type your argument here... (max ${maxLength} characters)`}
         />
+        
         {error && (
           <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{
             backgroundColor: 'rgba(248, 215, 218, 0.9)',
@@ -240,6 +257,7 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
             </div>
           </div>
         )}
+        
         <div className="position-absolute bottom-0 end-0 me-3 mb-2 d-flex gap-2">
           {enableVoice && (
             <motion.button
