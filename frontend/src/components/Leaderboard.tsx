@@ -166,13 +166,14 @@ const { theme } = useSettings();
         left: 0,
         width: '100vw',
         height: '100vh',
-        background: 'rgba(20,20,30,0.75)',
-        backdropFilter: 'blur(6px)',
+        background: 'rgba(255,255,255,0.95)',
+        backdropFilter: 'blur(8px)',
         zIndex: 4000,
         display: 'flex',
         alignItems: 'flex-start',
         justifyContent: 'center',
-        paddingTop: '5vh',
+        paddingTop: '2vh',
+        padding: '2vh 1rem',
       }}>
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
@@ -185,18 +186,16 @@ const { theme } = useSettings();
             boxShadow: '0 0 0 4px #ffe08255, 0 16px 48px #ffb30033, 0 2px 8px #ffb30022',
             minWidth: 300,
             maxWidth: 650,
-            width: '95vw',
+            width: 'calc(100vw - 2rem)',
             minHeight: 120,
-            maxHeight: '70vh',
+            maxHeight: 'calc(96vh - 4rem)',
             overflowY: 'auto',
-            // maxHeight: '90vh', // Remove this line
-            padding: '40px 24px 32px 24px',
-            // overflowY: 'auto', // Remove this line
+            padding: 'clamp(20px, 4vw, 40px) clamp(16px, 3vw, 24px) clamp(24px, 4vw, 32px) clamp(16px, 3vw, 24px)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             position: 'relative',
-            border: '3px solid #ffb300',
+            border: '3px solid #ffb300'
           }}
         >
           <button
@@ -310,25 +309,25 @@ const { theme } = useSettings();
                 : 'rgba(88, 204, 2, 0.02)',
               marginBottom: 10,
             }}>
-              <div style={{display: "flex", flexDirection: "column", gap: "12px", width: "100%"}} className="sm:flex-row sm:items-center sm:justify-between">
+              <div style={{display: "flex", flexDirection: "column", gap: "8px", width: "100%"}} className="sm:flex-row sm:items-center sm:justify-between">
                 {/* Search Input */}
-                <div className="relative w-full sm:max-w-[320px]" style={{width: "100%"}}>
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <div className="relative w-full" style={{width: "100%", maxWidth: "none"}}>
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i className="material-icons" style={{ 
                       color: theme === 'dark' ? '#a0aec0' : '#718096',
-                      fontSize: '20px'
+                      fontSize: 'clamp(16px, 4vw, 20px)'
                     }}>search</i>
                 </div>
                 <input
                   type="text"
                   style={{
                     width: '100%',
-                    padding: '6px 10px 6px 36px',
+                    padding: 'clamp(8px, 2vw, 10px) clamp(8px, 2vw, 10px) clamp(8px, 2vw, 10px) clamp(32px, 8vw, 40px)',
                     border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)'}`,
-                    borderRadius: '10px',
+                    borderRadius: '12px',
                     background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#ffffff',
                     color: theme === 'dark' ? '#ffffff' : '#2d3748',
-                    fontSize: '13px',
+                    fontSize: 'clamp(0.8rem, 3vw, 0.9rem)',
                     outline: 'none',
                     transition: 'all 0.2s ease',
                     boxShadow: '0 1px 4px rgba(0,0,0,0.03)'
@@ -350,27 +349,30 @@ const { theme } = useSettings();
               </div>
                 
                 {/* Sort Controls */}
-                <div className="flex items-center gap-2 w-full sm:w-auto" style={{display: "flex", alignItems: "center", gap: "8px", width: "100%", justifyContent: "space-between"}}>
+                <div className="flex items-center gap-2 w-full sm:w-auto" style={{display: "flex", alignItems: "center", gap: "clamp(6px, 2vw, 8px)", width: "100%", justifyContent: "space-between", flexWrap: "nowrap"}}>
                   <div style={{ 
                     color: theme === 'dark' ? '#a0aec0' : '#718096',
-                    fontSize: '13px',
+                    fontSize: 'clamp(0.75rem, 3vw, 0.85rem)',
                     fontWeight: 600,
-                    fontFamily: 'JetBrains Mono, monospace'
+                    fontFamily: 'JetBrains Mono, monospace',
+                    flexShrink: 0
                   }}>
-                    Sort by:
+                    Sort:
                   </div>
                 <select
                   style={{
-                    padding: '6px 10px',
+                    padding: 'clamp(6px, 2vw, 8px) clamp(8px, 2vw, 10px)',
                     border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)'}`,
                     borderRadius: '10px',
                     background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#ffffff',
                     color: theme === 'dark' ? '#ffffff' : '#2d3748',
-                    fontSize: '13px',
+                    fontSize: 'clamp(0.75rem, 3vw, 0.85rem)',
                     outline: 'none',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.03)'
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
+                    flex: 1,
+                    minWidth: 0
                   }}
                   className="focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   value={sortBy}
@@ -392,15 +394,16 @@ const { theme } = useSettings();
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     style={{
-                      padding: '10px',
-                      borderRadius: '12px',
+                      padding: 'clamp(8px, 2vw, 10px)',
+                      borderRadius: '10px',
                       background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(88, 204, 2, 0.05)',
                       border: `1px solid ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(88, 204, 2, 0.2)'}`,
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center'
+                      justifyContent: 'center',
+                      flexShrink: 0
                     }}
                   onClick={() => setSortDir(d => d === 'asc' ? 'desc' : 'asc')}
                     onMouseOver={e => {
@@ -414,7 +417,7 @@ const { theme } = useSettings();
                   >
                     <i className="material-icons" style={{ 
                       color: '#58cc02',
-                      fontSize: '20px'
+                      fontSize: 'clamp(16px, 4vw, 20px)'
                     }}>
                       {sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward'}
                     </i>
@@ -424,8 +427,7 @@ const { theme } = useSettings();
             </div>
             {/* Content Table */}
             <div style={{ 
-              padding: 'clamp(12px, 3vw, 32px)',
-              // maxHeight and overflowY removed to make all content visible
+              padding: 'clamp(8px, 2vw, 16px)',
             }}>
               {loading ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -517,7 +519,7 @@ const { theme } = useSettings();
                   <div style={{ fontSize: '14px', opacity: 0.8 }}>Try adjusting your search criteria</div>
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(8px, 2vw, 12px)' }}>
                   {filteredEntries.map((entry, index) => {
                     const badges = getBadges(entry, index);
                     const isCurrentUser = user && user.nickname === entry.nickname;
@@ -527,10 +529,10 @@ const { theme } = useSettings();
                         style={{
                           display: 'flex',
                           alignItems: 'center',
-                          gap: 'clamp(8px, 3vw, 16px)',
-                          padding: 'clamp(12px, 4vw, 20px)',
+                          gap: 'clamp(8px, 2vw, 12px)',
+                          padding: 'clamp(12px, 3vw, 16px)',
                           flexWrap: 'nowrap',
-                          borderRadius: '20px',
+                          borderRadius: '16px',
                           background: isCurrentUser 
                             ? 'linear-gradient(135deg, #d7f7c8 0%, #58cc02 100%)' 
                             : theme === 'dark' 
@@ -547,7 +549,8 @@ const { theme } = useSettings();
                           position: 'relative',
                           cursor: 'pointer',
                           transition: 'all 0.2s ease',
-                          overflow: 'hidden'
+                          overflow: 'hidden',
+                          minHeight: 'clamp(72px, 15vw, 88px)'
                         }}
                         whileHover={{ 
                           y: -2,
@@ -581,15 +584,15 @@ const { theme } = useSettings();
                         <div style={{ flexShrink: 0, position: 'relative' }}>
                           <div
                             style={{
-                              width: 'clamp(36px, 6vw, 48px)',
-                              height: 'clamp(36px, 6vw, 48px)',
+                              width: 'clamp(32px, 8vw, 40px)',
+                              height: 'clamp(32px, 8vw, 40px)',
                               borderRadius: '50%',
                               background: `linear-gradient(135deg, ${getRankColor(entry.rank - 1)} 0%, ${getRankColor(entry.rank - 1)}dd 100%)`,
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
                               fontWeight: 'bold',
-                              fontSize: '18px',
+                              fontSize: 'clamp(12px, 3vw, 16px)',
                               color: '#ffffff',
                               boxShadow: `0 4px 16px ${getRankColor(entry.rank - 1)}40`,
                               border: '2px solid rgba(255,255,255,0.2)'
@@ -604,34 +607,43 @@ const { theme } = useSettings();
                           src={(entry as any).avatar_url || entry.avatar || defaultAvatar}
                           alt="avatar"
                           style={{
-                            width: 'clamp(45px, 7vw, 56px)',
-                            height: 'clamp(45px, 7vw, 56px)',
+                            width: 'clamp(40px, 10vw, 52px)',
+                            height: 'clamp(40px, 10vw, 52px)',
                             borderRadius: '50%',
                             border: `3px solid ${getRankColor(entry.rank - 1)}`,
                             objectFit: 'cover',
                             background: theme === 'dark' ? 'rgba(255,255,255,0.05)' : '#f0f2f5',
-                            boxShadow: `0 4px 16px ${getRankColor(entry.rank - 1)}30`
+                            boxShadow: `0 4px 16px ${getRankColor(entry.rank - 1)}30`,
+                            flexShrink: 0
                           }}
                           onError={e => { e.currentTarget.src = defaultAvatar; }}
                         />
                         
                         {/* Player Info */}
-                        <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ 
+                          flex: 1, 
+                          minWidth: 0,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'center',
+                          gap: 'clamp(4px, 1vw, 8px)'
+                        }}>
                           <h3 style={{ 
                             fontWeight: 700, 
                             color: theme === 'dark' ? '#ffffff' : '#2d3748',
-                            fontSize: 'clamp(1rem, 2vw, 1.5rem)',
-                            marginBottom: '8px',
+                            fontSize: 'clamp(0.9rem, 3.5vw, 1.2rem)',
+                            margin: 0,
                             fontFamily: 'JetBrains Mono, monospace',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
+                            whiteSpace: 'nowrap',
+                            lineHeight: 1.2
                           }}>
                             {entry.nickname}
                             {isCurrentUser && (
                               <span style={{
-                                marginLeft: '8px',
-                                fontSize: '12px',
+                                marginLeft: '6px',
+                                fontSize: 'clamp(0.65rem, 2.5vw, 0.8rem)',
                                 color: '#58cc02',
                                 fontWeight: 600
                               }}>
@@ -639,80 +651,128 @@ const { theme } = useSettings();
                               </span>
                             )}
                           </h3>
-                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', maxWidth: '100%' }}>
+                          <div style={{ 
+                            display: 'flex', 
+                            gap: 'clamp(4px, 1vw, 6px)', 
+                            flexWrap: 'wrap', 
+                            alignItems: 'center', 
+                            maxWidth: '100%',
+                            overflow: 'hidden'
+                          }}>
                             <span style={{
-                              fontSize: '12px',
-                              padding: '4px 8px',
-                              borderRadius: '12px',
+                              fontSize: 'clamp(0.65rem, 2.5vw, 0.75rem)',
+                              padding: 'clamp(2px, 1vw, 4px) clamp(4px, 2vw, 6px)',
+                              borderRadius: '8px',
                               background: theme === 'dark' ? 'rgba(59, 130, 246, 0.2)' : '#dbeafe',
                               color: theme === 'dark' ? '#93c5fd' : '#1e40af',
                               fontWeight: 600,
                               display: 'flex',
                               alignItems: 'center',
-                              gap: '4px'
+                              gap: '2px',
+                              flexShrink: 0
                             }}>
-                              <i className="material-icons" style={{ fontSize: '14px' }}>language</i>
+                              <i className="material-icons" style={{ fontSize: 'clamp(10px, 3vw, 12px)' }}>language</i>
                               {entry.favorite_language}
                             </span>
                             <span style={{
-                              fontSize: '12px',
-                              padding: '4px 8px',
-                              borderRadius: '12px',
+                              fontSize: 'clamp(0.65rem, 2.5vw, 0.75rem)',
+                              padding: 'clamp(2px, 1vw, 4px) clamp(4px, 2vw, 6px)',
+                              borderRadius: '8px',
                               background: theme === 'dark' ? 'rgba(34, 197, 94, 0.2)' : '#dcfce7',
                               color: theme === 'dark' ? '#86efac' : '#166534',
                               fontWeight: 600,
                               display: 'flex',
                               alignItems: 'center',
-                              gap: '4px'
+                              gap: '2px',
+                              flexShrink: 0
                             }}>
-                              <i className="material-icons" style={{ fontSize: '14px' }}>military_tech</i>
-                              {entry.badges_count} Badges
+                              <i className="material-icons" style={{ fontSize: 'clamp(10px, 3vw, 12px)' }}>military_tech</i>
+                              {entry.badges_count}
                             </span>
-                            {badges.map((badge, i) => (
+                            {badges.slice(0, 2).map((badge, i) => (
                               <span
                                 key={i}
                                 style={{
-                                  fontSize: '12px',
-                                  padding: '4px 8px',
-                                  borderRadius: '12px',
+                                  fontSize: 'clamp(0.6rem, 2vw, 0.7rem)',
+                                  padding: 'clamp(2px, 1vw, 3px) clamp(4px, 2vw, 5px)',
+                                  borderRadius: '6px',
                                   background: badge.color,
                                   color: '#ffffff',
                                   fontWeight: 600,
-                                  boxShadow: `0 2px 8px ${badge.color}40`
+                                  boxShadow: `0 2px 8px ${badge.color}40`,
+                                  flexShrink: 0,
+                                  maxWidth: 'clamp(60px, 15vw, 80px)',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap'
                                 }}
                               >
                                 {badge.text}
                               </span>
                             ))}
+                            {badges.length > 2 && (
+                              <span style={{
+                                fontSize: 'clamp(0.6rem, 2vw, 0.7rem)',
+                                color: theme === 'dark' ? '#a0aec0' : '#718096',
+                                fontWeight: 600
+                              }}>
+                                +{badges.length - 2} more
+                              </span>
+                            )}
                           </div>
                         </div>
                         
                         {/* Score and Stats */}
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px', marginLeft: 'auto' }}>
+                        <div style={{ 
+                          display: 'flex', 
+                          flexDirection: 'column', 
+                          alignItems: 'flex-end', 
+                          gap: 'clamp(4px, 1vw, 6px)', 
+                          marginLeft: 'auto',
+                          flexShrink: 0,
+                          minWidth: 'clamp(80px, 20vw, 120px)'
+                        }}>
                           <div style={{ 
                             fontWeight: 700, 
-                            fontSize: 'clamp(1.2rem, 3vw, 20px)',
+                            fontSize: 'clamp(1rem, 4vw, 1.3rem)',
                             color: '#58cc02',
-                            textShadow: '0 1px 2px rgba(88, 204, 2, 0.1)'
+                            textShadow: '0 1px 2px rgba(88, 204, 2, 0.1)',
+                            lineHeight: 1
                           }}>
                             {entry.total_score}
                           </div>
-                          <div style={{ display: 'flex', gap: '12px', fontSize: 'clamp(0.9rem, 2vw, 14px)', color: theme === 'dark' ? '#a0aec0' : '#718096' }}>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <i className="material-icons" style={{ fontSize: '16px', color: '#ff9500' }}>local_fire_department</i>
+                          <div style={{ 
+                            display: 'flex', 
+                            gap: 'clamp(6px, 2vw, 8px)', 
+                            fontSize: 'clamp(0.7rem, 2.5vw, 0.85rem)', 
+                            color: theme === 'dark' ? '#a0aec0' : '#718096',
+                            alignItems: 'center',
+                            justifyContent: 'flex-end'
+                          }}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                              <i className="material-icons" style={{ fontSize: 'clamp(12px, 3vw, 14px)', color: '#ff9500' }}>local_fire_department</i>
                               {entry.current_streak ?? '-'}
                             </span>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <i className="material-icons" style={{ fontSize: '16px', color: '#3b82f6' }}>star</i>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+                              <i className="material-icons" style={{ fontSize: 'clamp(12px, 3vw, 14px)', color: '#3b82f6' }}>star</i>
                               {entry.level ?? '-'}
                             </span>
                           </div>
                           <div style={{
-                            fontSize: 'clamp(0.8rem, 2vw, 12px)',
+                            fontSize: 'clamp(0.6rem, 2vw, 0.75rem)',
                             color: theme === 'dark' ? '#718096' : '#a0aec0',
-                            fontFamily: 'JetBrains Mono, monospace'
+                            fontFamily: 'JetBrains Mono, monospace',
+                            textAlign: 'right',
+                            lineHeight: 1,
+                            maxWidth: '100%',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
                           }}>
-                            Last: {entry.last_activity ? new Date(entry.last_activity).toLocaleDateString() : '-'}
+                            {entry.last_activity ? new Date(entry.last_activity).toLocaleDateString(undefined, { 
+                              month: 'short', 
+                              day: 'numeric'
+                            }) : '-'}
                           </div>
                         </div>
                       </motion.div>
