@@ -331,13 +331,18 @@ function AppContent() {
   }, [user, scenario, loading, category, difficulty, language]);
 
   // Fetch scenario
-  const fetchScenario = async () => {
+  const fetchScenario = async (curRound: any = round) => {
+    // If triggered by click event, curRound will be an event object; normalize it to current round
+    if (typeof curRound !== 'number') {
+      curRound = round;
+    }
     setLoading(true);
     try {
       const res = await axios.post<ScenarioResponse>(`${API_BASE_URL}/scenario`, { 
         category, 
         difficulty,
-        language: language // Pass current language to get scenario in that language
+        language: language, // Pass current language to get scenario in that language
+        round: curRound
       });
       setScenario(res.data.scenario);
       setLanguage(res.data.language || language);
@@ -381,8 +386,9 @@ function AppContent() {
   // Next round logic
   const nextRound = async () => {
     if (round < TOTAL_ROUNDS) {
-      setRound(r => r + 1);
-      await fetchScenario();
+      const newRound = round + 1;
+      setRound(newRound);
+      await fetchScenario(newRound);
     } else {
       setRoundResult('gameover');
       setTimerActive(false);
