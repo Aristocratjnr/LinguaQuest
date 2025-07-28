@@ -210,7 +210,7 @@ def libre_translate(text, source, target):
 # User validation (simplified version without database)
 PROFANITY_LIST = {"badword", "admin", "root", "test", "guest", "anonymous"}
 
-@app.get("/users/validate", response_model=UserValidationResponse)
+@app.get("/api/v1/users/validate", response_model=UserValidationResponse)
 def validate_username(nickname: str = Query(...), db: Session = Depends(get_db)):
     """Validate username with database check"""
     name = nickname.strip()
@@ -241,7 +241,7 @@ def validate_username(nickname: str = Query(...), db: Session = Depends(get_db))
     
     return UserValidationResponse(valid=True, reason="Looks good!")
 
-@app.post("/users", response_model=UserResponse)
+@app.post("/api/v1/users", response_model=UserResponse)
 def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
     """Create a new user"""
     # Validate nickname first
@@ -266,7 +266,7 @@ def create_new_user(user: UserCreate, db: Session = Depends(get_db)):
         print(f"User creation error: {e}")
         raise HTTPException(status_code=500, detail="Failed to create user.")
 
-@app.get("/users/{nickname}", response_model=UserResponse)
+@app.get("/api/v1/users/{nickname}", response_model=UserResponse)
 def get_user(nickname: str, db: Session = Depends(get_db)):
     """Get user by nickname"""
     user = get_user_by_nickname(db, nickname)
@@ -274,7 +274,7 @@ def get_user(nickname: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found.")
     return user
 
-@app.post("/users/{nickname}/login")
+@app.post("/api/v1/users/{nickname}/login")
 def user_login(nickname: str, db: Session = Depends(get_db)):
     """Update user's last login time"""
     user = get_user_by_nickname(db, nickname)
@@ -288,7 +288,7 @@ def user_login(nickname: str, db: Session = Depends(get_db)):
         print(f"Login update error: {e}")
         return {"status": "error", "message": "Failed to record login"}
 
-@app.post("/scenario", response_model=ScenarioResponse)
+@app.post("/api/v1/scenario", response_model=ScenarioResponse)
 def get_scenario(req: ScenarioRequest):
     """Get a debate scenario with optimized translation"""
     try:
@@ -322,7 +322,7 @@ def get_scenario(req: ScenarioRequest):
         print(f"Scenario error: {e}")
         return ScenarioResponse(scenario="Error generating scenario.", language="en")
 
-@app.post("/translate", response_model=TranslationResponse)
+@app.post("/api/v1/translate", response_model=TranslationResponse)
 def translate_text(req: TranslationRequest):
     """Translate text using lightweight methods"""
     try:
@@ -333,7 +333,7 @@ def translate_text(req: TranslationRequest):
         print(error_msg)
         return TranslationResponse(translated_text=error_msg)
 
-@app.post("/evaluate", response_model=EvaluateResponse)
+@app.post("/api/v1/evaluate", response_model=EvaluateResponse)
 def evaluate_argument(req: EvaluateRequest):
     """Evaluate argument using lightweight methods"""
     try:
@@ -386,7 +386,7 @@ def evaluate_argument(req: EvaluateRequest):
         print(f"Evaluation error: {e}")
         return EvaluateResponse(persuaded=False, feedback="Evaluation error.", score=0)
 
-@app.post("/dialogue", response_model=DialogueResponse)
+@app.post("/api/v1/dialogue", response_model=DialogueResponse)
 def dialogue_endpoint(req: DialogueRequest):
     """Simple dialogue endpoint for AI conversation"""
     try:
@@ -418,7 +418,7 @@ def dialogue_endpoint(req: DialogueRequest):
             reasoning="Error in dialogue processing"
         )
 
-@app.post("/sentiment", response_model=SentimentResponse)
+@app.post("/api/v1/sentiment", response_model=SentimentResponse)
 def analyze_sentiment(req: SentimentRequest):
     """Analyze sentiment of text using lightweight VADER"""
     try:
@@ -520,7 +520,7 @@ def get_engagement_difficulties():
         {"key": "hard", "label": "Hard"}
     ]
 
-@app.get("/tts")
+@app.get("/api/v1/tts")
 def tts(text: str = Query(...), lang: str = Query("en")):
     """Text-to-speech endpoint"""
     try:
@@ -544,7 +544,7 @@ class ScoreEntry(BaseModel):
     score: int
     date: str
 
-@app.post('/score')
+@app.post('/api/v1/score')
 def submit_score(entry: ScoreEntry):
     """Submit score to leaderboard"""
     with LEADERBOARD_LOCK:
@@ -558,7 +558,7 @@ def submit_score(entry: ScoreEntry):
             json.dump(data, f, ensure_ascii=False, indent=2)
     return {'status': 'ok'}
 
-@app.get('/leaderboard', response_model=LeaderboardResponse)
+@app.get('/api/v1/leaderboard', response_model=LeaderboardResponse)
 def get_leaderboard():
     """Get leaderboard data"""
     with LEADERBOARD_LOCK:
