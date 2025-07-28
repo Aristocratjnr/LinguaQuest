@@ -567,11 +567,12 @@ def increment_streak(nickname: str):
     """Increment user's streak (simplified)"""
     return {"streak": 2}
 
-@app.get("/api/v1/leaderboard")
-def get_leaderboard_v1():
-    """Get leaderboard data (API v1 compatible)"""
-    leaderboard_data = get_leaderboard()
-    return {"leaderboard": leaderboard_data.leaderboard}
+# Commented out old leaderboard endpoint to avoid conflicts
+# @app.get("/api/v1/leaderboard")
+# def get_leaderboard_v1():
+#     """Get leaderboard data (API v1 compatible)"""
+#     leaderboard_data = get_leaderboard()
+#     return {"leaderboard": leaderboard_data.leaderboard}
 
 @app.post("/api/v1/leaderboard")
 def submit_leaderboard_v1(entry: dict):
