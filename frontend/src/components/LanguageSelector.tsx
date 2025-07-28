@@ -551,65 +551,65 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
           align-items: center;
           justify-content: center;
           z-index: 1000;
-          padding: 20px;
+          padding: clamp(8px, 2vw, 20px);
         }
 
         .duo-continue-modal {
           background: #ffffff;
-          border-radius: 24px;
+          border-radius: clamp(12px, 3vw, 24px);
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-          max-width: 400px;
+          max-width: clamp(280px, 95vw, 400px);
           width: 100%;
           overflow: hidden;
         }
 
         .duo-modal-header {
-         background: #444444
-          padding: 32px 24px 24px;
+          background: #444444;
+          padding: clamp(18px, 5vw, 32px) clamp(12px, 4vw, 24px) clamp(12px, 3vw, 24px);
           text-align: center;
           color: black;
         }
 
         .duo-modal-icon {
-          width: 56px;
-          height: 56px;
+          width: clamp(36px, 10vw, 56px);
+          height: clamp(36px, 10vw, 56px);
           background: linear-gradient(135deg, #ffffff, #808080);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          margin: 0 auto 16px;
+          margin: 0 auto clamp(8px, 2vw, 16px);
         }
 
         .duo-modal-icon .material-icons {
-          font-size: 28px;
+          font-size: clamp(18px, 6vw, 28px);
         }
 
         .duo-modal-title {
-          font-size: 24px;
+          font-size: clamp(16px, 5vw, 24px);
           font-weight: 800;
           margin: 0;
         }
 
         .duo-modal-body {
-          padding: 24px;
+          padding: clamp(12px, 4vw, 24px);
         }
 
         .duo-selected-lang {
           display: flex;
           align-items: center;
-          gap: 16px;
-          margin-bottom: 20px;
-          padding: 16px;
+          gap: clamp(8px, 3vw, 16px);
+          margin-bottom: clamp(12px, 3vw, 20px);
+          padding: clamp(8px, 2vw, 16px);
           background: #f8fafc;
-          border-radius: 16px;
+          border-radius: clamp(8px, 2vw, 16px);
         }
 
         .duo-modal-flag {
-          width: 48px;
-          height: 48px;
+          width: clamp(32px, 8vw, 48px);
+          height: clamp(32px, 8vw, 48px);
           object-fit: cover;
-          border-radius: 12px;
+          border-radius: clamp(8px, 2vw, 12px);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
@@ -618,21 +618,21 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
         }
 
         .duo-modal-lang-name {
-          font-size: 18px;
+          font-size: clamp(13px, 4vw, 18px);
           font-weight: 700;
-          margin: 0 0 4px 0;
+          margin: 0 0 clamp(2px, 1vw, 4px) 0;
           color: #3c3c3c;
         }
 
         .duo-modal-native {
-          font-size: 14px;
+          font-size: clamp(10px, 2vw, 14px);
           font-weight: 400;
           color: #777;
-          margin-left: 8px;
+          margin-left: clamp(4px, 1vw, 8px);
         }
 
         .duo-modal-lang-desc {
-          font-size: 14px;
+          font-size: clamp(10px, 2vw, 14px);
           color: #777;
           margin: 0;
           line-height: 1.4;
@@ -641,28 +641,28 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
         .duo-modal-note {
           display: flex;
           align-items: center;
-          gap: 8px;
-          padding: 12px 16px;
+          gap: clamp(6px, 2vw, 12px);
+          padding: clamp(8px, 2vw, 12px) clamp(10px, 3vw, 16px);
           background: #fff7ed;
-          border-radius: 12px;
-          font-size: 14px;
+          border-radius: clamp(8px, 2vw, 12px);
+          font-size: clamp(10px, 2vw, 14px);
           color: #92400e;
-          margin-bottom: 24px;
+          margin-bottom: clamp(12px, 3vw, 24px);
         }
 
         .duo-modal-note .material-icons {
-          font-size: 18px;
+          font-size: clamp(12px, 3vw, 18px);
           color: #f59e0b;
         }
 
         .duo-continue-btn {
           width: 100%;
-          padding: 16px 24px;
+          padding: clamp(12px, 3vw, 16px) clamp(16px, 4vw, 24px);
           background: linear-gradient(180deg, #58cc02 0%, #4eb600 100%);
           border: none;
-          border-radius: 16px;
+          border-radius: clamp(8px, 2vw, 16px);
           color: white;
-          font-size: 16px;
+          font-size: clamp(13px, 4vw, 16px);
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.5px;
@@ -670,9 +670,10 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
+          gap: clamp(6px, 2vw, 12px);
           box-shadow: 0 4px 0 #46a302, 0 8px 25px rgba(88, 204, 2, 0.3);
           transition: all 0.2s ease;
+          min-height: clamp(44px, 12vw, 48px);
         }
 
         .duo-continue-btn:hover {
