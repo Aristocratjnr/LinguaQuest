@@ -320,16 +320,44 @@ const renderNode = (node: ProgressionStage, isChild = false) => {
                     marginTop: window.innerWidth <= 768 ? '8px' : '0'
                   }}>{cat.label}</div>
                 </div>
-                {/* Children nodes */}
+                {/* Children nodes with dotted flow lines */}
                 {cat.children && (
-                  <div style={{ 
-                    display: 'flex', 
-                    gap: window.innerWidth <= 768 ? 12 : 28, 
-                    marginLeft: window.innerWidth <= 768 ? 0 : 80, 
+                  <div style={{
+                    position: 'relative',
+                    display: 'flex',
+                    gap: window.innerWidth <= 768 ? 12 : 28,
+                    marginLeft: window.innerWidth <= 768 ? 0 : 80,
                     marginTop: 16,
                     flexWrap: window.innerWidth <= 768 ? 'wrap' : 'nowrap',
-                    justifyContent: window.innerWidth <= 768 ? 'center' : 'flex-start'
+                    justifyContent: window.innerWidth <= 768 ? 'center' : 'flex-start',
                   }}>
+                    {/* Dotted flow lines: now on all screens */}
+                    {cat.children.length > 0 && (
+                      <svg
+                        width={cat.children.length * (window.innerWidth <= 768 ? 70 : 90)}
+                        height={window.innerWidth <= 768 ? 28 : 40}
+                        style={{
+                          position: 'absolute',
+                          top: window.innerWidth <= 768 ? -18 : -28,
+                          left: 0,
+                          pointerEvents: 'none',
+                          zIndex: 0,
+                        }}
+                      >
+                        {cat.children.map((child, idx) => (
+                          <line
+                            key={child.id}
+                            x1={15 + idx * (window.innerWidth <= 768 ? 70 : 90)}
+                            y1={0}
+                            x2={15 + idx * (window.innerWidth <= 768 ? 70 : 90)}
+                            y2={window.innerWidth <= 768 ? 18 : 28}
+                            stroke="#bdbdbd"
+                            strokeWidth={2}
+                            strokeDasharray="6,6"
+                          />
+                        ))}
+                      </svg>
+                    )}
                     {cat.children.map(child => renderNode(child, true))}
                   </div>
                 )}
