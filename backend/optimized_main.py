@@ -16,9 +16,13 @@ from typing import Dict, Optional
 
 # Set default encoding to UTF-8 for Windows compatibility
 if sys.platform.startswith('win'):
-    import codecs
-    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
-    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.detach())
+    try:
+        import codecs
+        sys.stdout = codecs.getwriter('utf-8')(sys.stdout.detach())
+        sys.stderr = codecs.getwriter('utf-8')(sys.stderr.detach())
+    except Exception:
+        # If stdout is already detached or there's an issue, skip encoding setup
+        pass
 
 from fastapi import FastAPI, Body, UploadFile, File, Query, Request, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
