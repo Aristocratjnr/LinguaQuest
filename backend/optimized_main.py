@@ -88,20 +88,55 @@ def read_root():
         "endpoints": {
             "docs": "/docs",
             "api": "/api/v1",
-            "health": "/health"
+            "health": "/health",
+            "keepalive": "/keepalive"
         }
+    }
+
+@app.get("/keepalive")
+def keepalive():
+    """Keepalive endpoint to prevent service from sleeping"""
+    return {
+        "status": "alive",
+        "timestamp": datetime.now().isoformat(),
+        "message": "Service is awake and responsive"
     }
 
 @app.get("/health")
 def health_check():
-    """Health check endpoint"""
-    return {
-        "status": "healthy",
-        "timestamp": datetime.now().isoformat(),
-        "port": os.environ.get("PORT", "not set"),
-        "memory_mode": "optimized",
-        "message": "LinguaQuest API is running successfully"
-    }
+    """Health check endpoint with detailed status"""
+    try:
+        # Check database connection
+        db_status = "unknown"
+        try:
+            from database import engine
+            with engine.connect() as conn:
+                conn.execute("SELECT 1")
+            db_status = "connected"
+        except Exception:
+            db_status = "disconnected"
+        
+        # Check file system
+        fs_status = "ok" if os.path.exists(os.path.dirname(__file__)) else "error"
+        
+        return {
+            "status": "healthy",
+            "timestamp": datetime.now().isoformat(),
+            "port": os.environ.get("PORT", "not set"),
+            "memory_mode": "optimized",
+            "database": db_status,
+            "filesystem": fs_status,
+            "uptime": "running",
+            "message": "LinguaQuest API is running successfully"
+        }
+    except Exception as e:
+        # Return partial health info even if some checks fail
+        return {
+            "status": "partial",
+            "timestamp": datetime.now().isoformat(),
+            "error": str(e),
+            "message": "API running with some issues"
+        }
 
 # Lazy loading functions
 def get_nllb_model():
@@ -685,17 +720,18 @@ def submit_score(entry: ScoreEntry):
             json.dump(data, f, ensure_ascii=False, indent=2)
     return {'status': 'ok'}
 
-@app.get('/api/v1/leaderboard', response_model=LeaderboardResponse)
-def get_leaderboard():
-    """Get leaderboard data"""
-    with LEADERBOARD_LOCK:
-        if os.path.exists(LEADERBOARD_FILE):
-            with open(LEADERBOARD_FILE, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-        else:
-            data = []
-    data = sorted(data, key=lambda x: (-x['score'], x['date']))[:10]
-    return LeaderboardResponse(leaderboard=data)
+# Basic leaderboard endpoint - commented out to avoid conflicts with enhanced version
+# @app.get('/api/v1/leaderboard', response_model=LeaderboardResponse)
+# def get_leaderboard():
+#     """Get leaderboard data"""
+#     with LEADERBOARD_LOCK:
+#         if os.path.exists(LEADERBOARD_FILE):
+#             with open(LEADERBOARD_FILE, 'r', encoding='utf-8') as f:
+#                 data = json.load(f)
+#         else:
+#             data = []
+#     data = sorted(data, key=lambda x: (-x['score'], x['date']))[:10]
+#     return LeaderboardResponse(leaderboard=data)
 
 # Enhanced leaderboard endpoint that returns proper user data
 @app.get("/api/v1/leaderboard")
@@ -908,28 +944,59 @@ def get_club(language_code: str):
 @app.on_event("startup")
 async def startup_event():
     """Initialize database and essential components"""
-    print("🚀 LinguaQuest Optimized API starting up...")
-    print("💾 Memory optimization: ON")
-    print("🤖 ML models: Lazy loading enabled")
-    
-    # Initialize database tables
     try:
-        print("🗄️ Creating database tables...")
-        Base.metadata.create_all(bind=engine)
-        print("✅ Database tables created successfully")
+        print("🚀 LinguaQuest Optimized API starting up...")
+        print("💾 Memory optimization: ON")
+        print("🤖 ML models: Lazy loading enabled")
+        
+        # Initialize database tables
+        try:
+            print("🗄️ Creating database tables...")
+            Base.metadata.create_all(bind=engine)
+            print("✅ Database tables created successfully")
+        except Exception as e:
+            print(f"⚠️ Database initialization warning: {e}")
+            print("🔄 Continuing without database (will affect user validation)")
     except Exception as e:
-        print(f"⚠️ Database initialization warning: {e}")
-        print("🔄 Continuing without database (will affect user validation)")
+        print(f"❌ Startup error: {e}")
+        # Don't crash on startup errors
+        import traceback
+        traceback.print_exc()
+
+# Add exception handler for unhandled errors
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """Global exception handler to prevent server crashes"""
+    print(f"❌ Unhandled exception: {exc}")
+    import traceback
+    traceback.print_exc()
+    
+    return {
+        "error": "Internal server error", 
+        "message": "The server encountered an unexpected error but is still running",
+        "timestamp": datetime.now().isoformat()
+    }
 
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
     print(f"🚀 Starting LinguaQuest Optimized API on port {port}")
     
-    uvicorn.run(
-        "optimized_main:app",
-        host="0.0.0.0",
-        port=port,
-        workers=1,
-        log_level="info"
-    )
+    try:
+        uvicorn.run(
+            "optimized_main:app",
+            host="0.0.0.0",
+            port=port,
+            workers=1,
+            log_level="info",
+            access_log=True,
+            # Production stability settings
+            loop="asyncio",
+            timeout_keep_alive=30,
+            timeout_graceful_shutdown=10
+        )
+    except Exception as e:
+        print(f"❌ Server startup failed: {e}")
+        # Log the error but don't exit - let Render restart the service
+        import traceback
+        traceback.print_exc()

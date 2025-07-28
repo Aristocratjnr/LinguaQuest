@@ -4,7 +4,7 @@ services:
     runtime: python  
     plan: free
     buildCommand: "cd backend && pip install -r requirements-optimized.txt"
-    startCommand: "cd backend && python start.py"
+    startCommand: "cd backend && python production_start.py"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
@@ -12,4 +12,11 @@ services:
         value: sqlite:///./linguaquest.db
       - key: CORS_ORIGINS
         value: "*"
+      - key: PORT
+        value: 10000
     healthCheckPath: /health
+    autoDeploy: true
+    # Add restart policy to keep service alive
+    scaling:
+      minInstances: 1
+      maxInstances: 1
