@@ -1235,7 +1235,7 @@ function AppContent() {
       {/* Header - Duolingo style */}
       <header style={{
         background: DUOLINGO_COLORS.white,
-        padding: 'clamp(8px, 2vw, 16px)',
+        padding: 'clamp(4px, 2vw, 16px)',
         boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
         position: 'sticky',
         top: 0,
@@ -1249,10 +1249,19 @@ function AppContent() {
           minWidth: 0,
           maxWidth: '100%',
           margin: '0 auto',
-          gap: 'clamp(8px, 2vw, 24px)',
+          gap: 'clamp(4px, 2vw, 16px)',
+          padding: '0 clamp(8px, 3vw, 16px)',
         }}>
           {/* Left: Logo + Streak */}
-          <div className="header-left" style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 18px)', minWidth: 0, flex: 1, flexWrap: 'wrap' }}>
+          <div className="header-left" style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 'clamp(4px, 1.5vw, 12px)', 
+            minWidth: 0, 
+            flex: 1, 
+            flexWrap: 'wrap',
+            justifyContent: window.innerWidth < 768 ? 'center' : 'flex-start'
+          }}>
             {/* Logo and app name */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -1416,7 +1425,15 @@ function AppContent() {
             </div>
           </div>
           {/* User profile and right side */}
-          <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: 'clamp(4px, 2vw, 8px)', minWidth: 0, flexWrap: 'wrap', flexShrink: 0 }}>
+          <div className="header-right" style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 'clamp(2px, 1vw, 8px)', 
+            minWidth: 0, 
+            flexWrap: 'wrap', 
+            flexShrink: 0,
+            justifyContent: window.innerWidth < 768 ? 'center' : 'flex-end'
+          }}>
             {/* Daily Reward Chest */}
             <motion.button
               style={{
@@ -1560,7 +1577,7 @@ function AppContent() {
       {/* Main content area */}
       <main style={{
         flex: 1,
-        padding: '0 16px 16px',
+        padding: 'clamp(8px, 3vw, 16px)',
         maxWidth: '1100px',
         width: '100%',
         margin: '0 auto',
@@ -1568,6 +1585,7 @@ function AppContent() {
           ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
           : 'none',
         minHeight: '100vh',
+        boxSizing: 'border-box',
       }}>
         {/* Category & Difficulty Indicator */}
         <motion.div
@@ -1581,22 +1599,23 @@ function AppContent() {
             background: 'rgba(255,255,255,0.45)',
             backdropFilter: 'blur(8px)',
             WebkitBackdropFilter: 'blur(8px)',
-            borderRadius: '14px', // smaller radius
-            padding: '8px 12px', // smaller padding
-            margin: '14px 0 8px 0', // smaller margin
+            borderRadius: 'clamp(10px, 2vw, 14px)',
+            padding: 'clamp(6px, 2vw, 12px)',
+            margin: 'clamp(8px, 2vw, 14px) 0 clamp(4px, 1.5vw, 8px) 0',
             boxShadow: '0 1px 4px rgba(88,204,2,0.08)',
             border: '1px solid rgba(88,204,2,0.10)',
             fontFamily: 'JetBrains Mono, monospace',
-            fontSize: '0.98rem',
-            ...fontStyles.bold, // 保持粗体
+            fontSize: 'clamp(0.8rem, 2.5vw, 0.98rem)',
+            ...fontStyles.bold,
             color: '#3caa3c',
-            gap: '10px',
-            maxWidth: '420px', // smaller and responsive
+            gap: 'clamp(6px, 2vw, 10px)',
+            maxWidth: window.innerWidth < 768 ? '100%' : '420px',
             width: '100%',
             minWidth: 0,
             marginLeft: 'auto',
             marginRight: 'auto',
             boxSizing: 'border-box',
+            flexDirection: window.innerWidth < 480 ? 'column' : 'row',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -1616,20 +1635,22 @@ function AppContent() {
               background: '#58cc02',
               color: 'white',
               border: 'none',
-              borderRadius: '12px',
-              padding: '8px 18px',
-              ...fontStyles.heading, // 使用最粗的字体样式
-              fontSize: '0.95rem',
+              ...fontStyles.heading,
+              fontSize: 'clamp(0.8rem, 2.5vw, 0.95rem)',
               cursor: 'pointer',
               boxShadow: '0 2px 0 #3caa3c',
               fontFamily: 'JetBrains Mono, monospace',
               letterSpacing: '0.01em',
               transition: 'all 0.2s',
-              marginLeft: '12px'
+              marginLeft: window.innerWidth < 480 ? '0' : 'clamp(8px, 2vw, 12px)',
+              marginTop: window.innerWidth < 480 ? 'clamp(4px, 1vw, 8px)' : '0',
+              minWidth: 'fit-content',
+              padding: 'clamp(6px, 2vw, 8px) clamp(12px, 3vw, 18px)',
+              borderRadius: 'clamp(8px, 2vw, 12px)',
             }}
             onClick={() => setShowCategorySelector(true)}
           >
-            <i className="material-icons" style={{ fontSize: '18px', verticalAlign: 'middle', marginRight: '4px' }}>edit</i>
+            <i className="material-icons" style={{ fontSize: 'clamp(16px, 4vw, 18px)', verticalAlign: 'middle', marginRight: '4px' }}>edit</i>
             Change
           </motion.button>
         </motion.div>
@@ -1863,18 +1884,26 @@ function AppContent() {
         {/* Two-column layout for cards */}
         <div style={{
           display: 'flex',
-          gap: '32px',
+          gap: window.innerWidth < 768 ? 'clamp(16px, 4vw, 24px)' : '32px',
           alignItems: 'flex-start',
           width: '100%',
           flexWrap: 'wrap',
+          flexDirection: window.innerWidth < 768 ? 'column' : 'row',
         }}>
           {/* Left column: Scenario, AI Response, and Feedback */}
-          <div style={{ flex: 1, minWidth: '320px', maxWidth: '520px' }}>
+          <div style={{ 
+            flex: 1, 
+            minWidth: window.innerWidth < 768 ? '100%' : '320px', 
+            maxWidth: window.innerWidth < 768 ? '100%' : '520px',
+            width: window.innerWidth < 768 ? '100%' : 'auto',
+          }}>
             {/* Scenario card - Polished */}
             <div className="duo-card" style={{
-              borderRadius: '28px',
-              padding: '36px 28px 32px 24px',
-              marginBottom: '32px',
+              borderRadius: 'clamp(16px, 4vw, 28px)',
+              padding: window.innerWidth < 480 
+                ? 'clamp(16px, 4vw, 20px) clamp(12px, 3vw, 16px) clamp(16px, 4vw, 20px) clamp(12px, 3vw, 16px)'
+                : 'clamp(24px, 5vw, 36px) clamp(18px, 4vw, 28px) clamp(20px, 4vw, 32px) clamp(16px, 3vw, 24px)',
+              marginBottom: 'clamp(16px, 4vw, 32px)',
               display: 'flex',
               alignItems: 'flex-start',
               position: 'relative',
@@ -2002,12 +2031,19 @@ function AppContent() {
             )}
           </div>
           {/* Right column: ArgumentInput and ToneSelector */}
-          <div style={{ flex: 1, minWidth: '320px', maxWidth: '520px' }}>
+          <div style={{ 
+            flex: 1, 
+            minWidth: window.innerWidth < 768 ? '100%' : '320px', 
+            maxWidth: window.innerWidth < 768 ? '100%' : '520px',
+            width: window.innerWidth < 768 ? '100%' : 'auto',
+          }}>
             {/* Input area - Polished */}
             <div className="duo-card" style={{
-              borderRadius: '28px',
-              padding: '36px 28px 32px 24px',
-              marginBottom: '32px',
+              borderRadius: 'clamp(16px, 4vw, 28px)',
+              padding: window.innerWidth < 480 
+                ? 'clamp(16px, 4vw, 20px) clamp(12px, 3vw, 16px) clamp(16px, 4vw, 20px) clamp(12px, 3vw, 16px)'
+                : 'clamp(24px, 5vw, 36px) clamp(18px, 4vw, 28px) clamp(20px, 4vw, 32px) clamp(16px, 3vw, 24px)',
+              marginBottom: 'clamp(16px, 4vw, 32px)',
               display: 'flex',
               alignItems: 'flex-start',
               position: 'relative',
