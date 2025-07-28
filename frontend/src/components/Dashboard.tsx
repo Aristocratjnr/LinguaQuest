@@ -30,6 +30,7 @@ import Age from './Age';
 import mascotImg from '../assets/images/logo.png'; // Use logo as mascot, or replace with mascot image
 
 import LanguageSelector from './LanguageSelector';
+import { clubApi, ClubData } from '../services/api';
 import ProgressionMap from './ProgressionMap';
 import LanguageClub from './LanguageClub';
 import { Routes, Route, useNavigate } from 'react-router-dom';
@@ -263,19 +264,16 @@ function AppContent() {
   ];
   // Language Club/Group Challenges state
   const [showClubModal, setShowClubModal] = useState(false);
-  // Example club data (replace with real data later)
-  const CLUB = {
-    name: 'Lingua Legends',
-    members: [
-      { nickname: nickname || 'You', xp: 320, avatar: avatar || mascotImg },
-      { nickname: 'Ama', xp: 280, avatar: undefined },
-      { nickname: 'Kwame', xp: 210, avatar: undefined },
-      { nickname: 'Esi', xp: 150, avatar: undefined },
-    ],
-    groupGoal: 1000,
-    groupProgress: 760,
-    challenge: 'Earn 1000 XP as a club this week!'
-  };
+  const [club, setClub] = useState<ClubData | null>(null);
+
+  // Fetch club data when user nickname is available
+  useEffect(() => {
+    if (user?.nickname) {
+      clubApi.getClub(user.nickname)
+        .then(setClub)
+        .catch(err => console.error('Failed to fetch club data', err));
+    }
+  }, [user?.nickname]);
   // Add responsive styles and global age validation error UI
   const [ageError, setAgeError] = useState<string | null>(null);
   // Apply theme class to body
@@ -3044,9 +3042,9 @@ function AppContent() {
         </button>
       </div>
       {/* Club/Group Challenges Modal */}
-      {showClubModal && (
+      {showClubModal && club && (
         <LanguageClub
-          club={CLUB}
+          club={club}
           mascotImg={mascotImg}
           onClose={() => setShowClubModal(false)}
         />

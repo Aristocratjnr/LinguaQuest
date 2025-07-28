@@ -277,6 +277,28 @@ export const engagementApi = {
   },
 };
 
+// Language Club API
+export interface ClubMember {
+  nickname: string;
+  xp: number;
+  avatar?: string;
+}
+
+export interface ClubData {
+  name: string;
+  members: ClubMember[];
+  groupGoal: number;
+  groupProgress: number;
+  challenge: string;
+}
+
+export const clubApi = {
+  getClub: async (nickname: string): Promise<ClubData> => {
+    const response = await axios.get(getApiUrl('api/club'), { params: { nickname } });
+    return response.data;
+  },
+};
+
 // Storage utility
 export const storage = {
   // Nickname storage
