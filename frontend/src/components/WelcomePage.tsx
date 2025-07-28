@@ -152,7 +152,18 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
                     delay: 0.1
                   }}
                 >
-                  {slides[currentSlide].character}
+                  <span style={{
+                    fontSize: 'clamp(28px, 7vw, 42px)',
+                    lineHeight: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '100%',
+                    height: '100%',
+                    textAlign: 'center'
+                  }}>
+                    {slides[currentSlide].character}
+                  </span>
                 </motion.div>
                 
                 <motion.h2 
@@ -423,10 +434,14 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         .duo-slide-content {
           position: absolute;
           width: 100%;
+          height: 100%;
           display: flex;
           flex-direction: column;
           align-items: center;
+          justify-content: center;
           text-align: center;
+          padding: clamp(8px, 2vw, 16px);
+          box-sizing: border-box;
         }
 
         .duo-slide-icon {
@@ -437,8 +452,24 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           align-items: center;
           justify-content: center;
           font-size: clamp(32px, 8vw, 48px);
-          margin-bottom: clamp(16px, 4vw, 24px);
+          margin: 0 auto clamp(16px, 4vw, 24px) auto;
           animation: iconBounce 4s ease-in-out infinite;
+          position: relative;
+          text-align: center;
+          line-height: 1;
+        }
+
+        .duo-slide-icon span {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+          font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Segoe UI Symbol', 'Android Emoji', 'EmojiSymbols', sans-serif;
+          font-variant-emoji: emoji;
+          text-rendering: optimizeLegibility;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
         }
 
         .duo-slide-title {
@@ -624,8 +655,12 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         }
 
         @keyframes iconBounce {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
+          0%, 100% { 
+            transform: translateY(0px) scale(1); 
+          }
+          50% { 
+            transform: translateY(clamp(-8px, -2vw, -10px)) scale(1.05); 
+          }
         }
 
         @keyframes shine {
