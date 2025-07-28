@@ -295,7 +295,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '1rem',
+      padding: 'clamp(8px, 2vw, 16px)',
       background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))',
       width: '100vw',
       boxSizing: 'border-box',
@@ -305,9 +305,9 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         className="nickname-card"
         style={{
           width: '100%',
-          maxWidth: '28rem',
+          maxWidth: 'clamp(320px, 90vw, 28rem)',
           background: 'var(--duo-card, #fff)',
-          borderRadius: '1rem',
+          borderRadius: 'clamp(12px, 3vw, 16px)',
           overflow: 'hidden',
           boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
           color: 'inherit',
@@ -332,7 +332,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         ]} currentStep={0} />
         {/* Header */}
         <div style={{
-          padding: '1rem 1.25rem 1rem 1.25rem',
+          padding: 'clamp(16px, 4vw, 20px) clamp(16px, 4vw, 20px) clamp(12px, 3vw, 16px) clamp(16px, 4vw, 20px)',
           background: '#ffffff',
           textAlign: 'center',
           color: 'var(--text-light, #e0e7ff)'
@@ -351,11 +351,11 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '6rem',
-                height: '6rem',
+                width: 'clamp(5rem, 15vw, 6rem)',
+                height: 'clamp(5rem, 15vw, 6rem)',
                 borderRadius: '50%',
                 background: avatarPreview ? 'transparent' : 'rgba(255, 255, 255, 0.2)',
-                marginBottom: '1rem',
+                marginBottom: 'clamp(12px, 3vw, 16px)',
                 overflow: 'hidden',
                 cursor: 'pointer',
                 border: '3px solid white',
@@ -378,7 +378,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
               ) : (
                 <>
                   <span className="material-icons nickname-avatar-icon" style={{ 
-                    fontSize: '2.5rem',
+                    fontSize: 'clamp(2rem, 6vw, 2.5rem)',
                     opacity: 0.8
                   }}>add_a_photo</span>
                   <div className="nickname-avatar-add-text" style={{
@@ -388,8 +388,8 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                     right: 0,
                     background: 'rgba(0,0,0,0.5)',
                     color: 'white',
-                    fontSize: '0.75rem',
-                    padding: '0.25rem',
+                    fontSize: 'clamp(0.7rem, 2vw, 0.75rem)',
+                    padding: 'clamp(0.2rem, 1vw, 0.25rem)',
                     textAlign: 'center',
                     width: '100%',
                   }}>
@@ -407,7 +407,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
             />
             <h2 style={{
               margin: 0,
-              fontSize: '1.5rem',
+              fontSize: 'clamp(1.2rem, 4vw, 1.5rem)',
               fontWeight: 700,
               letterSpacing: '-0.025em',
               color: 'var(--text-light, #e0e7ff'
@@ -415,9 +415,9 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
               Create Your Profile
             </h2>
             <p style={{
-              margin: '0.5rem 0 0',
+              margin: 'clamp(0.4rem, 1vw, 0.5rem) 0 0',
               opacity: 0.9,
-              fontSize: '0.875rem',
+              fontSize: 'clamp(0.8rem, 2.5vw, 0.875rem)',
               color: 'var(--text-dark, #222)'
             }}>
               Choose a nickname and profile picture
@@ -426,8 +426,8 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         </div>
         
         {/* Body */}
-        <div style={{ padding: '1rem 1.25rem' }}>
-          <div style={{ marginBottom: '1.5rem' }}>
+        <div style={{ padding: 'clamp(16px, 4vw, 20px) clamp(16px, 4vw, 20px)' }}>
+          <div style={{ marginBottom: 'clamp(20px, 5vw, 24px)' }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -447,7 +447,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
               } : {})
             }}>
               <div style={{
-                padding: '0.75rem',
+                padding: 'clamp(12px, 3vw, 14px)',
                 background: '#f1f5f9',
                 display: 'flex',
                 alignItems: 'center',
@@ -455,7 +455,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
               }}>
                 <span className="material-icons" style={{ 
                   color: '#64748b',
-                  fontSize: '1.25rem'
+                  fontSize: 'clamp(1.1rem, 3vw, 1.25rem)'
                 }}>alternate_email</span>
               </div>
               <input
@@ -471,11 +471,11 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                 spellCheck={language === 'en'}
                 style={{
                   flex: 1,
-                  padding: '0.75rem',
+                  padding: 'clamp(12px, 3vw, 14px)',
                   border: 'none',
                   background: 'transparent',
                   outline: 'none',
-                  fontSize: '1rem',
+                  fontSize: 'clamp(0.9rem, 3vw, 1rem)',
                   fontFamily: 'Noto Sans, Arial Unicode MS, system-ui, monospace',
                   color: 'var(--text-dark, #222)'
                 }}
@@ -486,8 +486,8 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginTop: '0.5rem',
-              fontSize: '0.75rem'
+              marginTop: 'clamp(8px, 2vw, 10px)',
+              fontSize: 'clamp(0.7rem, 2vw, 0.75rem)'
             }}>
               <AnimatePresence mode="wait">
                 {checking ? (
@@ -526,8 +526,8 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                     }}
                   >
                     <span className="material-icons" style={{ 
-                      fontSize: '1rem',
-                      marginRight: '0.25rem'
+                      fontSize: 'clamp(0.9rem, 2.5vw, 1rem)',
+                      marginRight: 'clamp(0.2rem, 1vw, 0.25rem)'
                     }}>check_circle</span>
                     {feedback}
                   </motion.div>
@@ -546,21 +546,21 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
               {(error || avatarError) && (
                 <motion.div
                   initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                  animate={{ opacity: 1, height: 'auto', marginTop: '0.5rem' }}
+                  animate={{ opacity: 1, height: 'auto', marginTop: 'clamp(8px, 2vw, 10px)' }}
                   exit={{ opacity: 0, height: 0, marginTop: 0 }}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    padding: '0.5rem',
+                    padding: 'clamp(8px, 2vw, 10px)',
                     background: '#fee2e2',
-                    borderRadius: '0.375rem',
+                    borderRadius: 'clamp(6px, 1.5vw, 8px)',
                     color: '#b91c1c',
-                    fontSize: '0.875rem'
+                    fontSize: 'clamp(0.8rem, 2.5vw, 0.875rem)'
                   }}
                 >
                   <span className="material-icons" style={{ 
-                    fontSize: '1rem',
-                    marginRight: '0.5rem'
+                    fontSize: 'clamp(0.9rem, 2.5vw, 1rem)',
+                    marginRight: 'clamp(0.4rem, 1vw, 0.5rem)'
                   }}>error</span>
                   {error || avatarError}
                 </motion.div>
@@ -575,14 +575,14 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
             whileTap={valid ? { scale: 0.98 } : {}}
             style={{
               width: '100%',
-              padding: '0.875rem',
-              borderRadius: '0.5rem',
+              padding: 'clamp(14px, 3.5vw, 16px)',
+              borderRadius: 'clamp(8px, 2vw, 10px)',
               border: 'none',
               background: valid ? 
                 'var(--duo-green, #58cc02)' : 
                 '#e2e8f0',
               color: valid ? 'var(--text-light, #e0e7ff)' : '#94a3b8',
-              fontSize: '1rem',
+              fontSize: 'clamp(0.9rem, 3vw, 1rem)',
               fontWeight: 600,
               cursor: valid ? 'pointer' : 'not-allowed',
               display: 'flex',
@@ -591,7 +591,8 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
               boxShadow: valid ? 
                 '0 4px 0 #3caa3c' : 
                 'none',
-              transition: 'all 0.2s'
+              transition: 'all 0.2s',
+              minHeight: 'clamp(44px, 12vw, 48px)'
             }}
           >
             {submitting ? (
@@ -602,7 +603,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                   border: '2px solid rgba(255, 255, 255, 0.3)',
                   borderTopColor: 'white',
                   borderRadius: '50%',
-                  marginRight: '0.5rem',
+                  marginRight: 'clamp(0.4rem, 1vw, 0.5rem)',
                   animation: 'spin 1s linear infinite'
                 }} />
                 Creating profile...
@@ -610,8 +611,8 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
             ) : (
               <>
                 <span className="material-icons" style={{ 
-                  fontSize: '1.25rem',
-                  marginRight: '0.5rem'
+                  fontSize: 'clamp(1.1rem, 3vw, 1.25rem)',
+                  marginRight: 'clamp(0.4rem, 1vw, 0.5rem)'
                 }}>arrow_forward</span>
                 Continue
               </>
@@ -621,17 +622,17 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         
         {/* Footer */}
         <div style={{
-          padding: '1rem',
+          padding: 'clamp(12px, 3vw, 16px)',
           background: '#f8fafc',
           borderTop: '1px solid #e2e8f0',
           textAlign: 'center',
-          fontSize: '0.75rem',
+          fontSize: 'clamp(0.7rem, 2vw, 0.75rem)',
           color: 'var(--text-dark, #64748b)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span className="material-icons" style={{ 
-              fontSize: '1rem',
-              marginRight: '0.25rem',
+              fontSize: 'clamp(0.9rem, 2.5vw, 1rem)',
+              marginRight: 'clamp(0.2rem, 1vw, 0.25rem)',
               color: '#64748b'
             }}>lock</span>
             Your information is secure and private
@@ -674,15 +675,15 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           align-items: center;
           justify-content: center;
           background: var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%));
-          padding: 1rem;
+          padding: clamp(8px, 2vw, 16px);
           box-sizing: border-box;
           overflow: auto;
         }
         .nickname-card {
           width: 100%;
-          max-width: 28rem;
+          max-width: clamp(320px, 90vw, 28rem);
           background: var(--duo-card, #fff);
-          border-radius: 1rem;
+          border-radius: clamp(12px, 3vw, 16px);
           overflow: hidden;
           box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
           color: inherit;
@@ -703,159 +704,6 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         }
         .dark .nickname-card p, body.dark .nickname-card p {
           color: var(--text-light, #e0e7ff) !important;
-        }
-        /* Mobile responsiveness */
-        @media (max-width: 600px) {
-          .nickname-prompt-container {
-            padding: 0;
-            min-height: 100vh;
-          }
-          .nickname-card {
-            width: 100vw;
-            max-width: 100vw;
-            min-height: 100vh;
-            margin: 0;
-            border-radius: 0;
-            box-shadow: none;
-            padding: 24px 16px;
-            display: flex;
-            flex-direction: column;
-          }
-          .nickname-card h2 {
-            font-size: 24px;
-            margin-top: 8px;
-            text-align: center;
-          }
-          .nickname-card p {
-            font-size: 16px;
-            line-height: 1.5;
-            text-align: center;
-            margin: 8px 0 24px;
-          }
-          .nickname-card input {
-            font-size: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-            border-radius: 12px;
-            min-height: 48px;
-            width: 100%;
-            box-sizing: border-box;
-          }
-          .nickname-card button, .nickname-card .motion-button {
-            font-size: 16px;
-            padding: 16px;
-            margin-top: 8px;
-            border-radius: 12px;
-            min-height: 48px;
-            width: 100%;
-            box-sizing: border-box;
-          }
-          .nickname-card .material-icons {
-            font-size: 32px;
-          }
-          .nickname-card [style*='width: 6rem'],
-          .nickname-avatar-upload {
-            width: 72px;
-            height: 72px;
-            min-width: 72px;
-            min-height: 72px;
-            max-width: 30vw;
-            max-height: 30vw;
-            margin: 0 auto 24px;
-            border-radius: 50%;
-          }
-          .nickname-avatar-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-          }
-          .nickname-avatar-icon {
-            font-size: 32px;
-          }
-          .nickname-avatar-add-text {
-            font-size: 14px;
-            padding: 4px;
-          }
-          /* Character counter adjustments */
-          .character-count {
-            font-size: 14px;
-            margin-top: 4px;
-            text-align: right;
-          }
-          /* Error message adjustments */
-          .error-message {
-            font-size: 14px;
-            padding: 12px;
-            margin-top: 16px;
-            border-radius: 8px;
-          }
-          /* Feedback message adjustments */
-          .feedback-message {
-            font-size: 14px;
-            padding: 12px;
-            margin-top: 16px;
-            border-radius: 8px;
-          }
-          /* Input container adjustments */
-          .nickname-input-container {
-            margin-bottom: 24px;
-          }
-          /* Avatar container adjustments */
-          .nickname-avatar-container {
-            margin-bottom: 24px;
-          }
-          /* Stepper adjustments */
-          .logic-flow-stepper {
-            margin: 0 0 24px;
-          }
-        }
-        
-        /* Extra small devices (phones, less than 360px) */
-        @media (max-width: 360px) {
-          .nickname-card h2 {
-            font-size: 20px;
-            font-size: 1.3rem;
-          }
-          .nickname-card p {
-            font-size: 0.95rem;
-          }
-          .nickname-card input {
-            font-size: 1rem;
-            padding: 0.9rem;
-          }
-          .nickname-card button, .nickname-card .motion-button {
-            font-size: 1rem;
-            padding: 1rem;
-          }
-          .nickname-card [style*='padding: 1rem 1.25rem'] {
-            padding: 1rem;
-          }
-          .nickname-card [style*='padding: 1rem'] {
-            padding: 1rem;
-          }
-          .nickname-card [style*='width: 6rem'],
-          .nickname-avatar-upload {
-            width: 5rem;
-            height: 5rem;
-            min-width: 5rem;
-            min-height: 5rem;
-          }
-        }
-        
-        /* Landscape orientation adjustments */
-        @media (max-width: 600px) and (orientation: landscape) {
-          .nickname-prompt-container {
-            min-height: auto;
-            padding: 1rem;
-          }
-          .nickname-card {
-            min-height: auto;
-            margin: 1rem auto;
-            max-width: 90vw;
-            border-radius: 1rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-          }
         }
       `}</style>
     </div>
