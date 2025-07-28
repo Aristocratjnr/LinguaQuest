@@ -225,48 +225,46 @@ export const gameApi = {
     return response.data;
   },
 };
-
-// Engagement API
 export const engagementApi = {
   // Get user streak
   getStreak: async (nickname: string): Promise<{ streak: number }> => {
-    const response = await axios.get(getApiUrl('streak'), { params: { nickname } });
+    const response = await axios.get(getApiUrl('api/engagement/streak'), { params: { nickname } });
     return response.data;
   },
 
   // Get user level
   getLevel: async (nickname: string): Promise<{ level: number }> => {
-    const response = await axios.get(getApiUrl('level'), { params: { nickname } });
+    const response = await axios.get(getApiUrl('api/engagement/level'), { params: { nickname } });
     return response.data;
   },
 
   // Update streak
   updateStreak: async (nickname: string, streak: number): Promise<{ streak: number }> => {
-    const response = await axios.patch(`${getApiUrl('streak')}?nickname=${encodeURIComponent(nickname)}&streak=${streak}`);
+    const response = await axios.patch(`${getApiUrl('api/engagement/streak')}?nickname=${encodeURIComponent(nickname)}&streak=${streak}`);
     return response.data;
   },
 
   // Update level
   updateLevel: async (nickname: string, level: number): Promise<{ level: number }> => {
-    const response = await axios.patch(`${getApiUrl('level')}?nickname=${encodeURIComponent(nickname)}&level=${level}`);
+    const response = await axios.patch(`${getApiUrl('api/engagement/level')}?nickname=${encodeURIComponent(nickname)}&level=${level}`);
     return response.data;
   },
 
   // Increment user streak
   incrementStreak: async (nickname: string): Promise<{ streak: number }> => {
-    const response = await axios.post(`${getApiUrl('streak/increment')}?nickname=${encodeURIComponent(nickname)}`);
+    const response = await axios.post(`${getApiUrl('api/engagement/streak/increment')}?nickname=${encodeURIComponent(nickname)}`);
     return response.data;
   },
 
   // Reset user streak
   resetStreak: async (nickname: string): Promise<{ streak: number }> => {
-    const response = await axios.post(`${getApiUrl('streak/reset')}?nickname=${encodeURIComponent(nickname)}`);
+    const response = await axios.post(`${getApiUrl('api/engagement/streak/reset')}?nickname=${encodeURIComponent(nickname)}`);
     return response.data;
   },
 
   // Get user badges
   getBadges: async (nickname: string): Promise<{ badges: Badge[] }> => {
-    const response = await axios.get(getApiUrl(`badges/${nickname}`));
+    const response = await axios.get(getApiUrl('api/engagement/badges/' + nickname));
     return response.data;
   },
 
