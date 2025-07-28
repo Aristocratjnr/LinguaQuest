@@ -39,6 +39,10 @@ const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose })
     challenge: "Learn together and have fun!"
   };
 
+  // Debug logging for production
+  console.log('LanguageClub - club data:', club);
+  console.log('LanguageClub - API_BASE_URL:', API_BASE_URL);
+
   // Use provided club data or fallback
   const safeClub = club || fallbackClub;
   
@@ -182,19 +186,33 @@ const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose })
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {sortedMembers.map((m, idx) => {
-              // Assign avatars in round-robin order if member.avatar is not set
+              // Use proper avatar fallback logic for production
               const fallbackAvatars = [defaultAvatar, boyAvatar, womanAvatar];
               let assignedAvatar = '';
+              
               if (m.avatar) {
-                // If avatar is a relative path, prepend backend base URL; otherwise use as is
+                // Check if it's already a full URL (starts with http/https)
                 if (m.avatar.startsWith('http')) {
                   assignedAvatar = m.avatar;
+                } else if (m.avatar.startsWith('/')) {
+                  // If it starts with /, it's an absolute path from server
+                  assignedAvatar = `${API_BASE_URL}${m.avatar}`;
                 } else {
-                  assignedAvatar = `${API_BASE_URL}/${m.avatar.replace(/^\//,'')}`;
+                  // If it's a relative path, construct the full URL
+                  assignedAvatar = `${API_BASE_URL}/${m.avatar}`;
                 }
               } else {
-                assignedAvatar = fallbackAvatars[idx % fallbackAvatars.length] || mascotImg;
+                // Use fallback avatars in round-robin fashion
+                assignedAvatar = fallbackAvatars[idx % fallbackAvatars.length];
               }
+              
+              // Debug logging
+              console.log(`Avatar for ${m.nickname}:`, {
+                originalAvatar: m.avatar,
+                assignedAvatar,
+                fallbackIndex: idx % fallbackAvatars.length
+              });
+              
               return (
                 <motion.div
                   key={m.nickname}
@@ -217,7 +235,18 @@ const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose })
                   }}
                 >
                   <span style={{ fontWeight: 300, fontSize: '1.15rem', minWidth: 24, textAlign: 'center', fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{idx + 1}</span>
-                  <img src={assignedAvatar} alt="avatar" style={{ width: 36, height: 36, borderRadius: '50%', border: '2.5px solid #1cb0f6', objectFit: 'cover', background: '#fff', boxShadow: '0 2px 8px #1cb0f622' }} />
+                  <img 
+                    src={assignedAvatar} 
+                    alt="avatar" 
+                    style={{ width: 36, height: 36, borderRadius: '50%', border: '2.5px solid #1cb0f6', objectFit: 'cover', background: '#fff', boxShadow: '0 2px 8px #1cb0f622' }} 
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      // On error, fall back to local default avatar
+                      if (target.src !== defaultAvatar) {
+                        target.src = defaultAvatar;
+                      }
+                    }}
+                  />
                   <span style={{ flex: 1, fontWeight: 300, fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{m.nickname}</span>
                   <span style={{ fontWeight: 300, fontFamily: "Fira Mono, Menlo, Consolas, monospace" }}>{m.xp} XP</span>
                   {idx === 0 && <span className="material-icons" style={{ color: '#ffd700', fontSize: 22, marginLeft: 6 }}>emoji_events</span>}
