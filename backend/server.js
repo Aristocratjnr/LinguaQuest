@@ -136,6 +136,26 @@ app.post('/api/engagement/update', (req, res) => {
   res.json({ success: true });
 });
 
+// Increment streak endpoint
+app.post('/api/engagement/streak/increment', (req, res) => {
+  const nickname = (req.query.nickname || '').toLowerCase();
+  if (!nickname || !USER_STREAKS[nickname]) {
+    return res.status(404).json({ success: false, error: 'User not found.' });
+  }
+  USER_STREAKS[nickname] = (USER_STREAKS[nickname] || 0) + 1;
+  res.json({ streak: USER_STREAKS[nickname] });
+});
+
+// Reset streak endpoint
+app.post('/api/engagement/streak/reset', (req, res) => {
+  const nickname = (req.query.nickname || '').toLowerCase();
+  if (!nickname || !USER_STREAKS[nickname]) {
+    return res.status(404).json({ success: false, error: 'User not found.' });
+  }
+  USER_STREAKS[nickname] = 1;
+  res.json({ streak: 1 });
+});
+
 // Delete user endpoint
 app.delete('/api/engagement/user', (req, res) => {
   const nickname = (req.body.nickname || '').toLowerCase();
