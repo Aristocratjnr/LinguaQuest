@@ -9,7 +9,7 @@ from crud import (
 )
 import re
 
-router = APIRouter(prefix="/api/v1")
+router = APIRouter()
 
 # Profanity list for username validation
 PROFANITY_LIST = {"badword", "admin", "root", "test", "guest", "anonymous"}

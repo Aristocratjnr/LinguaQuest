@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from database import get_db, User, UserProgressionStage
 from datetime import datetime
 
-router = APIRouter(prefix="/api/v1")
+router = APIRouter()
 
 # Pydantic models for API
 class ProgressionStageBase(BaseModel):
