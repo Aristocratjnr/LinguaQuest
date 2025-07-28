@@ -268,12 +268,12 @@ function AppContent() {
 
   // Fetch club data when user nickname is available
   useEffect(() => {
-    if (user?.nickname) {
-      clubApi.getClub(user.nickname)
+    if (language) {
+      clubApi.getClub(language)
         .then(setClub)
         .catch(err => console.error('Failed to fetch club data', err));
     }
-  }, [user?.nickname]);
+  }, [language]);
   // Add responsive styles and global age validation error UI
   const [ageError, setAgeError] = useState<string | null>(null);
   // Apply theme class to body
@@ -2968,7 +2968,12 @@ function AppContent() {
         </button>
         {/* Club/Group Challenges Button */}
         <button
-          onClick={() => setShowClubModal(true)}
+          onClick={() => {
+            if (!club && language) {
+              clubApi.getClub(language).then(setClub).catch(err => console.error('Failed to fetch club data', err));
+            }
+            setShowClubModal(true);
+          }}
           style={{
             background: 'linear-gradient(135deg, #e3f2fd 0%, #b3e5fc 100%)',
             color: '#1cb0f6',

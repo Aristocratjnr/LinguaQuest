@@ -293,8 +293,8 @@ export interface ClubData {
 }
 
 export const clubApi = {
-  getClub: async (nickname: string): Promise<ClubData> => {
-    const response = await axios.get(getApiUrl('api/club'), { params: { nickname } });
+  getClub: async (languageCode: string): Promise<ClubData> => {
+    const response = await axios.get(getApiUrl(`clubs/${languageCode}`));
     return response.data;
   },
 };
