@@ -288,7 +288,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           position: relative;
           overflow: hidden;
           font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-          padding: 20px;
+          padding: clamp(12px, 3vw, 20px);
         }
 
         .duo-bg-decorations {
@@ -342,26 +342,30 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
 
         .duo-welcome-card {
           background: #ffffff;
-          border-radius: 24px;
+          border-radius: clamp(16px, 4vw, 24px);
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.1);
           max-width: 440px;
           width: 100%;
           position: relative;
           z-index: 1;
           overflow: hidden;
+          min-height: clamp(500px, 80vh, 700px);
+          display: flex;
+          flex-direction: column;
         }
 
-        
-
-        .duo-logo-container {
-          margin-bottom: 20px;
+        .duo-welcome-header {
+          background: linear-gradient(135deg, #58cc02 0%, #4eb600 100%);
+          padding: clamp(24px, 6vw, 48px) clamp(16px, 4vw, 32px) clamp(16px, 4vw, 24px);
+          text-align: center;
+          color: white;
           position: relative;
-          z-index: 2;
+          overflow: hidden;
         }
 
         .duo-logo-circle {
-          width: 80px;
-          height: 80px;
+          width: clamp(64px, 16vw, 80px);
+          height: clamp(64px, 16vw, 80px);
           background: rgba(255, 255, 255, 0.2);
           border-radius: 50%;
           display: flex;
@@ -374,8 +378,8 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         }
 
         .duo-logo-img {
-          width: 48px;
-          height: 48px;
+          width: clamp(36px, 9vw, 48px);
+          height: clamp(36px, 9vw, 48px);
           object-fit: contain;
           filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
         }
@@ -386,28 +390,34 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         }
 
         .duo-welcome-title {
-          font-size: 32px;
+          font-size: clamp(20px, 6vw, 32px);
           font-weight: 800;
-          margin: 0 0 8px 0;
+          margin: 0 0 clamp(4px, 2vw, 8px) 0;
           letter-spacing: -0.5px;
+          line-height: 1.2;
         }
 
         .duo-welcome-tagline {
-          font-size: 16px;
+          font-size: clamp(14px, 3.5vw, 16px);
           margin: 0;
           opacity: 0.9;
           font-weight: 400;
+          line-height: 1.4;
         }
 
         .duo-slide-container {
-          padding: 32px;
+          padding: clamp(16px, 4vw, 32px);
           background: #ffffff;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
         }
 
         .duo-slider-wrapper {
           position: relative;
-          min-height: 280px;
+          min-height: clamp(200px, 50vw, 280px);
           overflow: hidden;
+          flex: 1;
         }
 
         .duo-slide-content {
@@ -420,46 +430,46 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         }
 
         .duo-slide-icon {
-          width: 100px;
-          height: 100px;
+          width: clamp(70px, 18vw, 100px);
+          height: clamp(70px, 18vw, 100px);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 48px;
-          margin-bottom: 24px;
+          font-size: clamp(32px, 8vw, 48px);
+          margin-bottom: clamp(16px, 4vw, 24px);
           animation: iconBounce 4s ease-in-out infinite;
         }
 
         .duo-slide-title {
-          font-size: 24px;
+          font-size: clamp(18px, 5vw, 24px);
           font-weight: 800;
-          margin: 0 0 16px 0;
+          margin: 0 0 clamp(12px, 3vw, 16px) 0;
           color: #3c3c3c;
           letter-spacing: -0.5px;
           line-height: 1.2;
         }
 
         .duo-slide-description {
-          font-size: 16px;
+          font-size: clamp(14px, 3.5vw, 16px);
           color: #777;
           margin: 0;
           line-height: 1.5;
-          max-width: 90%;
+          max-width: 95%;
         }
 
         .duo-cta-section {
-          margin-top: 24px;
+          margin-top: clamp(16px, 4vw, 24px);
         }
 
         .duo-get-started-btn {
           width: 100%;
-          padding: 18px 24px;
+          padding: clamp(14px, 4vw, 18px) clamp(16px, 4vw, 24px);
           background: linear-gradient(180deg, #58cc02 0%, #4eb600 100%);
           border: none;
-          border-radius: 16px;
+          border-radius: clamp(12px, 3vw, 16px);
           color: white;
-          font-size: 16px;
+          font-size: clamp(14px, 3.5vw, 16px);
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 1px;
@@ -467,11 +477,12 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
+          gap: clamp(6px, 2vw, 8px);
           box-shadow: 0 6px 0 #46a302, 0 12px 32px rgba(88, 204, 2, 0.4);
           transition: all 0.2s ease;
           position: relative;
           overflow: hidden;
+          min-height: clamp(48px, 12vw, 60px);
         }
 
         .duo-get-started-btn:hover {
@@ -502,37 +513,37 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         .duo-dots-container {
           display: flex;
           justify-content: center;
-          gap: 8px;
-          margin: 24px 0 20px;
+          gap: clamp(6px, 2vw, 8px);
+          margin: clamp(16px, 4vw, 24px) 0 clamp(12px, 3vw, 20px);
         }
 
         .duo-nav-dot {
-          width: 8px;
-          height: 8px;
+          width: clamp(6px, 2vw, 8px);
+          height: clamp(6px, 2vw, 8px);
           border-radius: 50%;
           cursor: pointer;
           transition: all 0.2s ease;
         }
 
         .duo-nav-dot.active {
-          width: 24px;
-          border-radius: 12px;
+          width: clamp(18px, 5vw, 24px);
+          border-radius: clamp(9px, 2.5vw, 12px);
         }
 
         .duo-nav-buttons {
           display: flex;
           justify-content: space-between;
-          gap: 12px;
+          gap: clamp(8px, 3vw, 12px);
         }
 
         .duo-nav-btn {
           flex: 1;
-          padding: 12px 16px;
+          padding: clamp(10px, 3vw, 12px) clamp(12px, 3vw, 16px);
           border: 2px solid #e5e5e5;
-          border-radius: 12px;
+          border-radius: clamp(8px, 2vw, 12px);
           background: #ffffff;
           color: #777;
-          font-size: 14px;
+          font-size: clamp(12px, 3vw, 14px);
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.5px;
@@ -540,8 +551,9 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 6px;
+          gap: clamp(4px, 1vw, 6px);
           transition: all 0.2s ease;
+          min-height: clamp(40px, 10vw, 48px);
         }
 
         .duo-nav-btn.next {
@@ -572,15 +584,17 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
 
         .duo-welcome-footer {
           background: #f8fafc;
-          padding: 16px 32px;
+          padding: clamp(12px, 3vw, 16px) clamp(16px, 4vw, 32px);
           border-top: 1px solid #e5e5e5;
           display: flex;
           justify-content: space-between;
           align-items: center;
+          flex-wrap: wrap;
+          gap: clamp(8px, 2vw, 12px);
         }
 
         .duo-copyright {
-          font-size: 12px;
+          font-size: clamp(10px, 2.5vw, 12px);
           color: #777;
           font-weight: 500;
         }
@@ -589,12 +603,14 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           background: transparent;
           border: none;
           color: #1cb0f6;
-          font-size: 12px;
+          font-size: clamp(10px, 2.5vw, 12px);
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.5px;
           cursor: pointer;
           transition: all 0.2s ease;
+          padding: clamp(4px, 1vw, 6px) clamp(8px, 2vw, 12px);
+          border-radius: 6px;
         }
 
         @keyframes orbFloat {
@@ -616,70 +632,6 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           0% { left: -100%; }
           50% { left: 100%; }
           100% { left: 100%; }
-        }
-
-        @media (max-width: 480px) {
-          .duo-welcome-bg {
-            padding: 16px;
-          }
-          
-          .duo-welcome-card {
-            border-radius: 20px;
-          }
-          
-          .duo-welcome-header {
-            padding: 32px 24px 24px;
-          }
-          
-          .duo-slide-container {
-            padding: 24px;
-          }
-          
-          .duo-logo-circle {
-            width: 64px;
-            height: 64px;
-          }
-          
-          .duo-logo-img {
-            width: 36px;
-            height: 36px;
-          }
-          
-          .duo-welcome-title {
-            font-size: 28px;
-          }
-          
-          .duo-slide-icon {
-            width: 80px;
-            height: 80px;
-            font-size: 40px;
-          }
-          
-          .duo-slide-title {
-            font-size: 20px;
-          }
-          
-          .duo-slide-description {
-            font-size: 14px;
-          }
-          
-          .duo-welcome-footer {
-            padding: 16px 24px;
-          }
-        }
-
-        @media (max-width: 360px) {
-          .duo-welcome-header {
-            padding: 24px 16px 16px;
-          }
-          
-          .duo-slide-container {
-            padding: 16px;
-          }
-          
-          .duo-welcome-title {
-            font-size: 24px;
-          }
         }
       `}</style>
     </div>
