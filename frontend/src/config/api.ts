@@ -1,11 +1,20 @@
 // API Configuration
 export const getApiBaseUrl = (): string => {
-  // In production (Vercel), use the production backend
+  // 1. Prefer environment variable injected at build time (Vite/CRA)
+  const envUrl = (import.meta as any).env?.VITE_BACKEND_URL || (process.env as any).REACT_APP_BACKEND_URL;
+  if (envUrl) return envUrl;
+
+  // 2. Check for global variable injected at runtime (e.g. set in index.html before bundle)
   if (typeof (globalThis as any).__BACKEND_URL__ !== 'undefined') {
     return (globalThis as any).__BACKEND_URL__;
   }
-  
-  // Fallback for development - try port 8000 where the server is running
+
+  // 3. Fallback to same-origin (assumes backend and frontend served together)
+  if (typeof window !== 'undefined' && window.location.origin) {
+    return window.location.origin;
+  }
+
+  // 4. Last resort: localhost for dev
   return 'http://127.0.0.1:8000';
 };
 
