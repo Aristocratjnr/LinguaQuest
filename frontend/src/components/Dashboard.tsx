@@ -3047,12 +3047,16 @@ function AppContent() {
         </button>
       </div>
       {/* Club/Group Challenges Modal */}
-      {showClubModal && club && (
-        <LanguageClub
-          club={club}
-          mascotImg={mascotImg}
-          onClose={() => setShowClubModal(false)}
-        />
+      {showClubModal && (
+        club ? (
+          <LanguageClub
+            club={club}
+            mascotImg={mascotImg}
+            onClose={() => setShowClubModal(false)}
+          />
+        ) : (
+          <div style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'rgba(0,0,0,0.6)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:4000,color:'#fff',fontSize:'1.25rem'}}>Loading club data...</div>
+        )
       )}
       {/* Progression Map Modal */}
       {showProgressionMap && (

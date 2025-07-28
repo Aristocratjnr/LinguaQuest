@@ -23,7 +23,7 @@ export const getApiUrl = (endpoint: string): string => {
   
   // FastAPI server endpoints (development and production)
   // All these endpoints use /api/v1 prefix in the FastAPI backend
-  const v1Endpoints = ['users', 'scores', 'sessions', 'stats', 'leaderboard', 'streak', 'badges', 'progression'];
+  const v1Endpoints = ['users', 'scores', 'sessions', 'stats', 'leaderboard', 'streak', 'badges', 'progression', 'clubs'];
   const needsV1Prefix = v1Endpoints.some(v1Endpoint => endpoint.startsWith(v1Endpoint));
   
   if (needsV1Prefix) {
