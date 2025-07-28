@@ -5,8 +5,8 @@ export const getApiBaseUrl = (): string => {
     return (globalThis as any).__BACKEND_URL__;
   }
   
-  // Fallback for development
-  return 'http://127.0.0.1:8002';
+  // Fallback for development - try port 8000 where the server is running
+  return 'http://127.0.0.1:8000';
 };
 
 // Check if we're in production (using the optimized backend)
