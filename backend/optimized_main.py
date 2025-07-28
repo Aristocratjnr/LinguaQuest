@@ -182,6 +182,15 @@ class SentimentResponse(BaseModel):
     confidence: float
     details: dict
 
+class ClubResponse(BaseModel):
+    id: str
+    name: str
+    description: str
+    language: str
+    member_count: int
+    level_requirement: int
+    created_at: str
+
 # Language mappings (simplified)
 EXTERNAL_LANG_MAP = {
     'en': 'en', 'fr': 'fr', 'es': 'es', 'de': 'de', 'pt': 'pt',
@@ -274,6 +283,30 @@ def get_user(nickname: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found.")
     return user
 
+@app.put("/api/v1/users/{nickname}", response_model=UserResponse)
+def update_user(nickname: str, user_data: dict = Body(...), db: Session = Depends(get_db)):
+    """Update user by nickname"""
+    user = get_user_by_nickname(db, nickname)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+    
+    try:
+        # Update user fields if provided
+        if 'email' in user_data:
+            user.email = user_data['email']
+        if 'favorite_language' in user_data:
+            user.favorite_language = user_data['favorite_language']
+        if 'avatar_url' in user_data:
+            user.avatar_url = user_data['avatar_url']
+        
+        db.commit()
+        db.refresh(user)
+        return user
+    except Exception as e:
+        db.rollback()
+        print(f"User update error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update user.")
+
 @app.post("/api/v1/users/{nickname}/login")
 def user_login(nickname: str, db: Session = Depends(get_db)):
     """Update user's last login time"""
@@ -288,8 +321,14 @@ def user_login(nickname: str, db: Session = Depends(get_db)):
         print(f"Login update error: {e}")
         return {"status": "error", "message": "Failed to record login"}
 
+# Add /scenario endpoint (without /api/v1 prefix) for backward compatibility
+@app.post("/scenario", response_model=ScenarioResponse)
+def get_scenario_legacy(req: ScenarioRequest):
+    """Legacy scenario endpoint for backward compatibility"""
+    return get_scenario_v1(req)
+
 @app.post("/api/v1/scenario", response_model=ScenarioResponse)
-def get_scenario(req: ScenarioRequest):
+def get_scenario_v1(req: ScenarioRequest):
     """Get a debate scenario with optimized translation"""
     try:
         print(f"Scenario request: {req.category}, {req.difficulty}, {req.language}")
@@ -321,6 +360,52 @@ def get_scenario(req: ScenarioRequest):
     except Exception as e:
         print(f"Scenario error: {e}")
         return ScenarioResponse(scenario="Error generating scenario.", language="en")
+
+@app.get("/api/v1/clubs/{language}", response_model=ClubResponse)
+def get_club(language: str):
+    """Get language club information"""
+    try:
+        # Mock club data based on language
+        clubs_data = {
+            "twi": {
+                "id": "twi_club",
+                "name": "Twi Learning Club",
+                "description": "Learn Twi with fellow language enthusiasts",
+                "language": "twi",
+                "member_count": 142,
+                "level_requirement": 1,
+                "created_at": "2024-01-15T00:00:00Z"
+            },
+            "gaa": {
+                "id": "gaa_club", 
+                "name": "Gaa Language Club",
+                "description": "Master Gaa language with native speakers",
+                "language": "gaa",
+                "member_count": 87,
+                "level_requirement": 1,
+                "created_at": "2024-02-01T00:00:00Z"
+            },
+            "ewe": {
+                "id": "ewe_club",
+                "name": "Ewe Learning Circle", 
+                "description": "Connect with Ewe language learners",
+                "language": "ewe",
+                "member_count": 96,
+                "level_requirement": 1,
+                "created_at": "2024-01-20T00:00:00Z"
+            }
+        }
+        
+        if language in clubs_data:
+            return ClubResponse(**clubs_data[language])
+        else:
+            raise HTTPException(status_code=404, detail=f"Club for language '{language}' not found")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Club fetch error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch club information")
 
 @app.post("/api/v1/translate", response_model=TranslationResponse)
 def translate_text(req: TranslationRequest):
