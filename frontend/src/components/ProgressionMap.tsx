@@ -29,11 +29,50 @@ const ProgressionMap: React.FC<ProgressionMapProps> = ({ onClose }) => {
           return;
         }
 
+        console.log('Fetching progression for user:', nickname);
         const data = await progressionApi.getProgression(nickname);
+        console.log('Progression data received:', data);
         setSkillTree(data);
         setError('');
-      } catch (err) {
-        setError(handleApiError(err));
+      } catch (err: any) {
+        console.error('Progression fetch error:', err);
+        
+        // Provide fallback progression data
+        const fallbackProgression = [
+          {
+            id: 'basics',
+            label: 'Language Basics',
+            unlocked: true,
+            children: [
+              { id: 'basics_1', label: 'Introduction', unlocked: true },
+              { id: 'basics_2', label: 'Simple Phrases', unlocked: false },
+              { id: 'basics_3', label: 'Basic Grammar', unlocked: false }
+            ]
+          },
+          {
+            id: 'food',
+            label: 'Food & Dining',
+            unlocked: false,
+            children: [
+              { id: 'food_1', label: 'Basic Food Terms', unlocked: false },
+              { id: 'food_2', label: 'Restaurant Conversations', unlocked: false },
+              { id: 'food_3', label: 'Cooking & Recipes', unlocked: false }
+            ]
+          },
+          {
+            id: 'travel',
+            label: 'Travel & Transportation',
+            unlocked: false,
+            children: [
+              { id: 'travel_1', label: 'Directions', unlocked: false },
+              { id: 'travel_2', label: 'Transportation', unlocked: false },
+              { id: 'travel_3', label: 'Hotels & Accommodation', unlocked: false }
+            ]
+          }
+        ];
+        
+        setSkillTree(fallbackProgression);
+        setError('Using demo data - server connection failed.');
       } finally {
         setLoading(false);
       }
@@ -41,8 +80,8 @@ const ProgressionMap: React.FC<ProgressionMapProps> = ({ onClose }) => {
 
     fetchProgression();
 
-    // Set up polling for real-time updates
-    const pollInterval = setInterval(fetchProgression, 30000); // Poll every 30 seconds
+    // Set up polling for real-time updates (but less frequent to reduce server load)
+    const pollInterval = setInterval(fetchProgression, 60000); // Poll every 60 seconds
 
     return () => clearInterval(pollInterval);
   }, []);

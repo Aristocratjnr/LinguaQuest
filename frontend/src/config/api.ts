@@ -38,6 +38,7 @@ export const getApiUrl = (endpoint: string): string => {
   if (needsV1Prefix) {
     return `${baseUrl}/api/v1/${endpoint}`;
   } else {
-    return `${baseUrl}/${endpoint}`;
+    // Legacy endpoints that don't use /api/v1 prefix
+    return `${baseUrl}/api/${endpoint}`;
   }
 };

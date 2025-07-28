@@ -38,16 +38,80 @@ const { theme } = useSettings();
       try {
         setLoading(true);
         setError('');
+        console.log('Fetching leaderboard data...');
         const leaderboardRes = await gameApi.getLeaderboard(limit, page * limit, sortBy, sortDir);
         console.log('Leaderboard response:', leaderboardRes);
-        if (!Array.isArray(leaderboardRes)) {
-          setError('Leaderboard data is not an array. Check backend response format.');
-          setEntries([]);
+        
+        // Handle different response formats with proper typing
+        let leaderboardData: LeaderboardEntry[] = [];
+        
+        if (Array.isArray(leaderboardRes)) {
+          // Direct array response
+          leaderboardData = leaderboardRes as LeaderboardEntry[];
+        } else if (leaderboardRes && typeof leaderboardRes === 'object' && 'leaderboard' in leaderboardRes) {
+          // Wrapped response format
+          const wrappedData = leaderboardRes as { leaderboard: LeaderboardEntry[] };
+          leaderboardData = Array.isArray(wrappedData.leaderboard) ? wrappedData.leaderboard : [];
         } else {
-          setEntries(leaderboardRes);
+          console.error('Leaderboard data is not in expected format:', leaderboardRes);
+          setError('Invalid leaderboard data format received from server.');
+          setEntries([]);
+          return;
         }
-      } catch (err) {
-        setError('Failed to load leaderboard data.');
+        
+        console.log('Setting leaderboard entries:', leaderboardData);
+        setEntries(leaderboardData);
+      } catch (err: any) {
+        console.error('Leaderboard fetch error:', err);
+        
+        // Provide fallback data when server is unavailable
+        const fallbackEntries = [
+          {
+            rank: 1,
+            nickname: "Demo Player 1",
+            avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=demo1",
+            total_score: 1250,
+            highest_score: 10,
+            games_played: 15,
+            current_streak: 5,
+            longest_streak: 8,
+            badges_count: 3,
+            last_activity: new Date().toISOString(),
+            favorite_language: "twi",
+            level: 12
+          },
+          {
+            rank: 2,
+            nickname: "Demo Player 2", 
+            avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=demo2",
+            total_score: 1100,
+            highest_score: 9,
+            games_played: 12,
+            current_streak: 3,
+            longest_streak: 6,
+            badges_count: 2,
+            last_activity: new Date().toISOString(),
+            favorite_language: "twi",
+            level: 11
+          },
+          {
+            rank: 3,
+            nickname: "Demo Player 3",
+            avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=demo3", 
+            total_score: 950,
+            highest_score: 8,
+            games_played: 10,
+            current_streak: 2,
+            longest_streak: 4,
+            badges_count: 1,
+            last_activity: new Date().toISOString(),
+            favorite_language: "twi",
+            level: 9
+          }
+        ];
+        
+        setEntries(fallbackEntries);
+        setError('Using demo data - server connection failed.');
       } finally {
         setLoading(false);
       }
