@@ -30,6 +30,7 @@ import Age from './Age';
 import mascotImg from '../assets/images/logo.png'; // Use logo as mascot, or replace with mascot image
 
 import LanguageSelector from './LanguageSelector';
+import { clubApi, ClubData } from '../services/api';
 import ProgressionMap from './ProgressionMap';
 import LanguageClub from './LanguageClub';
 import { Routes, Route, useNavigate } from 'react-router-dom';
@@ -263,19 +264,16 @@ function AppContent() {
   ];
   // Language Club/Group Challenges state
   const [showClubModal, setShowClubModal] = useState(false);
-  // Example club data (replace with real data later)
-  const CLUB = {
-    name: 'Lingua Legends',
-    members: [
-      { nickname: nickname || 'You', xp: 320, avatar: avatar || mascotImg },
-      { nickname: 'Ama', xp: 280, avatar: undefined },
-      { nickname: 'Kwame', xp: 210, avatar: undefined },
-      { nickname: 'Esi', xp: 150, avatar: undefined },
-    ],
-    groupGoal: 1000,
-    groupProgress: 760,
-    challenge: 'Earn 1000 XP as a club this week!'
-  };
+  const [club, setClub] = useState<ClubData | null>(null);
+
+  // Fetch club data when user nickname is available
+  useEffect(() => {
+    if (language) {
+      clubApi.getClub(language)
+        .then(setClub)
+        .catch(err => console.error('Failed to fetch club data', err));
+    }
+  }, [language]);
   // Add responsive styles and global age validation error UI
   const [ageError, setAgeError] = useState<string | null>(null);
   // Apply theme class to body
@@ -331,13 +329,18 @@ function AppContent() {
   }, [user, scenario, loading, category, difficulty, language]);
 
   // Fetch scenario
-  const fetchScenario = async () => {
+  const fetchScenario = async (curRound: any = round) => {
+    // If triggered by click event, curRound will be an event object; normalize it to current round
+    if (typeof curRound !== 'number') {
+      curRound = round;
+    }
     setLoading(true);
     try {
       const res = await axios.post<ScenarioResponse>(`${API_BASE_URL}/scenario`, { 
         category, 
         difficulty,
-        language: language // Pass current language to get scenario in that language
+        language: language, // Pass current language to get scenario in that language
+        round: curRound
       });
       setScenario(res.data.scenario);
       setLanguage(res.data.language || language);
@@ -381,8 +384,9 @@ function AppContent() {
   // Next round logic
   const nextRound = async () => {
     if (round < TOTAL_ROUNDS) {
-      setRound(r => r + 1);
-      await fetchScenario();
+      const newRound = round + 1;
+      setRound(newRound);
+      await fetchScenario(newRound);
     } else {
       setRoundResult('gameover');
       setTimerActive(false);
@@ -2964,7 +2968,12 @@ function AppContent() {
         </button>
         {/* Club/Group Challenges Button */}
         <button
-          onClick={() => setShowClubModal(true)}
+          onClick={() => {
+            if (!club && language) {
+              clubApi.getClub(language).then(setClub).catch(err => console.error('Failed to fetch club data', err));
+            }
+            setShowClubModal(true);
+          }}
           style={{
             background: 'linear-gradient(135deg, #e3f2fd 0%, #b3e5fc 100%)',
             color: '#1cb0f6',
@@ -3039,11 +3048,15 @@ function AppContent() {
       </div>
       {/* Club/Group Challenges Modal */}
       {showClubModal && (
-        <LanguageClub
-          club={CLUB}
-          mascotImg={mascotImg}
-          onClose={() => setShowClubModal(false)}
-        />
+        club ? (
+          <LanguageClub
+            club={club}
+            mascotImg={mascotImg}
+            onClose={() => setShowClubModal(false)}
+          />
+        ) : (
+          <div style={{position:'fixed',top:0,left:0,width:'100vw',height:'100vh',background:'rgba(0,0,0,0.6)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:4000,color:'#fff',fontSize:'1.25rem'}}>Loading club data...</div>
+        )
       )}
       {/* Progression Map Modal */}
       {showProgressionMap && (

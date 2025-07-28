@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import defaultAvatar from '../assets/images/avatar.jpg';
+import { API_BASE_URL } from '../config/api';
 import boyAvatar from '../assets/images/boy.jpg';
 import womanAvatar from '../assets/images/woman.jpg';
 
@@ -164,7 +165,17 @@ const LanguageClub: React.FC<LanguageClubProps> = ({ club, mascotImg, onClose })
             {sortedMembers.map((m, idx) => {
               // Assign avatars in round-robin order if member.avatar is not set
               const fallbackAvatars = [defaultAvatar, boyAvatar, womanAvatar];
-              const assignedAvatar = m.avatar || fallbackAvatars[idx % fallbackAvatars.length] || mascotImg;
+              let assignedAvatar = '';
+              if (m.avatar) {
+                // If avatar is a relative path, prepend backend base URL; otherwise use as is
+                if (m.avatar.startsWith('http')) {
+                  assignedAvatar = m.avatar;
+                } else {
+                  assignedAvatar = `${API_BASE_URL}/${m.avatar.replace(/^\//,'')}`;
+                }
+              } else {
+                assignedAvatar = fallbackAvatars[idx % fallbackAvatars.length] || mascotImg;
+              }
               return (
                 <motion.div
                   key={m.nickname}
