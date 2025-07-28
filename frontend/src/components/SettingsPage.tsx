@@ -28,7 +28,7 @@ const THEMES = [
 
 const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const { language, setLanguage, theme, setTheme, sound, setSound } = useSettings();
-  const { user, updateUser, logout } = useUser();
+  const { user, updateUser, logout, userStats } = useUser();
   
   // Use user data for nickname and avatar, fallback to settings context
   const nickname = user?.nickname || '';
@@ -49,39 +49,105 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Only fetch engagement data if we have a valid nickname
+    if (!nickname || nickname.trim() === '') {
+      console.log('No nickname available, skipping engagement data fetch');
+      
+      // Use userStats as fallback if available
+      if (userStats) {
+        console.log('Using userStats as fallback:', userStats);
+        setStreak(userStats.current_streak || 1);
+        // Calculate level from total score (every 100 points = 1 level)
+        const calculatedLevel = Math.max(1, Math.floor((userStats.total_score || 0) / 100) + 1);
+        setLevel(calculatedLevel);
+        setLoading(false);
+        setError(null);
+        return;
+      }
+      
+      setLoading(false);
+      setError('No user logged in');
+      return;
+    }
+
     setLoading(true);
     setError(null);
+    console.log('Fetching engagement data for:', nickname);
+    
     Promise.all([
-      engagementApi.getStreak(nickname),
-      engagementApi.getLevel(nickname)
+      engagementApi.getStreak(nickname).catch(err => {
+        console.error('Failed to get streak:', err);
+        // Use userStats as fallback if available
+        return { streak: userStats?.current_streak || 1 };
+      }),
+      engagementApi.getLevel(nickname).catch(err => {
+        console.error('Failed to get level:', err);
+        // Calculate level from userStats if available
+        const calculatedLevel = userStats ? Math.max(1, Math.floor((userStats.total_score || 0) / 100) + 1) : 1;
+        return { level: calculatedLevel };
+      })
     ])
       .then(([streakRes, levelRes]) => {
+        console.log('Engagement data received:', { streak: streakRes.streak, level: levelRes.level });
         setStreak(streakRes.streak);
         setLevel(levelRes.level);
+        setError(null); // Clear any previous errors
       })
-      .catch(() => setError('Failed to load engagement stats.'))
+      .catch((err) => {
+        console.error('Failed to load engagement stats:', err);
+        
+        // Use userStats as final fallback
+        if (userStats) {
+          console.log('Using userStats as final fallback');
+          setStreak(userStats.current_streak || 1);
+          const calculatedLevel = Math.max(1, Math.floor((userStats.total_score || 0) / 100) + 1);
+          setLevel(calculatedLevel);
+          setError('Engagement API unavailable. Showing data from user stats.');
+        } else {
+          setError('Failed to load engagement stats. Using default values.');
+          setStreak(1);
+          setLevel(1);
+        }
+      })
       .finally(() => setLoading(false));
-  }, [nickname]);
+  }, [nickname, userStats]);
 
   const handleResetStreak = async () => {
+    if (!nickname) {
+      toast.error('No user logged in');
+      return;
+    }
+    
     setResetting(true);
     try {
+      console.log('Resetting streak for:', nickname);
       const res = await engagementApi.resetStreak(nickname);
+      console.log('Streak reset response:', res);
       setStreak(res.streak);
       toast.success('Streak reset to 1.');
-    } catch {
+    } catch (err) {
+      console.error('Failed to reset streak:', err);
       toast.error('Failed to reset streak.');
     } finally {
       setResetting(false);
     }
   };
+  
   const handleResetLevel = async () => {
+    if (!nickname) {
+      toast.error('No user logged in');
+      return;
+    }
+    
     setResetting(true);
     try {
+      console.log('Resetting level for:', nickname);
       const res = await engagementApi.updateLevel(nickname, 1);
+      console.log('Level reset response:', res);
       setLevel(res.level);
       toast.success('Level reset to 1.');
-    } catch {
+    } catch (err) {
+      console.error('Failed to reset level:', err);
       toast.error('Failed to reset level.');
     } finally {
       setResetting(false);
