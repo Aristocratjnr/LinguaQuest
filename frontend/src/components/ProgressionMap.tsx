@@ -98,6 +98,9 @@ const renderNode = (node: ProgressionStage, isChild = false) => {
   const icon = node.unlocked
     ? isChild ? 'star' : 'check_circle'
     : 'lock';
+  
+  const isMobile = window.innerWidth <= 768;
+  
   return (
     <motion.div
       key={node.id}
@@ -110,17 +113,21 @@ const renderNode = (node: ProgressionStage, isChild = false) => {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: 6,
+        gap: isMobile ? 4 : 6,
         background: node.unlocked
           ? isChild
             ? 'linear-gradient(135deg, #e0ffe6 0%, #d7f7c8 100%)'
             : 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)'
           : '#f0f0f0',
-        borderRadius: 18,
-        padding: isChild ? '12px 18px' : '18px 24px',
+        borderRadius: isMobile ? 12 : 18,
+        padding: isChild 
+          ? isMobile ? '8px 12px' : '12px 18px'
+          : isMobile ? '12px 16px' : '18px 24px',
         boxShadow: node.unlocked ? '0 2px 8px #58cc0222' : 'none',
         border: `2px solid ${color}`,
-        minWidth: isChild ? 70 : 110,
+        minWidth: isChild 
+          ? isMobile ? 60 : 70
+          : isMobile ? 80 : 110,
         cursor: 'pointer',
         position: 'relative',
       }}
@@ -131,13 +138,25 @@ const renderNode = (node: ProgressionStage, isChild = false) => {
         className="material-icons"
         style={{
           color: !node.unlocked ? '#FFD700' : color,
-          fontSize: isChild ? 26 : 32,
+          fontSize: isChild 
+            ? isMobile ? 20 : 26
+            : isMobile ? 24 : 32,
           filter: node.unlocked ? 'drop-shadow(0 2px 8px #58cc0255)' : 'none',
         }}
       >
         {icon}
       </span>
-      <span style={{ fontSize: isChild ? '1.05rem' : '1.15rem', color, fontFamily: 'Fira Mono, Menlo, Consolas, monospace', fontWeight: 300 }}>{node.label}</span>
+      <span style={{ 
+        fontSize: isChild 
+          ? isMobile ? '0.8rem' : '1.05rem'
+          : isMobile ? '0.9rem' : '1.15rem', 
+        color, 
+        fontFamily: 'Fira Mono, Menlo, Consolas, monospace', 
+        fontWeight: 300,
+        textAlign: 'center',
+        lineHeight: isMobile ? 1.2 : 1.3,
+        wordBreak: isMobile ? 'break-word' : 'normal'
+      }}>{node.label}</span>
     </motion.div>
   );
 };
@@ -176,20 +195,20 @@ const renderNode = (node: ProgressionStage, isChild = false) => {
           transition={{ duration: 0.4 }}
           style={{
             background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
-            borderRadius: 32,
+            borderRadius: window.innerWidth <= 768 ? 16 : 32,
             boxShadow: '0 12px 40px #58cc0222, 0 2px 8px #58cc0222',
-            minWidth: 320,
-            maxWidth: '95vw',
-            minHeight: 320,
-            maxHeight: '90vh',
-            padding: '40px 24px 32px 24px',
+            minWidth: window.innerWidth <= 768 ? 280 : 320,
+            maxWidth: window.innerWidth <= 768 ? '98vw' : '95vw',
+            width: window.innerWidth <= 768 ? '98vw' : 'auto',
+            minHeight: window.innerWidth <= 768 ? 280 : 320,
+            maxHeight: window.innerWidth <= 768 ? '95vh' : '90vh',
+            padding: window.innerWidth <= 768 ? '20px 12px 16px 12px' : '40px 24px 32px 24px',
             overflowY: 'auto',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             position: 'relative',
-            border: '2.5px solid #58cc02',
-            // Add a class for custom scrollbar
+            border: `${window.innerWidth <= 768 ? 2 : 2.5}px solid #58cc02`,
           }}
           className="progression-map-scrollable"
         >
@@ -197,55 +216,124 @@ const renderNode = (node: ProgressionStage, isChild = false) => {
             onClick={onClose}
             style={{
               position: 'absolute',
-              top: 16,
-              right: 16,
+              top: window.innerWidth <= 768 ? 8 : 16,
+              right: window.innerWidth <= 768 ? 8 : 16,
               background: 'none',
               border: 'none',
-              fontSize: 28,
+              fontSize: window.innerWidth <= 768 ? 24 : 28,
               color: '#58cc02',
               cursor: 'pointer',
+              padding: '4px',
+              zIndex: 10,
             }}
             title="Close"
           >
             <span className="material-icons">close</span>
           </button>
-<h2 style={{ color: '#58cc02', marginBottom: 8, fontSize: '2rem', letterSpacing: '.01em', fontFamily: 'Fira Mono, Menlo, Consolas, monospace', fontWeight: 300 }}>
-            <span className="material-icons" style={{ verticalAlign: 'middle', fontSize: 32, marginRight: 8 }}>account_tree</span>
+<h2 style={{ 
+            color: '#58cc02', 
+            marginBottom: 8, 
+            fontSize: window.innerWidth <= 768 ? '1.5rem' : '2rem', 
+            letterSpacing: '.01em', 
+            fontFamily: 'Fira Mono, Menlo, Consolas, monospace', 
+            fontWeight: 300,
+            textAlign: 'center',
+            paddingRight: window.innerWidth <= 768 ? '40px' : '0'
+          }}>
+            <span className="material-icons" style={{ 
+              verticalAlign: 'middle', 
+              fontSize: window.innerWidth <= 768 ? 24 : 32, 
+              marginRight: window.innerWidth <= 768 ? 4 : 8 
+            }}>account_tree</span>
             Progression Map
           </h2>
           {loading && (
-            <div style={{ color: '#58cc02', marginBottom: 18, textAlign: 'center' }}>
-              <span className="material-icons" style={{ fontSize: 24, verticalAlign: 'middle', marginRight: 8 }}>hourglass_top</span>
+            <div style={{ 
+              color: '#58cc02', 
+              marginBottom: 18, 
+              textAlign: 'center',
+              fontSize: window.innerWidth <= 768 ? '0.9rem' : '1rem'
+            }}>
+              <span className="material-icons" style={{ 
+                fontSize: window.innerWidth <= 768 ? 20 : 24, 
+                verticalAlign: 'middle', 
+                marginRight: window.innerWidth <= 768 ? 4 : 8 
+              }}>hourglass_top</span>
               Loading...
             </div>
           )}
           {error && (
-            <div style={{ color: '#ff4b4b', marginBottom: 18, textAlign: 'center' }}>
-              <span className="material-icons" style={{ fontSize: 24, verticalAlign: 'middle', marginRight: 8 }}>error</span>
+            <div style={{ 
+              color: '#ff4b4b', 
+              marginBottom: 18, 
+              textAlign: 'center',
+              fontSize: window.innerWidth <= 768 ? '0.9rem' : '1rem',
+              padding: window.innerWidth <= 768 ? '0 8px' : '0'
+            }}>
+              <span className="material-icons" style={{ 
+                fontSize: window.innerWidth <= 768 ? 20 : 24, 
+                verticalAlign: 'middle', 
+                marginRight: window.innerWidth <= 768 ? 4 : 8 
+              }}>error</span>
               {error}
             </div>
           )}
-          <div style={{ color: '#3caa3c', marginBottom: 18, fontSize: '1.1rem', fontFamily: 'Fira Mono, Menlo, Consolas, monospace', fontWeight: 300 }}>
+          <div style={{ 
+            color: '#3caa3c', 
+            marginBottom: 18, 
+            fontSize: window.innerWidth <= 768 ? '1rem' : '1.1rem', 
+            fontFamily: 'Fira Mono, Menlo, Consolas, monospace', 
+            fontWeight: 300,
+            textAlign: 'center'
+          }}>
             {unlockedNodes} / {totalNodes} skills unlocked
           </div>
-          <div style={{ width: '100%', maxWidth: 520, margin: '0 auto' }}>
+          <div style={{ 
+            width: '100%', 
+            maxWidth: window.innerWidth <= 768 ? '100%' : 520, 
+            margin: '0 auto',
+            padding: window.innerWidth <= 768 ? '0 4px' : '0'
+          }}>
             {skillTree.map((cat, i) => (
-              <div key={cat.id} style={{ marginBottom: 32, position: 'relative' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div key={cat.id} style={{ 
+                marginBottom: window.innerWidth <= 768 ? 20 : 32, 
+                position: 'relative' 
+              }}>
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: window.innerWidth <= 768 ? 8 : 16,
+                  flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
+                  textAlign: window.innerWidth <= 768 ? 'center' : 'left'
+                }}>
                   {renderNode(cat)}
-                  {/* Connecting lines to children */}
-                  {cat.children && cat.children.length > 0 && (
+                  {/* Connecting lines to children - hide on mobile for cleaner look */}
+                  {cat.children && cat.children.length > 0 && window.innerWidth > 768 && (
                     <div style={{ height: 2, width: 32, background: '#bdbdbd', marginLeft: 8, marginRight: 8, borderRadius: 1 }} />
                   )}
-                  <div style={{ fontSize: '1.3rem', color: cat.unlocked ? '#58cc02' : '#bdbdbd', letterSpacing: '.01em', fontFamily: 'Fira Mono, Menlo, Consolas, monospace', fontWeight: 300 }}>{cat.label}</div>
+                  <div style={{ 
+                    fontSize: window.innerWidth <= 768 ? '1.1rem' : '1.3rem', 
+                    color: cat.unlocked ? '#58cc02' : '#bdbdbd', 
+                    letterSpacing: '.01em', 
+                    fontFamily: 'Fira Mono, Menlo, Consolas, monospace', 
+                    fontWeight: 300,
+                    marginTop: window.innerWidth <= 768 ? '8px' : '0'
+                  }}>{cat.label}</div>
                 </div>
                 {/* Children nodes */}
                 {cat.children && (
-                  <div style={{ display: 'flex', gap: 28, marginLeft: 80, marginTop: 16 }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    gap: window.innerWidth <= 768 ? 12 : 28, 
+                    marginLeft: window.innerWidth <= 768 ? 0 : 80, 
+                    marginTop: 16,
+                    flexWrap: window.innerWidth <= 768 ? 'wrap' : 'nowrap',
+                    justifyContent: window.innerWidth <= 768 ? 'center' : 'flex-start'
+                  }}>
                     {cat.children.map(child => renderNode(child, true))}
                   </div>
                 )}
-                {i < skillTree.length - 1 && (
+                {i < skillTree.length - 1 && window.innerWidth > 768 && (
                   <div style={{ height: 36, borderLeft: '3px dashed #bdbdbd', margin: '0 0 0 32px' }} />
                 )}
               </div>
@@ -276,35 +364,53 @@ const renderNode = (node: ProgressionStage, isChild = false) => {
                 <div
                   style={{
                     background: '#fff',
-                    borderRadius: 24,
+                    borderRadius: window.innerWidth <= 768 ? 16 : 24,
                     boxShadow: '0 8px 32px #58cc0222',
-                    padding: '32px 28px',
-                    minWidth: 260,
-                    maxWidth: '90vw',
+                    padding: window.innerWidth <= 768 ? '20px 16px' : '32px 28px',
+                    minWidth: window.innerWidth <= 768 ? 240 : 260,
+                    maxWidth: window.innerWidth <= 768 ? '85vw' : '90vw',
                     textAlign: 'center',
                     position: 'relative',
                     fontFamily: 'Fira Mono, Menlo, Consolas, monospace',
                     fontWeight: 300,
+                    margin: window.innerWidth <= 768 ? '0 16px' : '0',
                   }}
                   onClick={e => e.stopPropagation()}
                 >
-                  <span className="material-icons" style={{ fontSize: 40, color: selectedNode.unlocked ? '#58cc02' : '#FFD700', marginBottom: 8 }}>
+                  <span className="material-icons" style={{ 
+                    fontSize: window.innerWidth <= 768 ? 32 : 40, 
+                    color: selectedNode.unlocked ? '#58cc02' : '#FFD700', 
+                    marginBottom: window.innerWidth <= 768 ? 6 : 8 
+                  }}>
                     {selectedNode.unlocked ? 'emoji_events' : 'lock'}
                   </span>
-                  <h3 style={{ fontSize: '1.3rem', margin: 0, fontFamily: 'Fira Mono, Menlo, Consolas, monospace', fontWeight: 300 }}>{selectedNode.label}</h3>
-                  <div style={{ color: '#6c6f7d', fontSize: '1rem', margin: '12px 0 0 0', fontFamily: 'Fira Mono, Menlo, Consolas, monospace', fontWeight: 300 }}>
+                  <h3 style={{ 
+                    fontSize: window.innerWidth <= 768 ? '1.1rem' : '1.3rem', 
+                    margin: 0, 
+                    fontFamily: 'Fira Mono, Menlo, Consolas, monospace', 
+                    fontWeight: 300,
+                    lineHeight: 1.3
+                  }}>{selectedNode.label}</h3>
+                  <div style={{ 
+                    color: '#6c6f7d', 
+                    fontSize: window.innerWidth <= 768 ? '0.9rem' : '1rem', 
+                    margin: window.innerWidth <= 768 ? '8px 0 0 0' : '12px 0 0 0', 
+                    fontFamily: 'Fira Mono, Menlo, Consolas, monospace', 
+                    fontWeight: 300,
+                    lineHeight: 1.4
+                  }}>
                     {selectedNode.unlocked ? 'Skill unlocked! Keep progressing.' : 'This skill is locked. Complete previous skills to unlock.'}
                   </div>
                   <button
                     onClick={() => setSelectedNode(null)}
                     style={{
-                      marginTop: 18,
-                      padding: '8px 22px',
-                      borderRadius: 14,
+                      marginTop: window.innerWidth <= 768 ? 14 : 18,
+                      padding: window.innerWidth <= 768 ? '6px 18px' : '8px 22px',
+                      borderRadius: window.innerWidth <= 768 ? 12 : 14,
                       background: '#58cc02',
                       color: '#fff',
                       border: 'none',
-                      fontSize: '0.98rem',
+                      fontSize: window.innerWidth <= 768 ? '0.9rem' : '0.98rem',
                       cursor: 'pointer',
                       boxShadow: '0 2px 8px #58cc0222',
                       transition: 'all 0.2s',
