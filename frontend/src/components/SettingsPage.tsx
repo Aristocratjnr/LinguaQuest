@@ -27,16 +27,18 @@ const THEMES = [
 ];
 
 const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const { language, setLanguage, theme, setTheme, sound, setSound } = useSettings();
+  const { language, setLanguage, theme, setTheme, sound, setSound, resolvedTheme } = useSettings();
   const { user, updateUser, logout, userStats } = useUser();
-  
+
   // Use user data for nickname and avatar, fallback to settings context
   const nickname = user?.nickname || '';
   const avatar = user?.avatar || AVATARS[0];
-  
+
   // Use user preferences for language and theme when logged in, fallback to settings context
   const currentLanguage = user?.preferences?.language || language;
+  // Use resolvedTheme for actual UI mode (dark/light), not just the selected value
   const currentTheme = user?.preferences?.theme || theme;
+  const isDark = resolvedTheme === 'dark';
   
   // Engagement state
   const [streak, setStreak] = useState<number | null>(null);
@@ -214,18 +216,16 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     setSound(!sound);
   };
 
-  // Theme-aware styles
-  const isDark = currentTheme === 'dark';
+  // Theme-aware styles (now use resolvedTheme)
   const bgGradient = isDark
     ? 'linear-gradient(135deg, #232946 0%, #181c2a 100%)'
     : 'linear-gradient(135deg, #f5f7fa 0%, #e4e9f3 100%)';
-  
+
   const cardBackground = isDark ? '#232946' : '#ffffff';
-const cardBorder = isDark ? '1px solid #44476a' : '1px solid #d1d5db';
-const cardBoxShadow = isDark 
-  ? '0 4px 16px rgba(0, 0, 0, 0.2)' 
-  : '0 4px 16px rgba(0, 0, 0, 0.08)';
-  
+  const cardBorder = isDark ? '1px solid #44476a' : '1px solid #d1d5db';
+  const cardBoxShadow = isDark 
+    ? '0 4px 16px rgba(0, 0, 0, 0.2)' 
+    : '0 4px 16px rgba(0, 0, 0, 0.08)';
 
   const textColor = isDark ? '#e0e7ff' : '#4f46e5';
   const labelColor = isDark ? '#a5b4fc' : '#4f46e5';
