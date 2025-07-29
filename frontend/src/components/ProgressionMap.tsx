@@ -87,8 +87,8 @@ const ProgressionMap: React.FC<ProgressionMapProps> = ({ onClose }) => {
   }, []);
 
   // Count unlocked nodes
-  const totalNodes = skillTree.reduce((acc, cat) => acc + (cat.children ? cat.children.length : 0), skillTree.length);
-  const unlockedNodes = skillTree.reduce((acc, cat) => acc + (cat.children ? cat.children.filter(c => c.unlocked).length : 0) + (cat.unlocked ? 1 : 0), 0);
+  const totalNodes = skillTree.reduce((acc, cat) => acc + (Array.isArray(cat.children) ? cat.children.length : 0), skillTree.length);
+  const unlockedNodes = skillTree.reduce((acc, cat) => acc + (Array.isArray(cat.children) ? cat.children.filter(c => c.unlocked).length : 0) + (cat.unlocked ? 1 : 0), 0);
 
   // Render a single node (category or child)
 const renderNode = (node: ProgressionStage, isChild = false) => {
@@ -308,7 +308,7 @@ const renderNode = (node: ProgressionStage, isChild = false) => {
                 }}>
                   {renderNode(cat)}
                   {/* Connecting lines to children - hide on mobile for cleaner look */}
-                  {cat.children && cat.children.length > 0 && window.innerWidth > 768 && (
+                  {Array.isArray(cat.children) && cat.children.length > 0 && window.innerWidth > 768 && (
                     <div style={{ height: 2, width: 32, background: '#bdbdbd', marginLeft: 8, marginRight: 8, borderRadius: 1 }} />
                   )}
                   <div style={{ 
@@ -321,7 +321,7 @@ const renderNode = (node: ProgressionStage, isChild = false) => {
                   }}>{cat.label}</div>
                 </div>
                 {/* Children nodes with dotted flow lines */}
-                {cat.children && (
+                {Array.isArray(cat.children) && (
                   <div style={{
                     position: 'relative',
                     display: 'flex',
@@ -334,28 +334,44 @@ const renderNode = (node: ProgressionStage, isChild = false) => {
                     {/* Dotted flow lines: now on all screens */}
                     {cat.children.length > 0 && (
                       <svg
-                        width={cat.children.length * (window.innerWidth <= 768 ? 70 : 90)}
-                        height={window.innerWidth <= 768 ? 28 : 40}
+                        width={window.innerWidth <= 768 ? '100%' : cat.children.length * 90}
+                        height={window.innerWidth <= 768 ? 22 : 40}
                         style={{
                           position: 'absolute',
-                          top: window.innerWidth <= 768 ? -18 : -28,
+                          top: window.innerWidth <= 768 ? -12 : -28,
                           left: 0,
                           pointerEvents: 'none',
                           zIndex: 0,
+                          width: window.innerWidth <= 768 ? '100%' : undefined,
                         }}
                       >
-                        {cat.children.map((child, idx) => (
-                          <line
-                            key={child.id}
-                            x1={15 + idx * (window.innerWidth <= 768 ? 70 : 90)}
-                            y1={0}
-                            x2={15 + idx * (window.innerWidth <= 768 ? 70 : 90)}
-                            y2={window.innerWidth <= 768 ? 18 : 28}
-                            stroke="#bdbdbd"
-                            strokeWidth={2}
-                            strokeDasharray="6,6"
-                          />
-                        ))}
+                        {/* On mobile, calculate x positions based on actual rendered child positions for wrapping */}
+                        {cat.children.map((child, idx) => {
+                          let x;
+                          if (window.innerWidth <= 768) {
+                            // For mobile, spread lines evenly across the container width
+                            const gap = 12;
+                            const nodeWidth = 60;
+                            const totalWidth = cat.children.length * nodeWidth + (cat.children.length - 1) * gap;
+                            const containerWidth =  window.innerWidth * 0.95;
+                            const startX = (containerWidth - totalWidth) / 2 + nodeWidth / 2;
+                            x = startX + idx * (nodeWidth + gap);
+                          } else {
+                            x = 20 + idx * 90;
+                          }
+                          return (
+                            <line
+                              key={child.id}
+                              x1={x}
+                              y1={0}
+                              x2={x}
+                              y2={window.innerWidth <= 768 ? 12 : 28}
+                              stroke="#bdbdbd"
+                              strokeWidth={2}
+                              strokeDasharray="6,6"
+                            />
+                          );
+                        })}
                       </svg>
                     )}
                     {cat.children.map(child => renderNode(child, true))}
