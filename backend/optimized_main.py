@@ -84,6 +84,33 @@ app.add_middleware(
 
 
 # Basic scenarios
+SCENARIOS_EN = [
+    "I think eating healthy is important.",
+    "I like to work in the morning.",
+    "It is important to try hard in school.",
+    "Technology makes our lives easier.",
+    "Social media helps people connect.",
+    "Learning many languages is useful.",
+    "Tradition is more important than new ideas.",
+    "Climate change is the most pressing issue of our time.",
+    "I like to play games every day.",
+    "Helping each other is important.",
+    "I want to have a big job in the future.",
+    "Reading books every morning is good.",
+    "Having good conversations is important.",
+    "I want to be a doctor in the future.",
+    "Going to church every day is important.",
+    "Learning something new every day is good.",
+    "Helping others is important.",
+    "I want to be a teacher.",
+    "Being honest every day is important.",
+    "I want to be a scholar at school.",
+    "Trying hard is important.",
+    "I want to be a royal at home.",
+    "Working hard at work is important.",
+    "I want to be an elder who helps people."
+]
+
 SCENARIOS_TWI = [
     "Mekae sɛ didi ntutummu yɛ fɛ.",
     "Mepɛ sɛ meyɛ adwuma anɔpa biara.",
@@ -95,7 +122,47 @@ SCENARIOS_TWI = [
     "Nsakrae a ɛba asase so yɛ asɛm kɛse a ɛsɛ sɛ yɛhwɛ so.",
     "Mepɛ sɛ mebɔ agorɔ da biara.",
     "Mekae sɛ ɛho hia sɛ yɛboa yɛn ho.",
-    "Mepɛ sɛ meyɛ adwuma kɛse daakye."
+    "Mepɛ sɛ meyɛ adwuma kɛse daakye.",
+    "Mepɛ sɛ mekenkan nwoma anɔpa biara.",
+    "Mekae sɛ ɛho hia sɛ yɛbɔ nkɔmmɔ pa.",
+    "Mepɛ sɛ meyɛ dɔkita daakye.",
+    "Mekae sɛ ɛho hia sɛ yɛkɔ asɔre da biara.",
+    "Mepɛ sɛ mesua ade foforo da biara.",
+    "Mekae sɛ ɛho hia sɛ yɛboa afoforo.",
+    "Mepɛ sɛ meyɛ ɔkyerɛkyerɛni.",
+    "Mekae sɛ ɛho hia sɛ yɛdi nokware da biara.",
+    "Mepɛ sɛ meyɛ ɔbenfo wɔ sukuu.",
+    "Mekae sɛ ɛho hia sɛ yɛkɔ mmɔdenbɔ mu.",
+    "Mepɛ sɛ meyɛ ɔdehyeɛ wɔ fie.",
+    "Mekae sɛ ɛho hia sɛ yɛkɔ mmɔdenbɔ mu wɔ adwuma.",
+    "Mepɛ sɛ meyɛ ɔpanyin a ɔboa nkurɔfo."
+]
+
+SCENARIOS_GAA = [
+    "Mɛni tsɔɔ shikpon nɔ lɛ mli.",
+    "Mɛni yɛ adwuma anɔpa kɛji.",
+    "Shikpon yɛ hewalɛ mli.",
+    "Technologii yɛ mli hewalɛ.",
+    "Sosɔl midia yɛ mli kɛji amɛi bɔ abom.",
+    "Kɛ yɛkɛ sukuu, yɛtsɔɔ kasa pii.",
+    "Amɛi amammerɛ yɛ hewalɛ kɛji nsusui foforo.",
+    "Asaase nsakrae yɛ asɛm kɛse lɛ.",
+    "Mɛni bɔ agorɔ da biara.",
+    "Mɛni yɛ adwuma kɛse daakye.",
+    "Mɛni yɛ hewalɛ kɛji yɛboa yɛn ho.",
+    "Mɛni pɛ shikpon kɛji gbɛi.",
+    "Kɛ yɛkɛ gbɛi, yɛtsɔɔ nɔ lɛ mli.",
+    "Mɛni yɛ gbɛi kɛji yɛkɛ hewalɛ.",
+    "Kɛ yɛkɛ asɔre, yɛtsɔɔ gbɛi kɛji shikpon.",
+    "Mɛni yɛ hewalɛ kɛji yɛkɛ sukuu.",
+    "Kɛ yɛkɛ dɔkita, yɛtsɔɔ hewalɛ mli.",
+    "Mɛni yɛ adwuma kɛji yɛboa amɛi.",
+    "Kɛ yɛkɛ asafotufiami, yɛtsɔɔ amammerɛ pii.",
+    "Mɛni yɛ hewalɛ kɛji yɛkɛ gbɛi daakye.",
+    "Mɛni yɛ shikpon kɛji yɛkɛ hewalɛ da biara.",
+    "Kɛ yɛkɛ sukuu, yɛtsɔɔ amɛi bɔ abom.",
+    "Mɛni yɛ hewalɛ kɛji yɛkɛ asɔre.",
+    "Kɛ yɛkɛ asɔre, yɛtsɔɔ shikpon kɛji gbɛi."
 ]
 
 # Expanded Ga scenarios
@@ -110,21 +177,23 @@ SCENARIOS_GAA = [
     "Asaase nsakrae yɛ asɛm kɛse lɛ.",
     "Mɛni bɔ agorɔ da biara.",
     "Mɛni yɛ adwuma kɛse daakye.",
-    "Mɛni yɛ hewalɛ kɛji yɛboa yɛn ho."
+    "Mɛni yɛ hewalɛ kɛji yɛboa yɛn ho.",
+    "Mɛni pɛ shikpon kɛji gbɛi.",
+    "Kɛ yɛkɛ gbɛi, yɛtsɔɔ nɔ lɛ mli.",
+    "Mɛni yɛ gbɛi kɛji yɛkɛ hewalɛ.",
+    "Kɛ yɛkɛ asɔre, yɛtsɔɔ gbɛi kɛji shikpon.",
+    "Mɛni yɛ hewalɛ kɛji yɛkɛ sukuu.",
+    "Kɛ yɛkɛ dɔkita, yɛtsɔɔ hewalɛ mli.",
+    "Mɛni yɛ adwuma kɛji yɛboa amɛi.",
+    "Kɛ yɛkɛ asafotufiami, yɛtsɔɔ amammerɛ pii.",
+    "Mɛni yɛ hewalɛ kɛji yɛkɛ gbɛi daakye.",
+    "Mɛni yɛ shikpon kɛji yɛkɛ hewalɛ da biara.",
+    "Kɛ yɛkɛ sukuu, yɛtsɔɔ amɛi bɔ abom.",
+    "Mɛni yɛ hewalɛ kɛji yɛkɛ asɔre.",
+    "Kɛ yɛkɛ asɔre, yɛtsɔɔ shikpon kɛji gbɛi."
 ]
 
-SCENARIOS_TWI = [
-    "Mekae sɛ didi ntutummu yɛ fɛ.",
-    "Mepɛ sɛ meyɛ adwuma anɔpa biara.",
-    "Mekae sɛ ɛho hia sɛ yɛbɔ mmɔden wɔ sukuu."
-]
 
-# Add basic Ga scenarios (sample, can be expanded)
-SCENARIOS_GAA = [
-    "Mɛni tsɔɔ shikpon nɔ lɛ mli.",  # I like eating at home.
-    "Mɛni yɛ adwuma anɔpa kɛji.",    # I like to work in the morning.
-    "Shikpon yɛ hewalɛ mli."
-]
 
 @app.get("/")
 def read_root():
@@ -154,13 +223,10 @@ def keepalive():
 @app.get("/health")
 def health_check():
     """Health check endpoint with detailed status"""
-    try:
-        # Check database connection
-        db_status = "unknown"
-        try:
-            print(f"❌ NLLB model loading failed: {e}")
-            return None, None
-    return _nllb_model, _nllb_tokenizer
+    # Check database connection
+    db_status = "unknown"
+    # (Add actual DB check logic if needed)
+    return {"status": "ok"}
 
 def get_sentiment_analyzer():
     """Lazy load sentiment analyzer only when needed"""
