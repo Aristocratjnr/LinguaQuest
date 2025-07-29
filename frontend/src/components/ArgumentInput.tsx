@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
+import { useSettings } from '../context/SettingsContext';
 import { motion } from 'framer-motion';
 import { useActivityFeed } from './ActivityFeedContext';
 
@@ -43,6 +44,9 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
   maxLength = 500,
   error,
 }) => {
+  const { resolvedTheme } = useSettings();
+  const isDark = resolvedTheme === 'dark';
+
   const [isOverLimit, setIsOverLimit] = useState(false);
   const [listening, setListening] = useState(false);
   const { addActivity } = useActivityFeed();
@@ -59,9 +63,12 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
     [language, languages]
   );
 
+  // Theme-aware colors
+  const mutedColor = isDark ? '#a5b4fc' : '#6c757d';
+
   // Calculate character count and limit
   const characterCountColor = isOverLimit ? '#dc3545' : 
-    userArgument.length > maxLength * 0.8 ? '#ffc107' : '#6c757d';
+    userArgument.length > maxLength * 0.8 ? '#ffc107' : mutedColor;
 
   // Handle voice input
   const handleVoiceInput = useCallback(() => {
@@ -420,7 +427,7 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
             {isOverLimit ? 'warning' : 'tips_and_updates'}
           </i>
         </span>
-        <span style={{ color: '#6c757d', fontSize: '0.92rem', fontWeight: 400 }}>
+        <span style={{ color: mutedColor, fontSize: '0.92rem', fontWeight: 400 }}>
           {isOverLimit 
             ? `Please reduce your text to ${maxLength} characters or less`
             : `Enter your argument in English, then translate to practice ${languageLabel}${enableVoice ? ' (voice input available)' : ''}`

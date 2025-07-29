@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSettings } from '../context/SettingsContext';
 import { motion } from 'framer-motion';
 
 type ScenarioProps = {
@@ -18,6 +19,10 @@ const Scenario: React.FC<ScenarioProps> = ({
   languages,
   error
 }) => {
+  const { resolvedTheme } = useSettings();
+  const isDark = resolvedTheme === 'dark';
+  const textColor = isDark ? '#e0e7ff' : '#333';
+  const mutedColor = isDark ? '#a5b4fc' : '#6c757d';
   const currentLanguage = languages.find(l => l.code === language);
   const languageLabel = currentLanguage?.label || language.toUpperCase();
 
@@ -104,7 +109,7 @@ const Scenario: React.FC<ScenarioProps> = ({
           <div>
             <p className="mb-0 lh-lg" style={{ 
               fontSize: '1.05rem',
-              color: '#333',
+              color: textColor,
               lineHeight: '1.6',
               fontFamily: 'Noto Sans, Arial Unicode MS, system-ui, sans-serif',
             }}>
@@ -178,7 +183,7 @@ const Scenario: React.FC<ScenarioProps> = ({
 
       {/* Help text */}
       <div className="text-muted small mt-3 d-flex align-items-center" style={{ 
-        color: '#6c757d',
+        color: mutedColor,
         fontSize: '0.8rem',
         background: 'rgba(255,255,255,0.45)',
         backdropFilter: 'blur(8px)',
@@ -196,7 +201,7 @@ const Scenario: React.FC<ScenarioProps> = ({
         }}>
           <i className="material-icons" style={{ fontSize: '0.9rem' }}>tips_and_updates</i>
         </span>
-        <span style={{ color: '#6c757d', fontSize: '0.92rem', fontWeight: 400 }}>
+        <span style={{ color: mutedColor, fontSize: '0.92rem', fontWeight: 400 }}>
           Switch languages to practice different linguistic contexts and cultural perspectives
         </span>
       </div>

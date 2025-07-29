@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useSettings } from '../context/SettingsContext';
 import { motion } from 'framer-motion';
 import { useActivityFeed } from './ActivityFeedContext';
 
@@ -20,6 +21,14 @@ const Feedback: React.FC<FeedbackProps> = ({
   userArgument 
 }) => {
   const { addActivity } = useActivityFeed();
+
+  const { resolvedTheme } = useSettings();
+  const isDark = resolvedTheme === 'dark';
+  const textColor = isDark ? '#e0e7ff' : '#333';
+  const mutedColor = isDark ? '#a5b4fc' : '#6c757d';
+  const primaryColor = isDark ? '#58cc02' : '#3caa3c';
+  const secondaryColor = isDark ? '#d7f7c8' : '#c8f4b8';
+  const tertiaryColor = isDark ? '#3caa3c' : '#58cc02';
 
   useEffect(() => {
     if (score !== null) {
@@ -72,7 +81,7 @@ const Feedback: React.FC<FeedbackProps> = ({
                 fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                 fontSize: '1rem',
                 lineHeight: 1.6,
-                color: '#333',
+                color: textColor,
                 whiteSpace: 'pre-wrap',
                 flex: 1
               }}>
@@ -154,7 +163,7 @@ const Feedback: React.FC<FeedbackProps> = ({
               </div>
               <div style={{ 
                 flex: 1,
-                color: '#4b4b4b',
+                color: textColor,
                 fontSize: '0.95rem',
                 padding: '0 12px',
                 display: 'flex',
@@ -186,7 +195,7 @@ const Feedback: React.FC<FeedbackProps> = ({
         <div style={{ textAlign: 'center', margin: '24px 0' }}>
           <p style={{ 
             marginBottom: '16px', 
-            color: '#666', 
+            color: mutedColor, 
             fontSize: '0.95rem',
             display: 'flex',
             alignItems: 'center',
