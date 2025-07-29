@@ -1587,37 +1587,6 @@ function AppContent() {
         minHeight: '100vh',
         boxSizing: 'border-box',
       }}>
-        {/* Voice Command Button */}
-        <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0' }}>
-          <button
-            onClick={handleVoiceCommand}
-            style={{
-              background: DUOLINGO_COLORS.blue,
-              color: '#fff',
-              border: 'none',
-              borderRadius: 12,
-              padding: '10px 22px',
-              fontSize: '1rem',
-              fontWeight: 600,
-              boxShadow: '0 2px 8px #1cb0f655',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              transition: 'background 0.2s',
-            }}
-            aria-label="Activate Voice Command"
-          >
-            <span className="material-icons" style={{ fontSize: 22, verticalAlign: 'middle' }}>mic</span>
-            Voice Command
-          </button>
-        </div>
-        {/* Show error if any */}
-        {cmdError && (
-          <div style={{ color: DUOLINGO_COLORS.red, textAlign: 'center', marginBottom: 12, fontWeight: 500 }}>
-            {cmdError}
-          </div>
-        )}
         {/* Category & Difficulty Indicator */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
