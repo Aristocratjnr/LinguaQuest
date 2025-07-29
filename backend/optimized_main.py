@@ -305,8 +305,11 @@ def libre_translate(text, source, target):
                 return translated_text
     except Exception as e:
         print(f"MyMemory translation error: {e}")
-    
-    return f"[Translation to {target} not available]"
+        # If the server is offline or unreachable, return a clear message
+        return f"[Translation unavailable - server offline] {text}"
+
+    # If translation is not available, return a user-friendly message
+    return f"[Translation to {target} unavailable] {text}"
 
 # User validation (simplified version without database)
 PROFANITY_LIST = {"badword", "admin", "root", "test", "guest", "anonymous"}
@@ -575,37 +578,56 @@ def evaluate_argument(req: EvaluateRequest):
         print(f"Evaluation error: {e}")
         return EvaluateResponse(persuaded=False, feedback="Evaluation error.", score=0)
 
-@app.post("/api/v1/dialogue", response_model=DialogueResponse)
-def dialogue_endpoint(req: DialogueRequest):
-    """Simple dialogue endpoint for AI conversation"""
+
+# Real-time streaming dialogue endpoint
+from fastapi.responses import StreamingResponse
+import asyncio
+
+@app.post("/api/v1/dialogue", response_model=None)
+async def dialogue_stream_endpoint(req: DialogueRequest):
+    """Real-time streaming dialogue endpoint for AI conversation"""
     try:
-        # Simple response based on stance
+        # Detect demo/offline mode by environment variable or file (customize as needed)
+        demo_mode = False
+        if os.environ.get("LINGUAQUEST_DEMO_MODE", "0") == "1":
+            demo_mode = True
+        elif os.path.exists("DEMO_MODE"):
+            demo_mode = True
+
         responses = {
             "disagree": "I understand your point, but I have some concerns about this approach.",
             "neutral": "That's an interesting perspective. Let me consider this further.",
             "agree": "You make a compelling argument. I'm starting to see your point."
         }
-        
         # Simple stance progression
         new_stance = req.ai_stance
-        if len(req.user_argument) > 50:  # If argument is substantial
+        if len(req.user_argument) > 50:
             if req.ai_stance == "disagree":
                 new_stance = "neutral"
             elif req.ai_stance == "neutral":
                 new_stance = "agree"
-        
-        return DialogueResponse(
-            ai_response=responses.get(req.ai_stance, "I understand your perspective."),
-            new_stance=new_stance,
-            reasoning="Simple rule-based response"
-        )
+
+        ai_response = responses.get(req.ai_stance, "I understand your perspective.")
+        reasoning = "Simple rule-based response"
+
+        async def word_stream():
+            if demo_mode:
+                # Only show demo message ONCE, not as part of the AI response
+                yield "[Demo mode - server offline] The backend is currently in demo/offline mode. Real-time AI responses are unavailable.\n"
+                return
+            # Stream the response word by word for real-time effect
+            for word in ai_response.split():
+                yield word + " "
+                await asyncio.sleep(0.12)  # Simulate typing delay
+            # After streaming, send a JSON marker for stance and reasoning
+            yield f"\n[STANCE]: {new_stance}\n[REASONING]: {reasoning}"
+
+        return StreamingResponse(word_stream(), media_type="text/plain")
     except Exception as e:
-        print(f"Dialogue error: {e}")
-        return DialogueResponse(
-            ai_response="I'm having trouble responding right now.",
-            new_stance=req.ai_stance,
-            reasoning="Error in dialogue processing"
-        )
+        print(f"Dialogue streaming error: {e}")
+        async def error_stream():
+            yield "I'm having trouble responding right now."
+        return StreamingResponse(error_stream(), media_type="text/plain")
 
 @app.post("/api/v1/sentiment", response_model=SentimentResponse)
 def analyze_sentiment(req: SentimentRequest):
