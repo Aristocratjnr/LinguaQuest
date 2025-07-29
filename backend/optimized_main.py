@@ -305,11 +305,11 @@ def libre_translate(text, source, target):
                 return translated_text
     except Exception as e:
         print(f"MyMemory translation error: {e}")
-        # If the server is offline or unreachable, return a clear message
-        return f"[Translation unavailable - server offline] {text}"
+        # If the server is offline or unreachable, return a user-friendly message with the original input
+        return f"Sorry, translation is temporarily unavailable. Showing your original text: {text}"
 
-    # If translation is not available, return a user-friendly message
-    return f"[Translation to {target} unavailable] {text}"
+    # If translation is not available, return a user-friendly message with the original input
+    return f"Sorry, translation to '{target}' is unavailable. Showing your original text: {text}"
 
 # User validation (simplified version without database)
 PROFANITY_LIST = {"badword", "admin", "root", "test", "guest", "anonymous"}
