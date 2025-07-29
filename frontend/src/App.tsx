@@ -1,10 +1,13 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
+import { SettingsProvider } from './context/SettingsContext';
 
-// Simple App component that redirects to the root page
-// This maintains compatibility if anything still tries to import App
 const App: React.FC = () => {
-  return <Navigate to="/" replace />;
+  return (
+    <SettingsProvider>
+      <Navigate to="/" replace />
+    </SettingsProvider>
+  );
 };
 
 export default App;
