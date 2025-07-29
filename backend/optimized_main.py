@@ -82,22 +82,48 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Basic scenarios
-SCENARIOS_EN = [
-    "I think eating fast food is enjoyable.",
-    "I prefer to work early in the morning.",
-    "I believe it is important to work hard in school.",
-    "Technology makes our lives easier.",
-    "Social media brings people together.",
-    "Learning multiple languages is essential.",
-    "Traditional values are more important than modern ideas.",
-    "Climate change is the most pressing issue of our time."
+SCENARIOS_TWI = [
+    "Mekae sɛ didi ntutummu yɛ fɛ.",
+    "Mepɛ sɛ meyɛ adwuma anɔpa biara.",
+    "Mekae sɛ ɛho hia sɛ yɛbɔ mmɔden wɔ sukuu.",
+    "Teknoloji boa ma yɛn nkwa yɛ mmerɛw.",
+    "Sosɔl midia boa ma nnipa bɔ abom.",
+    "Sɛ wokɔ sukuu a, ɛsɛ sɛ wokɔ so sua kasa pii.",
+    "Amammerɛ titiriw sen nsusui foforo.",
+    "Nsakrae a ɛba asase so yɛ asɛm kɛse a ɛsɛ sɛ yɛhwɛ so.",
+    "Mepɛ sɛ mebɔ agorɔ da biara.",
+    "Mekae sɛ ɛho hia sɛ yɛboa yɛn ho.",
+    "Mepɛ sɛ meyɛ adwuma kɛse daakye."
+]
+
+# Expanded Ga scenarios
+SCENARIOS_GAA = [
+    "Mɛni tsɔɔ shikpon nɔ lɛ mli.",
+    "Mɛni yɛ adwuma anɔpa kɛji.",
+    "Shikpon yɛ hewalɛ mli.",
+    "Technologii yɛ mli hewalɛ.",
+    "Sosɔl midia yɛ mli kɛji amɛi bɔ abom.",
+    "Kɛ yɛkɛ sukuu, yɛtsɔɔ kasa pii.",
+    "Amɛi amammerɛ yɛ hewalɛ kɛji nsusui foforo.",
+    "Asaase nsakrae yɛ asɛm kɛse lɛ.",
+    "Mɛni bɔ agorɔ da biara.",
+    "Mɛni yɛ adwuma kɛse daakye.",
+    "Mɛni yɛ hewalɛ kɛji yɛboa yɛn ho."
 ]
 
 SCENARIOS_TWI = [
     "Mekae sɛ didi ntutummu yɛ fɛ.",
     "Mepɛ sɛ meyɛ adwuma anɔpa biara.",
     "Mekae sɛ ɛho hia sɛ yɛbɔ mmɔden wɔ sukuu."
+]
+
+# Add basic Ga scenarios (sample, can be expanded)
+SCENARIOS_GAA = [
+    "Mɛni tsɔɔ shikpon nɔ lɛ mli.",  # I like eating at home.
+    "Mɛni yɛ adwuma anɔpa kɛji.",    # I like to work in the morning.
+    "Shikpon yɛ hewalɛ mli."
 ]
 
 @app.get("/")
@@ -350,15 +376,26 @@ def get_scenario_v1(req: ScenarioRequest):
     try:
         print(f"Scenario request: {req.category}, {req.difficulty}, {req.language}")
         
+
+        import datetime
+        today = datetime.datetime.utcnow().date()
+
         if req.language == "en":
-            scenario = random.choice(SCENARIOS_EN)
+            idx = today.toordinal() % len(SCENARIOS_EN)
+            scenario = SCENARIOS_EN[idx]
             return ScenarioResponse(scenario=scenario, language="en")
-        
+
         # Check for pre-translated scenarios first
         if req.language == "twi" and SCENARIOS_TWI:
-            scenario = random.choice(SCENARIOS_TWI)
+            idx = today.toordinal() % len(SCENARIOS_TWI)
+            scenario = SCENARIOS_TWI[idx]
             return ScenarioResponse(scenario=scenario, language=req.language)
-        
+
+        if req.language == "gaa" and 'SCENARIOS_GAA' in globals() and SCENARIOS_GAA:
+            idx = today.toordinal() % len(SCENARIOS_GAA)
+            scenario = SCENARIOS_GAA[idx]
+            return ScenarioResponse(scenario=scenario, language=req.language)
+
         # For other languages, use lightweight translation
         scenario_en = random.choice(SCENARIOS_EN)
         try:
@@ -367,7 +404,7 @@ def get_scenario_v1(req: ScenarioRequest):
                 return ScenarioResponse(scenario=translated, language=req.language)
         except Exception as e:
             print(f"Translation error: {e}")
-        
+
         # Fallback to English with message
         return ScenarioResponse(
             scenario=f"{scenario_en} [Translation to {req.language.upper()} not available]",
