@@ -114,7 +114,7 @@ const AIResponse: React.FC<AIResponseProps> = ({
         <motion.div 
           className="p-4 mb-3 rounded-3 position-relative"
           style={{ 
-            background: 'rgba(255,255,255,0.6)',
+            background: 'var(--lq-background)',
             backdropFilter: 'blur(10px)',
             WebkitBackdropFilter: 'blur(10px)',
             borderLeft: '4px solid #58a700',
@@ -141,7 +141,7 @@ const AIResponse: React.FC<AIResponseProps> = ({
           {/* Response Text */}
           <p className="mb-0 mt-4 lh-lg" style={{ 
             fontSize: '1.05rem',
-            color: '#333'
+            color: 'var(--lq-text-main)'
           }}>
             {aiResponse}
           </p>
@@ -155,13 +155,13 @@ const AIResponse: React.FC<AIResponseProps> = ({
                 width: 40, 
                 height: 40,
                 border: 'none',
-                background: speaking ? '#58a700' : 'rgba(255, 255, 255, 0.48)',
+                background: speaking ? '#58a700' : 'var(--lq-background)',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
               }}
               onClick={handleSpeak}
               disabled={speaking}
               title="Hear response"
-              whileHover={{ backgroundColor: speaking ? '#48961f' : '#f1f1f19e' }}
+              whileHover={{ backgroundColor: speaking ? '#48961f' : 'var(--lq-background-hover)' }}
               whileTap={{ scale: 0.85 }}
             >
               <i className="material-icons" style={{ 
@@ -183,7 +183,7 @@ const AIResponse: React.FC<AIResponseProps> = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
           style={{ 
-            background: 'rgba(255,255,255,0.6)',
+            background: 'var(--lq-background)',
             backdropFilter: 'blur(10px)',
             WebkitBackdropFilter: 'blur(10px)',
             borderRadius: '16px',
@@ -227,7 +227,7 @@ const AIResponse: React.FC<AIResponseProps> = ({
       
       {/* Help Text */}
       <div className="text-muted small mt-3 d-flex align-items-center" style={{ 
-        color: '#6c757d',
+        color: 'var(--lq-text-muted)',
         fontSize: '0.8rem',
         background: 'rgba(255,255,255,0.6)',
         backdropFilter: 'blur(10px)',

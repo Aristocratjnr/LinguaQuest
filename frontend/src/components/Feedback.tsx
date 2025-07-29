@@ -26,9 +26,9 @@ const Feedback: React.FC<FeedbackProps> = ({
   const isDark = resolvedTheme === 'dark';
   const textColor = 'var(--lq-text-main)';
   const mutedColor = isDark ? 'var(--lq-text-muted-dark)' : 'var(--lq-text-muted)';
-  const primaryColor = '#58cc02';
-  const secondaryColor = '#d7f7c8';
-  const tertiaryColor = isDark ? '#3caa3c' : '#58cc02';
+  const primaryColor = 'var(--lq-text-main)';
+  const secondaryColor = 'var(--lq-text-muted)';
+  const tertiaryColor = isDark ? 'var(--lq-text-main)' : 'var(--lq-text-main)';
 
   useEffect(() => {
     if (score !== null) {
@@ -38,9 +38,9 @@ const Feedback: React.FC<FeedbackProps> = ({
   }, [score]);
 
   const getScoreColor = (score: number): string => {
-    if (score >= 8) return '#58a700'; // Duolingo green
+    if (score >= 8) return 'var(--lq-text-main)';
     if (score >= 5) return '#ffb800'; // Yellow
-    return '#ff3b30'; // Red
+    return 'var(--lq-text-main)';
   };
 
   const getScoreIcon = (score: number): string => {
@@ -71,7 +71,7 @@ const Feedback: React.FC<FeedbackProps> = ({
               gap: '12px'
             }}>
               <i className="material-icons" style={{ 
-                color: '#58cc02', 
+                color: 'var(--lq-text-main)', 
                 fontSize: '24px',
                 marginTop: '2px'
               }}>
@@ -119,7 +119,7 @@ const Feedback: React.FC<FeedbackProps> = ({
                 <div style={{
                   fontSize: '1rem',
                   fontWeight: 'bold',
-                  color: '#58cc02',
+                  color: 'var(--lq-text-main)',
                   textAlign: 'center',
                   display: 'flex',
                   alignItems: 'center',
@@ -134,7 +134,7 @@ const Feedback: React.FC<FeedbackProps> = ({
                   width: '80px',
                   height: '80px',
                   borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #d7f7c8 0%, #c8f4b8 100%)',
+                  background: 'linear-gradient(135deg, var(--lq-text-muted) 0%, var(--lq-text-muted) 100%)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -213,7 +213,7 @@ const Feedback: React.FC<FeedbackProps> = ({
             disabled={!userArgument || loading || disabled}
             onClick={onEvaluate}
             style={{
-              background: '#58cc02',
+              background: 'var(--lq-text-main)',
               color: 'white',
               border: 'none',
               borderRadius: '12px',
@@ -222,7 +222,7 @@ const Feedback: React.FC<FeedbackProps> = ({
               fontWeight: 'bold',
               cursor: !userArgument || loading || disabled ? 'not-allowed' : 'pointer',
               opacity: !userArgument || loading || disabled ? 0.7 : 1,
-              boxShadow: '0 4px 0 #3caa3c',
+              boxShadow: '0 4px 0 var(--lq-text-main)',
               transition: 'all 0.2s ease',
               display: 'flex',
               alignItems: 'center',

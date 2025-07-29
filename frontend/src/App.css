@@ -56,9 +56,9 @@ input, textarea, select, button {
   width: 100%;
   max-width: 600px;
   margin: 2rem auto 1rem auto;
-  background: #fff;
+  background: var(--duo-card);
   border-radius: 16px 16px 0 0;
-  box-shadow: 0 2px 16px #0002;
+  box-shadow: var(--duo-shadow);
   padding: 1rem 2rem;
 }
 
@@ -76,13 +76,30 @@ input, textarea, select, button {
 }
 
 .lq-card {
-  background: #fff;
+  background: var(--duo-card);
   border-radius: 0 0 16px 16px;
-  box-shadow: 0 2px 16px #0002;
+  box-shadow: var(--duo-shadow);
   padding: 2rem;
   max-width: 600px;
   width: 100%;
   margin-bottom: 2rem;
+}
+
+body.dark .lq-header,
+.dark .lq-header {
+  background: #1e293b;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.6);
+}
+
+body.dark .lq-card,
+.dark .lq-card {
+  background: #1e293b;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.6);
+}
+
+body.dark .lq-label,
+.dark .lq-label {
+  color: #cbd5e1;
 }
 
 .lq-section {
@@ -220,9 +237,9 @@ input, textarea, select, button {
 .lq-onboarding-card {
   max-width: 420px;
   margin: 2rem auto;
-  background: #fff;
+  background: var(--duo-card);
   border-radius: 16px;
-  box-shadow: 0 2px 16px #0002;
+  box-shadow: var(--duo-shadow);
   padding: 2rem 2.5rem;
   text-align: center;
 }
@@ -263,7 +280,7 @@ input, textarea, select, button {
   justify-content: center;
 }
 .lq-leaderboard-card {
-  background: #fff;
+  background: var(--duo-card);
   border-radius: 16px;
   box-shadow: 0 2px 24px #764ba244;
   padding: 2rem 2.5rem;
@@ -457,7 +474,7 @@ body.dark .mb-0, .dark .mb-0 {
   position: absolute;
   bottom: 0;
   width: 0.3em;
-  background: #fff;
+  background: var(--duo-card);
   border-radius: 0.2em;
   animation: lq-wave 1s infinite linear;
 }
@@ -512,7 +529,7 @@ body.dark .mb-0, .dark .mb-0 {
   pointer-events: auto;
 }
 .lq-voice-modal-inner {
-  background: #fff;
+  background: var(--duo-card);
   color: #232946;
   border-radius: 1.5rem;
   box-shadow: 0 8px 32px #23294633;
@@ -600,12 +617,12 @@ body.dark .mb-0, .dark .mb-0 {
   border-radius: 50%;
   border: 3px solid var(--duo-green);
   box-shadow: 0 0 0 4px #e9fbe5, 0 2px 8px #58cc0233;
-  background: #fff;
+  background: var(--duo-card);
   object-fit: cover;
 }
 
 .duo-card {
-  background: #fff;
+  background: var(--duo-card);
   color: #222;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
