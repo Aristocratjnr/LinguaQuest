@@ -352,7 +352,8 @@ const renderNode = (node: ProgressionStage, isChild = false) => {
                             // For mobile, spread lines evenly across the container width
                             const gap = 12;
                             const nodeWidth = 60;
-                            const totalWidth = cat.children.length * nodeWidth + (cat.children.length - 1) * gap;
+                            const childrenLength = cat.children?.length ?? 0;
+                            const totalWidth = childrenLength * nodeWidth + (childrenLength - 1) * gap;
                             const containerWidth =  window.innerWidth * 0.95;
                             const startX = (containerWidth - totalWidth) / 2 + nodeWidth / 2;
                             x = startX + idx * (nodeWidth + gap);
