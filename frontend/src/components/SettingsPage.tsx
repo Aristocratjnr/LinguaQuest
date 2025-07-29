@@ -195,21 +195,23 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   
   const handleThemeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newTheme = e.target.value;
+
+    // Update local theme immediately for responsive UI
+    setTheme(newTheme);
+
+    // Persist preference for logged-in users
     if (user) {
       try {
-        await updateUser({ 
-          preferences: { 
-            ...user.preferences, 
-            theme: newTheme 
-          }
+        await updateUser({
+          preferences: {
+            ...user.preferences,
+            theme: newTheme,
+          },
         });
         toast.success('Theme preference updated!');
       } catch (error) {
         toast.error('Failed to update theme preference');
       }
-    } else {
-      // For non-logged in users, use settings context
-      setTheme(newTheme);
     }
   };
   const handleSoundToggle = () => {
