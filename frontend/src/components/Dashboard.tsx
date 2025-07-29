@@ -576,7 +576,12 @@ function AppContent() {
   // Voice command logic
   const handleVoiceCommand = async () => {
     if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      setCmdError('Speech recognition is not supported in this browser. Please use the regular buttons instead.');
+      setCmdError(
+        '🚫 Speech Recognition is not supported in your browser.\n' +
+        'Try using Google Chrome or Microsoft Edge on desktop or Android.\n' +
+        'If you are on Firefox, Safari, or an older browser, voice commands will not work.\n' +
+        'You can still use the regular buttons.'
+      );
       return;
     }
 
@@ -717,7 +722,19 @@ function AppContent() {
       // Handle specific error types
       switch (event.error) {
         case 'not-allowed':
-          setCmdError('Microphone permission was denied. Please allow microphone access and try again.\n\nTo enable microphone access:\n1. Click the 🔒 or 🛡️ icon in your browser\'s address bar\n2. Change microphone permission to "Allow"\n3. Refresh the page and try again');
+          setCmdError(
+            '🚫 Microphone permission was denied or blocked by browser.\n' +
+            'Please allow microphone access in your browser settings and refresh the page.\n' +
+            'If you are in Incognito/Private mode, try regular mode.\n' +
+            'If you are on Chrome/Edge, click the 🔒 icon next to the URL and set Microphone to "Allow".'
+          );
+          break;
+        case 'service-not-allowed':
+          setCmdError(
+            '🚫 Speech recognition service is not allowed by your browser or device.\n' +
+            'This may happen if microphone permissions are blocked, or if your browser does not support the API.\n' +
+            'Try Chrome or Edge, and ensure microphone access is enabled.'
+          );
           break;
         case 'no-speech':
           setCmdError('No speech was detected. Please try speaking more clearly or try again.');
@@ -727,9 +744,6 @@ function AppContent() {
           break;
         case 'network':
           setCmdError('Network error occurred. Voice recognition requires internet access. Please check your connection and try again.');
-          break;
-        case 'service-not-allowed':
-          setCmdError('Speech recognition service is not allowed. Please check your browser settings.');
           break;
         case 'bad-grammar':
           setCmdError('Speech recognition grammar error. Please try again.');
