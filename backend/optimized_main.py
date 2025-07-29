@@ -47,6 +47,31 @@ _argument_evaluator = None
 _conversational_ai = None
 _speech_to_text = None
 
+# Lazy-load argument evaluator and conversational AI
+def get_argument_evaluator():
+    global _argument_evaluator
+    if _argument_evaluator is None:
+        try:
+            from simple_nlp_services import SimpleArgumentEvaluator
+            _argument_evaluator = SimpleArgumentEvaluator()
+            print("✅ Argument evaluator loaded")
+        except Exception as e:
+            print(f"❌ Argument evaluator loading failed: {e}")
+            return None
+    return _argument_evaluator
+
+def get_conversational_ai():
+    global _conversational_ai
+    if _conversational_ai is None:
+        try:
+            from simple_nlp_services import SimpleConversationalAI
+            _conversational_ai = SimpleConversationalAI()
+            print("✅ Conversational AI loaded")
+        except Exception as e:
+            print(f"❌ Conversational AI loading failed: {e}")
+            return None
+    return _conversational_ai
+
 def safe_print(message: str):
     """Safely print messages with UTF-8 encoding"""
     try:
@@ -525,54 +550,29 @@ def translate_text(req: TranslationRequest):
         print(error_msg)
         return TranslationResponse(translated_text=error_msg)
 
+
 @app.post("/api/v1/evaluate", response_model=EvaluateResponse)
 def evaluate_argument(req: EvaluateRequest):
-    """Evaluate argument using lightweight methods"""
+    """Evaluate argument using enhanced evaluator from simple_nlp_services"""
     try:
-        # Simple evaluation without heavy ML models
-        argument_length = len(req.argument.split())
-        
-        # Basic scoring
-        score = min(10, argument_length // 3)
-        
-        # Simple persuasion indicators
-        persuasive_words = ["because", "therefore", "however", "moreover", "furthermore", "since", "thus"]
-        persuasion_count = sum(1 for word in persuasive_words if word in req.argument.lower())
-        
-        if persuasion_count > 0:
-            score += 2
-            persuaded = persuasion_count >= 2
-        else:
-            persuaded = False
-        
-        # Simple sentiment check using VADER (lightweight)
-        sentiment_analyzer = get_sentiment_analyzer()
-        if sentiment_analyzer:
-            sentiment_scores = sentiment_analyzer.polarity_scores(req.argument)
-            if sentiment_scores['compound'] > 0.1:
-                score += 1
-                feedback_sentiment = "Your argument has a positive tone."
-            elif sentiment_scores['compound'] < -0.1:
-                score -= 1
-                feedback_sentiment = "Consider using more positive language."
-            else:
-                feedback_sentiment = "Your argument is neutral in tone."
-        else:
-            feedback_sentiment = "Tone analysis unavailable."
-        
-        feedback = f"Your {argument_length}-word argument "
-        if persuaded:
-            feedback += "is well-structured with good connecting words. "
-        else:
-            feedback += "could benefit from more persuasive language. "
-        feedback += feedback_sentiment
-        
-        score = max(0, min(10, score))
-        
+        argument_evaluator = get_argument_evaluator()
+        if argument_evaluator is None:
+            raise Exception("Argument evaluator unavailable")
+        # Use topic as 'persuasive argument' for now
+        eval_result = argument_evaluator.evaluate_argument(
+            argument=req.argument,
+            topic="persuasive argument",
+            tone=req.tone
+        )
+        score = eval_result.get('score', 0)
+        persuaded = eval_result.get('persuaded', False)
+        feedback = eval_result.get('feedback', [])
+        # Normalize to 0-10 scale for frontend display
+        normalized_score = max(0, min(10, round(score / 10)))
         return EvaluateResponse(
             persuaded=persuaded,
-            feedback=feedback,
-            score=score
+            feedback=" ".join(feedback) if isinstance(feedback, list) else str(feedback),
+            score=normalized_score
         )
     except Exception as e:
         print(f"Evaluation error: {e}")
@@ -583,32 +583,56 @@ def evaluate_argument(req: EvaluateRequest):
 from fastapi.responses import StreamingResponse
 import asyncio
 
+
 @app.post("/api/v1/dialogue", response_model=None)
 async def dialogue_stream_endpoint(req: DialogueRequest):
-    """Real-time streaming dialogue endpoint for AI conversation"""
+    """Real-time streaming dialogue endpoint using enhanced conversational AI"""
     try:
-        responses = {
-            "disagree": "I understand your point, but I have some concerns about this approach.",
-            "neutral": "That's an interesting perspective. Let me consider this further.",
-            "agree": "You make a compelling argument. I'm starting to see your point."
-        }
-        # Simple stance progression
-        new_stance = req.ai_stance
-        if len(req.user_argument) > 50:
-            if req.ai_stance == "disagree":
-                new_stance = "neutral"
-            elif req.ai_stance == "neutral":
-                new_stance = "agree"
+        conversational_ai = get_conversational_ai()
+        argument_evaluator = get_argument_evaluator()
+        if conversational_ai is None or argument_evaluator is None:
+            raise Exception("AI or argument evaluator unavailable")
+        context = [f"Scenario: {req.scenario}"]
+        # Generate AI response
+        ai_response = conversational_ai.generate_response(
+            user_input=req.user_argument,
+            context=context,
+            personality="neutral",
+            stance=req.ai_stance
+        )
+        # Evaluate argument to determine new stance
+        eval_result = argument_evaluator.evaluate_argument(
+            argument=req.user_argument,
+            topic=req.scenario,
+            tone="neutral"
+        )
+        score = eval_result.get('score', 0)
+        current_stance = req.ai_stance
+        # Stance progression logic
+        if score >= 75:
+            if current_stance == 'disagree':
+                new_stance = 'neutral'
+            elif current_stance == 'neutral':
+                new_stance = 'agree'
+            else:
+                new_stance = 'agree'
+        elif score >= 50:
+            if current_stance == 'disagree':
+                new_stance = 'neutral'
+            else:
+                new_stance = current_stance
+        else:
+            if current_stance == 'agree':
+                new_stance = 'neutral'
+            else:
+                new_stance = current_stance
 
-        ai_response = responses.get(req.ai_stance, "I understand your perspective.")
-        reasoning = "Simple rule-based response"
+        reasoning = "Argument evaluated for stance progression"
 
         async def word_stream():
-            # Always stream the response word by word for real-time effect
             for word in ai_response.split():
                 yield word + " "
-                await asyncio.sleep(0.12)  # Simulate typing delay
-            # After streaming, send a JSON marker for stance and reasoning
+                await asyncio.sleep(0.12)
             yield f"\n[STANCE]: {new_stance}\n[REASONING]: {reasoning}"
 
         return StreamingResponse(word_stream(), media_type="text/plain")
