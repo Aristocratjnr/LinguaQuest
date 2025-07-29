@@ -37,7 +37,8 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   // Use user preferences for language and theme when logged in, fallback to settings context
   const currentLanguage = user?.preferences?.language || language;
   // Use resolvedTheme for actual UI mode (dark/light), not just the selected value
-  const currentTheme = user?.preferences?.theme || theme;
+  // Use theme from settings context to ensure dropdown reflects current selection immediately
+  const currentTheme = theme;
   const isDark = resolvedTheme === 'dark';
   
   // Engagement state

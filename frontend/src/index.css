@@ -25,6 +25,9 @@
   --duo-error: #ff4b4b;
   --duo-success: #58cc02;
   --duo-shadow: 0 4px 24px 0 rgba(88,204,2,0.08);
+  /* LinguaQuest custom text variables */
+  --lq-text-main: #333;
+  --lq-text-muted: #6c757d;
 }
 
 html, body {
@@ -117,6 +120,13 @@ button {
 }
 
 /* Utility classes */
+.lq-text {
+  color: var(--lq-text-main) !important;
+}
+.lq-text-muted {
+  color: var(--lq-text-muted) !important;
+}
+
 .container {
   width: 100%;
   max-width: 1200px;
@@ -165,6 +175,9 @@ body.dark, .dark {
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --transition: all 0.2s ease-in-out;
+  /* Override text variables in dark mode */
+  --lq-text-main: #e0e7ff;
+  --lq-text-muted: #a5b4fc;
   background: var(--gradient) !important;
   color: var(--text-dark) !important;
 }
