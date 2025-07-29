@@ -1,3 +1,22 @@
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+import time
+def get_huggingface_conversational_model():
+    """Lazy load a HuggingFace conversational model (e.g., DialoGPT)"""
+    global _conversational_ai
+    return _conversational_ai
+
+def stream_huggingface_response(prompt: str):
+    """Generator for streaming HuggingFace model output token by token"""
+    ai = get_huggingface_conversational_model()
+    response = tokenizer.decode(output_ids[:, input_ids.shape[-1]:][0], skip_special_tokens=True)
+    # Stream word by word for demo (can stream by token for more granularity)
+    for word in response.split():
+        yield word + " "
+        time.sleep(0.08)  # Simulate real-time streaming
+@app.post("/api/v1/dialogue/stream")
+def dialogue_stream_endpoint(req: DialogueRequest):
+    """Streaming dialogue endpoint using HuggingFace conversational model"""
 # -*- coding: utf-8 -*-
 """
 Memory-optimized version of LinguaQuest API for Render deployment
@@ -113,47 +132,6 @@ def health_check():
         # Check database connection
         db_status = "unknown"
         try:
-            from database import engine
-            with engine.connect() as conn:
-                conn.execute("SELECT 1")
-            db_status = "connected"
-        except Exception:
-            db_status = "disconnected"
-        
-        # Check file system
-        fs_status = "ok" if os.path.exists(os.path.dirname(__file__)) else "error"
-        
-        return {
-            "status": "healthy",
-            "timestamp": datetime.now().isoformat(),
-            "port": os.environ.get("PORT", "not set"),
-            "memory_mode": "optimized",
-            "database": db_status,
-            "filesystem": fs_status,
-            "uptime": "running",
-            "message": "LinguaQuest API is running successfully"
-        }
-    except Exception as e:
-        # Return partial health info even if some checks fail
-        return {
-            "status": "partial",
-            "timestamp": datetime.now().isoformat(),
-            "error": str(e),
-            "message": "API running with some issues"
-        }
-
-# Lazy loading functions
-def get_nllb_model():
-    """Lazy load NLLB model only when needed"""
-    global _nllb_model, _nllb_tokenizer
-    if _nllb_model is None:
-        try:
-            from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
-            model_name = "facebook/nllb-200-distilled-600M"
-            _nllb_tokenizer = AutoTokenizer.from_pretrained(model_name)
-            _nllb_model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
-            print("✅ NLLB model loaded")
-        except Exception as e:
             print(f"❌ NLLB model loading failed: {e}")
             return None, None
     return _nllb_model, _nllb_tokenizer
