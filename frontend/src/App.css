@@ -102,6 +102,28 @@ body.dark .lq-label,
   color: #cbd5e1;
 }
 
+/* Mobile-friendly layout */
+@media (max-width: 600px) {
+  .lq-header,
+  .lq-card {
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0;
+    padding: 1rem;
+  }
+  .lq-header {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .lq-logo {
+    height: 40px;
+  }
+}
+
+.dark .lq-label {
+  color: #cbd5e1;
+}
+
 .lq-section {
   margin-bottom: 1.5rem;
 }
