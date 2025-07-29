@@ -17,6 +17,7 @@ type SettingsContextType = {
   setTheme: (t: string) => void;
   sound: boolean;
   setSound: (s: boolean) => void;
+  resolvedTheme: 'light' | 'dark';
 };
 
 const defaultAvatar = AVATARS[0];
@@ -28,6 +29,32 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   const [avatar, setAvatar] = useState(() => localStorage.getItem('lq_avatar') || defaultAvatar);
   const [language, setLanguageState] = useState(() => localStorage.getItem('lq_language') || 'twi');
   const [theme, setThemeState] = useState(() => localStorage.getItem('lq_theme') || 'system');
+  // Track resolved theme (light/dark) for system mode
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
+
+  // Helper to get system theme
+  const getSystemTheme = () =>
+    window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+
+  // Apply theme to <html> element
+  const applyTheme = (t: string) => {
+    let finalTheme = t === 'system' ? getSystemTheme() : t;
+    setResolvedTheme(finalTheme as 'light' | 'dark');
+    document.documentElement.classList.remove('theme-light', 'theme-dark');
+    document.documentElement.classList.add(`theme-${finalTheme}`);
+  };
+
+  // On mount and when theme changes, apply theme
+  React.useEffect(() => {
+    applyTheme(theme);
+    // Listen for system theme changes if 'system' is selected
+    if (theme === 'system') {
+      const mql = window.matchMedia('(prefers-color-scheme: dark)');
+      const listener = () => applyTheme('system');
+      mql.addEventListener('change', listener);
+      return () => mql.removeEventListener('change', listener);
+    }
+  }, [theme]);
   const [sound, setSound] = useState(true);
 
   // Persist nickname and avatar
@@ -43,6 +70,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   const handleSetTheme = (t: string) => {
     setThemeState(t);
     localStorage.setItem('lq_theme', t);
+    applyTheme(t);
   };
   // Persist language
   const handleSetLanguage = (l: string) => {
@@ -62,6 +90,8 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
       setTheme: handleSetTheme,
       sound,
       setSound,
+      // Optionally expose resolvedTheme for components that want to know actual mode
+      resolvedTheme,
     }}>
       {children}
     </SettingsContext.Provider>
