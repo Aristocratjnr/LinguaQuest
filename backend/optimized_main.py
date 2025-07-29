@@ -587,13 +587,6 @@ import asyncio
 async def dialogue_stream_endpoint(req: DialogueRequest):
     """Real-time streaming dialogue endpoint for AI conversation"""
     try:
-        # Detect demo/offline mode by environment variable or file (customize as needed)
-        demo_mode = False
-        if os.environ.get("LINGUAQUEST_DEMO_MODE", "0") == "1":
-            demo_mode = True
-        elif os.path.exists("DEMO_MODE"):
-            demo_mode = True
-
         responses = {
             "disagree": "I understand your point, but I have some concerns about this approach.",
             "neutral": "That's an interesting perspective. Let me consider this further.",
@@ -611,11 +604,7 @@ async def dialogue_stream_endpoint(req: DialogueRequest):
         reasoning = "Simple rule-based response"
 
         async def word_stream():
-            if demo_mode:
-                # Only show demo message ONCE, not as part of the AI response
-                yield "[Demo mode - server offline] The backend is currently in demo/offline mode. Real-time AI responses are unavailable.\n"
-                return
-            # Stream the response word by word for real-time effect
+            # Always stream the response word by word for real-time effect
             for word in ai_response.split():
                 yield word + " "
                 await asyncio.sleep(0.12)  # Simulate typing delay
