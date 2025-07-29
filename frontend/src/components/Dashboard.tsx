@@ -86,7 +86,7 @@ function AppContent() {
   const navigate = useNavigate();
   const { user, userStats, submitScore, startGameSession, endGameSession, incrementStreak, resetStreak, awardBadge, refreshUserStats, loginUser, createUser } = useUser();
 
-  const { theme, sound, nickname: tempNickname, avatar: tempAvatar, setNickname, setAvatar } = useSettings();
+  const { resolvedTheme: theme, sound, nickname: tempNickname, avatar: tempAvatar, setNickname, setAvatar } = useSettings();
 
   // Global font styles for the dashboard
   const fontStyles = {
@@ -97,21 +97,21 @@ function AppContent() {
 
   // Apply global font styles
   useEffect(() => {
-    // 添加简单明了的全局样式
+   
     const styleElement = document.createElement('style');
     styleElement.textContent = `
-      /* 基础设置 */
+    
       body {
         -webkit-font-smoothing: antialiased;
       }
 
-      /* 所有普通文本使用细体，同时确保清晰可见 */
+   
       body, p, div, span, label, a, li, td, th, input, textarea, button {
-        font-weight: 300; /* 纯细体 */
-        color: rgba(0, 0, 0, 0.9); /* 增强对比度确保可见性 */
+        font-weight: 300; 
+        color: rgba(0, 0, 0, 0.9); 
       }
 
-      /* 标题和强调文本保持粗体 */
+      
       h1, h2, h3, h4, h5, h6, strong, b, .bold {
         font-weight: 600;
       }
@@ -121,20 +121,20 @@ function AppContent() {
         font-weight: 600;
       }
 
-      /* 确保按钮文本可见 */
+     
       button, .btn {
-        font-weight: 400; /* 按钮文本稍微加粗以确保可见性 */
+        font-weight: 400; 
       }
 
-      /* 调整内联样式 */
+     
       [style*="font-weight:400"], [style*="font-weight: 400"],
       [style*="fontWeight:400"], [style*="fontWeight: 400"],
       [style*="fontWeight:normal"], [style*="fontWeight: normal"],
       [style*="font-weight:normal"], [style*="font-weight: normal"] {
-        font-weight: 300 !important; /* 普通文本转为细体 */
+        font-weight: 300 !important; 
       }
 
-      /* 保留粗体样式 */
+    
       [style*="font-weight:700"], [style*="font-weight: 700"],
       [style*="fontWeight:700"], [style*="fontWeight: 700"],
       [style*="font-weight:600"], [style*="font-weight: 600"],
@@ -144,12 +144,12 @@ function AppContent() {
         font-weight: 600 !important; /* 保持粗体元素 */
       }
 
-      /* 确保表单元素清晰可见 */
+     
       input, textarea, select {
-        font-weight: 400; /* 表单元素需要清晰可见 */
+        font-weight: 400; 
       }
 
-      /* 小文本尺寸调整，确保可读性 */
+      
       small, .small {
         font-weight: 400;
         font-size: 0.875rem;
