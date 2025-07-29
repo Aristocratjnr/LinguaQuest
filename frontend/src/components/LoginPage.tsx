@@ -231,7 +231,7 @@ const LoginPage: React.FC = () => {
         }
         
         .duo-login-card {
-          background: #ffffff;
+          background: var(--duo-card);
           border-radius: 24px;
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 8px 25px rgba(0, 0, 0, 0.06);
           padding: 48px 40px 40px;
@@ -270,7 +270,7 @@ const LoginPage: React.FC = () => {
         
         .duo-mascot-speech-bubble {
           position: relative;
-          background: #f7f7f7;
+          background: var(--duo-card);
           border-radius: 20px;
           padding: 12px 20px;
           margin-top: 16px;
@@ -288,17 +288,17 @@ const LoginPage: React.FC = () => {
           height: 0;
           border-left: 10px solid transparent;
           border-right: 10px solid transparent;
-          border-bottom: 10px solid #f7f7f7;
+          border-bottom: 10px solid var(--duo-card);
         }
         
         .speech-text {
           font-size: 14px;
-          color: #4b4b4b;
+          color: var(--lq-text-main);
           font-weight: 600;
         }
         
         .duo-login-title {
-          color: #3c3c3c;
+          color: var(--lq-text-main);
           font-size: 32px;
           font-weight: 800;
           margin: 0 0 8px 0;
@@ -307,7 +307,7 @@ const LoginPage: React.FC = () => {
         }
         
         .duo-login-subtitle {
-          color: #777;
+          color: var(--lq-text-muted);
           font-size: 16px;
           font-weight: 400;
           margin: 0 0 32px 0;
@@ -334,7 +334,7 @@ const LoginPage: React.FC = () => {
           left: 16px;
           top: 50%;
           transform: translateY(-50%);
-          color: #afafaf;
+          color: var(--lq-text-muted);
           font-size: 24px;
           z-index: 2;
           transition: color 0.2s ease;
@@ -343,32 +343,32 @@ const LoginPage: React.FC = () => {
         .duo-login-input {
           width: 100%;
           padding: 16px 16px 16px 52px;
-          border: 2px solid #e5e5e5;
+          border: 2px solid var(--lq-border);
           border-radius: 16px;
           font-size: 16px;
           font-weight: 400;
-          background: #fafafa;
-          color: #3c3c3c;
+          background: var(--duo-card);
+          color: var(--lq-text-main);
           outline: none;
           transition: all 0.2s ease;
           box-sizing: border-box;
         }
         
         .duo-login-input:focus {
-          border-color: #58cc02;
-          background: #ffffff;
+          border-color: var(--duo-card);
+          background: var(--duo-card);
           box-shadow: 0 0 0 4px rgba(88, 204, 2, 0.1);
         }
         
         .duo-login-input:focus + .duo-input-icon,
         .duo-login-input:not(:placeholder-shown) + .duo-input-icon {
-          color: #58cc02;
+          color: var(--duo-card);
         }
         
         .duo-login-btn {
           width: 100%;
           padding: 16px 24px;
-          background: linear-gradient(180deg, #58cc02 0%, #4eb600 100%);
+          background: linear-gradient(180deg, var(--duo-card), var(--duo-card));
           border: none;
           border-radius: 16px;
           color: white;
@@ -378,26 +378,26 @@ const LoginPage: React.FC = () => {
           letter-spacing: 0.5px;
           cursor: pointer;
           transition: all 0.2s ease;
-          box-shadow: 0 4px 0 #46a302, 0 8px 25px rgba(88, 204, 2, 0.3);
+          box-shadow: 0 4px 0 var(--duo-card), 0 8px 25px rgba(88, 204, 2, 0.3);
           position: relative;
           overflow: hidden;
         }
         
         .duo-login-btn:hover:not(.disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 6px 0 #46a302, 0 12px 35px rgba(88, 204, 2, 0.4);
+          box-shadow: 0 6px 0 var(--duo-card), 0 12px 35px rgba(88, 204, 2, 0.4);
         }
         
         .duo-login-btn:active:not(.disabled) {
           transform: translateY(2px);
-          box-shadow: 0 2px 0 #46a302, 0 4px 15px rgba(88, 204, 2, 0.2);
+          box-shadow: 0 2px 0 var(--duo-card), 0 4px 15px rgba(88, 204, 2, 0.2);
         }
         
         .duo-login-btn.disabled {
-          background: #e5e5e5;
-          color: #afafaf;
+          background: var(--lq-disabled);
+          color: var(--lq-text-disabled);
           cursor: not-allowed;
-          box-shadow: 0 4px 0 #d0d0d0;
+          box-shadow: 0 4px 0 var(--lq-disabled);
           transform: none;
         }
         
@@ -408,7 +408,7 @@ const LoginPage: React.FC = () => {
         .duo-login-btn-secondary {
           width: 100%;
           padding: 14px 24px;
-          background: linear-gradient(180deg, #1cb0f6 0%, #0c8ce8 100%);
+          background: linear-gradient(180deg, var(--duo-card), var(--duo-card));
           border: none;
           border-radius: 16px;
           color: white;
@@ -418,26 +418,26 @@ const LoginPage: React.FC = () => {
           letter-spacing: 0.5px;
           cursor: pointer;
           transition: all 0.2s ease;
-          box-shadow: 0 3px 0 #0c8ce8, 0 6px 20px rgba(28, 176, 246, 0.25);
+          box-shadow: 0 3px 0 var(--duo-card), 0 6px 20px rgba(28, 176, 246, 0.25);
           position: relative;
           overflow: hidden;
         }
         
         .duo-login-btn-secondary:hover:not(.disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 5px 0 #0c8ce8, 0 10px 30px rgba(28, 176, 246, 0.35);
+          box-shadow: 0 5px 0 var(--duo-card), 0 10px 30px rgba(28, 176, 246, 0.35);
         }
         
         .duo-login-btn-secondary:active:not(.disabled) {
           transform: translateY(1px);
-          box-shadow: 0 2px 0 #0c8ce8, 0 4px 15px rgba(28, 176, 246, 0.2);
+          box-shadow: 0 2px 0 var(--duo-card), 0 4px 15px rgba(28, 176, 246, 0.2);
         }
         
         .duo-login-btn-secondary.disabled {
-          background: #e5e5e5;
-          color: #afafaf;
+          background: var(--lq-disabled);
+          color: var(--lq-text-disabled);
           cursor: not-allowed;
-          box-shadow: 0 3px 0 #d0d0d0;
+          box-shadow: 0 3px 0 var(--lq-disabled);
           transform: none;
         }
         
@@ -462,7 +462,7 @@ const LoginPage: React.FC = () => {
         }
         
         .duo-login-error {
-          background: #ff4b4b;
+          background: var(--lq-error);
           color: white;
           padding: 12px 16px;
           border-radius: 12px;
@@ -476,7 +476,7 @@ const LoginPage: React.FC = () => {
         }
         
         .duo-login-footer {
-          color: #777;
+          color: var(--lq-text-muted);
           font-size: 14px;
           font-weight: 400;
           line-height: 1.4;
@@ -484,14 +484,14 @@ const LoginPage: React.FC = () => {
         }
         
         .duo-login-link {
-          color: #1cb0f6;
+          color: var(--duo-card);
           font-weight: 600;
           cursor: pointer;
           transition: color 0.2s ease;
         }
         
         .duo-login-link:hover {
-          color: #0c8ce8;
+          color: var(--duo-card);
         }
         
         .contact-modal-overlay {
@@ -510,7 +510,7 @@ const LoginPage: React.FC = () => {
         }
         
         .contact-modal {
-          background: white;
+          background: var(--duo-card);
           border-radius: 20px;
           max-width: 480px;
           width: 100%;
@@ -531,7 +531,7 @@ const LoginPage: React.FC = () => {
         
         .contact-modal-header h3 {
           margin: 0;
-          color: #3c3c3c;
+          color: var(--lq-text-main);
           font-size: 24px;
           font-weight: 700;
         }
@@ -539,7 +539,7 @@ const LoginPage: React.FC = () => {
         .contact-modal-close {
           background: none;
           border: none;
-          color: #777;
+          color: var(--lq-text-muted);
           cursor: pointer;
           padding: 8px;
           border-radius: 50%;
@@ -550,8 +550,8 @@ const LoginPage: React.FC = () => {
         }
         
         .contact-modal-close:hover {
-          background: #f0f0f0;
-          color: #3c3c3c;
+          background: var(--lq-disabled);
+          color: var(--lq-text-disabled);
         }
         
         .contact-modal-body {
@@ -561,7 +561,7 @@ const LoginPage: React.FC = () => {
         }
         
         .contact-modal-body p {
-          color: #777;
+          color: var(--lq-text-muted);
           margin: 0 0 24px 0;
           line-height: 1.5;
         }
@@ -577,19 +577,19 @@ const LoginPage: React.FC = () => {
           align-items: flex-start;
           gap: 16px;
           padding: 16px;
-          background: #f8f9fa;
+          background: var(--duo-card);
           border-radius: 12px;
           transition: all 0.2s ease;
           margin-bottom: 2px;
         }
         
         .contact-option:hover {
-          background: #f0f2f5;
+          background: var(--lq-disabled);
           transform: translateY(-1px);
         }
         
         .contact-option .material-icons {
-          color: #58cc02;
+          color: var(--duo-card);
           font-size: 28px;
           margin-top: 2px;
         }
@@ -599,7 +599,7 @@ const LoginPage: React.FC = () => {
         }
         
         .contact-option strong {
-          color: #3c3c3c;
+          color: var(--lq-text-main);
           font-size: 16px;
           font-weight: 600;
           display: block;
@@ -607,7 +607,7 @@ const LoginPage: React.FC = () => {
         }
         
         .contact-option p {
-          color: #777;
+          color: var(--lq-text-muted);
           font-size: 14px;
           margin: 0;
           line-height: 1.4;

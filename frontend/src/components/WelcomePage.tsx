@@ -219,7 +219,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
                 key={index}
                 className={`duo-nav-dot ${currentSlide === index ? 'active' : ''}`}
                 style={{ 
-                  background: currentSlide === index ? slide.color : '#d1d5db'
+                  background: currentSlide === index ? slide.color : 'var(--lq-text-muted)'
                 }}
                 onClick={() => {
                   setDirection(index > currentSlide ? 1 : -1);
@@ -271,7 +271,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
           >
-            © 2025 LinguaQuest
+            &copy; 2025 LinguaQuest
           </motion.span>
           <motion.button 
             className="duo-skip-btn"
@@ -279,7 +279,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
               setDirection(1);
               setCurrentSlide(slides.length - 1);
             }}
-            whileHover={{ scale: 1.05, color: '#58cc02' }}
+            whileHover={{ scale: 1.05, color: 'var(--lq-text-main)' }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300 }}
           >
@@ -292,7 +292,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         .duo-welcome-bg {
           min-height: 100vh;
           width: 100vw;
-          background: linear-gradient(135deg, #ffffff, #ffffff); 
+          background: var(--duo-bg);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -314,7 +314,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
 
         .decoration-orb {
           position: absolute;
-          background: rgba(255, 255, 255, 0.1);
+          background: var(--duo-card);
           border-radius: 50%;
           animation: orbFloat 12s ease-in-out infinite;
         }
@@ -352,7 +352,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         }
 
         .duo-welcome-card {
-          background: #ffffff;
+          background: var(--duo-card);
           border-radius: clamp(16px, 4vw, 24px);
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.1);
           max-width: 440px;
@@ -366,7 +366,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         }
 
         .duo-welcome-header {
-          background: linear-gradient(135deg, #58cc02 0%, #4eb600 100%);
+          background: var(--duo-header);
           padding: clamp(24px, 6vw, 48px) clamp(16px, 4vw, 32px) clamp(16px, 4vw, 24px);
           text-align: center;
           color: white;
@@ -377,14 +377,14 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         .duo-logo-circle {
           width: clamp(64px, 16vw, 80px);
           height: clamp(64px, 16vw, 80px);
-          background: rgba(255, 255, 255, 0.2);
+          background: var(--duo-card);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto;
           backdrop-filter: blur(10px);
-          border: 3px solid rgba(255, 255, 255, 0.3);
+          border: 3px solid var(--lq-border);
           animation: logoGlow 3s ease-in-out infinite;
         }
 
@@ -418,7 +418,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
 
         .duo-slide-container {
           padding: clamp(16px, 4vw, 32px);
-          background: #ffffff;
+          background: var(--duo-card);
           flex: 1;
           display: flex;
           flex-direction: column;
@@ -476,14 +476,14 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           font-size: clamp(18px, 5vw, 24px);
           font-weight: 800;
           margin: 0 0 clamp(12px, 3vw, 16px) 0;
-          color: #3c3c3c;
+          color: var(--lq-text-main);
           letter-spacing: -0.5px;
           line-height: 1.2;
         }
 
         .duo-slide-description {
           font-size: clamp(14px, 3.5vw, 16px);
-          color: #777;
+          color: var(--lq-text-muted);
           margin: 0;
           line-height: 1.5;
           max-width: 95%;
@@ -496,7 +496,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         .duo-get-started-btn {
           width: 100%;
           padding: clamp(14px, 4vw, 18px) clamp(16px, 4vw, 24px);
-          background: linear-gradient(180deg, #58cc02 0%, #4eb600 100%);
+          background: var(--duo-header);
           border: none;
           border-radius: clamp(12px, 3vw, 16px);
           color: white;
@@ -509,7 +509,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           align-items: center;
           justify-content: center;
           gap: clamp(6px, 2vw, 8px);
-          box-shadow: 0 6px 0 #46a302, 0 12px 32px rgba(88, 204, 2, 0.4);
+          box-shadow: 0 6px 0 var(--lq-shadow), 0 12px 32px var(--lq-shadow-opacity);
           transition: all 0.2s ease;
           position: relative;
           overflow: hidden;
@@ -518,12 +518,12 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
 
         .duo-get-started-btn:hover {
           transform: translateY(-3px);
-          box-shadow: 0 9px 0 #46a302, 0 18px 40px rgba(88, 204, 2, 0.5);
+          box-shadow: 0 9px 0 var(--lq-shadow), 0 18px 40px var(--lq-shadow-opacity);
         }
 
         .duo-get-started-btn:active {
           transform: translateY(3px);
-          box-shadow: 0 3px 0 #46a302, 0 6px 20px rgba(88, 204, 2, 0.3);
+          box-shadow: 0 3px 0 var(--lq-shadow), 0 6px 20px var(--lq-shadow-opacity);
         }
 
         .btn-text {
@@ -537,7 +537,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           left: -100%;
           width: 100%;
           height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+          background: linear-gradient(90deg, transparent, var(--lq-text-main), transparent);
           animation: shine 3s ease-in-out infinite;
         }
 
@@ -570,10 +570,10 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         .duo-nav-btn {
           flex: 1;
           padding: clamp(10px, 3vw, 12px) clamp(12px, 3vw, 16px);
-          border: 2px solid #e5e5e5;
+          border: 2px solid var(--lq-border);
           border-radius: clamp(8px, 2vw, 12px);
-          background: #ffffff;
-          color: #777;
+          background: var(--duo-card);
+          color: var(--lq-text-muted);
           font-size: clamp(12px, 3vw, 14px);
           font-weight: 700;
           text-transform: uppercase;
@@ -588,20 +588,20 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         }
 
         .duo-nav-btn.next {
-          background: linear-gradient(180deg, #58cc02 0%, #4eb600 100%);
-          border-color: #58cc02;
+          background: var(--duo-header);
+          border-color: var(--lq-text-main);
           color: white;
-          box-shadow: 0 4px 0 #46a302;
+          box-shadow: 0 4px 0 var(--lq-shadow);
         }
 
         .duo-nav-btn.next:hover {
           transform: translateY(-1px);
-          box-shadow: 0 5px 0 #46a302;
+          box-shadow: 0 5px 0 var(--lq-shadow);
         }
 
         .duo-nav-btn.prev:hover {
-          border-color: #58cc02;
-          color: #58cc02;
+          border-color: var(--lq-text-main);
+          color: var(--lq-text-main);
         }
 
         .duo-nav-btn.hidden {
@@ -614,9 +614,9 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         }
 
         .duo-welcome-footer {
-          background: #f8fafc;
+          background: var(--duo-bg);
           padding: clamp(12px, 3vw, 16px) clamp(16px, 4vw, 32px);
-          border-top: 1px solid #e5e5e5;
+          border: 1px solid var(--lq-border);
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -626,14 +626,14 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
 
         .duo-copyright {
           font-size: clamp(10px, 2.5vw, 12px);
-          color: #777;
+          color: var(--lq-text-muted);
           font-weight: 500;
         }
 
         .duo-skip-btn {
           background: transparent;
           border: none;
-          color: #1cb0f6;
+          color: var(--lq-text-main);
           font-size: clamp(10px, 2.5vw, 12px);
           font-weight: 700;
           text-transform: uppercase;
