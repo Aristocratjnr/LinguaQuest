@@ -21,8 +21,8 @@ const Scenario: React.FC<ScenarioProps> = ({
 }) => {
   const { resolvedTheme } = useSettings();
   const isDark = resolvedTheme === 'dark';
-  const textColor = isDark ? '#e0e7ff' : '#333';
-  const mutedColor = isDark ? '#a5b4fc' : '#6c757d';
+  const textColor = 'var(--lq-text-main)';
+  const mutedColor = isDark ? '#a5b4fc' : 'var(--lq-text-muted)';
   const currentLanguage = languages.find(l => l.code === language);
   const languageLabel = currentLanguage?.label || language.toUpperCase();
 
@@ -133,7 +133,7 @@ const Scenario: React.FC<ScenarioProps> = ({
       <div className="d-flex flex-column gap-2">
         <div className="d-flex align-items-center">
           <label className="form-label mb-0 me-2 d-flex align-items-center" style={{ 
-            color: '#6c757d',
+            color: 'var(--lq-text-muted)',
             fontWeight: 500,
             fontSize: '0.9rem'
           }}>

@@ -24,10 +24,10 @@ const Feedback: React.FC<FeedbackProps> = ({
 
   const { resolvedTheme } = useSettings();
   const isDark = resolvedTheme === 'dark';
-  const textColor = isDark ? '#e0e7ff' : '#333';
-  const mutedColor = isDark ? '#a5b4fc' : '#6c757d';
-  const primaryColor = isDark ? '#58cc02' : '#3caa3c';
-  const secondaryColor = isDark ? '#d7f7c8' : '#c8f4b8';
+  const textColor = 'var(--lq-text-main)';
+  const mutedColor = isDark ? 'var(--lq-text-muted-dark)' : 'var(--lq-text-muted)';
+  const primaryColor = '#58cc02';
+  const secondaryColor = '#d7f7c8';
   const tertiaryColor = isDark ? '#3caa3c' : '#58cc02';
 
   useEffect(() => {

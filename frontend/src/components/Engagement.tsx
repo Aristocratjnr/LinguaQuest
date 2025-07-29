@@ -33,7 +33,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
   });
 
   // Use user data from context instead of making API calls
-  const streak = user?.current_streak || 0;
+  const streak = userStats?.current_streak || 0;
   const xp = userStats?.total_score || 0;
   const loadingStats = !user || !userStats;
 
@@ -186,7 +186,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
     textAlign: 'center'
   }}>
     <h1 style={{
-      color: '#1cb0f6',
+      color: 'var(--lq-text-muted)',
       fontWeight: 900,
       marginBottom: '12px',
       fontSize: getFontSize(18, 22, 26),
@@ -197,7 +197,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
        WELCOME, {nickname.toUpperCase()}!
     </h1>
     <p style={{
-      color: '#222',
+      color: 'var(--text-dark)',
       fontWeight: 600,
       marginBottom: '0',
       fontSize: getFontSize(12, 14, 16),
@@ -217,8 +217,8 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
             display: 'flex',
             justifyContent: 'space-around',
             padding: getSpacing(12, 16, 24),
-            background: '#f9f9f9',
-            borderBottom: '1px solid #eee',
+            background: 'var(--duo-card, #fff)',
+            borderBottom: '1px solid var(--border-light)',
             gap: '8px'
           }}
         >
@@ -276,7 +276,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
               {loadingStats ? '...' : streak}
             </motion.div>
             <div style={{
-              color: '#222',
+              color: 'var(--text-dark)',
               fontSize: getFontSize(10, 11, 12),
               letterSpacing: '0.5px',
               fontWeight: 600
@@ -338,7 +338,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
               {loadingStats ? '...' : xp}
             </motion.div>
             <div style={{
-              color: '#222',
+              color: 'var(--text-dark)',
               fontSize: getFontSize(10, 11, 12),
               letterSpacing: '0.5px',
               fontWeight: 600
@@ -351,15 +351,15 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
         {/* Daily motivation */}
         <div style={{
           padding: getSpacing(12, 16, 24),
-          borderBottom: '1px solid #eee',
-          background: 'white',
+          borderBottom: '1px solid var(--border-light)',
+          background: 'var(--duo-card, #fff)',
           minHeight: isSmallMobile ? '70px' : isMobile ? '80px' : '100px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center'
         }}>
           <div style={{
-            color: '#58cc02',
+            color: 'var(--lq-text-muted)',
             fontWeight: 'bold',
             fontSize: getFontSize(11, 12, 14),
             marginBottom: '8px',
@@ -381,7 +381,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
                 justifyContent: 'center',
                 textAlign: 'center',
                 fontStyle: 'italic',
-                color: '#555',
+                color: 'var(--text-dark)',
                 fontSize: getFontSize(13, 14, 16),
                 lineHeight: '1.4'
               }}
@@ -394,7 +394,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
         {/* Tips carousel */}
         <div style={{
           padding: getSpacing(12, 16, 24),
-          background: '#f9f9f9',
+          background: 'var(--duo-card, #fff)',
           minHeight: isSmallMobile ? '90px' : isMobile ? '100px' : '120px'
         }}>
           <div style={{
@@ -404,7 +404,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
             marginBottom: getSpacing(8, 10, 12)
           }}>
             <div style={{
-              color: '#1cb0f6',
+              color: 'var(--lq-text-muted)',
               fontWeight: 'bold',
               fontSize: getFontSize(11, 12, 14),
               textTransform: 'uppercase',
@@ -420,7 +420,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
                   border: 'none',
                   cursor: 'pointer',
                   fontSize: getFontSize(18, 20, 22),
-                  color: '#1cb0f6',
+                  color: 'var(--lq-text-muted)',
                   marginRight: '8px'
                 }}
                 whileTap={{ scale: 0.9 }}
@@ -434,7 +434,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
                   border: 'none',
                   cursor: 'pointer',
                   fontSize: getFontSize(18, 20, 22),
-                  color: '#1cb0f6'
+                  color: 'var(--lq-text-muted)'
                 }}
                 whileTap={{ scale: 0.9 }}
               >
@@ -458,7 +458,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
                 minHeight: isSmallMobile ? '60px' : isMobile ? '70px' : '80px',
                 display: 'flex',
                 alignItems: 'center',
-                color: '#333',
+                color: 'var(--lq-text-main)',
                 fontSize: getFontSize(13, 14, 15),
                 lineHeight: '1.4'
               }}
