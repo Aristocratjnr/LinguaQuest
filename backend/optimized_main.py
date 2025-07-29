@@ -1,48 +1,5 @@
-from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
-import time
-def get_huggingface_conversational_model():
-    """Lazy load a HuggingFace conversational model (e.g., DialoGPT)"""
-    global _conversational_ai
-    return _conversational_ai
 
-def stream_huggingface_response(prompt: str):
-    """Generator for streaming HuggingFace model output token by token"""
-    ai = get_huggingface_conversational_model()
-    response = tokenizer.decode(output_ids[:, input_ids.shape[-1]:][0], skip_special_tokens=True)
-    # Stream word by word for demo (can stream by token for more granularity)
-    for word in response.split():
-        yield word + " "
-        time.sleep(0.08)  # Simulate real-time streaming
-@app.post("/api/v1/dialogue/stream")
 
-# Streaming dialogue endpoint (real-time response)
-@app.post("/api/v1/dialogue/stream")
-def dialogue_stream_endpoint(req: DialogueRequest):
-    """Streaming dialogue endpoint that yields the AI response word by word in real time"""
-    responses = {
-        "disagree": "I understand your point, but I have some concerns about this approach.",
-        "neutral": "That's an interesting perspective. Let me consider this further.",
-        "agree": "You make a compelling argument. I'm starting to see your point."
-    }
-    new_stance = req.ai_stance
-    if len(req.user_argument) > 50:
-        if req.ai_stance == "disagree":
-            new_stance = "neutral"
-        elif req.ai_stance == "neutral":
-            new_stance = "agree"
-    ai_response = responses.get(req.ai_stance, "I understand your perspective.")
-
-    def word_stream():
-        for word in ai_response.split():
-            yield word + " "
-            time.sleep(0.08)
-        # After streaming the main response, stream the rest of the fields as JSON
-        import json
-        meta = {"new_stance": new_stance, "reasoning": "Simple rule-based response"}
-        yield "\n" + json.dumps(meta)
-
-    return StreamingResponse(word_stream(), media_type="text/plain")
 # -*- coding: utf-8 -*-
 """
 Memory-optimized version of LinguaQuest API for Render deployment
