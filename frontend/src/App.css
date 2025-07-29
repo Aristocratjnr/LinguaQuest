@@ -120,6 +120,83 @@ body.dark .lq-label,
   }
 }
 
+/* Dashboard responsive layout */
+.app-container {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.app-container header {
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  background: var(--duo-card);
+  border-bottom: 1px solid var(--lq-border);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 2vw, 16px);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+/* Responsive text and layout */
+@media (max-width: 768px) {
+  .app-container {
+    font-size: 14px;
+  }
+  
+  .header-left {
+    justify-content: center;
+    width: 100%;
+  }
+  
+  /* Prevent layout shift on mobile */
+  .app-container * {
+    box-sizing: border-box;
+  }
+  
+  /* Stable input fields */
+  input, textarea, select {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+/* Dark mode dashboard overrides */
+body.dark .app-container header,
+.dark .app-container header {
+  background: var(--bg-dark);
+  border-bottom-color: var(--border-dark);
+}
+
+body.dark .app-container,
+.dark .app-container {
+  background: var(--bg-dark);
+  color: var(--text-dark);
+}
+
+/* Prevent text selection issues in dark mode */
+body.dark *,
+.dark * {
+  color: inherit;
+}
+
+/* Ensure all text uses theme variables */
+.app-container * {
+  color: var(--lq-text-main);
+}
+
+.app-container .muted,
+.app-container .secondary {
+  color: var(--lq-text-muted);
+}
+
 .dark .lq-label {
   color: #cbd5e1;
 }

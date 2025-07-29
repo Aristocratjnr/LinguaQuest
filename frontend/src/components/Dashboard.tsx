@@ -1248,10 +1248,10 @@ function AppContent() {
     }}>
       {/* Header - Duolingo style */}
       <header style={{
-        background: DUOLINGO_COLORS.white,
-        padding: 'clamp(4px, 2vw, 16px)',
+        background: 'var(--duo-card)',
+        padding: 'clamp(8px, 2vw, 16px)',
         boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-        position: 'sticky',
+        position: 'relative',
         top: 0,
         zIndex: 100
       }}>
@@ -1274,13 +1274,13 @@ function AppContent() {
             minWidth: 0, 
             flex: 1, 
             flexWrap: 'wrap',
-            justifyContent: window.innerWidth < 768 ? 'center' : 'flex-start'
+            justifyContent: 'flex-start'
           }}>
             {/* Logo and app name */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span style={{
-                  color: DUOLINGO_COLORS.green,
+                  color: 'var(--duo-green)',
                   fontSize: 'clamp(1.1rem, 4vw, 22px)',
                   fontWeight: 700,
                   fontFamily: 'JetBrains Mono, monospace',
@@ -1289,7 +1289,7 @@ function AppContent() {
                 }}>
                   LinguaQuest
                 </span>
-                <span className="material-icons" style={{ fontSize: 'clamp(1.1rem, 4vw, 22px)', color: DUOLINGO_COLORS.green, opacity: 0.85 }}>psychology</span>
+                <span className="material-icons" style={{ fontSize: 'clamp(1.1rem, 4vw, 22px)', color: 'var(--duo-green)', opacity: 0.85 }}>psychology</span>
               </div>
               <span style={{
                 color: DUOLINGO_COLORS.darkGray,
@@ -1351,7 +1351,7 @@ function AppContent() {
                   cy={27}
                   r={24}
                   fill="none"
-                  stroke="#e5e5e5"
+                  stroke="var(--lq-border)"
                   strokeWidth={6}
                 />
                 <motion.circle
@@ -1359,7 +1359,7 @@ function AppContent() {
                   cy={27}
                   r={24}
                   fill="none"
-                  stroke="#ff9c1a"
+                  stroke="var(--duo-orange)"
                   strokeWidth={6}
                   strokeDasharray={2 * Math.PI * 24}
                   strokeDashoffset={2 * Math.PI * 24 * (1 - dailyProgress)}
@@ -1376,7 +1376,7 @@ function AppContent() {
                 filter: 'drop-shadow(0 2px 6px #ff9c1a33)',
                 zIndex: 1,
                 position: 'relative',
-                background: 'white',
+                background: 'var(--duo-card)',
                 borderRadius: '50%',
                 padding: 4,
                 boxShadow: '0 2px 8px #ff9c1a22',
