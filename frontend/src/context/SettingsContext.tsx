@@ -36,12 +36,22 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   const getSystemTheme = () =>
     window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 
-  // Apply theme to <html> element
+  // Apply theme to <html> and <body> for compatibility with CSS
   const applyTheme = (t: string) => {
     let finalTheme = t === 'system' ? getSystemTheme() : t;
     setResolvedTheme(finalTheme as 'light' | 'dark');
     document.documentElement.classList.remove('theme-light', 'theme-dark');
     document.documentElement.classList.add(`theme-${finalTheme}`);
+    // Also set body class for legacy and CSS compatibility
+    document.body.classList.remove('dark', 'light');
+    document.body.classList.add(finalTheme);
+    if (finalTheme === 'dark') {
+      document.body.classList.add('dark');
+      document.body.classList.remove('light');
+    } else {
+      document.body.classList.add('light');
+      document.body.classList.remove('dark');
+    }
   };
 
   // On mount and when theme changes, apply theme
