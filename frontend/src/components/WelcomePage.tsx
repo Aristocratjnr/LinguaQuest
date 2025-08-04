@@ -279,7 +279,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
               setDirection(1);
               setCurrentSlide(slides.length - 1);
             }}
-            whileHover={{ scale: 1.05, color: 'var(--lq-text-main)' }}
+            whileHover={{ scale: 1.05, color: '#1a1a1a' }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300 }}
           >
@@ -292,7 +292,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         .duo-welcome-bg {
           min-height: 100vh;
           width: 100vw;
-          background: var(--duo-bg);
+          background: linear-gradient(135deg, #e0f7fa 0%, #f5f5f5 100%);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -300,6 +300,11 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           overflow: hidden;
           font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           padding: clamp(12px, 3vw, 20px);
+        }
+        
+        body.dark .duo-welcome-bg,
+        .dark .duo-welcome-bg {
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         }
 
         .duo-bg-decorations {
@@ -314,9 +319,14 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
 
         .decoration-orb {
           position: absolute;
-          background: var(--duo-card);
+          background: #ffffff;
           border-radius: 50%;
           animation: orbFloat 12s ease-in-out infinite;
+        }
+        
+        body.dark .decoration-orb,
+        .dark .decoration-orb {
+          background: #1e293b;
         }
 
         .orb-1 {
@@ -352,7 +362,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         }
 
         .duo-welcome-card {
-          background: var(--duo-card);
+          background: #ffffff;
           border-radius: clamp(16px, 4vw, 24px);
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.1);
           max-width: 440px;
@@ -364,28 +374,44 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           display: flex;
           flex-direction: column;
         }
+        
+        body.dark .duo-welcome-card,
+        .dark .duo-welcome-card {
+          background: #1e293b;
+        }
 
         .duo-welcome-header {
-          background: var(--duo-header);
+          background: linear-gradient(135deg, #1cb0f6 0%, #1899d6 100%);
           padding: clamp(24px, 6vw, 48px) clamp(16px, 4vw, 32px) clamp(16px, 4vw, 24px);
           text-align: center;
           color: white;
           position: relative;
           overflow: hidden;
         }
+        
+        body.dark .duo-welcome-header,
+        .dark .duo-welcome-header {
+          background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+        }
 
         .duo-logo-circle {
           width: clamp(64px, 16vw, 80px);
           height: clamp(64px, 16vw, 80px);
-          background: var(--duo-card);
+          background: #ffffff;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto;
           backdrop-filter: blur(10px);
-          border: 3px solid var(--lq-border);
+          border: 3px solid #e0e0e0;
           animation: logoGlow 3s ease-in-out infinite;
+        }
+        
+        body.dark .duo-logo-circle,
+        .dark .duo-logo-circle {
+          background: #0f172a;
+          border: 3px solid #334155;
         }
 
         .duo-logo-img {
@@ -418,10 +444,15 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
 
         .duo-slide-container {
           padding: clamp(16px, 4vw, 32px);
-          background: var(--duo-card);
+          background: #ffffff;
           flex: 1;
           display: flex;
           flex-direction: column;
+        }
+
+        body.dark .duo-slide-container,
+        .dark .duo-slide-container {
+          background: #1e293b;
         }
 
         .duo-slider-wrapper {
