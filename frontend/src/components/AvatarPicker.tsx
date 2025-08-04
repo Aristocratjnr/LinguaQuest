@@ -386,10 +386,10 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
 {{ ... }}
         }
         .dark .avatar-picker-card, body.dark .avatar-picker-card {
-          color: var(--text-light, #e0e7ff) !important;
+          color: #e0e7ff !important;
         }
         .dark .avatar-picker-card p, body.dark .avatar-picker-card p {
-          color: var(--text-light, #e0e7ff) !important;
+          color: #e0e7ff !important;
         }
       `}</style>
     </div>
