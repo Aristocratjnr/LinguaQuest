@@ -343,10 +343,10 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
             transition={{ type: 'spring', stiffness: 400 }}
           >
             <motion.div
-              className="nickname-avatar-upload"
+              className="nickname-avatar-container"
+              onClick={triggerFileInput}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={triggerFileInput}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -354,11 +354,11 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                 width: 'clamp(5rem, 15vw, 6rem)',
                 height: 'clamp(5rem, 15vw, 6rem)',
                 borderRadius: '50%',
-                background: avatarPreview ? 'transparent' : 'rgba(255, 255, 255, 0.2)',
+                background: avatarPreview ? 'transparent' : 'rgba(0, 0, 0, 0.05)',
                 marginBottom: 'clamp(12px, 3vw, 16px)',
                 overflow: 'hidden',
                 cursor: 'pointer',
-                border: '3px solid white',
+                border: '3px solid rgba(0, 0, 0, 0.1)',
                 position: 'relative',
                 transition: 'width 0.2s, height 0.2s',
               }}
@@ -736,6 +736,20 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         body.dark .nickname-card .material-icons,
         .dark .nickname-card .material-icons {
           color: #94a3b8;
+        }
+        body.dark .nickname-avatar-container,
+        .dark .nickname-avatar-container {
+          border-color: #334155 !important;
+          background: rgba(51, 65, 85, 0.2) !important;
+        }
+        .nickname-avatar-container {
+          border-color: white !important;
+          background: rgba(255, 255, 255, 0.2) !important;
+        }
+        body.dark .nickname-avatar-add-text,
+        .dark .nickname-avatar-add-text {
+          background: rgba(0, 0, 0, 0.5) !important;
+          color: white !important;
         }
         body.dark .nickname-footer,
         .dark .nickname-footer {
