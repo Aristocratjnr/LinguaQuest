@@ -720,6 +720,353 @@ const LoginPage: React.FC = () => {
           }
         }
         
+        /* Light theme specific styles */
+        body:not(.dark) .duo-login-bg {
+          background: linear-gradient(135deg, #e0f7fa 0%, #f5f5f5 100%);
+        }
+        
+        body:not(.dark) .duo-login-card {
+          background: white;
+          box-shadow: 0 8px 32px rgba(88, 204, 2, 0.12);
+        }
+        
+        body:not(.dark) .duo-login-title {
+          color: #1a1a1a;
+        }
+        
+        body:not(.dark) .duo-login-subtitle {
+          color: #666666;
+        }
+        
+        body:not(.dark) .duo-input-icon {
+          color: #888888;
+        }
+        
+        body:not(.dark) .duo-login-input {
+          background: white;
+          border-color: #e0e0e0;
+          color: #333333;
+        }
+        
+        body:not(.dark) .duo-login-input:focus {
+          border-color: #58cc02;
+          box-shadow: 0 0 0 4px rgba(88, 204, 2, 0.1);
+        }
+        
+        body:not(.dark) .duo-login-input:focus + .duo-input-icon,
+        body:not(.dark) .duo-login-input:not(:placeholder-shown) + .duo-input-icon {
+          color: #58cc02;
+        }
+        
+        body:not(.dark) .duo-login-btn {
+          background: linear-gradient(180deg, #58cc02 0%, #46a302 100%);
+          color: white;
+          box-shadow: 0 4px 0 #46a302, 0 8px 25px rgba(88, 204, 2, 0.3);
+        }
+        
+        body:not(.dark) .duo-login-btn:hover:not(.disabled) {
+          box-shadow: 0 6px 0 #46a302, 0 12px 35px rgba(88, 204, 2, 0.4);
+        }
+        
+        body:not(.dark) .duo-login-btn:active:not(.disabled) {
+          box-shadow: 0 2px 0 #46a302;
+        }
+        
+        body:not(.dark) .duo-login-btn.disabled {
+          background: #e0e0e0;
+          color: #999999;
+          box-shadow: 0 4px 0 #cccccc;
+        }
+        
+        body:not(.dark) .quick-play-btn {
+          background: linear-gradient(180deg, #1cb0f6 0%, #1899d6 100%);
+          color: white;
+          box-shadow: 0 4px 0 #1899d6, 0 8px 25px rgba(28, 176, 246, 0.3);
+        }
+        
+        body:not(.dark) .quick-play-btn:hover {
+          box-shadow: 0 6px 0 #1899d6, 0 12px 35px rgba(28, 176, 246, 0.4);
+        }
+        
+        body:not(.dark) .quick-play-btn:active {
+          box-shadow: 0 2px 0 #1899d6;
+        }
+        
+        body:not(.dark) .contact-admin-btn {
+          color: #666666;
+          border: 2px solid #e0e0e0;
+        }
+        
+        body:not(.dark) .contact-admin-btn:hover {
+          background: #f5f5f5;
+          color: #333333;
+        }
+        
+        body:not(.dark) .error-message {
+          background: #ffebee;
+          color: #c62828;
+          border: 1px solid #ffcdd2;
+        }
+        
+        body:not(.dark) .contact-modal {
+          background: white;
+        }
+        
+        body:not(.dark) .contact-modal-header h3 {
+          color: #1a1a1a;
+        }
+        
+        body:not(.dark) .contact-modal-close {
+          color: #888888;
+        }
+        
+        body:not(.dark) .contact-modal-close:hover {
+          background: #f5f5f5;
+        }
+        
+        body:not(.dark) .contact-modal-body p {
+          color: #666666;
+        }
+        
+        body:not(.dark) .contact-option {
+          background: white;
+        }
+        
+        body:not(.dark) .contact-option:hover {
+          background: #f5f5f5;
+        }
+        
+        body:not(.dark) .contact-option .material-icons {
+          color: #58cc02;
+        }
+        
+        body:not(.dark) .contact-option strong {
+          color: #1a1a1a;
+        }
+        
+        body:not(.dark) .contact-option p {
+          color: #666666;
+        }
+        
+        body:not(.dark) .contact-modal-btn {
+          background: linear-gradient(180deg, #58cc02 0%, #46a302 100%);
+          color: white;
+          box-shadow: 0 4px 0 #46a302;
+        }
+        
+        body:not(.dark) .contact-modal-btn:hover {
+          box-shadow: 0 6px 0 #46a302, 0 8px 25px rgba(88, 204, 2, 0.3);
+        }
+        
+        body:not(.dark) .contact-modal-btn:active {
+          box-shadow: 0 2px 0 #46a302;
+        }
+        
+        body:not(.dark) .duo-mascot-speech-bubble {
+          background: white;
+          color: #333333;
+          border: 1px solid #e0e0e0;
+        }
+        
+        body:not(.dark) .duo-mascot-speech-bubble::after {
+          border-top-color: white;
+        }
+        
+        body:not(.dark) .speech-text {
+          color: #333333;
+        }
+        
+        /* Dark theme specific styles */
+        body.dark .duo-login-bg,
+        .dark .duo-login-bg {
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        
+        body.dark .duo-login-card,
+        .dark .duo-login-card {
+          background: #1e293b;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        body.dark .duo-login-title,
+        .dark .duo-login-title {
+          color: #f0f0f0;
+        }
+        
+        body.dark .duo-login-subtitle,
+        .dark .duo-login-subtitle {
+          color: #cbd5e1;
+        }
+        
+        body.dark .duo-input-icon,
+        .dark .duo-input-icon {
+          color: #94a3b8;
+        }
+        
+        body.dark .duo-login-input,
+        .dark .duo-login-input {
+          background: #0f172a;
+          border-color: #334155;
+          color: #f0f0f0;
+        }
+        
+        body.dark .duo-login-input:focus,
+        .dark .duo-login-input:focus {
+          border-color: #58cc02;
+          box-shadow: 0 0 0 4px rgba(88, 204, 2, 0.2);
+        }
+        
+        body.dark .duo-login-input:focus + .duo-input-icon,
+        body.dark .duo-login-input:not(:placeholder-shown) + .duo-input-icon,
+        .dark .duo-login-input:focus + .duo-input-icon,
+        .dark .duo-login-input:not(:placeholder-shown) + .duo-input-icon {
+          color: #58cc02;
+        }
+        
+        body.dark .duo-login-btn,
+        .dark .duo-login-btn {
+          background: linear-gradient(180deg, #58cc02 0%, #46a302 100%);
+          color: white;
+          box-shadow: 0 4px 0 #46a302, 0 8px 25px rgba(88, 204, 2, 0.4);
+        }
+        
+        body.dark .duo-login-btn:hover:not(.disabled),
+        .dark .duo-login-btn:hover:not(.disabled) {
+          box-shadow: 0 6px 0 #46a302, 0 12px 35px rgba(88, 204, 2, 0.5);
+        }
+        
+        body.dark .duo-login-btn:active:not(.disabled),
+        .dark .duo-login-btn:active:not(.disabled) {
+          box-shadow: 0 2px 0 #46a302;
+        }
+        
+        body.dark .duo-login-btn.disabled,
+        .dark .duo-login-btn.disabled {
+          background: #334155;
+          color: #94a3b8;
+          box-shadow: 0 4px 0 #1e293b;
+        }
+        
+        body.dark .quick-play-btn,
+        .dark .quick-play-btn {
+          background: linear-gradient(180deg, #1cb0f6 0%, #1899d6 100%);
+          color: white;
+          box-shadow: 0 4px 0 #1899d6, 0 8px 25px rgba(28, 176, 246, 0.4);
+        }
+        
+        body.dark .quick-play-btn:hover,
+        .dark .quick-play-btn:hover {
+          box-shadow: 0 6px 0 #1899d6, 0 12px 35px rgba(28, 176, 246, 0.5);
+        }
+        
+        body.dark .quick-play-btn:active,
+        .dark .quick-play-btn:active {
+          box-shadow: 0 2px 0 #1899d6;
+        }
+        
+        body.dark .contact-admin-btn,
+        .dark .contact-admin-btn {
+          color: #cbd5e1;
+          border: 2px solid #334155;
+        }
+        
+        body.dark .contact-admin-btn:hover,
+        .dark .contact-admin-btn:hover {
+          background: #1e293b;
+          color: #f0f0f0;
+        }
+        
+        body.dark .error-message,
+        .dark .error-message {
+          background: #331a1a;
+          color: #ff6b6b;
+          border: 1px solid #552222;
+        }
+        
+        body.dark .contact-modal,
+        .dark .contact-modal {
+          background: #1e293b;
+        }
+        
+        body.dark .contact-modal-header h3,
+        .dark .contact-modal-header h3 {
+          color: #f0f0f0;
+        }
+        
+        body.dark .contact-modal-close,
+        .dark .contact-modal-close {
+          color: #94a3b8;
+        }
+        
+        body.dark .contact-modal-close:hover,
+        .dark .contact-modal-close:hover {
+          background: #0f172a;
+        }
+        
+        body.dark .contact-modal-body p,
+        .dark .contact-modal-body p {
+          color: #cbd5e1;
+        }
+        
+        body.dark .contact-option,
+        .dark .contact-option {
+          background: #0f172a;
+        }
+        
+        body.dark .contact-option:hover,
+        .dark .contact-option:hover {
+          background: #1e293b;
+        }
+        
+        body.dark .contact-option .material-icons,
+        .dark .contact-option .material-icons {
+          color: #58cc02;
+        }
+        
+        body.dark .contact-option strong,
+        .dark .contact-option strong {
+          color: #f0f0f0;
+        }
+        
+        body.dark .contact-option p,
+        .dark .contact-option p {
+          color: #cbd5e1;
+        }
+        
+        body.dark .contact-modal-btn,
+        .dark .contact-modal-btn {
+          background: linear-gradient(180deg, #58cc02 0%, #46a302 100%);
+          color: white;
+          box-shadow: 0 4px 0 #46a302;
+        }
+        
+        body.dark .contact-modal-btn:hover,
+        .dark .contact-modal-btn:hover {
+          box-shadow: 0 6px 0 #46a302, 0 8px 25px rgba(88, 204, 2, 0.4);
+        }
+        
+        body.dark .contact-modal-btn:active,
+        .dark .contact-modal-btn:active {
+          box-shadow: 0 2px 0 #46a302;
+        }
+        
+        body.dark .duo-mascot-speech-bubble,
+        .dark .duo-mascot-speech-bubble {
+          background: #0f172a;
+          color: #f0f0f0;
+          border: 1px solid #334155;
+        }
+        
+        body.dark .duo-mascot-speech-bubble::after,
+        .dark .duo-mascot-speech-bubble::after {
+          border-top-color: #0f172a;
+        }
+        
+        body.dark .speech-text,
+        .dark .speech-text {
+          color: #f0f0f0;
+        }
+        
         @media (max-width: 480px) {
           .duo-login-bg {
             padding: 0;
