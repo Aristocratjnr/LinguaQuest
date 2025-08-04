@@ -579,9 +579,9 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
               borderRadius: 'clamp(8px, 2vw, 10px)',
               border: 'none',
               background: valid ? 
-                'var(--duo-green, #58cc02)' : 
+                '#58cc02' : 
                 '#e2e8f0',
-              color: valid ? 'var(--text-light, #e0e7ff)' : '#94a3b8',
+              color: valid ? '#e0e7ff' : '#94a3b8',
               fontSize: 'clamp(0.9rem, 3vw, 1rem)',
               fontWeight: 600,
               cursor: valid ? 'pointer' : 'not-allowed',
