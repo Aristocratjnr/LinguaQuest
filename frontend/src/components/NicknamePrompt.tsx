@@ -700,18 +700,48 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         .dark .nickname-card {
           background: #1e293b;
         }
-        .dark .nickname-prompt-container, body.dark .nickname-prompt-container {
-          color: var(--text-light, #e0e7ff) !important;
+        body.dark .nickname-prompt-container,
+        .dark .nickname-prompt-container {
+          color: #e2e8f0 !important;
         }
-        .dark .nickname-card, body.dark .nickname-card {
-          color: var(--text-light, #e0e7ff) !important;
+        body.dark .nickname-card,
+        .dark .nickname-card {
+          color: #e2e8f0 !important;
         }
-        .dark .nickname-card input, body.dark .nickname-card input {
-          color: var(--text-light, #e0e7ff) !important;
-          background: transparent !important;
+        body.dark .nickname-card input,
+        .dark .nickname-card input {
+          color: #ffffff !important;
+          background: #181c2a !important;
+          border-color: #444c6e !important;
         }
-        .dark .nickname-card p, body.dark .nickname-card p {
-          color: var(--text-light, #e0e7ff) !important;
+        body.dark .nickname-card input:focus,
+        .dark .nickname-card input:focus {
+          background: #232946 !important;
+          box-shadow: 0 0 0 4px rgba(88, 204, 2, 0.1) !important;
+        }
+        body.dark .nickname-card p,
+        .dark .nickname-card p {
+          color: #e2e8f0 !important;
+        }
+        body.dark .nickname-card button,
+        .dark .nickname-card button {
+          background: #58cc02 !important;
+          color: #ffffff !important;
+        }
+        body.dark .nickname-card button:disabled,
+        .dark .nickname-card button:disabled {
+          background: #444c6e !important;
+          color: #94a3b8 !important;
+        }
+        body.dark .nickname-card .material-icons,
+        .dark .nickname-card .material-icons {
+          color: #94a3b8;
+        }
+        body.dark .nickname-footer,
+        .dark .nickname-footer {
+          background: #0f172a !important;
+          border-color: #334155 !important;
+          color: #e2e8f0 !important;
         }
       `}</style>
     </div>

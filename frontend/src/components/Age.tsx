@@ -564,7 +564,62 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
           100% { transform: rotate(360deg); }
         }
 
-        @media (max-width: 480px) {
+        /* Dark theme styles */
+body.dark .duo-age-bg,
+.dark .duo-age-bg {
+  background: var(--duo-bg);
+}
+
+body.dark .duo-age-card,
+.dark .duo-age-card,
+body.dark .duo-age-header,
+.dark .duo-age-header {
+  background: var(--duo-card);
+}
+
+body.dark .duo-speech-bubble,
+.dark .duo-speech-bubble {
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+body.dark .duo-speech-bubble::before,
+.dark .duo-speech-bubble::before {
+  border-bottom-color: #1e293b;
+}
+
+body.dark .duo-age-title,
+.dark .duo-age-title {
+  color: #ffffff;
+}
+
+body.dark .duo-age-subtitle,
+.dark .duo-age-subtitle,
+body.dark .speech-text,
+.dark .speech-text {
+  color: #e2e8f0;
+}
+
+body.dark .duo-age-input,
+.dark .duo-age-input {
+  background: #181c2a;
+  border-color: #444c6e;
+  color: #ffffff;
+}
+
+body.dark .duo-age-input:focus,
+.dark .duo-age-input:focus {
+  background: #232946;
+}
+
+body.dark .duo-input-icon,
+.dark .duo-input-icon {
+  color: #94a3b8;
+}
+
+/* End dark theme styles */
+
+@media (max-width: 480px) {
           .duo-age-bg {
             padding: 0;
           }

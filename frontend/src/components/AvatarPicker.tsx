@@ -382,14 +382,42 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
         }
       `}</style>
       <style>{`
-        .dark .avatar-picker-container, body.dark .avatar-picker-container {
-{{ ... }}
+        body.dark .avatar-picker-container,
+        .dark .avatar-picker-container {
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         }
-        .dark .avatar-picker-card, body.dark .avatar-picker-card {
-          color: #e0e7ff !important;
+        body.dark .avatar-picker-card,
+        .dark .avatar-picker-card {
+          background: #1e293b;
+          color: #e2e8f0 !important;
         }
-        .dark .avatar-picker-card p, body.dark .avatar-picker-card p {
-          color: #e0e7ff !important;
+        body.dark .avatar-picker-card h2,
+        .dark .avatar-picker-card h2 {
+          color: #ffffff !important;
+        }
+        body.dark .avatar-picker-card p,
+        .dark .avatar-picker-card p {
+          color: #e2e8f0 !important;
+        }
+        body.dark .avatar-picker-card button,
+        .dark .avatar-picker-card button {
+          background: #58cc02 !important;
+          color: #ffffff !important;
+        }
+        body.dark .avatar-picker-card button:disabled,
+        .dark .avatar-picker-card button:disabled {
+          background: #444c6e !important;
+          color: #94a3b8 !important;
+        }
+        body.dark .avatar-picker-card .material-icons,
+        .dark .avatar-picker-card .material-icons {
+          color: #94a3b8;
+        }
+        body.dark .avatar-picker-footer,
+        .dark .avatar-picker-footer {
+          background: #0f172a !important;
+          border-color: #334155 !important;
+          color: #e2e8f0 !important;
         }
       `}</style>
     </div>
