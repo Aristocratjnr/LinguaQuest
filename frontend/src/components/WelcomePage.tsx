@@ -697,17 +697,17 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         }
         
         body:not(.dark) .duo-get-started-btn {
-          background: linear-gradient(135deg, #58cc02 0%, #46a302 100%);
+          background: linear-gradient(135deg, #1cb0f6 0%, #1899d6 100%);
           color: white;
-          box-shadow: 0 6px 0 #46a302, 0 12px 32px rgba(88, 204, 2, 0.3);
+          box-shadow: 0 6px 0 #1899d6, 0 12px 32px rgba(28, 176, 246, 0.3);
         }
         
         body:not(.dark) .duo-get-started-btn:hover {
-          box-shadow: 0 9px 0 #46a302, 0 18px 40px rgba(88, 204, 2, 0.4);
+          box-shadow: 0 9px 0 #1899d6, 0 18px 40px rgba(28, 176, 246, 0.4);
         }
         
         body:not(.dark) .duo-get-started-btn:active {
-          box-shadow: 0 3px 0 #46a302, 0 6px 20px rgba(88, 204, 2, 0.3);
+          box-shadow: 0 3px 0 #1899d6, 0 6px 20px rgba(28, 176, 246, 0.3);
         }
         
         body:not(.dark) .duo-nav-btn {
@@ -789,19 +789,19 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         
         body.dark .duo-get-started-btn,
         .dark .duo-get-started-btn {
-          background: linear-gradient(135deg, #58cc02 0%, #46a302 100%);
+          background: linear-gradient(135deg, #1cb0f6 0%, #1899d6 100%);
           color: white;
-          box-shadow: 0 6px 0 #46a302, 0 12px 32px rgba(88, 204, 2, 0.4);
+          box-shadow: 0 6px 0 #1899d6, 0 12px 32px rgba(28, 176, 246, 0.4);
         }
         
         body.dark .duo-get-started-btn:hover,
         .dark .duo-get-started-btn:hover {
-          box-shadow: 0 9px 0 #46a302, 0 18px 40px rgba(88, 204, 2, 0.5);
+          box-shadow: 0 9px 0 #1899d6, 0 18px 40px rgba(28, 176, 246, 0.5);
         }
         
         body.dark .duo-get-started-btn:active,
         .dark .duo-get-started-btn:active {
-          box-shadow: 0 3px 0 #46a302, 0 6px 20px rgba(88, 204, 2, 0.4);
+          box-shadow: 0 3px 0 #1899d6, 0 6px 20px rgba(28, 176, 246, 0.4);
         }
         
         body.dark .duo-nav-btn,
