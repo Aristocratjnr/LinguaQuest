@@ -880,12 +880,15 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
             padding: 0;
             width: 100vw;
             height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
           
           .duo-continue-modal {
             width: 100vw;
-            height: 100vh;
-            max-height: 100vh;
+            height: auto;
+            max-height: 90vh;
             border-radius: 0;
             margin: 0;
             display: flex;
