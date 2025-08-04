@@ -537,7 +537,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           left: -100%;
           width: 100%;
           height: 100%;
-          background: linear-gradient(90deg, transparent, var(--lq-text-main), transparent);
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
           animation: shine 3s ease-in-out infinite;
         }
 
