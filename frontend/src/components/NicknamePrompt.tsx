@@ -475,7 +475,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                   border: 'none',
                   background: 'transparent',
                   outline: 'none',
-                  fontSize: 'clamp(0.9rem, 3vw, 1rem)',
+                  fontSize: '1rem', /* Fixed font size to prevent mobile zoom */
                   fontFamily: 'Noto Sans, Arial Unicode MS, system-ui, monospace',
                   color: 'var(--text-dark, #222)'
                 }}

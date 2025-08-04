@@ -650,7 +650,7 @@ const AgeVerification: React.FC<{ onConfirm?: (age: number) => void }> = ({ onCo
           }
           
           .duo-age-input {
-            font-size: 14px;
+            font-size: 16px; /* Increased from 14px to prevent mobile zoom */
             padding: 14px 14px 14px 44px;
           }
           

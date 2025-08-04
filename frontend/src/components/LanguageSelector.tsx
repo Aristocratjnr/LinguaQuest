@@ -564,25 +564,27 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
         }
 
         .duo-modal-header {
-          background: #444444;
+          background: linear-gradient(135deg, #58cc02 0%, #4eb600 100%);
           padding: clamp(18px, 5vw, 32px) clamp(12px, 4vw, 24px) clamp(12px, 3vw, 24px);
           text-align: center;
-          color: black;
+          color: white;
         }
 
         .duo-modal-icon {
           width: clamp(36px, 10vw, 56px);
           height: clamp(36px, 10vw, 56px);
-          background: linear-gradient(135deg, #ffffff, #808080);
+          background: linear-gradient(135deg, #ffffff, #e8f5e9);
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           margin: 0 auto clamp(8px, 2vw, 16px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .duo-modal-icon .material-icons {
           font-size: clamp(18px, 6vw, 28px);
+          color: #58cc02;
         }
 
         .duo-modal-title {
@@ -603,6 +605,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
           padding: clamp(8px, 2vw, 16px);
           background: #f8fafc;
           border-radius: clamp(8px, 2vw, 16px);
+          border: 1px solid #e5e5e5;
         }
 
         .duo-modal-flag {
@@ -648,6 +651,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
           font-size: clamp(10px, 2vw, 14px);
           color: #92400e;
           margin-bottom: clamp(12px, 3vw, 24px);
+          border: 1px solid #fed7aa;
         }
 
         .duo-modal-note .material-icons {
@@ -684,6 +688,83 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
         .duo-continue-btn:active {
           transform: translateY(2px);
           box-shadow: 0 2px 0 #46a302, 0 4px 15px rgba(88, 204, 2, 0.2);
+        }
+
+        /* Theme-specific styles for light mode */
+        .duo-continue-modal {
+          background: var(--duo-card, #ffffff);
+          color: var(--lq-text-main, #333);
+        }
+
+        .duo-modal-lang-name {
+          color: var(--lq-text-main, #333);
+        }
+
+        .duo-modal-native, .duo-modal-lang-desc {
+          color: var(--lq-text-muted, #6c757d);
+        }
+
+        .duo-selected-lang {
+          background: var(--duo-bg, #f8fafc);
+          border-color: var(--lq-border, #e5e5e5);
+        }
+
+        .duo-modal-note {
+          background: #fff7ed;
+          color: #92400e;
+          border-color: #fed7aa;
+        }
+
+        /* Theme-specific styles for dark mode */
+        body.dark .duo-continue-modal,
+        .dark .duo-continue-modal {
+          background: var(--duo-card-dark, #1e293b);
+          color: var(--lq-text-main-dark, #e2e8f0);
+        }
+
+        body.dark .duo-modal-header,
+        .dark .duo-modal-header {
+          background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        }
+
+        body.dark .duo-modal-lang-name,
+        .dark .duo-modal-lang-name {
+          color: var(--lq-text-main-dark, #e2e8f0);
+        }
+
+        body.dark .duo-modal-native,
+        .dark .duo-modal-native,
+        body.dark .duo-modal-lang-desc,
+        .dark .duo-modal-lang-desc {
+          color: var(--lq-text-muted-dark, #94a3b8);
+        }
+
+        body.dark .duo-selected-lang,
+        .dark .duo-selected-lang {
+          background: #0f172a;
+          border-color: #334155;
+        }
+
+        body.dark .duo-modal-icon,
+        .dark .duo-modal-icon {
+          background: linear-gradient(135deg, #1e293b, #0f172a);
+        }
+
+        body.dark .duo-modal-icon .material-icons,
+        .dark .duo-modal-icon .material-icons {
+          color: #4ade80;
+        }
+
+        body.dark .duo-modal-note,
+        .dark .duo-modal-note {
+          background: #3c2a13;
+          color: #fbbf24;
+          border-color: #7c2d12;
+        }
+
+        body.dark .duo-modal-note .material-icons,
+        .dark .duo-modal-note .material-icons {
+          color: #fbbf24;
         }
 
         @keyframes float {
@@ -801,7 +882,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
             height: 100vh;
           }
           
-          .duo-modal {
+          .duo-continue-modal {
             width: 100vw;
             height: 100vh;
             max-height: 100vh;
@@ -841,7 +922,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
             border-radius: 10px;
           }
           
-          .duo-modal-lang-text {
+          .duo-modal-lang-info {
             flex: 1;
           }
           
