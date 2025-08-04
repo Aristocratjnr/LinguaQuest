@@ -947,6 +947,31 @@ const LoginPage: React.FC = () => {
           box-shadow: 0 4px 0 #1e293b;
         }
         
+        body.dark .duo-login-btn-secondary,
+        .dark .duo-login-btn-secondary {
+          background: linear-gradient(180deg, #1cb0f6 0%, #1899d6 100%);
+          color: white;
+          box-shadow: 0 3px 0 #1899d6, 0 6px 20px rgba(28, 176, 246, 0.25);
+        }
+        
+        body.dark .duo-login-btn-secondary:hover:not(.disabled),
+        .dark .duo-login-btn-secondary:hover:not(.disabled) {
+          box-shadow: 0 5px 0 #1899d6, 0 10px 30px rgba(28, 176, 246, 0.35);
+        }
+        
+        body.dark .duo-login-btn-secondary:active:not(.disabled),
+        .dark .duo-login-btn-secondary:active:not(.disabled) {
+          box-shadow: 0 2px 0 #1899d6;
+          transform: translateY(1px);
+        }
+        
+        body.dark .duo-login-btn-secondary.disabled,
+        .dark .duo-login-btn-secondary.disabled {
+          background: #f0f0f0;
+          color: #999999;
+          box-shadow: 0 3px 0 #e0e0e0;
+        }
+        
         body.dark .quick-play-btn,
         .dark .quick-play-btn {
           background: linear-gradient(180deg, #1cb0f6 0%, #1899d6 100%);
@@ -1103,7 +1128,8 @@ const LoginPage: React.FC = () => {
           }
           
           .duo-login-input,
-          .duo-login-btn {
+          .duo-login-btn,
+          .duo-login-btn-secondary {
             font-size: 16px;
             padding: 16px;
             min-height: 48px; /* Touch target size */
@@ -1128,7 +1154,7 @@ const LoginPage: React.FC = () => {
             margin-top: 8px;
           }
           
-          .quick-play-btn {
+          .duo-login-btn-secondary {
             font-size: 14px;
             padding: 14px;
             margin-top: 12px;
@@ -1213,7 +1239,7 @@ const LoginPage: React.FC = () => {
           }
           
           /* Error message adjustments */
-          .error-message {
+          .duo-login-error {
             font-size: 14px;
             padding: 12px;
             margin-top: 16px;
