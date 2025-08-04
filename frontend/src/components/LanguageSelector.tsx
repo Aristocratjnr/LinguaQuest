@@ -692,21 +692,21 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
 
         /* Theme-specific styles for light mode */
         .duo-continue-modal {
-          background: var(--duo-card, #ffffff);
-          color: var(--lq-text-main, #333);
+          background: #ffffff;
+          color: #1a1a1a;
         }
 
         .duo-modal-lang-name {
-          color: var(--lq-text-main, #333);
+          color: #1a1a1a;
         }
 
         .duo-modal-native, .duo-modal-lang-desc {
-          color: var(--lq-text-muted, #6c757d);
+          color: #666666;
         }
 
         .duo-selected-lang {
-          background: var(--duo-bg, #f8fafc);
-          border-color: var(--lq-border, #e5e5e5);
+          background: #ffffff;
+          border-color: #e0e0e0;
         }
 
         .duo-modal-note {
