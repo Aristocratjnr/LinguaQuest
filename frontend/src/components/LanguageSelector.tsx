@@ -777,6 +777,68 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
           50% { transform: translateY(-20px) rotate(180deg); }
         }
 
+        /* Theme-specific styles for dark mode - Main Language Selection Area */
+        body.dark .duo-lang-card,
+        .dark .duo-lang-card {
+          background: #1e293b;
+          border-color: #334155;
+        }
+
+        body.dark .duo-lang-title,
+        .dark .duo-lang-title {
+          color: #ffffff;
+        }
+
+        body.dark .duo-lang-subtitle,
+        .dark .duo-lang-subtitle {
+          color: #e2e8f0;
+        }
+
+        body.dark .duo-language-card,
+        .dark .duo-language-card {
+          background: #0f172a;
+          border-color: #334155;
+        }
+
+        body.dark .duo-language-card:hover,
+        .dark .duo-language-card:hover {
+          border-color: #58cc02;
+        }
+
+        body.dark .duo-language-card.selected,
+        .dark .duo-language-card.selected {
+          border-color: #58cc02;
+          background: linear-gradient(135deg, #1e293b, #0f172a);
+        }
+
+        body.dark .duo-flag-container,
+        .dark .duo-flag-container {
+          background: #1e293b;
+        }
+
+        body.dark .duo-lang-name,
+        .dark .duo-lang-name {
+          color: #ffffff;
+        }
+
+        body.dark .duo-native-name,
+        .dark .duo-native-name,
+        body.dark .duo-lang-desc,
+        .dark .duo-lang-desc {
+          color: #e2e8f0;
+        }
+
+        body.dark .duo-lang-footer,
+        .dark .duo-lang-footer {
+          background: #0f172a;
+          border-color: #334155;
+        }
+
+        body.dark .duo-footer-content,
+        .dark .duo-footer-content {
+          color: #e2e8f0;
+        }
+
         @media (max-width: 600px) {
           .duo-lang-bg {
             padding: 0;
