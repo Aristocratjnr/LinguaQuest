@@ -3360,3 +3360,4 @@ function AppContent() {
 };
 
 export default AppContent;
+export { AppContent };

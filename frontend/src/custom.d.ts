@@ -5,6 +5,7 @@ declare const __BACKEND_URL__: string;
 
 // Web Speech API declarations
 interface SpeechRecognition extends EventTarget {
+  maxAlternatives: number;
   continuous: boolean;
   interimResults: boolean;
   lang: string;

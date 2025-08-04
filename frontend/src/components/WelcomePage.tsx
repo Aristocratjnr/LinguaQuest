@@ -15,7 +15,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
       title: "Welcome to LinguaQuest!",
       description: "Embark on a fun journey to master languages through interactive conversations",
       icon: "explore",
-      color: "#FFFFF",
+      color: "#FFFFFF",
       character: "👋"
     },
     {

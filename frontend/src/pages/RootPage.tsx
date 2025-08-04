@@ -14,7 +14,7 @@ import CategorySelector from '../components/CategorySelector';
 import LoginPage from '../components/LoginPage';
 import SettingsPage from '../components/SettingsPage';
 import Leaderboard from '../components/Leaderboard';
-import Dashboard from '../components/Dashboard'; // This will be our refactored App.tsx
+import Dashboard from '../components/Dashboard';
 
 const RootPage: React.FC = () => {
   const navigate = useNavigate();

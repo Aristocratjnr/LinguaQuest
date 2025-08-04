@@ -22,7 +22,7 @@ const Scenario: React.FC<ScenarioProps> = ({
   const { resolvedTheme } = useSettings();
   const isDark = resolvedTheme === 'dark';
   const textColor = 'var(--lq-text-main)';
-  const mutedColor = isDark ? '#a5b4fc' : 'var(--lq-text-muted)';
+  const mutedColor = isDark ? 'var(--lq-text-muted-dark)' : 'var(--lq-text-muted)';
   const currentLanguage = languages.find(l => l.code === language);
   const languageLabel = currentLanguage?.label || language.toUpperCase();
 

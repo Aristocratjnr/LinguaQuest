@@ -5,11 +5,17 @@
   --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
   --text-dark: #1e293b;
   --text-light: #64748b;
+  --text-lighter: #94a3b8;
   --bg-light: #f8fafc;
+  --bg-dark: #0f172a;
+  --bg-darker: #0a0f1f;
+  --border-light: #e2e8f0;
+  --border-dark: #1e293b;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-dark: 0 4px 24px 0 rgba(0, 0, 0, 0.25);
   --radius-sm: 0.25rem;
   --radius: 0.5rem;
   --radius-md: 0.75rem;
@@ -19,21 +25,39 @@
   --duo-blue: #1cb0f6;
   --duo-yellow: #ffd600;
   --duo-dark: #222;
+  --duo-light: #ffffff;
   --duo-bg: #f7fcf3;
+  --duo-bg-dark: #0d1b2a;
   --duo-card: #fff;
+  --duo-card-dark: #1e293b;
   --duo-accent: #ffb800;
   --duo-error: #ff4b4b;
   --duo-success: #58cc02;
   --duo-shadow: 0 4px 24px 0 rgba(88,204,2,0.08);
+  --duo-shadow-dark: 0 4px 24px 0 rgba(0,0,0,0.3);
   /* LinguaQuest custom text variables */
   --lq-text-main: #333;
+  --lq-text-main-dark: #e2e8f0;
   --lq-text-muted: #6c757d;
+  --lq-text-muted-dark: #94a3b8;
+  --lq-text-light: #94a3b8;
+  --lq-text-light-dark: #64748b;
   --lq-border: #e5e5e5;
+  --lq-border-dark: #334155;
   --lq-disabled: #f0f0f0;
+  --lq-disabled-dark: #1e293b;
   --lq-text-disabled: #afafaf;
-  --lq-error: #ff4b4b;
-  --lq-shadow: #46a302;
-  --lq-shadow-opacity: rgba(88, 204, 2, 0.4);
+  --lq-text-disabled-dark: #475569;
+  --lq-error: #dc3545;
+  --lq-error-dark: #ef4444;
+  --lq-success: #28a745;
+  --lq-success-dark: #4ade80;
+  --lq-warning: #ffc107;
+  --lq-warning-dark: #fbbf24;
+  --lq-info: #17a2b8;
+  --lq-info-dark: #38bdf8;
+  --lq-shadow: #e2e8f0;
+  --lq-shadow-opacity: rgba(0, 0, 0, 0.1);
   --duo-header: linear-gradient(135deg, #58cc02 0%, #4eb600 100%);
 }
 
@@ -189,6 +213,9 @@ body.dark, .dark {
   --lq-disabled: #374151;
   --lq-text-disabled: #6b7280;
   --lq-error: #ef4444;
+  --lq-success: #4ade80;
+  --lq-warning: #fbbf24;
+  --lq-info: #38bdf8;
   --lq-shadow: #1f2937;
   --lq-shadow-opacity: rgba(0, 0, 0, 0.4);
   --duo-header: linear-gradient(135deg, #1f2937 0%, #111827 100%);
@@ -260,6 +287,32 @@ body.dark .text-primary, .dark .text-primary {
 }
 body.dark .text-muted, .dark .text-muted {
   color: #a5b4fc !important;
+}
+
+/* Bootstrap text color overrides for dark mode */
+body.dark .text-primary, .dark .text-primary {
+  color: #a5b4fc !important;
+}
+body.dark .text-secondary, .dark .text-secondary {
+  color: #c7d2fe !important;
+}
+body.dark .text-success, .dark .text-success {
+  color: #4ade80 !important;
+}
+body.dark .text-danger, .dark .text-danger {
+  color: #f87171 !important;
+}
+body.dark .text-warning, .dark .text-warning {
+  color: #fbbf24 !important;
+}
+body.dark .text-info, .dark .text-info {
+  color: #38bdf8 !important;
+}
+body.dark .text-light, .dark .text-light {
+  color: #e0e7ff !important;
+}
+body.dark .text-dark, .dark .text-dark {
+  color: #181c2a !important;
 }
 
 /* Utility: dark mode for custom classes */

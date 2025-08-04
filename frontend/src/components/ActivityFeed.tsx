@@ -70,12 +70,12 @@ const ActivityFeed: React.FC<{ items: ActivityItem[] }> = ({ items }) => (
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="text-center py-5"
-              style={{ color: '#6c757d' }}
+              style={{ color: 'var(--lq-text-secondary)' }}
             >
               <div className="d-flex flex-column align-items-center">
                 <i className="material-icons mb-2" style={{ 
                   fontSize: '2.5rem',
-                  color: '#e8f5e9'
+                  color: 'var(--lq-success-light)'
                 }}>hourglass_empty</i>
                 <div className="fw-medium">No activity yet</div>
                 <small className="text-muted">Your actions will appear here</small>

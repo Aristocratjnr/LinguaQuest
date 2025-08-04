@@ -148,9 +148,9 @@ const ToneSelector: React.FC<ToneSelectorProps> = ({ tone, onChange, loading, di
 
     {/* Help Text */}
     <div className="text-muted small d-flex align-items-center" style={{ 
-      color: '#6c757d',
+      color: 'var(--lq-text-muted)',
       fontSize: '0.8rem',
-      background: 'rgba(255,255,255,0.45)',
+      background: 'var(--lq-help-background)',
       backdropFilter: 'blur(8px)',
       WebkitBackdropFilter: 'blur(8px)',
       borderRadius: '12px',

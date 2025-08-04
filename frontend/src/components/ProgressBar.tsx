@@ -26,7 +26,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ round, totalRounds }) => {
         flexWrap: 'wrap',
       }}>
         <span className="text-muted small fw-bold" style={{
-          color: '#58a700',
+          color: 'var(--duo-green)',
           fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
           fontWeight: 700,
           letterSpacing: '0.01em',
