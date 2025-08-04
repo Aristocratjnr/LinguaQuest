@@ -125,7 +125,9 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
                   transition: 'all 0.3s ease',
                   boxShadow: selected === avatar ? 
                     '0 12px 20px -4px rgba(88, 204, 2, 0.4), 0 4px 8px -2px rgba(88, 204, 2, 0.2)' : 
-                    '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                    '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                  minWidth: '80px',  
+                  minHeight: '80px'  
                 }}
                 whileHover={{ 
                   scale: 1.05,
@@ -308,6 +310,13 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
             grid-template-columns: repeat(2, 1fr);
             gap: 24px;
             margin-bottom: 24px;
+          }
+          .avatar-picker-card [style*='position: relative'] {
+            min-width: 80px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
           .avatar-picker-card img {
             min-width: 72px;
