@@ -194,8 +194,8 @@ body.dark, .dark {
   --primary-dark: #a5b4fc;
   --secondary: #a855f7;
   --gradient: linear-gradient(135deg, #232946 0%, #181c2a 100%);
-  --text-dark: #e0e7ff;
-  --text-light: #a5b4fc;
+  --text-dark: #ffffff;
+  --text-light: #e2e8f0;
   --bg-light: #181c2a;
   --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.25);
   --shadow: 0 4px 12px -1px rgba(0,0,0,0.45), 0 2px 4px -1px rgba(0,0,0,0.25);
@@ -207,11 +207,11 @@ body.dark, .dark {
   --radius-lg: 1rem;
   --transition: all 0.2s ease-in-out;
   /* Override text variables in dark mode */
-  --lq-text-main: #e0e7ff;
-  --lq-text-muted: #a5b4fc;
+  --lq-text-main: #ffffff;
+  --lq-text-muted: #e2e8f0;
   --lq-border: #374151;
   --lq-disabled: #374151;
-  --lq-text-disabled: #6b7280;
+  --lq-text-disabled: #94a3b8;
   --lq-error: #ef4444;
   --lq-success: #4ade80;
   --lq-warning: #fbbf24;
