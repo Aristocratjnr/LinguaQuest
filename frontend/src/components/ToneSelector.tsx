@@ -150,7 +150,7 @@ const ToneSelector: React.FC<ToneSelectorProps> = ({ tone, onChange, loading, di
     <div className="text-muted small d-flex align-items-center" style={{ 
       color: 'var(--lq-text-muted)',
       fontSize: '0.8rem',
-      background: 'var(--lq-help-background)',
+      background: 'rgba(240, 240, 240, 0.8)',
       backdropFilter: 'blur(8px)',
       WebkitBackdropFilter: 'blur(8px)',
       borderRadius: '12px',

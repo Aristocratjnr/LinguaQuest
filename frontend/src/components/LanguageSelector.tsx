@@ -718,8 +718,8 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
         /* Theme-specific styles for dark mode */
         body.dark .duo-continue-modal,
         .dark .duo-continue-modal {
-          background: var(--duo-card-dark, #1e293b);
-          color: var(--lq-text-main-dark, #e2e8f0);
+          background: #1e293b;
+          color: #ffffff;
         }
 
         body.dark .duo-modal-header,
@@ -729,14 +729,14 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
 
         body.dark .duo-modal-lang-name,
         .dark .duo-modal-lang-name {
-          color: var(--lq-text-main-dark, #e2e8f0);
+          color: #ffffff;
         }
 
         body.dark .duo-modal-native,
         .dark .duo-modal-native,
         body.dark .duo-modal-lang-desc,
         .dark .duo-modal-lang-desc {
-          color: var(--lq-text-muted-dark, #94a3b8);
+          color: #e2e8f0;
         }
 
         body.dark .duo-selected-lang,

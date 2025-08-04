@@ -760,12 +760,12 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         
         body.dark .duo-slide-title,
         .dark .duo-slide-title {
-          color: #f0f0f0;
+          color: #ffffff;
         }
         
         body.dark .duo-slide-description,
         .dark .duo-slide-description {
-          color: #cbd5e1;
+          color: #e2e8f0;
         }
         
         body.dark .duo-get-started-btn,
@@ -789,13 +789,13 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         .dark .duo-nav-btn {
           background: #0f172a;
           border-color: #334155;
-          color: #cbd5e1;
+          color: #e2e8f0;
         }
         
         body.dark .duo-nav-btn:hover,
         .dark .duo-nav-btn:hover {
           border-color: #1cb0f6;
-          color: #f0f0f0;
+          color: #ffffff;
         }
         
         body.dark .duo-nav-btn.next,
@@ -819,12 +819,12 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
         
         body.dark .duo-copyright,
         .dark .duo-copyright {
-          color: #94a3b8;
+          color: #cbd5e1;
         }
         
         body.dark .duo-skip-btn,
         .dark .duo-skip-btn {
-          color: #f0f0f0;
+          color: #ffffff;
         }
         
         body.dark .duo-skip-btn:hover,
