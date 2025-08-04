@@ -778,18 +778,53 @@ const LoginPage: React.FC = () => {
           box-shadow: 0 4px 0 #cccccc;
         }
         
-        body:not(.dark) .quick-play-btn {
-          background: linear-gradient(180deg, #1cb0f6 0%, #1899d6 100%);
-          color: white;
-          box-shadow: 0 4px 0 #1899d6, 0 8px 25px rgba(28, 176, 246, 0.3);
+        body:not(.dark) .quick-play-btn,
+        .quick-play-btn,
+        .duo-login-bg .quick-play-btn {
+          background: linear-gradient(180deg, #1cb0f6 0%, #1899d6 100%) !important;
+          color: white !important;
+          box-shadow: 0 4px 0 #1899d6, 0 8px 25px rgba(28, 176, 246, 0.3) !important;
         }
         
-        body:not(.dark) .quick-play-btn:hover {
-          box-shadow: 0 6px 0 #1899d6, 0 12px 35px rgba(28, 176, 246, 0.4);
+        body:not(.dark) .quick-play-btn:hover,
+        .quick-play-btn:hover,
+        .duo-login-bg .quick-play-btn:hover {
+          box-shadow: 0 6px 0 #1899d6, 0 12px 35px rgba(28, 176, 246, 0.4) !important;
         }
         
-        body:not(.dark) .quick-play-btn:active {
-          box-shadow: 0 2px 0 #1899d6;
+        body:not(.dark) .quick-play-btn:active,
+        .quick-play-btn:active,
+        .duo-login-bg .quick-play-btn:active {
+          box-shadow: 0 2px 0 #1899d6 !important;
+        }
+        
+        body:not(.dark) .duo-login-btn-secondary,
+        .duo-login-btn-secondary,
+        .duo-login-bg .duo-login-btn-secondary {
+          background: linear-gradient(180deg, #1cb0f6 0%, #1899d6 100%) !important;
+          color: white !important;
+          box-shadow: 0 3px 0 #1899d6, 0 6px 20px rgba(28, 176, 246, 0.25) !important;
+        }
+        
+        body:not(.dark) .duo-login-btn-secondary:hover:not(.disabled),
+        .duo-login-btn-secondary:hover:not(.disabled),
+        .duo-login-bg .duo-login-btn-secondary:hover:not(.disabled) {
+          box-shadow: 0 5px 0 #1899d6, 0 10px 30px rgba(28, 176, 246, 0.35) !important;
+        }
+        
+        body:not(.dark) .duo-login-btn-secondary:active:not(.disabled),
+        .duo-login-btn-secondary:active:not(.disabled),
+        .duo-login-bg .duo-login-btn-secondary:active:not(.disabled) {
+          box-shadow: 0 2px 0 #1899d6 !important;
+          transform: translateY(1px);
+        }
+        
+        body:not(.dark) .duo-login-btn-secondary.disabled,
+        .duo-login-btn-secondary.disabled,
+        .duo-login-bg .duo-login-btn-secondary.disabled {
+          background: #f0f0f0 !important;
+          color: #999999 !important;
+          box-shadow: 0 3px 0 #e0e0e0 !important;
         }
         
         body:not(.dark) .contact-admin-btn {
@@ -948,45 +983,52 @@ const LoginPage: React.FC = () => {
         }
         
         body.dark .duo-login-btn-secondary,
-        .dark .duo-login-btn-secondary {
-          background: linear-gradient(180deg, #1cb0f6 0%, #1899d6 100%);
-          color: white;
-          box-shadow: 0 3px 0 #1899d6, 0 6px 20px rgba(28, 176, 246, 0.25);
+        .dark .duo-login-btn-secondary,
+        .duo-login-bg .duo-login-btn-secondary {
+          background: linear-gradient(180deg, #1cb0f6 0%, #1899d6 100%) !important;
+          color: white !important;
+          box-shadow: 0 3px 0 #1899d6, 0 6px 20px rgba(28, 176, 246, 0.25) !important;
         }
         
         body.dark .duo-login-btn-secondary:hover:not(.disabled),
-        .dark .duo-login-btn-secondary:hover:not(.disabled) {
-          box-shadow: 0 5px 0 #1899d6, 0 10px 30px rgba(28, 176, 246, 0.35);
+        .dark .duo-login-btn-secondary:hover:not(.disabled),
+        .duo-login-bg .duo-login-btn-secondary:hover:not(.disabled) {
+          box-shadow: 0 5px 0 #1899d6, 0 10px 30px rgba(28, 176, 246, 0.35) !important;
         }
         
         body.dark .duo-login-btn-secondary:active:not(.disabled),
-        .dark .duo-login-btn-secondary:active:not(.disabled) {
-          box-shadow: 0 2px 0 #1899d6;
+        .dark .duo-login-btn-secondary:active:not(.disabled),
+        .duo-login-bg .duo-login-btn-secondary:active:not(.disabled) {
+          box-shadow: 0 2px 0 #1899d6 !important;
           transform: translateY(1px);
         }
         
         body.dark .duo-login-btn-secondary.disabled,
-        .dark .duo-login-btn-secondary.disabled {
-          background: #f0f0f0;
-          color: #999999;
-          box-shadow: 0 3px 0 #e0e0e0;
+        .dark .duo-login-btn-secondary.disabled,
+        .duo-login-bg .duo-login-btn-secondary.disabled {
+          background: #334155 !important;
+          color: #94a3b8 !important;
+          box-shadow: 0 3px 0 #1e293b !important;
         }
         
         body.dark .quick-play-btn,
-        .dark .quick-play-btn {
-          background: linear-gradient(180deg, #1cb0f6 0%, #1899d6 100%);
-          color: white;
-          box-shadow: 0 4px 0 #1899d6, 0 8px 25px rgba(28, 176, 246, 0.4);
+        .dark .quick-play-btn,
+        .duo-login-bg .quick-play-btn {
+          background: linear-gradient(180deg, #1cb0f6 0%, #1899d6 100%) !important;
+          color: white !important;
+          box-shadow: 0 4px 0 #1899d6, 0 8px 25px rgba(28, 176, 246, 0.4) !important;
         }
         
         body.dark .quick-play-btn:hover,
-        .dark .quick-play-btn:hover {
-          box-shadow: 0 6px 0 #1899d6, 0 12px 35px rgba(28, 176, 246, 0.5);
+        .dark .quick-play-btn:hover,
+        .duo-login-bg .quick-play-btn:hover {
+          box-shadow: 0 6px 0 #1899d6, 0 12px 35px rgba(28, 176, 246, 0.5) !important;
         }
         
         body.dark .quick-play-btn:active,
-        .dark .quick-play-btn:active {
-          box-shadow: 0 2px 0 #1899d6;
+        .dark .quick-play-btn:active,
+        .duo-login-bg .quick-play-btn:active {
+          box-shadow: 0 2px 0 #1899d6 !important;
         }
         
         body.dark .contact-admin-btn,
