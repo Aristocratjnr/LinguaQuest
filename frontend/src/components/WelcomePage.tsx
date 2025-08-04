@@ -668,6 +668,195 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ onGetStarted }) => {
           50% { left: 100%; }
           100% { left: 100%; }
         }
+
+        /* Light theme specific styles */
+        body:not(.dark) .duo-welcome-bg {
+          background: linear-gradient(135deg, #e0f7fa 0%, #f5f5f5 100%);
+        }
+        
+        body:not(.dark) .duo-welcome-card {
+          background: white;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+        
+        body:not(.dark) .duo-welcome-header {
+          background: linear-gradient(135deg, #1cb0f6 0%, #1899d6 100%);
+        }
+        
+        body:not(.dark) .duo-logo-circle {
+          background: white;
+          border-color: #e0e0e0;
+        }
+        
+        body:not(.dark) .duo-slide-title {
+          color: #1a1a1a;
+        }
+        
+        body:not(.dark) .duo-slide-description {
+          color: #666666;
+        }
+        
+        body:not(.dark) .duo-get-started-btn {
+          background: linear-gradient(135deg, #58cc02 0%, #46a302 100%);
+          color: white;
+          box-shadow: 0 6px 0 #46a302, 0 12px 32px rgba(88, 204, 2, 0.3);
+        }
+        
+        body:not(.dark) .duo-get-started-btn:hover {
+          box-shadow: 0 9px 0 #46a302, 0 18px 40px rgba(88, 204, 2, 0.4);
+        }
+        
+        body:not(.dark) .duo-get-started-btn:active {
+          box-shadow: 0 3px 0 #46a302, 0 6px 20px rgba(88, 204, 2, 0.3);
+        }
+        
+        body:not(.dark) .duo-nav-btn {
+          background: white;
+          border-color: #e0e0e0;
+          color: #666666;
+        }
+        
+        body:not(.dark) .duo-nav-btn:hover {
+          border-color: #1cb0f6;
+          color: #1cb0f6;
+        }
+        
+        body:not(.dark) .duo-nav-btn.next {
+          background: linear-gradient(135deg, #1cb0f6 0%, #1899d6 100%);
+          border-color: #1899d6;
+          color: white;
+          box-shadow: 0 4px 0 #1899d6;
+        }
+        
+        body:not(.dark) .duo-nav-btn.next:hover {
+          box-shadow: 0 5px 0 #1899d6;
+        }
+        
+        body:not(.dark) .duo-welcome-footer {
+          background: #f8f9fa;
+          border-color: #e0e0e0;
+        }
+        
+        body:not(.dark) .duo-copyright {
+          color: #666666;
+        }
+        
+        body:not(.dark) .duo-skip-btn {
+          color: #1cb0f6;
+        }
+        
+        body:not(.dark) .duo-skip-btn:hover {
+          background: #e3f2fd;
+        }
+        
+        body:not(.dark) .decoration-orb {
+          background: rgba(255, 255, 255, 0.3);
+          box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Dark theme specific styles */
+        body.dark .duo-welcome-bg,
+        .dark .duo-welcome-bg {
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        
+        body.dark .duo-welcome-card,
+        .dark .duo-welcome-card {
+          background: #1e293b;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        body.dark .duo-welcome-header,
+        .dark .duo-welcome-header {
+          background: linear-gradient(135deg, #1cb0f6 0%, #1899d6 100%);
+        }
+        
+        body.dark .duo-logo-circle,
+        .dark .duo-logo-circle {
+          background: #0f172a;
+          border-color: #334155;
+        }
+        
+        body.dark .duo-slide-title,
+        .dark .duo-slide-title {
+          color: #f0f0f0;
+        }
+        
+        body.dark .duo-slide-description,
+        .dark .duo-slide-description {
+          color: #cbd5e1;
+        }
+        
+        body.dark .duo-get-started-btn,
+        .dark .duo-get-started-btn {
+          background: linear-gradient(135deg, #58cc02 0%, #46a302 100%);
+          color: white;
+          box-shadow: 0 6px 0 #46a302, 0 12px 32px rgba(88, 204, 2, 0.4);
+        }
+        
+        body.dark .duo-get-started-btn:hover,
+        .dark .duo-get-started-btn:hover {
+          box-shadow: 0 9px 0 #46a302, 0 18px 40px rgba(88, 204, 2, 0.5);
+        }
+        
+        body.dark .duo-get-started-btn:active,
+        .dark .duo-get-started-btn:active {
+          box-shadow: 0 3px 0 #46a302, 0 6px 20px rgba(88, 204, 2, 0.4);
+        }
+        
+        body.dark .duo-nav-btn,
+        .dark .duo-nav-btn {
+          background: #0f172a;
+          border-color: #334155;
+          color: #cbd5e1;
+        }
+        
+        body.dark .duo-nav-btn:hover,
+        .dark .duo-nav-btn:hover {
+          border-color: #1cb0f6;
+          color: #f0f0f0;
+        }
+        
+        body.dark .duo-nav-btn.next,
+        .dark .duo-nav-btn.next {
+          background: linear-gradient(135deg, #1cb0f6 0%, #1899d6 100%);
+          border-color: #1899d6;
+          color: white;
+          box-shadow: 0 4px 0 #1899d6;
+        }
+        
+        body.dark .duo-nav-btn.next:hover,
+        .dark .duo-nav-btn.next:hover {
+          box-shadow: 0 5px 0 #1899d6;
+        }
+        
+        body.dark .duo-welcome-footer,
+        .dark .duo-welcome-footer {
+          background: #0f172a;
+          border-color: #334155;
+        }
+        
+        body.dark .duo-copyright,
+        .dark .duo-copyright {
+          color: #94a3b8;
+        }
+        
+        body.dark .duo-skip-btn,
+        .dark .duo-skip-btn {
+          color: #f0f0f0;
+        }
+        
+        body.dark .duo-skip-btn:hover,
+        .dark .duo-skip-btn:hover {
+          background: #1e293b;
+        }
+        
+        body.dark .decoration-orb,
+        .dark .decoration-orb {
+          background: rgba(30, 41, 59, 0.3);
+          box-shadow: inset 0 0 20px rgba(30, 41, 59, 0.5);
+        }
+        
       `}</style>
     </div>
   );
