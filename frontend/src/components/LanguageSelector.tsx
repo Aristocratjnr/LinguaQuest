@@ -264,7 +264,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
         .duo-lang-bg {
           min-height: 100vh;
           width: 100vw;
-        background: linear-gradient(135deg, #ffffff, #ffffff); 
+          background: linear-gradient(135deg, #e0f7fa 0%, #f5f5f5 100%);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -272,6 +272,11 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
           overflow: hidden;
           font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           padding: 20px;
+        }
+        
+        body.dark .duo-lang-bg,
+        .dark .duo-lang-bg {
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
         }
 
         .duo-decorations {

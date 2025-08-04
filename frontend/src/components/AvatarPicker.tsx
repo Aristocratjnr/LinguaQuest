@@ -27,21 +27,21 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))',
+      background: 'linear-gradient(135deg, #e0f7fa 0%, #f5f5f5 100%)',
       padding: '1rem',
       fontFamily: '"JetBrains Mono", monospace',
-      color: 'var(--text-dark, #222)'
+      color: '#1a1a1a'
     }}>
       <motion.div 
         className="avatar-picker-card"
         style={{
           width: '100%',
           maxWidth: '32rem',
-          background: 'var(--duo-card, #fff)',
+          background: '#ffffff',
           borderRadius: '1.25rem',
           overflow: 'hidden',
           boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-          color: 'inherit'
+          color: '#1a1a1a'
         }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -184,9 +184,9 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
               borderRadius: '0.5rem',
               border: 'none',
               background: selected ? 
-                'var(--duo-green, #58cc02)' : 
+                '#58cc02' : 
                 '#e2e8f0',
-              color: selected ? 'var(--text-light, #e0e7ff)' : '#94a3b8',
+              color: selected ? '#ffffff' : '#94a3b8',
               fontSize: '1rem',
               fontWeight: 600,
               cursor: selected ? 'pointer' : 'not-allowed',
@@ -231,7 +231,7 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
           borderTop: '1px solid #e2e8f0',
           textAlign: 'center',
           fontSize: '0.75rem',
-          color: 'var(--text-dark, #64748b)'
+          color: '#64748b'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span className="material-icons" style={{ 

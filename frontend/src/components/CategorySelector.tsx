@@ -184,7 +184,7 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
   return (
     <div className="container-fluid d-flex align-items-center justify-content-center min-vh-100 px-2 px-sm-3 px-md-4"
          style={{ 
-           background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))',
+           background: 'var(--duo-bg)',
            fontFamily: "'JetBrains Mono', monospace",
            minHeight: '100vh',
            padding: 'clamp(8px, 2vw, 16px)'
@@ -198,7 +198,7 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
           overflow: 'hidden',
           boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
           minHeight: 'clamp(400px, 80vh, 420px)',
-          background: 'white'
+          background: 'var(--duo-card)'
         }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

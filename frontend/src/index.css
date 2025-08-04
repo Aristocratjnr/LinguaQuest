@@ -218,7 +218,13 @@ body.dark, .dark {
   --lq-info: #38bdf8;
   --lq-shadow: #1f2937;
   --lq-shadow-opacity: rgba(0, 0, 0, 0.4);
+  --duo-bg: #0d1b2a;
+  --duo-bg-dark: #0d1b2a;
+  --duo-card: #1e293b;
+  --duo-card-dark: #1e293b;
   --duo-header: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  --text-dark: #ffffff;
+  --text-light: #e2e8f0;
   background: var(--gradient) !important;
   color: var(--text-dark) !important;
 }

@@ -296,7 +296,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
       alignItems: 'center',
       justifyContent: 'center',
       padding: 'clamp(8px, 2vw, 16px)',
-      background: 'var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%))',
+      background: 'linear-gradient(135deg, #e0f7fa 0%, #f5f5f5 100%)',
       width: '100vw',
       boxSizing: 'border-box',
       overflow: 'auto'
@@ -674,15 +674,19 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           display: flex;
           align-items: center;
           justify-content: center;
-          background: var(--duo-bg, linear-gradient(135deg, #58cc02 0%, #4CAF50 100%));
+          background: linear-gradient(135deg, #e0f7fa 0%, #f5f5f5 100%);
           padding: clamp(8px, 2vw, 16px);
           box-sizing: border-box;
           overflow: auto;
         }
+        body.dark .nickname-prompt-container,
+        .dark .nickname-prompt-container {
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
         .nickname-card {
           width: 100%;
           max-width: clamp(320px, 90vw, 28rem);
-          background: var(--duo-card, #fff);
+          background: #ffffff;
           border-radius: clamp(12px, 3vw, 16px);
           overflow: hidden;
           box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -691,6 +695,10 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           display: flex;
           flex-direction: column;
           min-height: auto;
+        }
+        body.dark .nickname-card,
+        .dark .nickname-card {
+          background: #1e293b;
         }
         .dark .nickname-prompt-container, body.dark .nickname-prompt-container {
           color: var(--text-light, #e0e7ff) !important;
