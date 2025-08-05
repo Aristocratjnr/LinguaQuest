@@ -60,6 +60,11 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ round, totalRounds }) => {
         <span className="material-icons" style={{ color: '#58a700', fontSize: '1.3em' }}>flag</span>
         <span className="material-icons" style={{ color: '#764ba2', fontSize: '1.3em' }}>outlined_flag</span>
       </div>
+      <style>{`
+        body.dark .material-icons, .dark .material-icons {
+          color: #e2e8f0 !important;
+        }
+      `}</style>
       {/* Main progress bar */}
       <div style={{
         height: '0.7em',

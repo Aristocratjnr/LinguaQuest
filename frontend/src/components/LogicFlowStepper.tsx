@@ -99,7 +99,6 @@ const LogicFlowStepper: React.FC<LogicFlowStepperProps> = ({ steps, currentStep,
                   style={{ 
                     fontSize: 'min(1.2rem, 4vw)', 
                     verticalAlign: 'middle',
-                    color: 'inherit',
                   }}
                 >
                   {step.icon}

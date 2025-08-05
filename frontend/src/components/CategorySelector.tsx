@@ -414,6 +414,51 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
           Choose a topic and difficulty to begin
         </div>
       </motion.div>
+      
+      {/* Dark mode styles */}
+      <style>{`
+        body.dark .card,
+        .dark .card {
+          background: #1e293b !important;
+          color: #e2e8f0 !important;
+        }
+        
+        body.dark .card-header,
+        .dark .card-header {
+          background: #0f172a !important;
+          border-color: #334155 !important;
+          color: #e2e8f0 !important;
+        }
+        
+        body.dark .card-footer,
+        .dark .card-footer {
+          background: #0f172a !important;
+          border-color: #334155 !important;
+          color: #e2e8f0 !important;
+        }
+        
+        body.dark .material-icons,
+        .dark .material-icons {
+          color: #e2e8f0 !important;
+        }
+        
+        body.dark .lq-btn-primary,
+        .dark .lq-btn-primary {
+          background: #58cc02 !important;
+          color: #ffffff !important;
+        }
+        
+        body.dark .lq-btn-primary:hover,
+        .dark .lq-btn-primary:hover {
+          background: #4db501 !important;
+        }
+        
+        body.dark .lq-btn-primary:disabled,
+        .dark .lq-btn-primary:disabled {
+          background: #444c6e !important;
+          color: #94a3b8 !important;
+        }
+      `}</style>
     </div>
   );
 };
