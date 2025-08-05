@@ -776,6 +776,10 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           background: #330d0d !important;
           color: #f87171 !important;
         }
+        body.dark .lq-logic-stepper .material-icons,
+        .dark .lq-logic-stepper .material-icons {
+          color: #e2e8f0 !important;
+        }
         body.dark .nickname-footer,
         .dark .nickname-footer {
           background: #0f172a !important;

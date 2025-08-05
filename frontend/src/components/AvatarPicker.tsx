@@ -413,6 +413,10 @@ const AvatarPicker: React.FC<{ onConfirm: (avatar: string) => void }> = ({ onCon
         .dark .avatar-picker-card .material-icons {
           color: #94a3b8;
         }
+        body.dark .lq-logic-stepper .material-icons,
+        .dark .lq-logic-stepper .material-icons {
+          color: #e2e8f0 !important;
+        }
         body.dark .avatar-picker-footer,
         .dark .avatar-picker-footer {
           background: #0f172a !important;
