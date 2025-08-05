@@ -99,6 +99,7 @@ const LogicFlowStepper: React.FC<LogicFlowStepperProps> = ({ steps, currentStep,
                   style={{ 
                     fontSize: 'min(1.2rem, 4vw)', 
                     verticalAlign: 'middle',
+                    color: 'inherit',
                   }}
                 >
                   {step.icon}
@@ -177,6 +178,14 @@ const LogicFlowStepper: React.FC<LogicFlowStepperProps> = ({ steps, currentStep,
           </React.Fragment>
         );
       })}
+      
+      {/* Dark mode styles for material icons */}
+      <style>{`
+        body.dark .lq-logic-stepper .material-icons,
+        .dark .lq-logic-stepper .material-icons {
+          color: #e2e8f0 !important;
+        }
+      `}</style>
     </div>
   );
 };
