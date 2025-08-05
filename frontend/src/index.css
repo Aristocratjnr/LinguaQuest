@@ -354,3 +354,8 @@ body.dark .lq-btn-dialogue, .dark .lq-btn-dialogue {
   background: linear-gradient(90deg, #fbbf24 0%, #232946 100%) !important;
   color: #fff !important;
 }
+
+/* Material Icons in dark mode */
+body.dark .material-icons, .dark .material-icons {
+  color: #e2e8f0 !important;
+}

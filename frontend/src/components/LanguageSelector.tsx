@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '../context/UserContext';
 import { storage, userApi } from '../services/api';
 import ghanaFlag from '../assets/images/ghana.png';
+import languageIcon from '../assets/images/language-icon.png';
 
 interface Language {
   code: string;
@@ -124,7 +125,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
             transition={{ delay: 0.2, type: 'spring', stiffness: 400 }}
           >
             <div className="duo-icon-container">
-              <span className="material-icons">language</span>
+              <img src={languageIcon} alt="Language" className="duo-lang-icon" />
             </div>
             <h1 className="duo-lang-title">Choose your language</h1>
             <p className="duo-lang-subtitle">
@@ -782,6 +783,21 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onSelect, onBack })
         .dark .duo-lang-card {
           background: #1e293b;
           border-color: #334155;
+        }
+
+        body.dark .duo-lang-header,
+        .dark .duo-lang-header {
+          background: linear-gradient(135deg, #1e293b, #0f172a);
+        }
+
+        body.dark .duo-lang-header::before,
+        .dark .duo-lang-header::before {
+          background: #1e293b;
+        }
+
+        body.dark .duo-icon-container,
+        .dark .duo-icon-container {
+          background: #0f172a;
         }
 
         body.dark .duo-lang-title,

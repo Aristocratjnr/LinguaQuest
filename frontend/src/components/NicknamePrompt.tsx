@@ -331,11 +331,11 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
           { label: 'Age', icon: 'cake' }
         ]} currentStep={0} />
         {/* Header */}
-        <div style={{
+        <div className="nickname-header" style={{
           padding: 'clamp(16px, 4vw, 20px) clamp(16px, 4vw, 20px) clamp(12px, 3vw, 16px) clamp(16px, 4vw, 20px)',
           background: '#ffffff',
           textAlign: 'center',
-          color: 'var(--text-light, #e0e7ff)'
+          color: '#e0e7ff'
         }}>
           <motion.div
             initial={{ scale: 0.9 }}
@@ -410,7 +410,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
               fontSize: 'clamp(1.2rem, 4vw, 1.5rem)',
               fontWeight: 700,
               letterSpacing: '-0.025em',
-              color: 'var(--text-light, #e0e7ff'
+              color: '#e0e7ff'
             }}>
               Create Your Profile
             </h2>
@@ -418,7 +418,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
               margin: 'clamp(0.4rem, 1vw, 0.5rem) 0 0',
               opacity: 0.9,
               fontSize: 'clamp(0.8rem, 2.5vw, 0.875rem)',
-              color: 'var(--text-dark, #222)'
+              color: '#1e293b'
             }}>
               Choose a nickname and profile picture
             </p>
@@ -428,7 +428,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         {/* Body */}
         <div style={{ padding: 'clamp(16px, 4vw, 20px) clamp(16px, 4vw, 20px)' }}>
           <div style={{ marginBottom: 'clamp(20px, 5vw, 24px)' }}>
-            <div style={{
+            <div className="nickname-input-container" style={{
               display: 'flex',
               alignItems: 'center',
               background: '#f8fafc',
@@ -475,9 +475,9 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                   border: 'none',
                   background: 'transparent',
                   outline: 'none',
-                  fontSize: '1rem', /* Fixed font size to prevent mobile zoom */
+                  fontSize: 'var(--text-md, 1rem)', /* Fixed font size to prevent mobile zoom */
                   fontFamily: 'Noto Sans, Arial Unicode MS, system-ui, monospace',
-                  color: 'var(--text-dark, #222)'
+                  color: '#1e293b'
                 }}
               />
             </div>
@@ -548,6 +548,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
                   initial={{ opacity: 0, height: 0, marginTop: 0 }}
                   animate={{ opacity: 1, height: 'auto', marginTop: 'clamp(8px, 2vw, 10px)' }}
                   exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                  className="nickname-error-message"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -581,7 +582,7 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
               background: valid ? 
                 '#58cc02' : 
                 '#e2e8f0',
-              color: valid ? '#e0e7ff' : '#94a3b8',
+              color: valid ? '#ffffff' : '#94a3b8',
               fontSize: 'clamp(0.9rem, 3vw, 1rem)',
               fontWeight: 600,
               cursor: valid ? 'pointer' : 'not-allowed',
@@ -621,13 +622,13 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         </div>
         
         {/* Footer */}
-        <div style={{
+        <div className="nickname-footer" style={{
           padding: 'clamp(12px, 3vw, 16px)',
           background: '#f8fafc',
           borderTop: '1px solid #e2e8f0',
           textAlign: 'center',
           fontSize: 'clamp(0.7rem, 2vw, 0.75rem)',
-          color: 'var(--text-dark, #64748b)'
+          color: '#64748b'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span className="material-icons" style={{ 
@@ -750,6 +751,30 @@ const NicknamePrompt: React.FC<{ onConfirm: (nickname: string, avatar: string) =
         .dark .nickname-avatar-add-text {
           background: rgba(0, 0, 0, 0.5) !important;
           color: white !important;
+        }
+        body.dark .nickname-header,
+        .dark .nickname-header {
+          background: #0f172a !important;
+          color: #e2e8f0 !important;
+        }
+        body.dark .nickname-input-container,
+        .dark .nickname-input-container {
+          background: #1e293b !important;
+          border-color: #334155 !important;
+        }
+        body.dark .nickname-input-container div,
+        .dark .nickname-input-container div {
+          background: #0f172a !important;
+        }
+        body.dark .nickname-input-container input,
+        .dark .nickname-input-container input {
+          background: #1e293b !important;
+          color: #e2e8f0 !important;
+        }
+        body.dark .nickname-error-message,
+        .dark .nickname-error-message {
+          background: #330d0d !important;
+          color: #f87171 !important;
         }
         body.dark .nickname-footer,
         .dark .nickname-footer {

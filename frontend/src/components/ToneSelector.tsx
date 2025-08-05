@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useSettings } from '../context/SettingsContext';
 
 type ToneSelectorProps = {
   tone: string;
@@ -9,7 +10,11 @@ type ToneSelectorProps = {
   tones: string[];
 };
 
-const ToneSelector: React.FC<ToneSelectorProps> = ({ tone, onChange, loading, disabled, tones }) => (
+const ToneSelector: React.FC<ToneSelectorProps> = ({ tone, onChange, loading, disabled, tones }) => {
+  const { resolvedTheme } = useSettings();
+  const isDark = resolvedTheme === 'dark';
+  
+  return (
   <motion.div 
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -48,7 +53,7 @@ const ToneSelector: React.FC<ToneSelectorProps> = ({ tone, onChange, loading, di
     <div className="mb-4">
       <div className="d-flex align-items-center mb-3">
         <label className="form-label mb-0 me-3 d-flex align-items-center" style={{ 
-          color: '#6c757d',
+          color: isDark ? '#e2e8f0' : '#6c757d',
           fontWeight: 500,
           fontSize: '0.9rem'
         }}>
@@ -68,14 +73,18 @@ const ToneSelector: React.FC<ToneSelectorProps> = ({ tone, onChange, loading, di
             aria-label="Select tone"
             style={{
               borderRadius: '12px 0 0 12px',
-              border: '1px solid #dee2e6',
+              border: isDark ? '1px solid #334155' : '1px solid #dee2e6',
               boxShadow: 'none',
               fontSize: '0.9rem',
-              backgroundColor: disabled ? '#f8f9fa' : 'white'
+              backgroundColor: disabled ? (isDark ? '#1e293b' : '#f8f9fa') : (isDark ? '#1e293b' : 'white'),
+              color: isDark ? '#ffffff' : '#333'
             }}
           >
             {tones.map(t => (
-              <option key={t} value={t}>
+              <option key={t} value={t} style={{
+                backgroundColor: isDark ? '#1e293b' : 'white',
+                color: isDark ? '#ffffff' : '#333'
+              }}>
                 {t.charAt(0).toUpperCase() + t.slice(1)}
               </option>
             ))}
@@ -169,6 +178,7 @@ const ToneSelector: React.FC<ToneSelectorProps> = ({ tone, onChange, loading, di
       Different styles work better in different scenarios
     </div>
   </motion.div>
-);
+  );
+}
 
 export default ToneSelector;

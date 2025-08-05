@@ -47,6 +47,11 @@ const ArgumentInput: React.FC<ArgumentInputProps> = ({
   const { resolvedTheme } = useSettings();
   const isDark = resolvedTheme === 'dark';
 
+  const textColor = isDark ? '#ffffff' : '#333';
+  const backgroundColor = isDark ? '#1e293b' : '#fff';
+  const borderColor = isDark ? '#334155' : '#e0e0e0';
+  const placeholderColor = isDark ? '#e2e8f0' : '#999';
+
   const [isOverLimit, setIsOverLimit] = useState(false);
   const [listening, setListening] = useState(false);
   const { addActivity } = useActivityFeed();
