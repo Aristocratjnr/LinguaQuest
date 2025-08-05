@@ -142,7 +142,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
       >
        {/* Header with mascot - Updated Avatar Section */}
 <div style={{
-  background: '#ffffff',
+  background: theme === 'dark' ? 'var(--duo-card-dark)' : '#ffffff',
   padding: getSpacing(12, 16, 24),
   display: 'flex',
   flexDirection: 'column',
@@ -158,7 +158,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
     style={{
       width: isSmallMobile ? '80px' : '100px',
       height: isSmallMobile ? '80px' : '100px',
-      background: 'var(--duo-card, #fff)',
+      background: theme === 'dark' ? 'var(--duo-card-dark)' : 'var(--duo-card, #fff)',
       borderRadius: '50%',
       display: 'flex',
       justifyContent: 'center',
@@ -236,7 +236,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
             display: 'flex',
             justifyContent: 'space-around',
             padding: getSpacing(12, 16, 24),
-            background: 'var(--duo-card)',
+            background: theme === 'dark' ? 'var(--duo-card-dark)' : 'var(--duo-card)',
             borderBottom: '1px solid var(--lq-border)',
             gap: '8px'
           }}
@@ -410,15 +410,17 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
           </AnimatePresence>
 
           <div style={{
+            display: 'flex',
+            alignItems: 'center',
             color: 'var(--lq-text-muted)',
             fontWeight: 'bold',
             fontSize: getFontSize(11, 12, 14),
             marginBottom: '8px',
             textTransform: 'uppercase',
-            letterSpacing: '1px',
-            textAlign: 'center'
+            letterSpacing: '1px'
           }}>
-            TIP
+            <span style={{ marginRight: '8px' }}>💡</span>
+            <span>TIP</span>
           </div>
           <AnimatePresence mode="wait">
             <motion.div
