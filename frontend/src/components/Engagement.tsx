@@ -409,6 +409,17 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
             </motion.div>
           </AnimatePresence>
 
+          <div style={{
+            color: 'var(--lq-text-muted)',
+            fontWeight: 'bold',
+            fontSize: getFontSize(11, 12, 14),
+            marginBottom: '8px',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+            textAlign: 'center'
+          }}>
+            TIP
+          </div>
           <AnimatePresence mode="wait">
             <motion.div
               key={tipIndex}
