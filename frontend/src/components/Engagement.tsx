@@ -436,7 +436,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
           <div style={{
             display: 'flex',
             justifyContent: 'center',
-            marginTop: getSpacing(12, 14, 16),
+            marginTop: getSpacing(8, 10, 12),
             gap: '8px'
           }}>
             {tips.map((_, i) => (
