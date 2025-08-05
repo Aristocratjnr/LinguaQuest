@@ -32,6 +32,26 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
     height: typeof window !== 'undefined' ? window.innerHeight : 800,
   });
 
+  // Detect theme
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    const currentTheme = document.body.classList.contains('dark') ? 'dark' : 'light';
+    setTheme(currentTheme);
+
+    const observer = new MutationObserver(() => {
+      const newTheme = document.body.classList.contains('dark') ? 'dark' : 'light';
+      setTheme(newTheme);
+    });
+
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   // Use user data from context instead of making API calls
   const streak = userStats?.current_streak || 0;
   const xp = userStats?.total_score || 0;
@@ -185,26 +205,25 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
     alignItems: 'center',
     textAlign: 'center'
   }}>
-    <h1 style={{
-      color: 'var(--lq-text-muted)',
-      fontWeight: 900,
-      marginBottom: '12px',
-      fontSize: getFontSize(18, 22, 26),
-      letterSpacing: '-0.5px',
-      lineHeight: '1.2',
-      textShadow: '0 2px 8px rgba(28,176,246,0.10)'
-    }}>
-       WELCOME, {nickname.toUpperCase()}!
-    </h1>
-    <p style={{
-      color: 'var(--text-dark)',
-      fontWeight: 600,
-      marginBottom: '0',
-      fontSize: getFontSize(12, 14, 16),
-      lineHeight: '1.3'
-    }}>
-      READY FOR YOUR LANGUAGE CHALLENGE?
-    </p>
+
+       <h1 style={{
+         color: theme === 'dark' ? 'var(--lq-text-main-dark)' : 'var(--lq-text-main)',
+         fontSize: getFontSize(18, 20, 22),
+         fontWeight: 'bold',
+         marginBottom: '4px',
+         textTransform: 'uppercase'
+       }}>
+         WELCOME, {nickname.toUpperCase()}!
+       </h1>
+       <p style={{
+         color: 'var(--lq-text-muted)',
+         fontSize: getFontSize(12, 14, 16),
+         fontWeight: 600,
+         marginBottom: '0',
+         lineHeight: '1.3'
+       }}>
+         READY FOR YOUR LANGUAGE CHALLENGE?
+       </p>
   </div>
 </div>
 
@@ -217,8 +236,8 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
             display: 'flex',
             justifyContent: 'space-around',
             padding: getSpacing(12, 16, 24),
-            background: 'var(--duo-card, #fff)',
-            borderBottom: '1px solid var(--border-light)',
+            background: 'var(--duo-card)',
+            borderBottom: '1px solid var(--lq-border)',
             gap: '8px'
           }}
         >
@@ -276,7 +295,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
               {loadingStats ? '...' : streak}
             </motion.div>
             <div style={{
-              color: 'var(--text-dark)',
+              color: theme === 'dark' ? 'var(--lq-text-main-dark)' : 'var(--lq-text-main)',
               fontSize: getFontSize(10, 11, 12),
               letterSpacing: '0.5px',
               fontWeight: 600
@@ -338,7 +357,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
               {loadingStats ? '...' : xp}
             </motion.div>
             <div style={{
-              color: 'var(--text-dark)',
+              color: theme === 'dark' ? 'var(--lq-text-main-dark)' : 'var(--lq-text-main)',
               fontSize: getFontSize(10, 11, 12),
               letterSpacing: '0.5px',
               fontWeight: 600
@@ -351,8 +370,8 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
         {/* Daily motivation */}
         <div style={{
           padding: getSpacing(12, 16, 24),
-          borderBottom: '1px solid var(--border-light)',
-          background: 'var(--duo-card, #fff)',
+          borderBottom: '1px solid var(--lq-border)',
+          background: theme === 'dark' ? 'var(--duo-card-dark)' : 'var(--duo-card)',
           minHeight: isSmallMobile ? '70px' : isMobile ? '80px' : '100px',
           display: 'flex',
           flexDirection: 'column',
@@ -381,7 +400,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
                 justifyContent: 'center',
                 textAlign: 'center',
                 fontStyle: 'italic',
-                color: 'var(--text-dark)',
+                color: theme === 'dark' ? '#fff' : 'var(--lq-text-main)',
                 fontSize: getFontSize(13, 14, 16),
                 lineHeight: '1.4'
               }}
@@ -389,60 +408,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
               {quotes[quoteIndex]}
             </motion.div>
           </AnimatePresence>
-        </div>
 
-        {/* Tips carousel */}
-        <div style={{
-          padding: getSpacing(12, 16, 24),
-          background: 'var(--duo-card, #fff)',
-          minHeight: isSmallMobile ? '90px' : isMobile ? '100px' : '120px'
-        }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: getSpacing(8, 10, 12)
-          }}>
-            <div style={{
-              color: 'var(--lq-text-muted)',
-              fontWeight: 'bold',
-              fontSize: getFontSize(11, 12, 14),
-              textTransform: 'uppercase',
-              letterSpacing: '1px'
-            }}>
-              QUICK TIPS
-            </div>
-            <div style={{ display: 'flex' }}>
-              <motion.button 
-                onClick={() => setTipIndex((i) => (i - 1 + tips.length) % tips.length)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: getFontSize(18, 20, 22),
-                  color: 'var(--lq-text-muted)',
-                  marginRight: '8px'
-                }}
-                whileTap={{ scale: 0.9 }}
-              >
-                ‹
-              </motion.button>
-              <motion.button 
-                onClick={() => setTipIndex((i) => (i + 1) % tips.length)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: getFontSize(18, 20, 22),
-                  color: 'var(--lq-text-muted)'
-                }}
-                whileTap={{ scale: 0.9 }}
-              >
-                ›
-              </motion.button>
-            </div>
-          </div>
-          
           <AnimatePresence mode="wait">
             <motion.div
               key={tipIndex}
@@ -451,14 +417,14 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.3 }}
               style={{
-                background: 'white',
+                background: theme === 'dark' ? '#333' : 'var(--lq-card)',
                 borderRadius: '8px',
                 padding: getSpacing(10, 12, 16),
                 boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
                 minHeight: isSmallMobile ? '60px' : isMobile ? '70px' : '80px',
                 display: 'flex',
                 alignItems: 'center',
-                color: 'var(--lq-text-main)',
+                color: theme === 'dark' ? '#fff' : 'var(--lq-text-main)',
                 fontSize: getFontSize(13, 14, 15),
                 lineHeight: '1.4'
               }}
@@ -493,7 +459,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
         {/* Start button */}
         <div style={{
           padding: getSpacing(12, 16, 24),
-          background: 'white',
+          background: theme === 'dark' ? 'var(--duo-card-dark)' : 'var(--duo-card)',
           textAlign: 'center'
         }}>
           <motion.button
@@ -530,7 +496,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
           
           <div style={{
             marginTop: getSpacing(8, 10, 12),
-            color: '#666',
+            color: 'var(--lq-text-muted)',
             fontSize: getFontSize(10, 11, 12),
             letterSpacing: '0.5px'
           }}>
