@@ -370,7 +370,7 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
         {/* Daily motivation */}
         <div style={{
           padding: getSpacing(12, 16, 24),
-          borderBottom: '1px solid var(--lq-border)',
+          borderBottom: isMobile ? 'none' : '1px solid var(--lq-border)',
           background: theme === 'dark' ? 'var(--duo-card-dark)' : 'var(--duo-card)',
           minHeight: isSmallMobile ? '70px' : isMobile ? '80px' : '100px',
           display: 'flex',
@@ -408,7 +408,18 @@ const Engagement: React.FC<{ nickname: string; avatar?: string; onStart: () => v
               {quotes[quoteIndex]}
             </motion.div>
           </AnimatePresence>
+        </div>
 
+        {/* Tips section - now in its own distinct section */}
+        <div style={{
+          padding: getSpacing(12, 16, 24),
+          borderBottom: '1px solid var(--lq-border)',
+          background: theme === 'dark' ? 'var(--duo-card-dark)' : 'var(--duo-card)',
+          minHeight: isSmallMobile ? '90px' : isMobile ? '100px' : '120px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center'
+        }}>
           <div style={{
             display: 'flex',
             alignItems: 'center',

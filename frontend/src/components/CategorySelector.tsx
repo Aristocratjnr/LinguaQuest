@@ -244,25 +244,27 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
             Topic Category
           </h5>
           <div className="row g-3 mb-4" style={{
-            marginBottom: 'clamp(20px, 5vw, 24px)',
-            gap: 'clamp(8px, 2vw, 12px)'
+            marginBottom: 'clamp(20px, 5vw, 24px)'
           }}>
             {categories.map(c => (
               <div className="col-12 col-sm-6" key={c.key}>
                 <motion.button
                   className="btn w-100 py-3 px-2 position-relative"
                   style={{ 
-                    borderRadius: 'clamp(8px, 2vw, 12px)', 
+                    borderRadius: 'clamp(10px, 2.5vw, 12px)', 
                     transition: 'all 0.2s cubic-bezier(.4,0,.2,1)',
                     boxShadow: category === c.key ? '0 4px 12px rgba(88,204,2,0.2)' : '0 2px 8px rgba(0,0,0,0.05)',
                     fontWeight: 500,
-                    fontSize: 'clamp(0.9rem, 2.5vw, 1.05rem)',
+                    fontSize: 'clamp(1rem, 2.8vw, 1.1rem)',
                     letterSpacing: '.01em',
                     background: category === c.key ? '#e8f5e8' : 'white',
                     color: '#22223b',
                     border: category === c.key ? '2px solid #58cc02' : '1.5px solid #e0e7ef',
-                    padding: 'clamp(12px, 3vw, 16px)',
-                    minHeight: 'clamp(48px, 12vw, 56px)'
+                    padding: 'clamp(16px, 4vw, 20px)',
+                    minHeight: 'clamp(60px, 15vw, 70px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}
                   onClick={() => {
                     setCategory(c.key);
@@ -272,25 +274,30 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
                   whileTap={{ scale: 0.97 }}
                   aria-pressed={category === c.key}
                 >
-                  <div className="d-flex align-items-center justify-content-center gap-2">
+                  <div className="d-flex align-items-center justify-content-center gap-3">
                     <i className="material-icons" style={{ 
-                      fontSize: 'clamp(1.1rem, 3vw, 1.35rem)', 
+                      fontSize: 'clamp(1.3rem, 4vw, 1.6rem)', 
                       color: '#adb5bd' 
                     }}>{c.icon}</i>
-                    <span className="fw-medium">{c.label}</span>
+                    <span className="fw-medium" style={{
+                      fontSize: 'clamp(1rem, 3vw, 1.15rem)'
+                    }}>{c.label}</span>
                   </div>
                   {category === c.key && (
                     <span className="position-absolute top-0 end-0 translate-middle badge rounded-pill p-2 shadow"
                           style={{ 
-                            fontSize: 'clamp(0.6rem, 1.5vw, 0.7rem)', 
-                            right: 'clamp(6px, 2vw, 8px)', 
-                            top: 'clamp(6px, 2vw, 8px)', 
+                            fontSize: 'clamp(0.7rem, 2vw, 0.8rem)', 
+                            right: 'clamp(8px, 2.5vw, 12px)', 
+                            top: 'clamp(8px, 2.5vw, 12px)', 
                             background: '#58cc02',
-                            minWidth: 'clamp(20px, 5vw, 24px)',
-                            minHeight: 'clamp(20px, 5vw, 24px)'
+                            minWidth: 'clamp(24px, 6vw, 28px)',
+                            minHeight: 'clamp(24px, 6vw, 28px)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                           }}>
                       <i className="material-icons" style={{ 
-                        fontSize: 'clamp(0.7rem, 2vw, 0.8rem)', 
+                        fontSize: 'clamp(0.8rem, 2.5vw, 1rem)', 
                         color: 'white' 
                       }}>check</i>
                       <span className="visually-hidden">Selected</span>
@@ -303,34 +310,38 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
           
           <h5 className="mb-3 d-flex align-items-center" style={{ 
             fontWeight: 600, 
-            fontSize: 'clamp(0.9rem, 2.5vw, 1.05rem)', 
+            fontSize: 'clamp(1rem, 2.8vw, 1.15rem)', 
             color: '#58cc02', 
             textTransform: 'uppercase', 
             letterSpacing: '0.5px',
-            marginBottom: 'clamp(12px, 3vw, 16px)'
+            marginBottom: 'clamp(16px, 4vw, 20px)',
+            marginTop: 'clamp(8px, 2vw, 12px)'
           }}>
-            <i className="material-icons me-2" style={{ fontSize: 'clamp(1rem, 2.5vw, 1.1rem)', color: '#58cc02' }}>signal_cellular_alt</i>
+            <i className="material-icons me-2" style={{ fontSize: 'clamp(1.1rem, 3vw, 1.3rem)', color: '#58cc02' }}>signal_cellular_alt</i>
             Difficulty Level
           </h5>
-          <div className="d-flex flex-column flex-sm-row gap-2 mb-4" style={{
-            marginBottom: 'clamp(20px, 5vw, 24px)',
-            gap: 'clamp(8px, 2vw, 12px)'
+          <div className="d-flex flex-column flex-sm-row gap-3 mb-4" style={{
+            marginBottom: 'clamp(24px, 6vw, 28px)',
+            gap: 'clamp(12px, 3vw, 16px)'
           }}>
             {difficulties.map(d => (
               <motion.button
                 key={d.key}
-                className="btn py-2 flex-grow-1"
+                className="btn py-3 flex-grow-1"
                 style={{ 
-                  borderRadius: 'clamp(8px, 2vw, 12px)',
+                  borderRadius: 'clamp(10px, 2.5vw, 12px)',
                   background: difficulty === d.key ? '#e8f5e8' : 'white',
                   border: difficulty === d.key ? '2px solid #58cc02' : '1.5px solid #e0e7ef',
                   color: '#22223b',
                   fontWeight: 500,
-                  fontSize: 'clamp(0.9rem, 2.5vw, 1.01rem)',
+                  fontSize: 'clamp(1rem, 2.8vw, 1.1rem)',
                   boxShadow: difficulty === d.key ? '0 4px 12px rgba(88,204,2,0.2)' : '0 2px 8px rgba(0,0,0,0.05)',
                   transition: 'all 0.2s cubic-bezier(.4,0,.2,1)',
-                  padding: 'clamp(10px, 2.5vw, 12px)',
-                  minHeight: 'clamp(40px, 10vw, 44px)'
+                  padding: 'clamp(16px, 4vw, 20px)',
+                  minHeight: 'clamp(56px, 14vw, 60px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}
                 onClick={() => {
                   setDifficulty(d.key);
@@ -340,11 +351,13 @@ const CategorySelector: React.FC<{ onConfirm: (category: string, difficulty: str
                 whileTap={{ scale: 0.97 }}
                 aria-pressed={difficulty === d.key}
               >
-                <div className="d-flex align-items-center justify-content-center gap-1">
-                  <span>{d.label}</span>
+                <div className="d-flex align-items-center justify-content-center gap-2">
+                  <span style={{
+                    fontSize: 'clamp(1rem, 3vw, 1.15rem)'
+                  }}>{d.label}</span>
                   {difficulty === d.key && (
                     <i className="material-icons ms-2" style={{ 
-                      fontSize: 'clamp(0.8rem, 2vw, 0.95rem)', 
+                      fontSize: 'clamp(1rem, 3vw, 1.2rem)', 
                       color: '#58cc02' 
                     }}>check_circle</i>
                   )}
