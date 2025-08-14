@@ -6,7 +6,19 @@ body, .app-container {
 
 body.dark, .dark {
   background: #0f172a;
-  color: #ffffff;
+  color: #f8fafc;
+  --text-primary: #f8fafc;
+  --text-secondary: #e2e8f0;
+  --text-muted: #94a3b8;
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --border-color: #475569;
+  --accent-color: #60a5fa;
+  --success-color: #4ade80;
+  --error-color: #f87171;
+  --card-bg: #1e293b;
+  --card-shadow: 0 4px 24px 0 rgba(0,0,0,0.4);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -19,7 +31,9 @@ h1, h2, h3, h4, h5, h6 {
 
 body.dark h1, body.dark h2, body.dark h3, body.dark h4, body.dark h5, body.dark h6,
 .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
-  color: #a5f3fc;
+  color: #60a5fa;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 .card-title, .scenario-title, .feedback-title {
@@ -43,7 +57,47 @@ body.dark .card-title, body.dark .scenario-title, body.dark .feedback-title,
 
 body.dark .card-body, body.dark .scenario-body, body.dark .feedback-body,
 .dark .card-body, .dark .scenario-body, .dark .feedback-body {
-  color: #ffffff;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Improved form controls in dark mode */
+body.dark input, .dark input,
+body.dark textarea, .dark textarea,
+body.dark select, .dark select {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+}
+
+body.dark input:focus, .dark input:focus,
+body.dark textarea:focus, .dark textarea:focus,
+body.dark select:focus, .dark select:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+  outline: none;
+}
+
+/* Improved buttons in dark mode */
+body.dark .btn-primary, .dark .btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border: none;
+  color: white;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+body.dark .btn-primary:hover, .dark .btn-primary:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+body.dark .btn-primary:active, .dark .btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 input, textarea, select, button {
@@ -107,14 +161,76 @@ input, textarea, select, button {
 
 body.dark .lq-header,
 .dark .lq-header {
-  background: #1e293b;
-  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.3);
+  background: var(--bg-secondary);
+  box-shadow: var(--card-shadow);
+  border-bottom: 1px solid var(--border-color);
 }
 
 body.dark .lq-card,
 .dark .lq-card {
-  background: #1e293b;
-  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.3);
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-color);
+}
+
+/* Improved cards and containers */
+body.dark .card, .dark .card,
+body.dark .modal-content, .dark .modal-content {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+body.dark .card-header, .dark .card-header,
+body.dark .modal-header, .dark .modal-header {
+  background-color: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Improved text contrast */
+body.dark p, .dark p,
+body.dark span, .dark span,
+body.dark div, .dark div,
+body.dark label, .dark label {
+  color: var(--text-secondary);
+}
+
+/* Improved links */
+body.dark a, .dark a {
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+body.dark a:hover, .dark a:hover {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+/* Improved form labels */
+body.dark label, .dark label {
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+/* Improved feedback messages */
+body.dark .text-success, .dark .text-success {
+  color: var(--success-color) !important;
+}
+
+body.dark .text-danger, .dark .text-danger,
+body.dark .text-error, .dark .text-error {
+  color: var(--error-color) !important;
+}
+
+/* Improved disabled states */
+body.dark .btn:disabled, .dark .btn:disabled,
+body.dark .btn.disabled, .dark .btn.disabled {
+  background-color: var(--bg-tertiary) !important;
+  color: var(--text-muted) !important;
+  border-color: var(--border-color) !important;
+  opacity: 0.7;
 }
 
 body.dark .lq-label,
