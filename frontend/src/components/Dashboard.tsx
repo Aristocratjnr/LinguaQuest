@@ -84,9 +84,57 @@ interface LeaderboardResponse { leaderboard: any[]; }
 function AppContent() {
   // Router setup
   const navigate = useNavigate();
+  
+  // Get user data from context
   const { user, userStats, submitScore, startGameSession, endGameSession, incrementStreak, resetStreak, awardBadge, refreshUserStats, loginUser, createUser } = useUser();
-
-  const { resolvedTheme: theme, sound, nickname: tempNickname, avatar: tempAvatar, setNickname, setAvatar } = useSettings();
+  
+  // Get settings from context
+  const { 
+    resolvedTheme: theme, 
+    sound, 
+    nickname: tempNickname, 
+    avatar: tempAvatar, 
+    setNickname, 
+    setAvatar 
+  } = useSettings();
+  
+  // State to track the current avatar
+  const [currentAvatar, setCurrentAvatar] = useState<string>('');
+  
+  // Update current avatar when user or tempAvatar changes
+  useEffect(() => {
+    if (user?.avatar) {
+      setCurrentAvatar(user.avatar);
+    } else if (tempAvatar) {
+      setCurrentAvatar(tempAvatar);
+    } else {
+      setCurrentAvatar('');
+    }
+  }, [user?.avatar, tempAvatar]);
+  
+  // Expose setAvatarFromSettings to window for cross-component updates
+  useEffect(() => {
+    window.setAvatarFromSettings = (avatar: string) => {
+      setCurrentAvatar(avatar);
+    };
+    
+    return () => {
+      delete window.setAvatarFromSettings;
+    };
+  }, []);
+  
+  // Log avatar changes for debugging
+  useEffect(() => {
+    console.log('Avatar updated:', { 
+      userAvatar: user?.avatar, 
+      tempAvatar, 
+      currentAvatar 
+    });
+  }, [user?.avatar, tempAvatar, currentAvatar]);
+  
+  // Use user data for nickname and avatar when logged in, fallback to temp values during onboarding
+  const displayName = user?.nickname || tempNickname || '';
+  const displayAvatar = currentAvatar;
 
   // Global font styles for the dashboard
   const fontStyles = {
@@ -161,10 +209,7 @@ function AppContent() {
       document.head.removeChild(styleElement);
     };
   }, []);
-  
-  // Use user data for nickname and avatar when logged in, fallback to temp values during onboarding
-  const nickname = user?.nickname || tempNickname || '';
-  const avatar = user?.avatar || tempAvatar;
+
   const [scenario, setScenario] = useState('');
   const [language, setLanguage] = useState('twi');
   const [aiStance, setAiStance] = useState('disagree');
@@ -1556,9 +1601,14 @@ function AppContent() {
               onMouseOut={e => e.currentTarget.style.boxShadow = 'none'}
             >
               <img 
-                src={user?.avatar || avatar} 
+                src={displayAvatar} 
                 alt="User" 
                 style={{ width: '100%', height: '100%', objectFit: 'cover', minWidth: 0, minHeight: 0 }} 
+                onError={(e) => {
+                  // Fallback to default avatar if image fails to load
+                  const target = e.target as HTMLImageElement;
+                  target.src = '/default-avatar.png';
+                }}
               />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
@@ -1581,7 +1631,7 @@ function AppContent() {
                  letterSpacing: '0.01em',
                  lineHeight: 1.1
                }}>
-                 {nickname}
+                 {displayName}
                </span>
             </div>
           </div>

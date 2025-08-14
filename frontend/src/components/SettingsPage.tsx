@@ -167,6 +167,10 @@ const SettingsPage: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     if (user) {
       try {
         await updateUser({ avatar: a });
+        // Also update the avatar in the Dashboard if the window function exists
+        if (window.setAvatarFromSettings) {
+          window.setAvatarFromSettings(a);
+        }
         toast.success('Avatar updated!');
       } catch (error) {
         toast.error('Failed to update avatar');

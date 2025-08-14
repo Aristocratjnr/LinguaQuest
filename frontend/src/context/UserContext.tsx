@@ -1,4 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+
+declare global {
+  interface Window {
+    setAvatarFromSettings?: (avatar: string) => void;
+  }
+}
 import { userApi, gameApi, engagementApi, storage, User, UserCreate, UserUpdate, ScoreCreate, GameSessionCreate, GameSessionUpdate, UserStats } from '../services/api';
 
 interface UserContextType {
@@ -10,7 +16,7 @@ interface UserContextType {
   // User actions
   createUser: (userData: UserCreate) => Promise<void>;
   loginUser: (nickname: string) => Promise<void>;
-  updateUser: (userData: UserUpdate) => Promise<void>;
+  updateUser: (userData: UserUpdate) => Promise<User>;
   logout: () => void;
   
   // Game actions
@@ -145,12 +151,24 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       setError(null);
       
       const updatedUser = await userApi.updateUser(user.nickname, userData);
-      setUser(updatedUser);
+      
+      // Create a new user object with updated fields to ensure React detects the change
+      const newUser = { ...user, ...updatedUser };
+      setUser(newUser);
       
       // Update localStorage if avatar changed
       if (userData.avatar) {
         storage.setAvatar(userData.avatar);
+        // Force update by calling the setter from settings context if available
+        if (window.setAvatarFromSettings) {
+          window.setAvatarFromSettings(userData.avatar);
+        }
       }
+      
+      // Refresh user stats to ensure all components are up to date
+      await refreshUserStats();
+      
+      return updatedUser;
     } catch (err: any) {
       setError(err.message || 'Failed to update user');
       throw err;

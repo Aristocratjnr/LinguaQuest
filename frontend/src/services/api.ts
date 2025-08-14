@@ -169,6 +169,10 @@ export const userApi = {
   // Update user profile
   updateUser: async (nickname: string, userData: UserUpdate): Promise<User> => {
     const response = await axios.put(getApiUrl(`users/${nickname}`), userData);
+    // Update local storage if avatar is being updated
+    if (userData.avatar !== undefined) {
+      storage.setAvatar(userData.avatar);
+    }
     return response.data;
   },
 
