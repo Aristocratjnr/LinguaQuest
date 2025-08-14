@@ -27,7 +27,7 @@ import { UserProvider, useUser } from '../context/UserContext';
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Age from './Age';
-import mascotImg from '../assets/images/logo.png'; // Use logo as mascot, or replace with mascot image
+import mascotImg from '../assets/images/logo.png';
 
 import LanguageSelector from './LanguageSelector';
 import { clubApi, ClubData } from '../services/api';
@@ -35,7 +35,7 @@ import ProgressionMap from './ProgressionMap';
 import LanguageClub from './LanguageClub';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import LoginPage from './LoginPage';
-import { Dashboard } from '@mui/icons-material';
+import { Dashboard as DashboardIcon } from '@mui/icons-material';
 
 // Duolingo color palette
 const DUOLINGO_COLORS = {
@@ -1281,8 +1281,6 @@ function AppContent() {
     navigate('/login');
     return null;
   }
-
- 
 
   // Main dashboard layout with Duolingo styling
   return (
