@@ -798,6 +798,33 @@ const LoginPage: React.FC = () => {
           box-shadow: 0 2px 0 #1899d6 !important;
         }
         
+        /* Login link styles */
+        .duo-login-link {
+          color: #1cb0f6;
+          cursor: pointer;
+          text-decoration: none;
+          font-weight: 600;
+          transition: color 0.2s;
+          margin-top: 4px;
+          display: inline-block;
+        }
+        
+        .duo-login-link:hover {
+          color: #1899d6;
+          text-decoration: underline;
+        }
+        
+        /* Dark theme overrides */
+        body.dark .duo-login-link,
+        .dark .duo-login-link {
+          color: #58cc02;
+        }
+        
+        body.dark .duo-login-link:hover,
+        .dark .duo-login-link:hover {
+          color: #46a302;
+        }
+        
         body:not(.dark) .duo-login-btn-secondary,
         .duo-login-btn-secondary,
         .duo-login-bg .duo-login-btn-secondary {
