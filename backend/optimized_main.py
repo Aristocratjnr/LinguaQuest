@@ -14,7 +14,7 @@ import json
 import threading
 import tempfile
 import re
-from typing import Dict, Optional, Any
+from typing import Dict, Optional, Any, AsyncGenerator
 
 # Set default encoding to UTF-8 for Windows compatibility
 if sys.platform.startswith('win'):
@@ -543,6 +543,12 @@ def get_scenario_v1(req: ScenarioRequest):
 #         print(f"Club fetch error: {e}")
 #         raise HTTPException(status_code=500, detail="Failed to fetch club information")
 
+# Legacy route for backward compatibility
+@app.post("/translate", response_model=TranslationResponse)
+async def legacy_translate_text(req: TranslationRequest):
+    """Legacy translate endpoint for backward compatibility"""
+    return await translate_text(req)
+
 @app.post("/api/v1/translate", response_model=TranslationResponse)
 async def translate_text(req: TranslationRequest):
     """Translate text using lightweight methods with AIService fallback"""
@@ -663,6 +669,12 @@ async def evaluate_argument(req: EvaluateRequest):
 from fastapi.responses import StreamingResponse
 import asyncio
 
+
+# Legacy route for backward compatibility
+@app.post("/dialogue", response_model=None)
+async def legacy_dialogue_stream_endpoint(req: DialogueRequest):
+    """Legacy dialogue endpoint for backward compatibility"""
+    return StreamingResponse(dialogue_stream_generator(req), media_type="text/event-stream")
 
 @app.post("/api/v1/dialogue", response_model=None)
 async def dialogue_stream_endpoint(req: DialogueRequest):
