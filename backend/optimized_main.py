@@ -14,7 +14,7 @@ import json
 import threading
 import tempfile
 import re
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 
 # Set default encoding to UTF-8 for Windows compatibility
 if sys.platform.startswith('win'):
@@ -32,6 +32,9 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import requests
 from urllib.parse import quote
+
+# AI Service
+from services.ai_service import AIService
 
 # Database imports
 from sqlalchemy.orm import Session
@@ -271,6 +274,7 @@ class TranslationRequest(BaseModel):
 
 class TranslationResponse(BaseModel):
     translated_text: str
+    details: Optional[Dict[str, Any]] = None
 
 class EvaluateRequest(BaseModel):
     argument: str
@@ -540,43 +544,119 @@ def get_scenario_v1(req: ScenarioRequest):
 #         raise HTTPException(status_code=500, detail="Failed to fetch club information")
 
 @app.post("/api/v1/translate", response_model=TranslationResponse)
-def translate_text(req: TranslationRequest):
-    """Translate text using lightweight methods"""
+async def translate_text(req: TranslationRequest):
+    """Translate text using lightweight methods with AIService fallback"""
     try:
+        # First try the primary translation method
         translated = libre_translate(req.text, req.src_lang, req.tgt_lang)
+        
+        # If the translation failed or returned an error message, try AIService
+        if translated.startswith("[") and "error" in translated.lower():
+            raise Exception("Primary translation service returned an error")
+            
         return TranslationResponse(translated_text=translated)
+        
     except Exception as e:
-        error_msg = f"Translation error: {str(e)}"
-        print(error_msg)
-        return TranslationResponse(translated_text=error_msg)
+        print(f"Primary translation failed, trying AIService fallback: {e}")
+        try:
+            # Try AIService as fallback
+            ai_service = AIService()
+            
+            # Format the prompt for translation
+            messages = [
+                {
+                    "role": "system", 
+                    "content": f"You are a professional translator. Translate the following text from {req.src_lang.upper()} to {req.tgt_lang.upper()}. "
+                              f"Return only the translated text with no additional commentary or formatting."
+                },
+                {
+                    "role": "user", 
+                    "content": req.text
+                }
+            ]
+            
+            # Get translation from AI service
+            result = await ai_service.generate_response(
+                messages=messages,
+                temperature=0.3,  # Lower temperature for more consistent translations
+                max_tokens=1000
+            )
+            
+            if result.get('success', False):
+                translated = result['response'].strip()
+                # Remove any potential quotes or brackets from the response
+                translated = translated.strip('"\'[]')
+                return TranslationResponse(
+                    translated_text=translated,
+                    details={"source": "ai_service_fallback"}
+                )
+            else:
+                raise Exception("AIService translation failed")
+                
+        except Exception as ai_error:
+            print(f"AIService translation fallback failed: {ai_error}")
+            # Final fallback - return the original text with an error message
+            return TranslationResponse(
+                translated_text=f"[Translation Error] {req.text}",
+                details={
+                    "error": str(ai_error),
+                    "source": "fallback"
+                }
+            )
 
 
 @app.post("/api/v1/evaluate", response_model=EvaluateResponse)
-def evaluate_argument(req: EvaluateRequest):
-    """Evaluate argument using enhanced evaluator from simple_nlp_services"""
+async def evaluate_argument(req: EvaluateRequest):
+    """Evaluate argument using AIService with fallback to simple_nlp_services"""
     try:
-        argument_evaluator = get_argument_evaluator()
-        if argument_evaluator is None:
-            raise Exception("Argument evaluator unavailable")
-        # Use topic as 'persuasive argument' for now
-        eval_result = argument_evaluator.evaluate_argument(
+        # Try AIService first
+        ai_service = AIService()
+        evaluation = await ai_service.evaluate_argument(
             argument=req.argument,
-            topic="persuasive argument",
+            scenario="persuasive argument",
             tone=req.tone
         )
-        score = eval_result.get('score', 0)
-        persuaded = eval_result.get('persuaded', False)
-        feedback = eval_result.get('feedback', [])
-        # Normalize to 0-10 scale for frontend display
-        normalized_score = max(0, min(10, round(score / 10)))
+        
+        if evaluation.get('success', False):
+            scores = evaluation.get('evaluation', {})
+            return EvaluateResponse(
+                persuaded=scores.get('is_persuasive', False),
+                feedback=scores.get('explanation', "No detailed feedback available."),
+                score=int(scores.get('overall_score', 5))
+            )
+        
+        # Fallback to simple evaluator if AIService fails
+        argument_evaluator = get_argument_evaluator()
+        if argument_evaluator is not None:
+            eval_result = argument_evaluator.evaluate_argument(
+                argument=req.argument,
+                topic="persuasive argument",
+                tone=req.tone
+            )
+            score = eval_result.get('score', 0)
+            persuaded = eval_result.get('persuaded', False)
+            feedback = eval_result.get('feedback', [])
+            normalized_score = max(0, min(10, round(score / 10)))
+            return EvaluateResponse(
+                persuaded=persuaded,
+                feedback=" ".join(feedback) if isinstance(feedback, list) else str(feedback),
+                score=normalized_score
+            )
+        
+        # Final fallback if both methods fail
         return EvaluateResponse(
-            persuaded=persuaded,
-            feedback=" ".join(feedback) if isinstance(feedback, list) else str(feedback),
-            score=normalized_score
+            persuaded=False,
+            feedback="Evaluation service is currently unavailable. Please try again later.",
+            score=0
         )
+        
     except Exception as e:
         print(f"Evaluation error: {e}")
-        return EvaluateResponse(persuaded=False, feedback="Evaluation error.", score=0)
+        return EvaluateResponse(
+            persuaded=False, 
+            feedback=f"Evaluation error: {str(e)}", 
+            score=0
+        )
 
 
 # Real-time streaming dialogue endpoint
@@ -586,60 +666,94 @@ import asyncio
 
 @app.post("/api/v1/dialogue", response_model=None)
 async def dialogue_stream_endpoint(req: DialogueRequest):
-    """Real-time streaming dialogue endpoint using enhanced conversational AI"""
+    """Real-time streaming dialogue endpoint using AIService with fallback"""
     try:
-        conversational_ai = get_conversational_ai()
-        argument_evaluator = get_argument_evaluator()
-        if conversational_ai is None or argument_evaluator is None:
-            raise Exception("AI or argument evaluator unavailable")
+        ai_service = AIService()
         context = [f"Scenario: {req.scenario}"]
+        
+        # Try AIService first for generating response
+        ai_response = ""
+        new_stance = req.ai_stance
+        reasoning = ""
+        
         # Generate AI response
-        ai_response = conversational_ai.generate_response(
-            user_input=req.user_argument,
-            context=context,
-            personality="neutral",
-            stance=req.ai_stance
+        messages = [
+            {"role": "system", "content": f"You are having a debate about: {req.scenario}. Your current stance is: {req.ai_stance}."},
+            {"role": "user", "content": req.user_argument}
+        ]
+        
+        ai_result = await ai_service.generate_response(
+            messages=messages,
+            temperature=0.7,
+            max_tokens=200
         )
-        # Evaluate argument to determine new stance
-        eval_result = argument_evaluator.evaluate_argument(
-            argument=req.user_argument,
-            topic=req.scenario,
-            tone="neutral"
-        )
-        score = eval_result.get('score', 0)
-        current_stance = req.ai_stance
-        # Stance progression logic
-        if score >= 75:
-            if current_stance == 'disagree':
-                new_stance = 'neutral'
-            elif current_stance == 'neutral':
-                new_stance = 'agree'
-            else:
-                new_stance = 'agree'
-        elif score >= 50:
-            if current_stance == 'disagree':
-                new_stance = 'neutral'
-            else:
-                new_stance = current_stance
+        
+        if ai_result.get('success', False):
+            ai_response = ai_result['response']
+            
+            # Evaluate argument for stance progression using AIService
+            eval_result = await ai_service.evaluate_argument(
+                argument=req.user_argument,
+                scenario=req.scenario,
+                tone="neutral"
+            )
+            
+            if eval_result.get('success', False):
+                scores = eval_result.get('evaluation', {})
+                score = scores.get('overall_score', 50)  # Default to neutral
+                current_stance = req.ai_stance
+                
+                # Enhanced stance progression logic
+                if score >= 75:
+                    if current_stance == 'disagree':
+                        new_stance = 'neutral'
+                        reasoning = "The argument was quite persuasive, so I'm moving towards a more neutral stance."
+                    elif current_stance == 'neutral':
+                        new_stance = 'agree'
+                        reasoning = "The argument was very persuasive, so I now agree with your point."
+                elif score >= 50:
+                    if current_stance == 'disagree':
+                        new_stance = 'neutral'
+                        reasoning = "The argument had some good points, so I'm moving towards a more neutral stance."
+                    else:
+                        new_stance = current_stance
+                        reasoning = "The argument was reasonable but not convincing enough to change my stance."
+                else:
+                    if current_stance == 'agree':
+                        new_stance = 'neutral'
+                        reasoning = "The argument wasn't very strong, so I'm moving back to a more neutral position."
+                    else:
+                        new_stance = current_stance
+                        reasoning = "The argument wasn't convincing enough to change my stance."
         else:
-            if current_stance == 'agree':
-                new_stance = 'neutral'
+            # Fallback to simple conversational AI
+            conversational_ai = get_conversational_ai()
+            if conversational_ai is not None:
+                ai_response = conversational_ai.generate_response(
+                    user_input=req.user_argument,
+                    context=context,
+                    personality="neutral",
+                    stance=req.ai_stance
+                )
+                new_stance = req.ai_stance  # Keep same stance in fallback mode
+                reasoning = "Using fallback response system"
             else:
-                new_stance = current_stance
-
-        reasoning = "Argument evaluated for stance progression"
+                ai_response = "I'm having trouble generating a response right now. Could you rephrase or try again later?"
+                new_stance = req.ai_stance
+                reasoning = "Service unavailable"
 
         async def word_stream():
             for word in ai_response.split():
                 yield word + " "
-                await asyncio.sleep(0.12)
+                await asyncio.sleep(0.1)  # Slightly faster than before
             yield f"\n[STANCE]: {new_stance}\n[REASONING]: {reasoning}"
 
         return StreamingResponse(word_stream(), media_type="text/plain")
+        
     except Exception as e:
         print(f"Dialogue streaming error: {e}")
         async def error_stream():
-            yield "I'm having trouble responding right now."
+            yield "I'm having trouble responding right now. Please try again later."
         return StreamingResponse(error_stream(), media_type="text/plain")
 
 @app.post("/api/v1/sentiment", response_model=SentimentResponse)
