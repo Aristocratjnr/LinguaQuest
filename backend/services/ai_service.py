@@ -1,5 +1,5 @@
 import os
-import openai
+import httpx
 from typing import Dict, List, Optional, Any
 import logging
 from dotenv import load_dotenv
@@ -13,27 +13,36 @@ load_dotenv()
 
 class AIService:
     """
-    A service for handling AI-related functionality using the OpenAI API.
+    A service for handling AI-related functionality using the OpenRouter API.
     """
     
-    # Default model to use
-    DEFAULT_MODEL = "gpt-3.5-turbo"
+    # Default model to use (OpenRouter model identifier)
+    DEFAULT_MODEL = "openai/gpt-3.5-turbo"
+    BASE_URL = "https://openrouter.ai/api/v1"
     
     def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
         """
         Initialize the AI service.
         
         Args:
-            api_key: Optional OpenAI API key (will use OPENAI_API_KEY from environment if not provided)
-            model: Optional model name to use (defaults to gpt-3.5-turbo)
+            api_key: Optional OpenRouter API key (will use OPENROUTER_API_KEY from environment if not provided)
+            model: Optional model name to use (defaults to openai/gpt-3.5-turbo)
         """
-        self.api_key = api_key or os.getenv('OPENAI_API_KEY')
+        self.api_key = api_key or os.getenv('OPENROUTER_API_KEY')
         self.model = model or self.DEFAULT_MODEL
         
         if not self.api_key:
-            logger.warning("No OpenAI API key provided. Some features may not work.")
-        else:
-            openai.api_key = self.api_key
+            logger.warning("No OpenRouter API key provided. Some features may not work.")
+        
+        # Initialize HTTP client
+        self.client = httpx.AsyncClient(
+            base_url=self.BASE_URL,
+            headers={
+                "Authorization": f"Bearer {self.api_key}",
+                "HTTP-Referer": os.getenv('SITE_URL', 'https://linguaquest.onrender.com/'),
+                "X-Title": "LinguaQuest"
+            } if self.api_key else {}
+        )
     
     async def generate_response(
         self,
@@ -44,7 +53,7 @@ class AIService:
         **kwargs
     ) -> Dict[str, Any]:
         """
-        Generate a response using the OpenAI Chat API.
+        Generate a response using the OpenRouter API.
         
         Args:
             messages: List of message dictionaries with 'role' and 'content' keys
@@ -59,25 +68,33 @@ class AIService:
         if not self.api_key:
             return self._fallback_response(messages)
         
+        target_model = model or self.model
+        
         try:
-            response = await openai.ChatCompletion.acreate(
-                model=model or self.model,
-                messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens,
+            payload = {
+                "model": target_model,
+                "messages": messages,
+                "temperature": temperature,
+                "max_tokens": max_tokens,
                 **kwargs
-            )
+            }
+            
+            response = await self.client.post("/chat/completions", json=payload)
+            response.raise_for_status()
+            response_data = response.json()
             
             return {
                 'success': True,
-                'response': response.choices[0].message['content'].strip(),
-                'model': response.model,
-                'usage': dict(response.usage),
-                'finish_reason': response.choices[0].finish_reason
+                'response': response_data['choices'][0]['message']['content'].strip(),
+                'model': response_data['model'],
+                'usage': response_data.get('usage', {}),
+                'finish_reason': response_data['choices'][0].get('finish_reason', 'stop')
             }
             
         except Exception as e:
-            error_msg = f"AI API request failed: {str(e)}"
+            error_msg = f"OpenRouter API request failed: {str(e)}"
+            if hasattr(e, 'response') and hasattr(e.response, 'text'):
+                error_msg += f" - {e.response.text}"
             logger.error(error_msg)
             return self._fallback_response(messages, error=error_msg)
     
@@ -191,7 +208,7 @@ class AIService:
         if 'hello' in last_message.lower() or 'hi' in last_message.lower():
             response = "Hello! How can I help you today?"
         elif '?' in last_message:
-            response = "I'm sorry, I'm having trouble processing your request right now. Please try again later."
+            response = "I'm currently experiencing some technical difficulties. Please try again in a moment."
         else:
             response = "I understand. Please tell me more."
         
@@ -199,9 +216,13 @@ class AIService:
             'success': False,
             'response': response,
             'model': 'fallback',
-            'error': error or 'Using fallback response',
+            'error': error or 'Using fallback response - Check your OpenRouter API key and internet connection',
             'is_fallback': True
         }
+        
+    async def close(self):
+        """Close the HTTP client when done."""
+        await self.client.aclose()
 
 
 # Singleton instance

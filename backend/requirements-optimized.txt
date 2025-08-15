@@ -8,4 +8,4 @@ vaderSentiment==3.3.2
 gTTS==2.5.4
 SQLAlchemy==2.0.41
 alembic==1.16.4
-openai==0.28.0
+httpx==0.25.0
