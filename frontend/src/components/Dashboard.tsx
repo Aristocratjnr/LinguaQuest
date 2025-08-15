@@ -138,9 +138,18 @@ function AppContent() {
 
   // Global font styles for the dashboard
   const fontStyles = {
-    regular: { fontWeight: 300 }, // Thin text for regular content
-    bold: { fontWeight: 600 },    // Bold text for emphasis
-    heading: { fontWeight: 700 }  // Extra bold for headings
+    regular: { 
+      fontWeight: 300,
+      color: theme === 'dark' ? '#e2e8f0' : 'rgba(0, 0, 0, 0.9)'
+    }, // Thin text for regular content
+    bold: {
+      fontWeight: 600,
+      color: theme === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.9)'
+    },    // Bold text for emphasis
+    heading: {
+      fontWeight: 700,
+      color: theme === 'dark' ? '#ffffff' : 'rgba(0, 0, 0, 0.9)'
+    }  // Extra bold for headings
   };
 
   // Apply global font styles
@@ -155,18 +164,52 @@ function AppContent() {
 
    
       body, p, div, span, label, a, li, td, th, input, textarea, button {
-        font-weight: 300; 
-        color: rgba(0, 0, 0, 0.9); 
+        font-weight: 300;
+        color: var(--text-color, rgba(0, 0, 0, 0.9));
+      }
+      
+      /* Dark mode overrides */
+      .dark body,
+      .dark p,
+      .dark div,
+      .dark span,
+      .dark label,
+      .dark a,
+      .dark li,
+      .dark td,
+      .dark th,
+      .dark input,
+      .dark textarea,
+      .dark button {
+        color: #e2e8f0;
       }
 
       
       h1, h2, h3, h4, h5, h6, strong, b, .bold {
         font-weight: 600;
+        color: var(--heading-color, rgba(0, 0, 0, 0.9));
       }
       h1, h2, h3, h4, h5, h6, strong, b, .bold, 
       .btn-primary, .nav-link.active, [class*="heading"], 
       [class*="title"], .navbar-brand {
         font-weight: 600;
+        color: var(--heading-color, rgba(0, 0, 0, 0.9));
+      }
+      
+      /* Dark mode overrides for headings */
+      .dark h1,
+      .dark h2,
+      .dark h3,
+      .dark h4,
+      .dark h5,
+      .dark h6,
+      .dark strong,
+      .dark b,
+      .dark .bold,
+      .dark .btn-primary,
+      .dark [class*="heading"],
+      .dark [class*="title"] {
+        color: #ffffff;
       }
 
      
@@ -194,13 +237,36 @@ function AppContent() {
 
      
       input, textarea, select {
-        font-weight: 400; 
+        font-weight: 400;
+        background-color: var(--input-bg, #ffffff);
+        color: var(--input-text, #000000);
+        border: 1px solid var(--input-border, #ced4da);
+      }
+      
+      /* Dark mode form elements */
+      .dark input,
+      .dark textarea,
+      .dark select {
+        background-color: #2d3748;
+        color: #e2e8f0;
+        border-color: #4a5568;
+      }
+      
+      .dark input::placeholder,
+      .dark textarea::placeholder {
+        color: #a0aec0;
       }
 
       
       small, .small {
         font-weight: 400;
         font-size: 0.875rem;
+        color: var(--text-muted, #6c757d);
+      }
+      
+      .dark small,
+      .dark .small {
+        color: #a0aec0;
       }
     `;
     document.head.appendChild(styleElement);
@@ -1284,19 +1350,22 @@ function AppContent() {
 
   // Main dashboard layout with Duolingo styling
   return (
-    <div className="app-container" style={{ 
+    <div className={`app-container ${theme === 'dark' ? 'dark' : ''}`} style={{ 
       minHeight: '100vh',
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      backgroundColor: theme === 'dark' ? '#1a202c' : '#ffffff',
+      color: theme === 'dark' ? '#e2e8f0' : '#1a202c'
     }}>
       {/* Header - Duolingo style */}
       <header style={{
-        background: 'var(--duo-card)',
+        background: theme === 'dark' ? '#1a202c' : 'var(--duo-card)',
         padding: 'clamp(8px, 2vw, 16px)',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+        boxShadow: theme === 'dark' ? '0 2px 4px rgba(0,0,0,0.2)' : '0 2px 4px rgba(0,0,0,0.05)',
         position: 'relative',
         top: 0,
-        zIndex: 100
+        zIndex: 100,
+        borderBottom: theme === 'dark' ? '1px solid #2d3748' : '1px solid #e2e8f0'
       }}>
         <div style={{
           display: 'flex',
@@ -1697,7 +1766,7 @@ function AppContent() {
               background: '#58cc02',
               color: 'white',
               border: 'none',
-              ...fontStyles.heading,
+              fontWeight: 700,
               fontSize: 'clamp(0.8rem, 2.5vw, 0.95rem)',
               cursor: 'pointer',
               boxShadow: '0 2px 0 #3caa3c',
@@ -2660,7 +2729,6 @@ function AppContent() {
                 borderRadius: '16px',
                 background: 'rgba(108, 122, 137, 0.1)',
                 border: '1px solid rgba(108, 122, 137, 0.2)',
-                color: '#6c757d',
                 fontSize: '14px',
                 ...fontStyles.regular, // 应用细体样式
                 cursor: 'pointer',

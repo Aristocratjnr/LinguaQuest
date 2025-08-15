@@ -674,7 +674,40 @@ import asyncio
 @app.post("/dialogue", response_model=None)
 async def legacy_dialogue_stream_endpoint(req: DialogueRequest):
     """Legacy dialogue endpoint for backward compatibility"""
-    return StreamingResponse(dialogue_stream_generator(req), media_type="text/event-stream")
+    try:
+        ai_service = AIService()
+        
+        # Generate AI response
+        messages = [
+            {"role": "system", "content": f"You are having a debate about: {req.scenario}. Your current stance is: {req.ai_stance}."},
+            {"role": "user", "content": req.user_argument}
+        ]
+        
+        ai_result = await ai_service.generate_response(
+            messages=messages,
+            temperature=0.7,
+            max_tokens=200
+        )
+        
+        if ai_result.get('success', False):
+            ai_response = ai_result['response']
+            new_stance = req.ai_stance  # Keep same stance for legacy endpoint
+            reasoning = "Using legacy endpoint with simplified response"
+            
+            async def word_stream():
+                yield ai_response
+                
+            return StreamingResponse(word_stream(), media_type="text/plain")
+        else:
+            async def error_stream():
+                yield "I'm having trouble responding right now. Please try again later."
+            return StreamingResponse(error_stream(), media_type="text/plain")
+            
+    except Exception as e:
+        print(f"Legacy dialogue error: {e}")
+        async def error_stream():
+            yield "I'm having trouble responding right now. Please try again later."
+        return StreamingResponse(error_stream(), media_type="text/plain")
 
 @app.post("/api/v1/dialogue", response_model=None)
 async def dialogue_stream_endpoint(req: DialogueRequest):
